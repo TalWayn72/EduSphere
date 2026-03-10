@@ -44,6 +44,12 @@
     "leave": "Leave anyway",
     "stay": "Stay on page"
   },
+  "certificates": {
+    "title": "Certificates",
+    "description": "Your earned course completion certificates.",
+    "errorLoading": "Failed to load certificates. Please try again later.",
+    "empty": "No certificates yet — complete a course to earn one!"
+  },
   "profilePage": {
     "accountDetails": "Account Details",
     "permissions": "Permissions",

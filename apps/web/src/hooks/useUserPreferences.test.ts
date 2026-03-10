@@ -188,10 +188,10 @@ describe('useUserPreferences', () => {
 
   // ── BUG-045: setLocale error handling ────────────────────────────────
 
-  it('BUG-045: setLocale reverts localStorage and throws when DB mutation fails', async () => {
+  it('BUG-045: setLocale keeps localStorage change and throws when DB mutation fails', async () => {
     setupMocks({ dbLocale: 'en', i18nLanguage: 'en' });
 
-    // Override mutation to return a GraphQL error (use static import — same module instance)
+    // Override mutation to return a GraphQL error
     const fakeError = { message: 'Network error', graphQLErrors: [], networkError: null };
     mockUpdatePreferences.mockResolvedValue({ error: fakeError });
     vi.mocked(urql.useMutation).mockReturnValue([
@@ -216,10 +216,11 @@ describe('useUserPreferences', () => {
     // setLocale must have thrown
     expect(thrownError).toBeDefined();
 
-    // Revert: localStorage must NOT be 'es' after failure (reverted to prev 'en')
-    expect(localStorage.getItem('edusphere_locale')).not.toBe('es');
+    // localStorage IS kept as 'es' even after failure (new behavior: don't revert)
+    // This ensures the user's preference persists locally even when backend is down.
+    expect(localStorage.getItem('edusphere_locale')).toBe('es');
 
-    // Error must be logged — console.error is called with 2 args
+    // Error must be logged — console.error is called with a message about retrying
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('[useUserPreferences]'),
       expect.stringContaining('Network error')

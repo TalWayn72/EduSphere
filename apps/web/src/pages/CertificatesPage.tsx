@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { Award } from 'lucide-react';
 import { Layout } from '@/components/Layout';
@@ -38,6 +39,7 @@ function CertSkeleton() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function CertificatesPage() {
+  const { t } = useTranslation('common');
   const [mounted, setMounted] = useState(false);
   const [activeCertId, setActiveCertId] = useState<string | null>(null);
 
@@ -71,17 +73,17 @@ export function CertificatesPage() {
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold" data-testid="page-heading">
-            Certificates
+            {t('certificates.title', 'Certificates')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Your earned course completion certificates.
+            {t('certificates.description', 'Your earned course completion certificates.')}
           </p>
         </div>
 
         {error && (
           <Card className="p-4 border-destructive/30 bg-destructive/5">
             <p className="text-sm text-destructive" data-testid="error-message">
-              Failed to load certificates. Please try again later.
+              {t('certificates.errorLoading', 'Failed to load certificates. Please try again later.')}
             </p>
           </Card>
         )}
@@ -104,7 +106,7 @@ export function CertificatesPage() {
           >
             <Award className="h-16 w-16 text-muted-foreground/30 mb-4" />
             <p className="text-base font-medium text-muted-foreground">
-              No certificates yet — complete a course to earn one!
+              {t('certificates.empty', 'No certificates yet — complete a course to earn one!')}
             </p>
           </div>
         )}

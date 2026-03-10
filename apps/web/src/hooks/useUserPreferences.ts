@@ -117,17 +117,13 @@ export function useUserPreferences(): UseUserPreferencesReturn {
       const result = await updatePreferences({ input: { locale } });
 
       if (result.error) {
-        // Mutation failed: revert the optimistic update
-        const prevLocale = meResult.data?.me?.preferences?.locale as SupportedLocale | undefined;
-        const fallback = prevLocale ?? (localStorage.getItem('edusphere_locale') as SupportedLocale | null) ?? 'en' as SupportedLocale;
-        void i18n.changeLanguage(fallback);
-        localStorage.setItem('edusphere_locale', fallback);
-        applyDocumentDirection(fallback);
+        // DB mutation failed — keep the localStorage/i18n change (user can see it)
+        // but log the error and rethrow so SettingsPage can show a toast.
+        // The locale stays in localStorage and will be re-synced to DB when backend recovers.
         console.error(
-          `[useUserPreferences] Failed to save locale "${locale}" to DB:`,
+          `[useUserPreferences] Failed to persist locale "${locale}" to DB (will retry on next session):`,
           result.error.message
         );
-        // Re-throw so SettingsPage can show an error toast
         throw result.error;
       }
     },

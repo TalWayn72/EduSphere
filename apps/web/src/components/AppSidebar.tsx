@@ -93,6 +93,10 @@ export function AppSidebar() {
     }
   }, [collapsed]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--sidebar-w', collapsed ? '64px' : '240px');
+  }, [collapsed]);
+
   const toggleCollapsed = () => setCollapsed((prev) => !prev);
 
   const toggleTheme = () => {
@@ -117,7 +121,21 @@ export function AppSidebar() {
           className="h-7 w-7 shrink-0 object-contain"
           data-testid="sidebar-logo-icon"
           aria-hidden
+          onError={(e) => {
+            const img = e.currentTarget;
+            img.style.display = 'none';
+            const fallback = img.nextElementSibling as HTMLElement | null;
+            if (fallback) fallback.style.display = 'flex';
+          }}
         />
+        <div
+          className="h-7 w-7 shrink-0 rounded bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold"
+          aria-hidden
+          style={{ display: 'none' }}
+          data-testid="sidebar-logo-fallback"
+        >
+          {(branding.organizationName?.[0] ?? 'E').toUpperCase()}
+        </div>
         {!collapsed && (
           <span className="text-lg font-bold text-foreground truncate" data-testid="sidebar-brand-name">
             {branding.organizationName}

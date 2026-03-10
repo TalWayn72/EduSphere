@@ -217,8 +217,8 @@ describe('SrsReviewPage', () => {
     });
     renderPage();
     expect(screen.getByTestId('error-state')).toBeInTheDocument();
-    // error.message is rendered verbatim (not translated)
-    expect(screen.getByText('Network error')).toBeInTheDocument();
+    // Raw error.message must NOT be shown — only the user-friendly i18n message
+    expect(screen.queryByText('Network error')).not.toBeInTheDocument();
   });
 
   it('wraps content in Layout', () => {

@@ -34,5 +34,13 @@
   "gamification": "Gamification",
   "certificates": "Certificates",
   "srsReview": "SRS Review",
-  "quizBuilder": "Quiz Builder"
+  "quizBuilder": "Quiz Builder",
+  "skillPaths": "Skill Paths",
+  "socialFeed": "Social Feed",
+  "findPeople": "Find People",
+  "peerReview": "Peer Review",
+  "assessments": "Assessments",
+  "groupChallenges": "Group Challenges",
+  "peerMatching": "Peer Matching",
+  "cohortInsights": "Cohort Insights"
 }

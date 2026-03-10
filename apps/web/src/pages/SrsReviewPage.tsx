@@ -58,7 +58,6 @@ export function SrsReviewPage() {
           <p className="text-destructive font-medium">
             {t('errorLoading', 'Failed to load review cards')}
           </p>
-          <p className="text-sm text-muted-foreground">{error.message}</p>
           <Button asChild variant="outline">
             <Link to="/dashboard">
               {t('backToDashboard', 'Back to Dashboard')}

@@ -1,9 +1,48 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 10 מרץ 2026 (Phase 47 ✅ COMPLETE — AI Chavruta Partner + Mentor Path + Cohort Insights + Graph Credentials)
+**תאריך עדכון:** 11 מרץ 2026 (BUG-058..062 UI/UX Bugs — nav keys, layout offset, logo, SRS error, language persistence ✅ FIXED)
 **מצב פרויקט:** ✅ **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅**
-**בדיקות:** Security: **1,031 tests** | Web: **4,098** (337 files) | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 582 + annotation 144 + collab 180 + core 719+) | סה"כ: **~6,700+ tests** | TypeScript: **0 errors**
+**בדיקות:** Security: **1,031 tests** | Web: **4,103** (337 files) | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 582 + annotation 144 + collab 180 + core 719+) | סה"כ: **~6,710+ tests** | TypeScript: **0 errors**
+
+---
+
+## BUG-058..062-UI-REGRESSION | ✅ Fixed | HIGH
+**UI/UX Bug Batch — nav keys, layout, logo, SRS error, language persistence**
+**Date:** 2026-03-11
+**Severity:** 🔴 Critical (visible to all users)
+
+### BUG-058: Missing nav translation keys → raw key names shown in sidebar
+**Problem:** `skillPaths`, `socialFeed`, `findPeople`, `peerReview`, `assessments`, `groupChallenges`, `peerMatching`, `cohortInsights` were missing from `en/nav.json` and `he/nav.json`. Sidebar displayed raw key strings (e.g., "skillPaths") instead of human-readable labels.
+**Fix:** Added all 8 missing keys to both `packages/i18n/src/locales/en/nav.json` and `packages/i18n/src/locales/he/nav.json`.
+**Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-001 suite — asserts raw keys never appear in sidebar.
+
+### BUG-059: Layout main content overlaps expanded sidebar
+**Problem:** `Layout.tsx` always applied `ml-16` (64px) to main content, even when sidebar was expanded to `w-60` (240px). Content appeared behind the sidebar at 100% zoom.
+**Fix:** `AppSidebar.tsx` now sets `--sidebar-w` CSS variable (64px/240px) on `document.documentElement` via useEffect. `Layout.tsx` uses `style={{ marginLeft: 'var(--sidebar-w, 64px)' }}` instead of hardcoded `ml-16`.
+**Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-003 suite — asserts main content x >= sidebar right edge.
+
+### BUG-060: Logo not visible (default SVG missing)
+**Problem:** `DEFAULT_BRANDING.logoUrl` pointed to `/defaults/logo.svg` but the directory `apps/web/public/defaults/` didn't exist. Logo was a broken image.
+**Fix:** Created `apps/web/public/defaults/logo.svg` (simple "E" on blue square). Added `onError` handler to `AppSidebar` logo img that hides broken image and shows letter-based `data-testid="sidebar-logo-fallback"` div.
+**Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-002 suite — asserts logo img OR fallback is visible.
+
+### BUG-061: SRS Review page shows raw `[GraphQL] Unexpected error.` to users
+**Problem:** `SrsReviewPage.tsx` rendered `{error.message}` directly, exposing urql internal error strings.
+**Fix:** Removed the `<p>{error.message}</p>` line. Error state now shows only the i18n-translated friendly message.
+**Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-004 suite — asserts `[GraphQL] Unexpected error.` never in DOM. `SrsReviewPage.test.tsx` updated: `queryByText('Network error')` asserts NOT in document.
+
+### BUG-062: Language preference reverts after DB failure (backend down in dev)
+**Problem:** `useUserPreferences.setLocale()` was reverting localStorage AND i18next to previous locale when the GraphQL mutation failed. In dev mode (backend down), any language change was immediately lost.
+**Fix:** Removed the revert block. localStorage and i18n keep the new locale even when DB mutation fails. Error is logged and rethrown for UI toast. The locale will be synced to DB via `GlobalLocaleSync` on next session when backend is available.
+**Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-006 suite — asserts localStorage survives reload. `useUserPreferences.test.ts` BUG-045 updated to verify localStorage IS kept as new value after DB failure.
+
+### Additional fixes in this batch:
+- `CertificatesPage.tsx`: Replaced 4 hardcoded English strings with `useTranslation('common')` + `t()` calls
+- `packages/i18n/src/locales/{en,he}/common.json`: Added `certificates` i18n section
+- **New E2E files:** `apps/web/e2e/course-lifecycle.spec.ts`, `apps/web/e2e/ui-bugs-regression.spec.ts`
+- **Unit tests updated:** `useUserPreferences.test.ts`, `SrsReviewPage.test.tsx`
+- **Tests:** Web 4,103/4,103 ✅ | TypeScript: 0 errors ✅
 
 ---
 
@@ -465,6 +504,53 @@ After adding Layout to the 8 pages, their unit tests required mock updates:
 ### Why E2E tests didn't catch this before
 
 Zero existing E2E tests checked for sidebar presence. Tests only checked `header`, `nav` links, and `main` content — none verified `aside[data-testid="app-sidebar"]`.
+
+---
+
+## BUG-057 — "הירשם" enrollment button shown to already-enrolled user (recurring)
+
+**Status:** ✅ Fixed (2026-03-10)
+**Severity:** 🟡 Medium (UX regression — misleading button state)
+**Reported:** User reports enrolled in "נהר שלום - פנינים מאוצר הרש"ש" but "הירשם" button still clickable
+**Recurring:** Yes — same root cause found in two places (Wave 1 + Wave 2)
+
+### Root Cause
+
+**Wave 1 — `CourseDetailPage.tsx`:**
+React 19's `useOptimistic` reverts to its base state (`isEnrolled`) when `startTransition` ends.
+After `enrollMutation` succeeded, `MY_ENROLLMENTS_QUERY` urql cache was NOT invalidated, so `enrollData` remained stale (pre-enrollment). `isEnrolled` stayed `false` → `useOptimistic` reverted → button showed "הירשם" again.
+
+**Wave 2 — `CoursesDiscoveryPage.tsx`:**
+`toDisplayCourse()` hardcoded `enrolled: false` for every course. The page never fetched `MY_ENROLLMENTS_QUERY`, so enrolled courses showed "Enroll Free" instead of "Continue".
+
+**Wave 3 — `CourseList.tsx`:** ✅ Already correct. Used `reexecuteEnrollments({ requestPolicy: 'network-only' })` after mutation.
+
+### Fix
+
+**Round 1 — `CourseDetailPage.tsx`** ([apps/web/src/pages/CourseDetailPage.tsx](apps/web/src/pages/CourseDetailPage.tsx)):
+- Destructured `reexecuteEnrollments` from `useQuery(MY_ENROLLMENTS_QUERY)`
+- Added `enrolledLocal: boolean | null` state that pins new enrolled state immediately after mutation
+- Added `useEffect([enrollData])` to reset `enrolledLocal` once server data refetches
+- Added `handleEnrollSuccess` callback that: `setEnrolledLocal(!isEnrolled)` + `showToast(msg)` + `reexecuteEnrollments({ requestPolicy: 'network-only' })`
+- Pattern mirrors the correct implementation in `CourseList.tsx`
+
+**Round 2 — `CoursesDiscoveryPage.tsx`** ([apps/web/src/pages/CoursesDiscoveryPage.tsx](apps/web/src/pages/CoursesDiscoveryPage.tsx)):
+- Added `MY_ENROLLMENTS_QUERY` import and `useQuery` with `pause: !mounted`
+- Built `enrolledIds = useMemo(() => new Set(...), [enrollmentData])`
+- Passed `enrolled={enrolledIds.has(course.id)}` to each `CourseCard` (overrides the hardcoded `false`)
+
+### Tests Added
+- `CourseDetailPage.test.tsx`: 3 new regression tests
+  - `calls reexecuteEnrollments with network-only after successful enroll`
+  - `regression guard: Enroll button does NOT revert to "הירשם" after successful enrollment`
+  - `regression guard: Unenroll button does NOT revert to "בטל" after successful unenroll`
+- `CoursesDiscoveryPage.test.tsx`: 2 new regression tests
+  - `enrolled course shows "Continue" not "Enroll Free" (regression guard: enrolled:false hardcoded)`
+  - `no course shows "Continue" when myEnrollments is empty (non-enrolled user)`
+
+### Anti-Recurrence
+- `CourseDetailPage.test.tsx` ← guards against `useOptimistic` revert
+- `CoursesDiscoveryPage.test.tsx` ← guards against `enrolled: false` hardcode regression
 
 ---
 
