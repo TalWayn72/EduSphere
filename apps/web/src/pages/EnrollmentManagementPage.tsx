@@ -248,7 +248,7 @@ export function EnrollmentManagementPage() {
   }>({
     query: ADMIN_COURSE_ENROLLMENTS_QUERY,
     variables: { courseId: selectedCourseId },
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const courses = coursesResult.data?.courses ?? [];

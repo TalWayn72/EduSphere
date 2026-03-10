@@ -105,13 +105,13 @@ export function CourseAnalyticsPage() {
   const [{ data, fetching, error }] = useQuery<CourseAnalyticsResult>({
     query: COURSE_ANALYTICS_QUERY,
     variables: { courseId },
-    pause: true, // courseAnalytics not in live gateway (tier-3)
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const [{ data: riskData }] = useQuery<AtRiskResult>({
     query: AT_RISK_LEARNERS_QUERY,
     variables: { courseId },
-    pause: true, // atRiskLearners not in live gateway (tier-3)
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const [, resolveFlag] = useMutation(RESOLVE_AT_RISK_FLAG_MUTATION);

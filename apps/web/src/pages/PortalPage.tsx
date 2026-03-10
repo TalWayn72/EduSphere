@@ -38,7 +38,7 @@ export function PortalPage() {
   const navigate = useNavigate();
   const [{ data, fetching, error }] = useQuery({
     query: PUBLIC_PORTAL_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   useEffect(() => {

@@ -365,8 +365,10 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 43**     | SCORM 2004 Player, cmi5 AU Launcher, InstructorAnalyticsDashboard, MyProgressPage, Microlearning resolvers, AI Usage service, Expo SDK 55 upgrade | 3 days   | ✅ Complete    |
 | **Phase 44**     | Skills-Based Learning Paths DB schema (skills, skill_prerequisites, skill_paths, learner_skill_progress) + migration 0026 with RLS (SI-1 compliant) | 1 day    | ✅ Complete    |
 | **Phase 45**     | Social Learning Experience — Discussion Threads UI, Social Feed + Following wire-up, Peer Review (service + UI + IDOR guard), 360° Assessment UI + RadarChart, AI Discussion Insights (Ollama SEC-6), migration 0027, 4 E2E specs, 32 security assertions | 6 days   | ✅ Complete    |
+| **Phase 46**     | Group Challenges + KG Peer Matching — GroupChallengeService (NATS score events), PeerMatchingService (Apache AGE complementary skill gap), Leaderboard, CountdownTimer, migration 0028 | 2 days   | ✅ Complete    |
+| **Phase 47**     | AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials — ChavrutaPartnerMatchService (AGE + SQL), findMentorsByPathTopology (AGE Cypher STUDIED path), getCohortInsights (cohort_id), GraphGroundedCredentialService + issueGraphGroundedBadge, migration 0029 | 2 days   | ✅ Complete    |
 
-**Current Status:** Phases 1-45 complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 4,130+ tests passing across 330+ test files (web) + 1,160+ (subgraph-content) + 1,031+ (security). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** Phases 1-47 complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 7,635+ tests passing across 330+ test files (web) + 1,193+ (subgraph-content) + 1,060+ (security). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -466,7 +468,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **4,130+ tests passing** (330+ test files — core ~664, knowledge ~544, DB ~428, mobile ~218, i18n ~304, security ~1,031, contract ~88, Phase 39-45 additions)  |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **4,098+ tests passing** (330+ test files — core ~664, knowledge ~544, DB ~428, mobile ~218, i18n ~304, security ~1,060, contract ~88, Phase 39-47 additions)  |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |

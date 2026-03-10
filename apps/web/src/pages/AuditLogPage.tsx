@@ -48,7 +48,7 @@ export function AuditLogPage() {
       since: since || undefined,
       until: until || undefined,
     },
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   if (!role || !ADMIN_ROLES.has(role)) {

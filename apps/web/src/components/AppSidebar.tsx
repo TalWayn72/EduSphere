@@ -26,6 +26,7 @@ import {
   ClipboardList,
   Swords,
   UserCheck,
+  Lightbulb,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -60,6 +61,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/assessments', icon: ClipboardList, labelKey: 'assessments' },
   { to: '/challenges', icon: Swords, labelKey: 'groupChallenges' },
   { to: '/peer-matching', icon: UserCheck, labelKey: 'peerMatching' },
+  { to: '/cohort-insights', icon: Lightbulb, labelKey: 'cohortInsights' },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {

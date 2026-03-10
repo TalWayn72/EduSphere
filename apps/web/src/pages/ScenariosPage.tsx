@@ -56,7 +56,7 @@ export function ScenariosPage() {
     null
   );
 
-  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY, pause: true }); // scenarioTemplates not in live gateway
+  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY, pause: true }); // TODO(Phase-49): resolver not yet in supergraph — wire when available
 
   const scenarios: ScenarioTemplate[] =
     (result.data?.scenarioTemplates as ScenarioTemplate[] | undefined) ?? [];

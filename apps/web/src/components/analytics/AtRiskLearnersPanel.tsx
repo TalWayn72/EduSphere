@@ -35,7 +35,7 @@ export function AtRiskLearnersPanel({ courseId }: Props) {
   const [{ data, fetching }] = useQuery<AtRiskResult>({
     query: AT_RISK_LEARNERS_QUERY,
     variables: { courseId },
-    pause: true, // atRiskLearners not yet in live supergraph
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   if (fetching) {

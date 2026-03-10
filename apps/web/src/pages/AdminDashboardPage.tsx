@@ -55,7 +55,7 @@ export function AdminDashboardPage() {
 
   const [result] = useQuery<{ adminOverview: AdminOverviewData }>({
     query: ADMIN_OVERVIEW_QUERY,
-    pause: true, // adminOverview not in live gateway
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const quickLinks = useMemo(

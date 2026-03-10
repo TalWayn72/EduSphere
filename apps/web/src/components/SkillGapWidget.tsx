@@ -63,7 +63,7 @@ export function SkillGapWidget() {
 
   const [{ data: profilesData, fetching: profilesFetching }] = useQuery<{
     skillProfiles: SkillProfile[];
-  }>({ query: SKILL_PROFILES_QUERY, pause: true }); // skillProfiles not in live gateway
+  }>({ query: SKILL_PROFILES_QUERY, pause: true }); // TODO(Phase-49): resolver not yet in supergraph — wire when available
 
   const [{ data: reportData, fetching: reportFetching }] = useQuery<{
     skillGapAnalysis: SkillGapReport;

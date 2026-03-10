@@ -65,7 +65,7 @@ export function GamificationSettingsPage() {
 
   const [result, refetch] = useQuery<AdminBadgesResult>({
     query: ADMIN_BADGES_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [, createBadge] = useMutation(CREATE_BADGE_MUTATION);
   const [, updateBadge] = useMutation(UPDATE_BADGE_MUTATION);

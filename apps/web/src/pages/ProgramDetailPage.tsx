@@ -46,20 +46,20 @@ export function ProgramDetailPage(): React.ReactElement {
   const [programResult] = useQuery<{ program: CredentialProgram | null }>({
     query: PROGRAM_QUERY,
     variables: { id: id ?? '' },
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const [enrollmentsResult] = useQuery<{
     myProgramEnrollments: ProgramEnrollment[];
   }>({
     query: MY_PROGRAM_ENROLLMENTS_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const [progressResult] = useQuery<{ programProgress: ProgramProgress }>({
     query: PROGRAM_PROGRESS_QUERY,
     variables: { programId: id ?? '' },
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const [, enrollMutation] = useMutation(ENROLL_IN_PROGRAM_MUTATION);

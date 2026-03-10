@@ -58,7 +58,7 @@ export function BiExportSettingsPage() {
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [tokensResult, refetchTokens] = useQuery<{ biApiTokens: BiApiToken[] }>(
-    { query: BI_API_TOKENS_QUERY, pause: true }
+    { query: BI_API_TOKENS_QUERY, pause: true } // TODO(Phase-49): resolver not yet in supergraph — wire when available
   );
   const [, generateKey] = useMutation<{ generateBIApiKey: string }>(
     GENERATE_BI_API_KEY_MUTATION

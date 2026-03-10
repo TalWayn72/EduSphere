@@ -58,7 +58,7 @@ export function ComplianceReportsPage() {
 
   const [{ data, fetching, error }] = useQuery({
     query: COMPLIANCE_COURSES_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [{ fetching: generating }, generateReport] = useMutation(
     GENERATE_COMPLIANCE_REPORT_MUTATION

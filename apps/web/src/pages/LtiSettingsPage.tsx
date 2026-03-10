@@ -96,7 +96,7 @@ export function LtiSettingsPage() {
     ltiPlatforms: LtiPlatform[];
   }>({
     query: LTI_PLATFORMS_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   const [, registerPlatform] = useMutation(REGISTER_PLATFORM_MUTATION);

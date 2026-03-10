@@ -67,12 +67,12 @@ export function CrmSettingsPage() {
     crmConnection: CrmConnectionData | null;
   }>({
     query: CRM_CONNECTION_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [logResult] = useQuery<{ crmSyncLog: CrmSyncEntry[] }>({
     query: CRM_SYNC_LOG_QUERY,
     variables: { limit: 20 },
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [, disconnectCrm] = useMutation(DISCONNECT_CRM_MUTATION);
 

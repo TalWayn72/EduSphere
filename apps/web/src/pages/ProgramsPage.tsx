@@ -40,13 +40,13 @@ export function ProgramsPage(): React.ReactElement {
   const navigate = useNavigate();
   const [programsResult] = useQuery<{ programs: CredentialProgram[] }>({
     query: PROGRAMS_QUERY,
-    pause: true, // programs not in live gateway
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [enrollmentsResult] = useQuery<{
     myProgramEnrollments: ProgramEnrollment[];
   }>({
     query: MY_PROGRAM_ENROLLMENTS_QUERY,
-    pause: true, // myProgramEnrollments not in live gateway
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [, enrollMutation] = useMutation(ENROLL_IN_PROGRAM_MUTATION);
 

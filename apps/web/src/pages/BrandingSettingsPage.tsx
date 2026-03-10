@@ -55,7 +55,7 @@ export function BrandingSettingsPage() {
 
   const [queryResult] = useQuery<BrandingQueryResult>({
     query: TENANT_BRANDING_QUERY,
-    pause: true,
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
   const [mutResult, updateBranding] = useMutation(
     UPDATE_TENANT_BRANDING_MUTATION

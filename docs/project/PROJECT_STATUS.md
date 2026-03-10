@@ -1,17 +1,17 @@
 # EduSphere — Project Status Dashboard
 
-**Last Updated:** 2026-03-10 | **Session:** 35 | **Branch:** master | **Commit:** `72cf1d6`
+**Last Updated:** 2026-03-10 | **Session:** 36 | **Branch:** master | **Commit:** `8afc4bc`
 
 ---
 
-## Overall Status: Phase 46 Complete — Active Development
+## Overall Status: Phase 47 Complete — Active Development
 
 | Metric | Value |
 |--------|-------|
 | Active Branch | master |
-| Latest Commit | 72cf1d6 (Phase 46 — Group Challenges + KG Peer Matching) |
-| Phases Complete | 46 / 46 planned |
-| Total Tests | 6,500+ |
+| Latest Commit | 8afc4bc (Phase 47 — AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) |
+| Phases Complete | 47 / 47 planned |
+| Total Tests | 7,635+ |
 | Test Pass Rate | 100% |
 | TypeScript Errors | 0 |
 | Open Critical Bugs | 0 |
@@ -69,6 +69,7 @@
 | 44 | Dark Mode Contrast Fixes (BUG-059) | ✅ | Session 33 |
 | 45 | Social Learning Experience | ✅ | Session 34 |
 | **46** | **Group Challenges + KG Peer Matching** | **✅** | **Session 35** |
+| **47** | **AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials** | **✅** | **Session 35** |
 
 ---
 
@@ -80,12 +81,13 @@
 | subgraph-content | 1,160+ | Pass |
 | subgraph-annotation | 144 | Pass |
 | subgraph-collaboration | 180+ | Pass |
-| subgraph-agent | 599 | Pass |
-| subgraph-knowledge | 544 | Pass |
-| web (frontend) | 4,074 | Pass |
+| subgraph-agent | 702 | Pass |
+| subgraph-knowledge | 582 | Pass |
+| web (frontend) | 4,098 | Pass |
 | security tests | 1,060 | Pass |
 | mobile | 256 | Pass |
-| **TOTAL** | **6,500+** | **100% pass** |
+| subgraph-content | 1,193 | Pass |
+| **TOTAL** | **7,635+** | **100% pass** |
 
 ---
 
@@ -106,6 +108,15 @@
 ---
 
 ## Recent Activity
+
+### Session 35 cont. — Phase 47 (2026-03-10)
+- GAP-3 Chavruta: ChavrutaPartnerMatchService (AGE + SQL), 7 tests
+- GAP-6 Mentor Path: findMentorsByPathTopology() (Apache AGE Cypher STUDIED path + SQL fallback), 5 tests
+- GAP-7 Cohort Insights: getCohortInsights() social_feed_items with cohort_id, 3 tests
+- GAP-8 Graph Credentials: GraphGroundedCredentialService + issueGraphGroundedBadge (coverage ≥70% gate), 5 tests
+- DB migration 0029: chavruta_partner_sessions + knowledge_path_credentials + cohort_id on social_feed_items
+- Frontend: ChavrutaPartnerPage + MentorDiscoveryPage + CohortInsightsWidget + GraphCredentialBadge + 3 query files
+- Tests: agent 702 | knowledge 582 | content 1,193 | web 4,098
 
 ### Session 35 — Phase 46 (2026-03-10)
 - Phase 46: Group Challenges + KG Peer Matching — 30 files changed, 2,536 insertions
@@ -178,13 +189,9 @@ ALL PRD GAPS CLOSED (G-1 through G-4, P-1 through P-3)
 
 ---
 
-## Phase 46 Complete ✅
+## Phase 47 Complete ✅
 
-All 46 planned phases complete. Next priorities (Phase 47+):
-- AI Chavruta partner matching (GAP-3): LangGraph.js Socratic debate facilitation
-- Mentor matching by knowledge path topology (GAP-6): Apache AGE shortest-path queries
-- Cross-cohort institutional knowledge (GAP-7): HybridRAG past cohort surface
-- Graph-grounded micro-credentials (GAP-8): Apache AGE + pgvector assessment data
+All 47 planned phases complete. Phase 48: Protocol closure + P2 admin wire-up
 
 ---
 

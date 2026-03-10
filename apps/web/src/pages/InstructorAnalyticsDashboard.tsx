@@ -92,7 +92,7 @@ export function InstructorAnalyticsDashboard() {
 
   const [{ data, fetching }] = useQuery<OverviewResult>({
     query: INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY,
-    pause: true, // myCourses.courseAnalytics not yet in live supergraph
+    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
   });
 
   if (!ALLOWED_ROLES.has(role ?? '')) {

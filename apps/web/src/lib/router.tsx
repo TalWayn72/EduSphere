@@ -462,6 +462,11 @@ const MentorDiscoveryPage = lazy(() =>
     default: m.MentorDiscoveryPage,
   }))
 );
+const CohortInsightsPage = lazy(() =>
+  import('@/pages/CohortInsightsPage').then((m) => ({
+    default: m.CohortInsightsPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -956,6 +961,11 @@ export const router = createBrowserRouter([
     // Mentor Discovery — find a mentor by knowledge path topology
     path: '/mentor/discover/:courseId?',
     element: guarded(<MentorDiscoveryPage />),
+  },
+  {
+    // Cohort Insights — GAP-7: cross-cohort institutional knowledge
+    path: '/cohort-insights',
+    element: guarded(<CohortInsightsPage />),
   },
   {
     path: '/',
