@@ -180,3 +180,6 @@ export * from './skills';
 
 // Phase 45: Social Learning — Peer Review + Discussion Likes
 export * from './peer-review';
+
+// Phase 46: Group Challenges + KG Peer Matching
+export * from './group-challenges';

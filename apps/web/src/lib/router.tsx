@@ -437,6 +437,21 @@ const AssessmentResultPage = lazy(() =>
     default: m.AssessmentResultPage,
   }))
 );
+const GroupChallengesPage = lazy(() =>
+  import('@/pages/GroupChallengesPage').then((m) => ({
+    default: m.GroupChallengesPage,
+  }))
+);
+const ChallengeDetailPage = lazy(() =>
+  import('@/pages/ChallengeDetailPage').then((m) => ({
+    default: m.ChallengeDetailPage,
+  }))
+);
+const PeerMatchingPage = lazy(() =>
+  import('@/pages/PeerMatchingPage').then((m) => ({
+    default: m.PeerMatchingPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -906,6 +921,21 @@ export const router = createBrowserRouter([
     // People search — find and follow other learners
     path: '/people',
     element: guarded(<UserSearchPage />),
+  },
+  {
+    // Group Challenges — competitive learning challenges
+    path: '/challenges',
+    element: guarded(<GroupChallengesPage />),
+  },
+  {
+    // Challenge Detail — leaderboard + score submission
+    path: '/challenges/:id',
+    element: guarded(<ChallengeDetailPage />),
+  },
+  {
+    // Peer Matching — AI-powered learner matching
+    path: '/peer-matching',
+    element: guarded(<PeerMatchingPage />),
   },
   {
     path: '/',

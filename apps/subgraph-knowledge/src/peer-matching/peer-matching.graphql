@@ -1,0 +1,28 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@requires", "@provides", "@authenticated", "@requiresScopes"])
+
+type PeerMatch {
+  userId: ID!
+  matchReason: String!
+  complementarySkills: [String!]!
+  sharedCourseCount: Int!
+}
+
+type PeerMatchRequest {
+  id: ID!
+  requesterId: ID!
+  matchedUserId: ID!
+  courseId: String
+  matchReason: String
+  status: String!
+  createdAt: String!
+}
+
+extend type Query {
+  peerMatches(courseId: String): [PeerMatch!]! @authenticated
+  myPeerMatchRequests: [PeerMatchRequest!]! @authenticated
+}
+
+extend type Mutation {
+  requestPeerMatch(matchedUserId: ID!, courseId: String): PeerMatchRequest! @authenticated
+  respondToPeerMatch(requestId: ID!, accept: Boolean!): PeerMatchRequest! @authenticated
+}

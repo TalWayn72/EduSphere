@@ -1,0 +1,72 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@requires", "@provides", "@authenticated", "@requiresScopes", "@requiresRole"])
+
+enum ChallengeType {
+  QUIZ
+  PROJECT
+  DISCUSSION
+}
+
+enum ChallengeStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+type GroupChallenge {
+  id: ID!
+  title: String!
+  description: String
+  courseId: String
+  challengeType: ChallengeType!
+  targetScore: Int!
+  startDate: String!
+  endDate: String!
+  maxParticipants: Int!
+  status: ChallengeStatus!
+  participantCount: Int!
+  createdBy: ID!
+}
+
+type ChallengeParticipant {
+  id: ID!
+  challengeId: ID!
+  userId: ID!
+  score: Int!
+  rank: Int
+  joinedAt: String!
+  completedAt: String
+}
+
+type GroupChallengeEdge {
+  node: GroupChallenge!
+  cursor: String!
+}
+
+type GroupChallengeConnection {
+  edges: [GroupChallengeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input CreateChallengeInput {
+  title: String!
+  description: String
+  courseId: String
+  challengeType: ChallengeType!
+  targetScore: Int!
+  startDate: String!
+  endDate: String!
+  maxParticipants: Int
+}
+
+extend type Query {
+  activeChallenges(courseId: String, first: Int, after: String): GroupChallengeConnection! @authenticated
+  challengeLeaderboard(challengeId: ID!): [ChallengeParticipant!]! @authenticated
+  myChallengePariticipations: [ChallengeParticipant!]! @authenticated
+}
+
+extend type Mutation {
+  createChallenge(input: CreateChallengeInput!): GroupChallenge! @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  joinChallenge(challengeId: ID!): ChallengeParticipant! @authenticated
+  submitChallengeScore(challengeId: ID!, score: Int!): ChallengeParticipant! @authenticated
+}

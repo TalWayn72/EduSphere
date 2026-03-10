@@ -24,6 +24,8 @@ import {
   Search,
   Star,
   ClipboardList,
+  Swords,
+  UserCheck,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -56,6 +58,8 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/people', icon: Search, labelKey: 'findPeople' },
   { to: '/peer-review', icon: Star, labelKey: 'peerReview' },
   { to: '/assessments', icon: ClipboardList, labelKey: 'assessments' },
+  { to: '/challenges', icon: Swords, labelKey: 'groupChallenges' },
+  { to: '/peer-matching', icon: UserCheck, labelKey: 'peerMatching' },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {
