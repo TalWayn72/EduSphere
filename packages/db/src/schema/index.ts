@@ -189,3 +189,6 @@ export * from './knowledge-credentials';
 
 // Phase 50: B2B Billing, Subscription Plans & YAU Counting
 export * from './billing';
+
+// Phase 52: B2B2C Partner Portal (partners + partner_revenue)
+export * from './partners';

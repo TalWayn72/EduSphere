@@ -498,6 +498,18 @@ const GlossaryPage = lazy(() =>
 const PricingPage = lazy(() =>
   import('@/pages/PricingPage').then((m) => ({ default: m.PricingPage }))
 );
+const PartnerSignupPage = lazy(() =>
+  import('@/pages/PartnerSignupPage').then((m) => ({ default: m.PartnerSignupPage }))
+);
+const PartnerDashboardPage = lazy(() =>
+  import('@/pages/PartnerDashboardPage').then((m) => ({ default: m.PartnerDashboardPage }))
+);
+const InvestorDeckPage = lazy(() =>
+  import('@/pages/InvestorDeckPage').then((m) => ({ default: m.InvestorDeckPage }))
+);
+const HrisConfigPage = lazy(() =>
+  import('@/pages/HrisConfigPage').then((m) => ({ default: m.HrisConfigPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -1036,6 +1048,25 @@ export const router = createBrowserRouter([
     element: guarded(<CohortInsightsPage />),
   },
   {
+    // Public partner program signup — no auth required
+    path: '/partners',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PartnerSignupPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Partner revenue + API key dashboard
+    path: '/partner/dashboard',
+    element: guarded(<PartnerDashboardPage />),
+  },
+  {
+    // Internal investor deck — SUPER_ADMIN only (role guard inside component)
+    path: '/internal/investor-deck',
+    element: guarded(<InvestorDeckPage />),
+  },
+  {
     // Public B2B pilot signup — no auth required
     path: '/pilot',
     element: (
@@ -1048,6 +1079,11 @@ export const router = createBrowserRouter([
     // SUPER_ADMIN pilot request management
     path: '/admin/pilot-requests',
     element: guarded(<PilotRequestsAdminPage />),
+  },
+  {
+    // Phase 52 — HRIS & Enterprise Integrations config (ORG_ADMIN / SUPER_ADMIN)
+    path: '/admin/hris-config',
+    element: guarded(<HrisConfigPage />),
   },
   {
     path: '/',
