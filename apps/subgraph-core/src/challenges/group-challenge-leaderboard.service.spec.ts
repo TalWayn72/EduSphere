@@ -1,12 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-const mockWithTenantContext = vi.fn(async (_db, _ctx, fn: (tx: unknown) => unknown) => fn(mockTx));
-const mockReturning = vi.fn();
-const mockTx = {
-  select: vi.fn(),
-  update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) })) })),
-};
+const { mockWithTenantContext, mockTx, mockReturning } = vi.hoisted(() => {
+  const mockReturning = vi.fn();
+  const mockTx = {
+    select: vi.fn(),
+    update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) })) })),
+  };
+  return {
+    mockReturning,
+    mockWithTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) => fn(mockTx)),
+    mockTx,
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   db: {},
@@ -55,7 +61,7 @@ describe('GroupChallengeLeaderboardService', () => {
     ];
     mockTx.select
       .mockReturnValueOnce({ from: vi.fn(() => ({ where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue([{ id: CHALLENGE }]) })) })) })
-      .mockReturnValueOnce({ from: vi.fn(() => ({ where: vi.fn(() => ({ orderBy: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue(participants) })) })) })) });
+      .mockReturnValueOnce({ from: vi.fn(() => ({ where: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue(participants) })) })) });
 
     const service = makeService();
     const result = await service.getChallengeLeaderboard(TENANT, USER, CHALLENGE);

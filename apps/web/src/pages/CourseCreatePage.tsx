@@ -11,6 +11,7 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+import { AiCourseCreatorModal } from '@/components/AiCourseCreatorModal';
 // Step 1 is shown immediately — keep eager
 import { CourseWizardStep1 } from './CourseWizardStep1';
 // Steps 2–4 are lazy: avoids pulling TipTap+KaTeX (~450 KB) on initial page load.
@@ -100,6 +101,7 @@ export function CourseCreatePage() {
   ];
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   const form = useForm<CourseSchemaValues>({
     resolver: zodResolver(courseSchema),
@@ -260,6 +262,36 @@ export function CourseCreatePage() {
               {STEPS[step]?.description}
             </p>
           </div>
+
+          {step === 0 && (
+            <>
+              {/* AI Course Builder CTA */}
+              <div
+                data-testid="ai-builder-cta"
+                className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">✨</span>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-indigo-300">
+                      AI Course Builder — Build in 10 Minutes
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-400">
+                      Describe your course → AI creates all modules, lessons, and quiz questions automatically.
+                    </p>
+                  </div>
+                  <Button
+                    data-testid="launch-ai-builder-btn"
+                    onClick={() => setShowAiModal(true)}
+                    className="bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    Launch AI Builder →
+                  </Button>
+                </div>
+              </div>
+              <AiCourseCreatorModal open={showAiModal} onClose={() => setShowAiModal(false)} />
+            </>
+          )}
 
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}

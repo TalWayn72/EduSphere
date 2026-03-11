@@ -467,6 +467,25 @@ const CohortInsightsPage = lazy(() =>
     default: m.CohortInsightsPage,
   }))
 );
+const PilotSignupPage = lazy(() =>
+  import('@/pages/PilotSignupPage').then((m) => ({ default: m.PilotSignupPage }))
+);
+const PilotRequestsAdminPage = lazy(() =>
+  import('@/pages/PilotRequestsAdminPage').then((m) => ({ default: m.PilotRequestsAdminPage }))
+);
+const OrgUsagePage = lazy(() =>
+  import('@/pages/OrgUsagePage').then((m) => ({ default: m.OrgUsagePage }))
+);
+const PlatformUsageDashboardPage = lazy(() =>
+  import('@/pages/PlatformUsageDashboardPage').then((m) => ({
+    default: m.PlatformUsageDashboardPage,
+  }))
+);
+const ROIAnalyticsDashboardPage = lazy(() =>
+  import('@/pages/ROIAnalyticsDashboardPage').then((m) => ({
+    default: m.ROIAnalyticsDashboardPage,
+  }))
+);
 const FaqPage = lazy(() =>
   import('@/pages/FaqPage').then((m) => ({ default: m.FaqPage }))
 );
@@ -475,6 +494,9 @@ const FeaturesPage = lazy(() =>
 );
 const GlossaryPage = lazy(() =>
   import('@/pages/GlossaryPage').then((m) => ({ default: m.GlossaryPage }))
+);
+const PricingPage = lazy(() =>
+  import('@/pages/PricingPage').then((m) => ({ default: m.PricingPage }))
 );
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
@@ -554,6 +576,15 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <GlossaryPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public pricing page — no authentication required
+    path: '/pricing',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PricingPage />
       </Suspense>
     ),
   },
@@ -911,6 +942,9 @@ export const router = createBrowserRouter([
   { path: '/admin/bi-export', element: guarded(<BiExportSettingsPage />) },
   { path: '/admin/cpd', element: guarded(<CpdSettingsPage />) },
   { path: '/admin/analytics', element: guarded(<TenantAnalyticsPage />) },
+  { path: '/admin/usage', element: guarded(<OrgUsagePage />) },
+  { path: '/admin/platform-usage', element: guarded(<PlatformUsageDashboardPage />) },
+  { path: '/admin/roi-analytics', element: guarded(<ROIAnalyticsDashboardPage />) },
   {
     // Manager Dashboard — MANAGER / ORG_ADMIN / SUPER_ADMIN only
     path: '/manager',
@@ -1000,6 +1034,20 @@ export const router = createBrowserRouter([
     // Cohort Insights — GAP-7: cross-cohort institutional knowledge
     path: '/cohort-insights',
     element: guarded(<CohortInsightsPage />),
+  },
+  {
+    // Public B2B pilot signup — no auth required
+    path: '/pilot',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PilotSignupPage />
+      </Suspense>
+    ),
+  },
+  {
+    // SUPER_ADMIN pilot request management
+    path: '/admin/pilot-requests',
+    element: guarded(<PilotRequestsAdminPage />),
   },
   {
     path: '/',

@@ -12,6 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { QuizBuilderForm } from '@/components/quiz-builder/QuizBuilderForm';
 import type { QuizQuestionItem } from '@/components/quiz-builder/QuizQuestion';
@@ -28,6 +34,7 @@ export function QuizBuilderPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [title, setTitle] = useState('');
   const [questions, setQuestions] = useState<QuizQuestionItem[]>([]);
   const [passingScore, setPassingScore] = useState(DEFAULT_PASSING_SCORE);
@@ -84,7 +91,18 @@ export function QuizBuilderPage() {
       <div className="container mx-auto p-6 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle>Quiz Builder</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Quiz Builder</CardTitle>
+              <Button
+                data-testid="generate-quiz-ai-btn"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowGenerateModal(true)}
+                className="gap-2"
+              >
+                ✨ Generate from content
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-6" noValidate>
@@ -118,6 +136,22 @@ export function QuizBuilderPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={showGenerateModal} onOpenChange={setShowGenerateModal}>
+        <DialogContent data-testid="generate-quiz-modal">
+          <DialogHeader>
+            <DialogTitle>✨ Generate Quiz from Content</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-sm text-slate-500 text-center">
+            <p className="text-2xl mb-3">🚧</p>
+            <p className="font-semibold text-slate-700 mb-1">Coming in Phase 52</p>
+            <p>
+              Paste a lesson URL, upload a PDF, or select an existing lesson — and AI will
+              generate quiz questions automatically.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

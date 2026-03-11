@@ -1,9 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { LandingPage } from './LandingPage';
 
-// Mock react-router-dom Link so it renders as <a>
+// Mock urql — PilotCTASection uses useMutation which requires a Provider
+vi.mock('urql', async () => {
+  const actual = await vi.importActual<typeof import('urql')>('urql');
+  return {
+    ...actual,
+    useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [{ fetching: false, data: undefined, error: undefined }, vi.fn()]),
+  };
+});
+
+// Mock react-router-dom Link
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
   return {
@@ -27,112 +37,81 @@ describe('LandingPage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the hero section with main headline', () => {
+  it('renders the hero section with B2B headline', () => {
     renderLanding();
-    expect(screen.getByTestId('hero-section')).toBeInTheDocument();
-    expect(
-      screen.getByText(/The AI-Powered Learning Platform Built for the Future/i)
-    ).toBeInTheDocument();
+    const hero = screen.getByTestId('hero-section');
+    expect(hero).toBeInTheDocument();
+    expect(hero).toHaveTextContent(/AI-Native LMS/i);
   });
 
-  it('renders the hero sub-headline', () => {
+  it('renders hero pricing anchor and CTAs', () => {
     renderLanding();
-    expect(
-      screen.getByText(/Personalized learning paths, knowledge graphs/i)
-    ).toBeInTheDocument();
+    const hero = screen.getByTestId('hero-section');
+    expect(hero).toHaveTextContent(/\$12,000/i);
+    expect(screen.getAllByRole('link', { name: /Request Demo/i }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('link', { name: /Pilot/i }).length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders hero CTA buttons', () => {
+  it('renders compliance badges section', () => {
     renderLanding();
-    expect(screen.getByRole('link', { name: /Get Started Free/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Watch Demo/i })).toBeInTheDocument();
-  });
-
-  it('renders the stats bar with stat labels', () => {
-    renderLanding();
-    expect(screen.getByTestId('stats-bar')).toBeInTheDocument();
-    // Labels are static — values are animated (AnimatedCounter) and may render
-    // as 0 initially in jsdom before requestAnimationFrame completes.
-    expect(screen.getByText('Courses')).toBeInTheDocument();
-    expect(screen.getByText('Learners')).toBeInTheDocument();
-    expect(screen.getByText('Completion Rate')).toBeInTheDocument();
-    expect(screen.getByText('Languages')).toBeInTheDocument();
-  });
-
-  it('renders all 6 feature cards', () => {
-    renderLanding();
-    const section = screen.getByTestId('features-section');
+    const section = screen.getByTestId('compliance-badges-section');
     expect(section).toBeInTheDocument();
-    expect(section).toHaveTextContent('AI Tutoring');
-    // There's also a footer link named "Knowledge Graph" — check within features section
-    expect(section.querySelectorAll('h3').length).toBeGreaterThanOrEqual(6);
-    const headings = Array.from(section.querySelectorAll('h3')).map((h) => h.textContent);
-    expect(headings).toContain('Knowledge Graph');
-    expect(headings).toContain('Gamification');
-    expect(headings).toContain('Enterprise Grade');
-    expect(headings).toContain('Multi-language');
-    expect(headings).toContain('Live Sessions');
+    expect(section).toHaveTextContent('FERPA');
+    expect(section).toHaveTextContent('WCAG');
+    expect(section).toHaveTextContent('SCORM');
   });
 
-  it('renders how it works section with 3 steps', () => {
+  it('renders competitor comparison table', () => {
     renderLanding();
-    expect(screen.getByTestId('how-it-works-section')).toBeInTheDocument();
-    expect(screen.getByText(/Sign Up & Set Goals/i)).toBeInTheDocument();
-    expect(screen.getByText(/Learn at Your Pace/i)).toBeInTheDocument();
-    expect(screen.getByText(/Track Mastery/i)).toBeInTheDocument();
+    const section = screen.getByTestId('vs-competitors-section');
+    expect(section).toBeInTheDocument();
+    expect(section).toHaveTextContent('Canvas');
+    expect(section).toHaveTextContent('Knowledge Graph');
   });
 
-  it('renders the testimonials section with 3 testimonials', () => {
+  it('renders 4 B2B pricing tiers', () => {
     renderLanding();
-    const testimonialsSection = screen.getByTestId('testimonials-section');
-    expect(testimonialsSection).toBeInTheDocument();
-    // Use within() to scope queries — TestimonialsCarousel also contains some author names
-    expect(within(testimonialsSection).getByText('Sarah Chen')).toBeInTheDocument();
-    expect(within(testimonialsSection).getByText('Marcus Rivera')).toBeInTheDocument();
-    expect(within(testimonialsSection).getByText('Dr. Aisha Patel')).toBeInTheDocument();
+    const section = screen.getByTestId('pricing-section');
+    expect(section).toBeInTheDocument();
+    expect(section).toHaveTextContent('Starter');
+    expect(section).toHaveTextContent('Growth');
+    expect(section).toHaveTextContent('University');
+    expect(section).toHaveTextContent('Enterprise');
+    expect(section).toHaveTextContent('$12,000');
+    expect(section).toHaveTextContent('Most Popular');
+    // Anti-regression: old B2C tiers must NOT appear
+    expect(section).not.toHaveTextContent('Free');
+    expect(section).not.toHaveTextContent('Pro');
   });
 
-  it('renders 3 pricing tiers', () => {
+  it('renders pilot CTA section with form', () => {
     renderLanding();
-    expect(screen.getByTestId('pricing-section')).toBeInTheDocument();
-    expect(screen.getByText('Free')).toBeInTheDocument();
-    expect(screen.getByText('Pro')).toBeInTheDocument();
-    expect(screen.getByText('Enterprise')).toBeInTheDocument();
-    expect(screen.getByText('Most Popular')).toBeInTheDocument();
+    const section = screen.getByTestId('pilot-cta-section');
+    expect(section).toBeInTheDocument();
+    expect(section).toHaveTextContent('90');
   });
 
-  it('renders the CTA banner', () => {
+  it('renders the footer with institutional tagline', () => {
     renderLanding();
-    expect(screen.getByTestId('cta-banner')).toBeInTheDocument();
-    expect(screen.getByText(/Ready to Transform Your Learning/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Start Free Today/i })).toBeInTheDocument();
+    const footer = screen.getByTestId('landing-footer');
+    expect(footer).toBeInTheDocument();
+    expect(footer).toHaveTextContent(/© 2026 EduSphere/i);
+    expect(footer).toHaveTextContent(/institutions/i);
   });
 
-  it('renders the footer with copyright 2026', () => {
-    renderLanding();
-    expect(screen.getByTestId('landing-footer')).toBeInTheDocument();
-    expect(screen.getByText(/© 2026 EduSphere/i)).toBeInTheDocument();
-  });
-
-  it('renders navigation header with all data-testid', () => {
+  it('renders navigation header', () => {
     renderLanding();
     const nav = screen.getByTestId('landing-nav');
     expect(nav).toBeInTheDocument();
-    // Use getAllBy for links that appear in both desktop nav and mobile nav
     expect(screen.getAllByRole('link', { name: /Log In/i }).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByRole('link', { name: /Get Started/i }).length).toBeGreaterThanOrEqual(1);
   });
 
   it('mobile nav toggle opens and closes the menu', () => {
     renderLanding();
     const toggle = screen.getByRole('button', { name: /Open menu/i });
     expect(toggle).toBeInTheDocument();
-
-    // Menu hidden initially on desktop; fireEvent opens it
     fireEvent.click(toggle);
     expect(screen.getByRole('button', { name: /Close menu/i })).toBeInTheDocument();
-
-    // Close it
     fireEvent.click(screen.getByRole('button', { name: /Close menu/i }));
     expect(screen.getByRole('button', { name: /Open menu/i })).toBeInTheDocument();
   });
@@ -142,25 +121,24 @@ describe('LandingPage', () => {
     const body = document.body.textContent ?? '';
     expect(body).not.toMatch(/undefined/i);
     expect(body).not.toMatch(/TypeError/i);
-    expect(body).not.toMatch(/stack trace/i);
     expect(body).not.toMatch(/Cannot read/i);
     expect(body).not.toMatch(/\[object Object\]/);
+    expect(body).not.toMatch(/urql/i);
+    expect(body).not.toMatch(/GraphQL error/i);
   });
 
-  it('all required data-testid attributes are present', () => {
+  it('all required B2B data-testid attributes are present', () => {
     renderLanding();
-    const ids = [
+    const requiredIds = [
       'hero-section',
-      'stats-bar',
-      'features-section',
-      'how-it-works-section',
-      'testimonials-section',
+      'compliance-badges-section',
+      'vs-competitors-section',
       'pricing-section',
-      'cta-banner',
+      'pilot-cta-section',
       'landing-footer',
       'landing-nav',
     ];
-    for (const id of ids) {
+    for (const id of requiredIds) {
       expect(screen.getByTestId(id), `Missing data-testid="${id}"`).toBeInTheDocument();
     }
   });

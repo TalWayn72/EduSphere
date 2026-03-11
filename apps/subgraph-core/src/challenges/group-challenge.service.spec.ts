@@ -2,20 +2,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BadRequestException } from '@nestjs/common';
 
 // ── DB mocks ──────────────────────────────────────────────────────────────────
-const mockReturning = vi.fn();
-const mockInsert = vi.fn(() => ({ values: vi.fn(() => ({ returning: mockReturning })) }));
-const mockSelect = vi.fn();
-const mockUpdate = vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) })) }));
-const mockExecute = vi.fn();
-
-const mockWithTenantContext = vi.fn(async (_db, _ctx, fn: (tx: unknown) => unknown) =>
-  fn({
-    insert: mockInsert,
-    select: mockSelect,
-    update: mockUpdate,
-    execute: mockExecute,
-  })
-);
+const { mockWithTenantContext, mockInsert, mockSelect, mockUpdate, mockExecute, mockReturning } = vi.hoisted(() => {
+  const mockReturning = vi.fn();
+  const mockInsert = vi.fn(() => ({ values: vi.fn(() => ({ returning: mockReturning })) }));
+  const mockSelect = vi.fn();
+  const mockUpdate = vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) })) }));
+  const mockExecute = vi.fn();
+  return {
+    mockReturning,
+    mockInsert,
+    mockSelect,
+    mockUpdate,
+    mockExecute,
+    mockWithTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({ insert: mockInsert, select: mockSelect, update: mockUpdate, execute: mockExecute })
+    ),
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),

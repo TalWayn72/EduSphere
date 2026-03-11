@@ -166,6 +166,17 @@ test.describe('Global AEO — Meta Tags & Structured Data', () => {
     const paths = ['/faq', '/features', '/glossary'];
     for (const path of paths) {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      // Wait for React + react-helmet-async to update the canonical away from the static default.
+      // The static index.html canonical is https://edusphere.dev/; PageMeta sets app.edusphere.dev URLs.
+      await page.waitForFunction(
+        () => {
+          const link = document.querySelector('link[rel="canonical"]');
+          const href = link?.getAttribute('href') ?? '';
+          // Accept any canonical that's been set to a path-specific URL
+          return href.length > 0 && href !== 'https://edusphere.dev/';
+        },
+        { timeout: 10000 },
+      );
       const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
       expect(canonical).toBeTruthy();
       if (canonical) canonicals.push(canonical);

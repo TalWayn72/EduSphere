@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageMeta, SoftwareApplicationSchema } from '@/components/seo';
+import { PageMeta, SoftwareApplicationSchema, OrganizationSchema, WebSiteSchema } from '@/components/seo';
 import { Link } from 'react-router-dom';
 import { Brain, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -81,6 +81,8 @@ export function LandingPage() {
         canonical="https://app.edusphere.dev/landing"
       />
       <SoftwareApplicationSchema />
+      <OrganizationSchema />
+      <WebSiteSchema />
       <LandingNav />
       <main id="main-content">
         <HeroSection />
