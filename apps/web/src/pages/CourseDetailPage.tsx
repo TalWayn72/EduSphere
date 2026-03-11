@@ -5,7 +5,7 @@
  * Uses React 19 useTransition for the enroll/unenroll action so the UI
  * stays responsive while the mutation is in flight.
  */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { UnsavedChangesDialog } from '@/components/UnsavedChangesDialog';
@@ -209,10 +209,19 @@ export function CourseDetailPage() {
     pause: !courseId || !mounted,
   });
 
-  const [{ data: enrollData, error: enrollError }] = useQuery<EnrollmentData>({
-    query: MY_ENROLLMENTS_QUERY,
-    pause: !mounted,
-  });
+  const [{ data: enrollData, error: enrollError }, reexecuteEnrollments] =
+    useQuery<EnrollmentData>({
+      query: MY_ENROLLMENTS_QUERY,
+      pause: !mounted,
+    });
+
+  // Local override prevents useOptimistic revert flash: after mutation succeeds,
+  // the urql cache still holds stale data, so useOptimistic base-state reverts.
+  // We pin the new state here until the refetch brings fresh server data.
+  const [enrolledLocal, setEnrolledLocal] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (enrollData) setEnrolledLocal(null);
+  }, [enrollData]);
 
   const [{ data: progressData }] = useQuery<ProgressData>({
     query: MY_COURSE_PROGRESS_QUERY,
@@ -254,17 +263,32 @@ export function CourseDetailPage() {
     lessonsData?.lessonsByCourse ?? (error ? MOCK_LESSONS_FALLBACK : []);
   // When gateway is offline (enrollError) and showing mock course, treat as enrolled
   // so "בטל הרשמה" is shown rather than the misleading "הירשם".
-  const isEnrolled = enrollError
-    ? true
-    : (enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ??
-      false);
+  // enrolledLocal overrides stale cache while the refetch is in-flight.
+  const isEnrolled =
+    enrolledLocal !== null
+      ? enrolledLocal
+      : enrollError
+        ? true
+        : (enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ??
+          false);
   const progress = progressData?.myCourseProgress;
 
-  const showToast = (msg: string) => {
+  const showToast = useCallback((msg: string) => {
     setToast(msg);
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
-  };
+  }, []);
+
+  // Captured at render-time so the closure reads the pre-click isEnrolled value.
+  // If the user was not enrolled → they clicked enroll → new state is true, and vice versa.
+  const handleEnrollSuccess = useCallback(
+    (msg: string) => {
+      setEnrolledLocal(!isEnrolled);
+      showToast(msg);
+      reexecuteEnrollments({ requestPolicy: 'network-only' });
+    },
+    [isEnrolled, showToast, reexecuteEnrollments]
+  );
 
   const { optimisticEnrolled, handleEnroll, isEnrolling } =
     useOptimisticEnrollment({
@@ -272,7 +296,7 @@ export function CourseDetailPage() {
       isEnrolled,
       enrollMutation: (vars) => enrollMutation(vars),
       unenrollMutation: (vars) => unenrollMutation(vars),
-      onSuccess: showToast,
+      onSuccess: handleEnrollSuccess,
       onError: (msg, raw) => {
         const action = isEnrolled ? 'unenroll' : 'enroll';
         console.error(`[CourseDetailPage] ${action} failed:`, msg, raw);

@@ -12,12 +12,7 @@ import {
   createDatabaseConnection,
   withTenantContext,
   closeAllPools,
-  schema,
   sql,
-  eq,
-  and,
-  isNotNull,
-  desc,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 

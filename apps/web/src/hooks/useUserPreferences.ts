@@ -127,7 +127,7 @@ export function useUserPreferences(): UseUserPreferencesReturn {
         throw result.error;
       }
     },
-    [i18n, updatePreferences, meResult.data?.me?.preferences?.locale]
+    [i18n, updatePreferences]
   );
 
   return {

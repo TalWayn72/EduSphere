@@ -29,7 +29,6 @@ import {
   verifyCredentialSignature,
 } from './open-badge.crypto.js';
 import { GraphGroundedCredentialService } from '../certificate/graph-credential.service.js';
-import type { KnowledgePathCoverageResult } from '../certificate/graph-credential.service.js';
 import { buildLinkedInShareUrl } from './open-badge.types.js';
 import type {
   Ed25519KeyPair,

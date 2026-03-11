@@ -408,6 +408,55 @@ describe('CoursesDiscoveryPage', () => {
       'UI/UX Design Fundamentals with Figma'
     );
   });
+
+  // ── BUG REGRESSION: enrolled: false hardcoded (Wave 2 of enrollment bug) ─────
+  // Root cause: toDisplayCourse() hardcoded enrolled:false for ALL courses.
+  // Fix: MY_ENROLLMENTS_QUERY now fetched; enrolled={enrolledIds.has(course.id)}.
+  describe('BUG REGRESSION: enrolled status reflects real MY_ENROLLMENTS_QUERY data', () => {
+    it('enrolled course shows "Continue" not "Enroll Free" (regression guard: enrolled:false hardcoded)', () => {
+      vi.mocked(urql.useQuery).mockImplementation((args) => {
+        const queryName = getQueryName(args.query);
+        if (queryName.includes('MyEnrollments') || queryName.includes('myEnrollments')) {
+          return makeQueryResult({ myEnrollments: [{ courseId: 'c-1' }] });
+        }
+        if (queryName.includes('SearchCourses') || queryName.includes('searchCourses')) {
+          if (args.pause) return NOOP_QUERY;
+          return makeQueryResult({ searchCourses: MOCK_COURSES_DATA });
+        }
+        return makeQueryResult({ courses: MOCK_COURSES_DATA });
+      });
+
+      renderPage();
+
+      // Course c-1 is enrolled → CourseCard should render "Continue" (not "Enroll Free")
+      // BAD STATE: "Enroll Free" would appear for ALL courses with hardcoded enrolled:false
+      const continueButtons = screen.getAllByRole('button', { name: /continue/i });
+      expect(continueButtons.length).toBe(1);
+
+      // Non-enrolled courses (c-2, c-3) still show "Enroll Free"
+      const enrollButtons = screen.getAllByRole('button', { name: /enroll in/i });
+      expect(enrollButtons.length).toBe(2);
+    });
+
+    it('no course shows "Continue" when myEnrollments is empty (non-enrolled user)', () => {
+      vi.mocked(urql.useQuery).mockImplementation((args) => {
+        const queryName = getQueryName(args.query);
+        if (queryName.includes('MyEnrollments') || queryName.includes('myEnrollments')) {
+          return makeQueryResult({ myEnrollments: [] });
+        }
+        if (queryName.includes('SearchCourses') || queryName.includes('searchCourses')) {
+          if (args.pause) return NOOP_QUERY;
+          return makeQueryResult({ searchCourses: MOCK_COURSES_DATA });
+        }
+        return makeQueryResult({ courses: MOCK_COURSES_DATA });
+      });
+
+      renderPage();
+
+      // No enrolled courses → no "Continue" buttons
+      expect(screen.queryByRole('button', { name: /continue/i })).not.toBeInTheDocument();
+    });
+  });
 });
 
 // ── Route registration regression ─────────────────────────────────────────────

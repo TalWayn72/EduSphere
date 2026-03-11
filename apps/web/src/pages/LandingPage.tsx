@@ -17,12 +17,16 @@ import {
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { Player } from '@remotion/player';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MotionCard } from '@/components/landing/MotionCard';
 import { AnimatedCounter } from '@/components/landing/AnimatedCounter';
 import { TestimonialsCarousel } from '@/components/landing/TestimonialsCarousel';
 import { VideoSection } from '@/components/landing/VideoSection';
+import { AIChavrutaTyping } from '@/remotion/AIChavrutaTyping';
+import { KnowledgeGraphGrow } from '@/remotion/KnowledgeGraphGrow';
+import { OnboardingSpeed } from '@/remotion/OnboardingSpeed';
 import { useReducedMotion } from '@/providers/ReducedMotionProvider';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -109,33 +113,35 @@ function HeroSection() {
   return (
     <section
       data-testid="hero-section"
-      className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 text-white"
+      className="relative overflow-hidden text-white"
     >
-      {/* Pre-rendered Remotion background video — preload=none avoids blocking LCP */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover -z-10"
-        src="/hero-bg.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="none"
-        poster="/hero-bg-poster.webp"
+      {/* Layer 1 — fallback dark gradient (always visible, sits behind everything) */}
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950"
         aria-hidden="true"
       />
-      {/* Overlay for text readability */}
-      <div className="absolute inset-0 bg-black/30 -z-10" aria-hidden="true" />
 
-      {/* Animated background orbs — CSS-only, prefers-reduced-motion aware */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="motion-safe:animate-pulse absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-        <div className="motion-safe:animate-pulse absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-purple-400/10 blur-3xl" />
-        <div className="motion-safe:animate-bounce absolute top-1/3 left-1/4 w-4 h-4 rounded-full bg-white/20" style={{ animationDuration: '3s' }} />
-        <div className="motion-safe:animate-bounce absolute top-1/2 right-1/3 w-3 h-3 rounded-full bg-white/15" style={{ animationDuration: '4s' }} />
-        <div className="motion-safe:animate-bounce absolute bottom-1/4 left-1/2 w-2 h-2 rounded-full bg-white/25" style={{ animationDuration: '2.5s' }} />
-      </div>
+      {/* Layer 2 — Remotion: knowledge graph growing in the background */}
+      {!prefersReducedMotion && (
+        <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+          <Player
+            component={KnowledgeGraphGrow}
+            durationInFrames={360}
+            fps={30}
+            compositionWidth={1920}
+            compositionHeight={1080}
+            style={{ width: '100%', height: '100%' }}
+            autoPlay
+            loop
+          />
+        </div>
+      )}
 
-      <div ref={heroRef} className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center">
+      {/* Layer 3 — semi-transparent overlay so text stays readable */}
+      <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+
+      {/* Layer 4 — content (relative + z-10 to float above all layers) */}
+      <div ref={heroRef} className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center">
         <h1 className="hero-animate text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
           The AI-Powered Learning Platform<br className="hidden sm:block" /> Built for the Future
         </h1>
@@ -216,6 +222,67 @@ function FeaturesSection() {
               </Card>
             </MotionCard>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── AIChavrutaSection ─────────────────────────────────────────────────────────
+function AIChavrutaSection() {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <section
+      data-testid="ai-chavruta-section"
+      className="bg-white dark:bg-card py-20"
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row items-center gap-12">
+          {/* Text */}
+          <div className="flex-1 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 dark:bg-indigo-950 px-4 py-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-5">
+              <Brain className="h-4 w-4" aria-hidden="true" />
+              AI Learning Partner
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-foreground mb-5">
+              Meet Your Chavruta —<br className="hidden sm:block" /> The AI That Thinks With You
+            </h2>
+            <p className="text-gray-500 dark:text-muted-foreground leading-relaxed mb-6 max-w-lg">
+              Our AI tutor doesn't just answer questions — it debates, challenges your reasoning,
+              and builds concept connections in your personal knowledge graph as you learn.
+            </p>
+            <ul className="space-y-3 text-sm text-gray-600 dark:text-muted-foreground">
+              {['Socratic dialogue adapted to your level', 'Concepts auto-linked to your knowledge graph', 'Switch topics mid-conversation — AI keeps context'].map((f) => (
+                <li key={f} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-indigo-600 flex-shrink-0" aria-hidden="true" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* Remotion demo */}
+          <div className="flex-1 w-full max-w-sm lg:max-w-md">
+            <MotionCard>
+              <div className="rounded-2xl overflow-hidden shadow-2xl bg-[#1e1b4b]" style={{ aspectRatio: '3/2' }}>
+                {prefersReducedMotion ? (
+                  <div className="w-full h-full flex items-center justify-center p-6 text-center">
+                    <p className="text-indigo-300 text-sm">AI Chavruta demo (motion reduced)</p>
+                  </div>
+                ) : (
+                  <Player
+                    component={AIChavrutaTyping}
+                    durationInFrames={240}
+                    fps={30}
+                    compositionWidth={600}
+                    compositionHeight={400}
+                    style={{ width: '100%', height: '100%' }}
+                    autoPlay
+                    loop
+                  />
+                )}
+              </div>
+            </MotionCard>
+          </div>
         </div>
       </div>
     </section>
@@ -383,8 +450,24 @@ function PricingSection() {
 
 // ── CTABanner ─────────────────────────────────────────────────────────────────
 function CTABanner() {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <section data-testid="cta-banner" className="relative overflow-hidden bg-indigo-700 py-20 text-white text-center">
+      {/* Remotion onboarding animation as background */}
+      {!prefersReducedMotion && (
+        <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
+          <Player
+            component={OnboardingSpeed}
+            durationInFrames={300}
+            fps={30}
+            compositionWidth={1920}
+            compositionHeight={400}
+            style={{ width: '100%', height: '100%' }}
+            autoPlay
+            loop
+          />
+        </div>
+      )}
       <div className="cta-shimmer absolute inset-0 pointer-events-none" aria-hidden="true" />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Ready to Transform Your Learning?</h2>
@@ -458,6 +541,7 @@ export function LandingPage() {
         <HeroSection />
         <StatsBar />
         <FeaturesSection />
+        <AIChavrutaSection />
         <VideoSection />
         <HowItWorksSection />
         <TestimonialsSection />

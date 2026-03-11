@@ -17,6 +17,7 @@ import {
   COURSES_DISCOVERY_QUERY,
   SEARCH_COURSES_DISCOVERY_QUERY,
 } from '@/lib/graphql/courses-discovery.queries';
+import { MY_ENROLLMENTS_QUERY } from '@/lib/graphql/content.queries';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -220,6 +221,21 @@ export function CoursesDiscoveryPage() {
       variables: { query: debouncedSearch, limit: 50 },
       pause: !mounted || !isSearching,
     });
+
+  const [{ data: enrollmentData }] = useQuery({
+    query: MY_ENROLLMENTS_QUERY,
+    pause: !mounted,
+  });
+
+  const enrolledIds = useMemo(
+    () =>
+      new Set(
+        ((enrollmentData?.myEnrollments ?? []) as Array<{ courseId: string }>).map(
+          (e) => e.courseId
+        )
+      ),
+    [enrollmentData]
+  );
 
   const fetching = isSearching ? searchFetching : listFetching;
   const error = isSearching ? searchError : listError;
@@ -491,6 +507,7 @@ export function CoursesDiscoveryPage() {
                     <CourseCard
                       key={course.id}
                       {...course}
+                      enrolled={enrolledIds.has(course.id)}
                       onClick={() => {
                         navigate(`/courses/${course.id}`);
                       }}

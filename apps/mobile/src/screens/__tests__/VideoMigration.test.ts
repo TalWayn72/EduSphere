@@ -6,6 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { execSync } from 'child_process';
 
 const MOBILE_ROOT = resolve(__dirname, '../../../../');
 const SRC_ROOT = resolve(__dirname, '../../../');
@@ -44,7 +45,6 @@ describe('Expo SDK 55 migration checks', () => {
   });
 
   it('no source files import from expo-av', () => {
-    const { execSync } = require('child_process') as typeof import('child_process');
     const result = execSync(
       'grep -rl "expo-av" src/ --include="*.ts" --include="*.tsx" 2>/dev/null || true',
       { cwd: MOBILE_ROOT, encoding: 'utf8' },

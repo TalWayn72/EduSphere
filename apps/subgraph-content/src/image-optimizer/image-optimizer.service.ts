@@ -1,9 +1,9 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
 // sharp and file-type are optional peer deps — guard for environments without them.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type SharpFn = (input: Buffer) => { webp(opts: unknown): { toBuffer(): Promise<Buffer> }; metadata(): Promise<{ width?: number; height?: number }> };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type FileTypeFromBufferFn = (buf: Buffer) => Promise<{ mime: string } | undefined>;
 
 let sharpFn: SharpFn | null = null;

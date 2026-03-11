@@ -14,7 +14,7 @@ interface TenantBrandingResult {
 /** Inject customCss into <head> as a <style> tag safely (textContent, not innerHTML) */
 function injectCustomCss(css: string | null | undefined): void {
   const id = 'tenant-custom-css';
-  let el = document.getElementById(id) as HTMLStyleElement | null;
+  let el = document.getElementById(id) as HTMLElement | null;
   if (!css) {
     el?.remove();
     return;

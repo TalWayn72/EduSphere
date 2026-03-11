@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 
 // node-clamscan is an optional peer dependency — guard against missing install.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type NodeClamConstructor = new () => { init(opts: unknown): Promise<NodeClamInstance> };
 interface NodeClamInstance {
   scanBuffer(buf: Buffer): Promise<{ isInfected: boolean | null; viruses: string[] | null }>;

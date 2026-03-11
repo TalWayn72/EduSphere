@@ -599,6 +599,96 @@ describe('CourseDetailPage', () => {
     });
   });
 
+  // ── BUG REGRESSION: Enrollment button revert (BUG-XXX) ──────────────────────
+  // Root cause: useOptimistic reverts to base `isEnrolled` after transition ends,
+  // but MY_ENROLLMENTS_QUERY cache was stale (not refetched after mutation).
+  // Fix: reexecuteEnrollments({ requestPolicy: 'network-only' }) in onSuccess
+  //      + enrolledLocal state pins new value until refetch completes.
+  describe('BUG REGRESSION: enrollment button reverts to הירשם after enroll (BUG-XXX)', () => {
+    it('calls reexecuteEnrollments with network-only after successful enroll', async () => {
+      const reexecuteFn = vi.fn();
+      vi.mocked(urql.useQuery).mockReturnValue([
+        {
+          data: {
+            course: MOCK_COURSE,
+            myEnrollments: [],
+            myCourseProgress: null,
+            lessonsByCourse: MOCK_LESSONS,
+          },
+          fetching: false,
+          error: undefined,
+        },
+        reexecuteFn,
+      ] as never);
+
+      const enrollFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'ENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, enrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^enroll$/i }));
+      });
+
+      await waitFor(() => {
+        expect(reexecuteFn).toHaveBeenCalledWith({ requestPolicy: 'network-only' });
+      });
+    });
+
+    it('regression guard: Enroll button does NOT revert to "הירשם" after successful enrollment', async () => {
+      const enrollFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'ENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, enrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^enroll$/i }));
+      });
+
+      await waitFor(() => {
+        expect(enrollFn).toHaveBeenCalled();
+      });
+
+      // BAD STATE: "Enroll" must NOT appear after successful enrollment
+      // (this was the recurring bug — button reverted to "הירשם")
+      expect(
+        screen.queryByRole('button', { name: /^enroll$/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it('regression guard: Unenroll button does NOT revert to "בטל" after successful unenroll', async () => {
+      vi.mocked(urql.useQuery).mockReturnValue(
+        makeQueryResult({ myEnrollments: [{ courseId: 'course-1' }] })
+      );
+      const unenrollFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'UNENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, unenrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^unenroll$/i }));
+      });
+
+      await waitFor(() => {
+        expect(unenrollFn).toHaveBeenCalled();
+      });
+
+      // BAD STATE: "Unenroll" must NOT appear after successful unenrollment
+      expect(
+        screen.queryByRole('button', { name: /^unenroll$/i })
+      ).not.toBeInTheDocument();
+    });
+  });
+
   describe('Fork Course', () => {
     it('shows Fork Course button for INSTRUCTOR role', () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);

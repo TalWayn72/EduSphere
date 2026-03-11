@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
 // ── DB mocks ──────────────────────────────────────────────────────────────────
 const mockReturning = vi.fn();
@@ -113,7 +113,7 @@ describe('GroupChallengeService', () => {
 
   it('publishScoreEvent — publishes NATS event when connection available', async () => {
     const { connect } = await import('nats');
-    const natsConn = await (connect as ReturnType<typeof vi.fn>)({});
+    await (connect as ReturnType<typeof vi.fn>)({});
     // Service should have connected in constructor — just verify no throw
     await expect(service.publishScoreEvent(TENANT, USER, CHALLENGE, 85)).resolves.not.toThrow();
   });

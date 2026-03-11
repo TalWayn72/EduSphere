@@ -12,7 +12,9 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "remotion": "remotion studio src/remotion/Root.tsx",
+    "remotion:render": "remotion render src/remotion/Root.tsx"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

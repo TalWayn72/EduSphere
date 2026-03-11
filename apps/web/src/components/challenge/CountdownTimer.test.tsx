@@ -19,7 +19,7 @@ describe('CountdownTimer', () => {
 
   it('clears interval on unmount (memory safety)', () => {
     vi.useFakeTimers();
-    const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
     const future = new Date(Date.now() + 86400000).toISOString();
     const { unmount } = render(<CountdownTimer endDate={future} />);
     unmount();
