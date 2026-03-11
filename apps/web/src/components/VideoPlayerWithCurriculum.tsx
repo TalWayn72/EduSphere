@@ -6,7 +6,7 @@
  *
  * Layout: flex row — video area (flex-1) | curriculum sidebar (320px, collapsible to 0).
  */
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle2, Circle, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +28,16 @@ export interface VideoPlayerWithCurriculumProps {
   videoUrl: string;
   curriculum: CurriculumSection[];
   onLessonSelect: (lessonId: string) => void;
+  /**
+   * Pre-signed MinIO URL to a WebVTT captions file.
+   * When provided, a <track> element is added (WCAG 1.2.2) and a CC toggle
+   * button appears in the player controls.
+   */
+  captionsUrl?: string;
+  /** BCP-47 language tag for the captions track (default: "en"). */
+  captionsLang?: string;
+  /** Human-readable label for the captions track (default: "English"). */
+  captionsLabel?: string;
 }
 
 // Flat list of all lessons across all sections for prev/next navigation
@@ -49,8 +59,25 @@ export function VideoPlayerWithCurriculum({
   videoUrl,
   curriculum,
   onLessonSelect,
+  captionsUrl,
+  captionsLang = 'en',
+  captionsLabel = 'English',
 }: VideoPlayerWithCurriculumProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [captionsEnabled, setCaptionsEnabled] = useState(true);
+  const trackRef = useRef<HTMLTrackElement>(null);
+
+  const toggleCaptions = useCallback(() => {
+    setCaptionsEnabled((prev) => {
+      const next = !prev;
+      // trackRef.current.track may be undefined in environments that do not
+      // implement the TextTrack API (e.g. jsdom in tests).
+      if (trackRef.current?.track) {
+        trackRef.current.track.mode = next ? 'showing' : 'hidden';
+      }
+      return next;
+    });
+  }, []);
 
   const all = flatLessons(curriculum);
   const currentIndex = all.findIndex((l) => l.id === currentLessonId);
@@ -73,7 +100,20 @@ export function VideoPlayerWithCurriculum({
               controls
               className="w-full h-full"
               data-testid="video-element"
-            />
+              crossOrigin={captionsUrl ? 'anonymous' : undefined}
+            >
+              {captionsUrl && (
+                <track
+                  ref={trackRef}
+                  kind="captions"
+                  src={captionsUrl}
+                  srcLang={captionsLang}
+                  label={captionsLabel}
+                  default
+                  data-testid="captions-track"
+                />
+              )}
+            </video>
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-white/50 text-sm"
@@ -83,6 +123,29 @@ export function VideoPlayerWithCurriculum({
             </div>
           )}
         </div>
+
+        {/* Caption controls — only shown when captionsUrl is provided */}
+        {captionsUrl && (
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/30">
+            <button
+              onClick={toggleCaptions}
+              aria-label="Toggle captions"
+              aria-pressed={captionsEnabled}
+              data-testid="cc-toggle-btn"
+              className={cn(
+                'flex items-center justify-center px-2 py-1 rounded text-xs font-bold border transition-colors',
+                captionsEnabled
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-transparent text-muted-foreground border-border hover:bg-muted'
+              )}
+            >
+              CC
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {captionsEnabled ? 'Captions on' : 'Captions off'}
+            </span>
+          </div>
+        )}
 
         {/* Lesson info */}
         <div className="p-4 border-b border-border">

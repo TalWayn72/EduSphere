@@ -58,11 +58,15 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
           </div>
           <div className="space-y-2">
             <Label htmlFor="expertise">Subject Expertise</Label>
+            {/* TODO WCAG 3.3.7 — Redundant Entry: expertise/specialization already collected
+                at instructor registration should be pre-populated here rather than re-entered.
+                autocomplete="organization-title" is the closest standard token for professional role. */}
             <Input
               id="expertise"
               value={expertise}
               onChange={(e) => setExpertise(e.target.value)}
               placeholder="e.g. Torah, Talmud, Jewish History"
+              autoComplete="organization-title"
             />
           </div>
         </div>

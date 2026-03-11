@@ -53,11 +53,15 @@ export function StudentOnboardingSteps({ currentStep, onComplete, onSkip }: Stud
           <h2 className="text-xl font-semibold">Welcome! Let&apos;s set up your profile</h2>
           <div className="space-y-2">
             <Label htmlFor="displayName">Display Name</Label>
+            {/* TODO WCAG 3.3.7 — Redundant Entry: if the user's name was collected at
+                registration, pre-populate this field from their profile rather than asking again.
+                autocomplete="nickname" allows the browser to offer saved values. */}
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="How should we call you?"
+              autoComplete="nickname"
             />
           </div>
         </div>

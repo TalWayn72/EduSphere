@@ -1,0 +1,199 @@
+# Linkerd ServerAuthorization policies for EduSphere subgraphs.
+# Enforces mTLS-only communication and restricts which services may
+# call each subgraph inbound. Plaintext traffic is rejected by default
+# when these policies are active.
+#
+# Apply with: kubectl apply -f server-policies.yaml -n edusphere
+# Verify with: linkerd viz edges -n edusphere
+
+---
+# ─── subgraph-core (port 4001) ───────────────────────────────────────────────
+# Only the gateway is permitted to call subgraph-core inbound.
+apiVersion: policy.linkerd.io/v1beta2
+kind: Server
+metadata:
+  name: subgraph-core
+  namespace: edusphere
+  labels:
+    app: subgraph-core
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-core
+  port: 4001
+  proxyProtocol: HTTP/2
+---
+apiVersion: policy.linkerd.io/v1beta2
+kind: ServerAuthorization
+metadata:
+  name: subgraph-core-allow-gateway
+  namespace: edusphere
+spec:
+  server:
+    name: subgraph-core
+  client:
+    meshTLS:
+      serviceAccounts:
+        - name: edusphere-gateway
+          namespace: edusphere
+
+---
+# ─── subgraph-content (port 4002) ────────────────────────────────────────────
+# Only the gateway is permitted to call subgraph-content inbound.
+apiVersion: policy.linkerd.io/v1beta2
+kind: Server
+metadata:
+  name: subgraph-content
+  namespace: edusphere
+  labels:
+    app: subgraph-content
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-content
+  port: 4002
+  proxyProtocol: HTTP/2
+---
+apiVersion: policy.linkerd.io/v1beta2
+kind: ServerAuthorization
+metadata:
+  name: subgraph-content-allow-gateway
+  namespace: edusphere
+spec:
+  server:
+    name: subgraph-content
+  client:
+    meshTLS:
+      serviceAccounts:
+        - name: edusphere-gateway
+          namespace: edusphere
+
+---
+# ─── subgraph-annotation (port 4003) ─────────────────────────────────────────
+# Only the gateway is permitted to call subgraph-annotation inbound.
+apiVersion: policy.linkerd.io/v1beta2
+kind: Server
+metadata:
+  name: subgraph-annotation
+  namespace: edusphere
+  labels:
+    app: subgraph-annotation
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-annotation
+  port: 4003
+  proxyProtocol: HTTP/2
+---
+apiVersion: policy.linkerd.io/v1beta2
+kind: ServerAuthorization
+metadata:
+  name: subgraph-annotation-allow-gateway
+  namespace: edusphere
+spec:
+  server:
+    name: subgraph-annotation
+  client:
+    meshTLS:
+      serviceAccounts:
+        - name: edusphere-gateway
+          namespace: edusphere
+
+---
+# ─── subgraph-collaboration (port 4004) ──────────────────────────────────────
+# Gateway and subgraph-core are permitted to call subgraph-collaboration.
+apiVersion: policy.linkerd.io/v1beta2
+kind: Server
+metadata:
+  name: subgraph-collaboration
+  namespace: edusphere
+  labels:
+    app: subgraph-collaboration
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-collaboration
+  port: 4004
+  proxyProtocol: HTTP/2
+---
+apiVersion: policy.linkerd.io/v1beta2
+kind: ServerAuthorization
+metadata:
+  name: subgraph-collaboration-allow-gateway
+  namespace: edusphere
+spec:
+  server:
+    name: subgraph-collaboration
+  client:
+    meshTLS:
+      serviceAccounts:
+        - name: edusphere-gateway
+          namespace: edusphere
+        - name: subgraph-core
+          namespace: edusphere
+
+---
+# ─── subgraph-agent (port 4005) ──────────────────────────────────────────────
+# Gateway and subgraph-knowledge are permitted to call subgraph-agent.
+apiVersion: policy.linkerd.io/v1beta2
+kind: Server
+metadata:
+  name: subgraph-agent
+  namespace: edusphere
+  labels:
+    app: subgraph-agent
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-agent
+  port: 4005
+  proxyProtocol: HTTP/2
+---
+apiVersion: policy.linkerd.io/v1beta2
+kind: ServerAuthorization
+metadata:
+  name: subgraph-agent-allow-gateway
+  namespace: edusphere
+spec:
+  server:
+    name: subgraph-agent
+  client:
+    meshTLS:
+      serviceAccounts:
+        - name: edusphere-gateway
+          namespace: edusphere
+        - name: subgraph-knowledge
+          namespace: edusphere
+
+---
+# ─── subgraph-knowledge (port 4006) ──────────────────────────────────────────
+# Gateway and subgraph-agent are permitted to call subgraph-knowledge.
+apiVersion: policy.linkerd.io/v1beta2
+kind: Server
+metadata:
+  name: subgraph-knowledge
+  namespace: edusphere
+  labels:
+    app: subgraph-knowledge
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-knowledge
+  port: 4006
+  proxyProtocol: HTTP/2
+---
+apiVersion: policy.linkerd.io/v1beta2
+kind: ServerAuthorization
+metadata:
+  name: subgraph-knowledge-allow-gateway
+  namespace: edusphere
+spec:
+  server:
+    name: subgraph-knowledge
+  client:
+    meshTLS:
+      serviceAccounts:
+        - name: edusphere-gateway
+          namespace: edusphere
+        - name: subgraph-agent
+          namespace: edusphere

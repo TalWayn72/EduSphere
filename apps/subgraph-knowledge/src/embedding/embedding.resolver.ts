@@ -4,8 +4,29 @@ import {
   Mutation,
   Args,
   ResolveReference,
+  Context,
 } from '@nestjs/graphql';
+import { UnauthorizedException } from '@nestjs/common';
+import type { TenantContext } from '@edusphere/db';
 import { EmbeddingService } from './embedding.service';
+
+type GqlContext = {
+  tenantId?: string | null;
+  userId?: string | null;
+  role?: string | null;
+};
+
+/** Extract a typed TenantContext from the GraphQL request context or throw. */
+function requireTenantCtx(ctx: GqlContext): TenantContext {
+  if (!ctx.tenantId || !ctx.userId || !ctx.role) {
+    throw new UnauthorizedException('Missing tenant context for embedding query');
+  }
+  return {
+    tenantId: ctx.tenantId,
+    userId: ctx.userId,
+    userRole: ctx.role as TenantContext['userRole'],
+  };
+}
 
 @Resolver('Embedding')
 export class EmbeddingResolver {
@@ -23,14 +44,18 @@ export class EmbeddingResolver {
     return this.embeddingService.findByContentItem(contentItemId);
   }
 
+  /** SI-9 / OWASP LLM06: tenantCtx required — enforces RLS on pgvector queries. */
   @Query('semanticSearch')
   async semanticSearch(
     @Args('query') query: number[],
     @Args('limit') limit: number = 10,
-    @Args('minSimilarity') minSimilarity: number = 0.7
+    @Args('minSimilarity') minSimilarity: number = 0.7,
+    @Context() ctx: GqlContext
   ) {
+    const tenantCtx = requireTenantCtx(ctx);
     return this.embeddingService.semanticSearchByVector(
       query,
+      tenantCtx,
       limit,
       minSimilarity
     );
@@ -38,12 +63,14 @@ export class EmbeddingResolver {
 
   @Query('semanticSearchByContentItem')
   async semanticSearchByContentItem(
-    @Args('contentItemId') contentItemId: string,
+    @Args('contentItemId') _contentItemId: string,
     @Args('query') query: number[],
-    @Args('limit') limit: number = 5
+    @Args('limit') limit: number = 5,
+    @Context() ctx: GqlContext
   ) {
+    const tenantCtx = requireTenantCtx(ctx);
     // Legacy — delegates to vector search ignoring contentItemId filter
-    return this.embeddingService.semanticSearchByVector(query, limit, 0.7);
+    return this.embeddingService.semanticSearchByVector(query, tenantCtx, limit, 0.7);
   }
 
   @Mutation('createEmbedding')

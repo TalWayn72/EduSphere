@@ -18,6 +18,32 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn(),
 }));
 
+// Shared S3 send mock — reassigned per-test for VTT assertions
+const s3SendMock = vi.fn().mockResolvedValue({});
+
+// Mock @aws-sdk/client-s3 to intercept VTT uploads
+vi.mock('@aws-sdk/client-s3', () => {
+  class S3Client {
+    send = s3SendMock;
+  }
+  class PutObjectCommand {
+    constructor(public readonly args: unknown) {}
+  }
+  return { S3Client, PutObjectCommand };
+});
+
+// Mock @edusphere/config
+vi.mock('@edusphere/config', () => ({
+  minioConfig: {
+    endpoint: 'http://minio:9000',
+    region: 'us-east-1',
+    accessKey: 'minioadmin',
+    secretKey: 'minioadmin',
+    bucket: 'edusphere',
+    port: 9000,
+  },
+}));
+
 // Mock fs/promises unlink
 vi.mock('fs/promises', () => ({
   unlink: vi.fn().mockResolvedValue(undefined),
@@ -78,6 +104,7 @@ describe('TranscriptionService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    s3SendMock.mockResolvedValue({});
     service = new TranscriptionService(
       mockWhisper as any,
       mockMinio as any,
@@ -196,6 +223,37 @@ describe('TranscriptionService', () => {
       );
 
       await new Promise((r) => setTimeout(r, 20));
+    });
+
+    it('uploads primary-language VTT to MinIO after transcription (WCAG 1.2.2)', async () => {
+      s3SendMock.mockResolvedValue({});
+
+      await service.transcribeFile(makeEvent());
+
+      // S3 send must have been called at least once (VTT upload)
+      expect(s3SendMock).toHaveBeenCalled();
+      // The PutObjectCommand arg carries Key and ContentType
+      const callArg = s3SendMock.mock.calls[0][0] as { args: Record<string, unknown> };
+      const putArgs = callArg.args;
+      expect(putArgs).toMatchObject({
+        Key: expect.stringContaining('captions/'),
+        ContentType: 'text/vtt',
+      });
+      // Key must follow pattern captions/{tenantId}/{courseId}/{assetId}/{lang}.vtt
+      expect(putArgs.Key as string).toMatch(
+        /^captions\/tenant-uuid\/course-uuid\/asset-uuid\/en\.vtt$/
+      );
+    });
+
+    it('does not fail transcription when VTT upload fails', async () => {
+      s3SendMock.mockRejectedValueOnce(new Error('MinIO down'));
+
+      // Must still complete successfully (VTT failure is non-fatal)
+      await expect(service.transcribeFile(makeEvent())).resolves.toBeUndefined();
+      expect(mockNats.publish).toHaveBeenCalledWith(
+        'transcription.completed',
+        expect.objectContaining({ assetId: 'asset-uuid' })
+      );
     });
   });
 });

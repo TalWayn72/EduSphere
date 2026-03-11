@@ -1,5 +1,6 @@
 import { useRef } from 'react';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { DragOrder } from '@/types/quiz';
 
 interface Props {
@@ -37,16 +38,33 @@ export function DragOrderQuestion({ item, value, onChange, disabled }: Props) {
     e.preventDefault();
   };
 
+  /** Keyboard reorder: move item at `idx` up or down by one position */
+  const handleMove = (idx: number, direction: 'up' | 'down') => {
+    if (disabled) return;
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= orderedItems.length) return;
+    const next = [...orderedItems];
+    const [moved] = next.splice(idx, 1);
+    if (!moved) return;
+    next.splice(targetIdx, 0, moved);
+    onChange(next.map((it) => it.id));
+  };
+
   return (
     <div className="space-y-3">
       <p className="font-medium text-sm">{item.question}</p>
       <p className="text-xs text-muted-foreground">
         Drag items into the correct order
       </p>
-      <ul className="space-y-2" role="list" aria-label="Orderable items">
+      {/* WCAG 2.5.7 — screen-reader instruction for keyboard users */}
+      <span className="sr-only">
+        Keyboard users: use the up and down buttons to reorder items
+      </span>
+      <ul role="list" aria-label="Orderable items" className="space-y-2">
         {orderedItems.map((it, idx) => (
           <li
             key={it.id}
+            role="listitem"
             draggable={!disabled}
             onDragStart={() => handleDragStart(idx)}
             onDragOver={handleDragOver}
@@ -61,7 +79,32 @@ export function DragOrderQuestion({ item, value, onChange, disabled }: Props) {
             <span className="flex-shrink-0 text-xs text-muted-foreground w-5 text-center">
               {idx + 1}
             </span>
-            {it.text}
+            <span className="flex-1">{it.text}</span>
+            {/* Keyboard-accessible Up/Down controls (WCAG 2.5.7) */}
+            <div className="flex flex-col gap-0.5 ml-auto">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                disabled={disabled || idx === 0}
+                aria-label={`Move ${it.text} up`}
+                onClick={() => handleMove(idx, 'up')}
+                tabIndex={0}
+              >
+                <ChevronUp className="h-3 w-3" aria-hidden />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                disabled={disabled || idx === orderedItems.length - 1}
+                aria-label={`Move ${it.text} down`}
+                onClick={() => handleMove(idx, 'down')}
+                tabIndex={0}
+              >
+                <ChevronDown className="h-3 w-3" aria-hidden />
+              </Button>
+            </div>
           </li>
         ))}
       </ul>

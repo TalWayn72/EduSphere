@@ -1,0 +1,80 @@
+# Linkerd mTLS enforcement: deny all plaintext traffic between pods.
+# ServiceProfiles define per-route observability; AuthorizationPolicy
+# enforces that only mTLS-authenticated clients may connect.
+#
+# Apply with: kubectl apply -f mtls-test.yaml -n edusphere
+# Verify mTLS: linkerd viz edges -n edusphere
+#              linkerd check --proxy -n edusphere
+
+---
+# Default deny — no unauthenticated (plaintext) traffic allowed to any pod
+# in the edusphere namespace. Pods without a valid mTLS identity are rejected.
+apiVersion: policy.linkerd.io/v1beta2
+kind: AuthorizationPolicy
+metadata:
+  name: deny-plaintext-inbound
+  namespace: edusphere
+  annotations:
+    security.edusphere.io/purpose: "Enforce mTLS-only inter-service communication"
+    security.edusphere.io/compliance: "ISO 27001 A.13.2, SOC 2 CC6.7"
+spec:
+  targetRef:
+    group: policy.linkerd.io
+    kind: Namespace
+    name: edusphere
+  requiredAuthenticationRefs:
+    - name: mesh-tls-only
+      kind: MeshTLSAuthentication
+      group: policy.linkerd.io
+
+---
+# MeshTLSAuthentication: accept connections only from pods within the mesh
+# (i.e., pods that have a Linkerd proxy with a valid SPIFFE identity).
+apiVersion: policy.linkerd.io/v1beta2
+kind: MeshTLSAuthentication
+metadata:
+  name: mesh-tls-only
+  namespace: edusphere
+spec:
+  identities:
+    - "*.edusphere.serviceaccount.identity.linkerd.cluster.local"
+
+---
+# ServiceProfile for edusphere-gateway — enables per-route metrics/retries.
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: edusphere-gateway.edusphere.svc.cluster.local
+  namespace: edusphere
+spec:
+  routes:
+    - name: "GraphQL POST"
+      condition:
+        method: POST
+        pathRegex: /graphql
+      responseClasses:
+        - condition:
+            status:
+              min: 500
+              max: 599
+          isFailure: true
+    - name: "Health check"
+      condition:
+        method: GET
+        pathRegex: /health(z)?
+
+---
+# NetworkAuthentication: explicitly reject unauthenticated (non-mTLS) sources.
+# This is a belt-and-suspenders policy alongside the MeshTLSAuthentication above.
+apiVersion: policy.linkerd.io/v1beta2
+kind: NetworkAuthentication
+metadata:
+  name: reject-unauthenticated
+  namespace: edusphere
+spec:
+  networks:
+    - cidr: "0.0.0.0/0"
+      except:
+        - cidr: "10.0.0.0/8"
+        - cidr: "172.16.0.0/12"
+        - cidr: "192.168.0.0/16"

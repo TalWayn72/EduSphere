@@ -1,0 +1,372 @@
+# EduSphere Kubernetes NetworkPolicy — Defence-in-depth layer alongside Linkerd mTLS.
+#
+# These policies enforce network-level segmentation:
+#   - Default deny all ingress AND egress in the edusphere namespace
+#   - Explicit allow rules per service for required traffic only
+#
+# Apply with: kubectl apply -f edusphere-network-policies.yaml -n edusphere
+# Requires a CNI that supports NetworkPolicy (Calico, Cilium, or Weave).
+
+---
+# ─── DEFAULT DENY ALL ────────────────────────────────────────────────────────
+# Deny all ingress and egress for every pod in the edusphere namespace.
+# All permitted flows are added explicitly below.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: edusphere
+  annotations:
+    security.edusphere.io/purpose: "Zero-trust baseline — deny all then allow specific"
+    security.edusphere.io/compliance: "ISO 27001 A.13.1, SOC 2 CC6.6"
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+# ─── GATEWAY → SUBGRAPH-CORE (4001) ──────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-subgraph-core
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-core
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: edusphere-gateway
+      ports:
+        - protocol: TCP
+          port: 4001
+
+---
+# ─── GATEWAY → SUBGRAPH-CONTENT (4002) ───────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-subgraph-content
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-content
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: edusphere-gateway
+      ports:
+        - protocol: TCP
+          port: 4002
+
+---
+# ─── GATEWAY → SUBGRAPH-ANNOTATION (4003) ────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-subgraph-annotation
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-annotation
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: edusphere-gateway
+      ports:
+        - protocol: TCP
+          port: 4003
+
+---
+# ─── GATEWAY + SUBGRAPH-CORE → SUBGRAPH-COLLABORATION (4004) ─────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-core-to-subgraph-collaboration
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-collaboration
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: edusphere-gateway
+        - podSelector:
+            matchLabels:
+              app: subgraph-core
+      ports:
+        - protocol: TCP
+          port: 4004
+
+---
+# ─── GATEWAY + SUBGRAPH-KNOWLEDGE → SUBGRAPH-AGENT (4005) ───────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-knowledge-to-subgraph-agent
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-agent
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: edusphere-gateway
+        - podSelector:
+            matchLabels:
+              app: subgraph-knowledge
+      ports:
+        - protocol: TCP
+          port: 4005
+
+---
+# ─── GATEWAY + SUBGRAPH-AGENT → SUBGRAPH-KNOWLEDGE (4006) ───────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-agent-to-subgraph-knowledge
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-knowledge
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: edusphere-gateway
+        - podSelector:
+            matchLabels:
+              app: subgraph-agent
+      ports:
+        - protocol: TCP
+          port: 4006
+
+---
+# ─── ALL SUBGRAPHS → POSTGRESQL (5432) ───────────────────────────────────────
+# All subgraphs and the gateway may egress to PostgreSQL on 5432.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-subgraphs-to-postgres
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      role: subgraph
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+
+---
+# ─── ALL SUBGRAPHS → NATS (4222) ─────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-subgraphs-to-nats
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      role: subgraph
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: nats
+      ports:
+        - protocol: TCP
+          port: 4222
+        # NATS cluster routing port
+        - protocol: TCP
+          port: 6222
+        # NATS monitoring
+        - protocol: TCP
+          port: 8222
+
+---
+# ─── ALL SUBGRAPHS → MINIO (9000) ────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-subgraphs-to-minio
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      role: subgraph
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: minio
+      ports:
+        - protocol: TCP
+          port: 9000
+        # MinIO Console
+        - protocol: TCP
+          port: 9001
+
+---
+# ─── PROMETHEUS SCRAPE (9090) ────────────────────────────────────────────────
+# Allow Prometheus to scrape metrics from all pods in the namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus-scrape
+  namespace: edusphere
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+        # Node.js default metrics port
+        - protocol: TCP
+          port: 9464
+
+---
+# ─── HEALTH CHECK ENDPOINTS ───────────────────────────────────────────────────
+# Allow Kubernetes liveness/readiness probes and internal load balancer health checks
+# from the host network (kubelets run on the host network, not as pods).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-health-check-probes
+  namespace: edusphere
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Kubelet liveness/readiness probes come from the host network
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            # Restrict to cluster node CIDR — adjust for your cluster
+            except:
+              - 169.254.0.0/16
+      ports:
+        # HTTP health endpoint on each subgraph
+        - protocol: TCP
+          port: 3000
+        # Alternate health port (NestJS default)
+        - protocol: TCP
+          port: 3001
+
+---
+# ─── DNS EGRESS ───────────────────────────────────────────────────────────────
+# All pods must be able to resolve DNS (kube-dns in kube-system).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: edusphere
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# ─── KEYCLOAK EGRESS (8080/8443) ─────────────────────────────────────────────
+# Subgraphs and gateway must reach Keycloak for JWKS/token validation.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-keycloak-egress
+  namespace: edusphere
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: keycloak
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
+
+---
+# ─── EXTERNAL EGRESS (Ollama / OpenAI / Anthropic) ───────────────────────────
+# Only subgraph-agent may reach external AI endpoints. All other pods
+# have no external egress (default deny covers this).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-agent-external-ai-egress
+  namespace: edusphere
+spec:
+  podSelector:
+    matchLabels:
+      app: subgraph-agent
+  policyTypes:
+    - Egress
+  egress:
+    # HTTPS to external LLM providers (OpenAI, Anthropic) and Ollama
+    - ports:
+        - protocol: TCP
+          port: 443
+        # Ollama default port (in-cluster)
+        - protocol: TCP
+          port: 11434

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { VideoPlayerWithCurriculum } from './VideoPlayerWithCurriculum';
 
 vi.mock('lucide-react', () => ({
@@ -111,5 +111,100 @@ describe('VideoPlayerWithCurriculum', () => {
     expect(screen.getByTestId('progress-count')).toBeInTheDocument();
     expect(screen.getByTestId('prev-lesson-btn')).toBeInTheDocument();
     expect(screen.getByTestId('next-lesson-btn')).toBeInTheDocument();
+  });
+});
+
+// ── Captions / WCAG 1.2.2 ─────────────────────────────────────────────────────
+
+describe('VideoPlayerWithCurriculum — captions (WCAG 1.2.2)', () => {
+  const CAPTIONS_URL = 'https://minio.example.com/captions/tenant/course/asset/en.vtt';
+
+  function renderWithCaptions(captionsUrl?: string) {
+    return render(
+      <VideoPlayerWithCurriculum
+        courseTitle="Test Course"
+        currentLessonId="l1"
+        videoUrl="https://example.com/video.mp4"
+        curriculum={MOCK_CURRICULUM}
+        onLessonSelect={vi.fn()}
+        captionsUrl={captionsUrl}
+      />
+    );
+  }
+
+  it('renders <track> element when captionsUrl is provided', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    const track = screen.getByTestId('captions-track');
+    expect(track).toBeInTheDocument();
+    expect(track).toHaveAttribute('kind', 'captions');
+    expect(track).toHaveAttribute('src', CAPTIONS_URL);
+  });
+
+  it('does NOT render <track> when captionsUrl is not provided', () => {
+    renderWithCaptions();
+    expect(screen.queryByTestId('captions-track')).not.toBeInTheDocument();
+  });
+
+  it('renders CC toggle button when captionsUrl is provided', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    const btn = screen.getByTestId('cc-toggle-btn');
+    expect(btn).toBeInTheDocument();
+    expect(btn).toHaveTextContent('CC');
+  });
+
+  it('does NOT render CC toggle button when captionsUrl is not provided', () => {
+    renderWithCaptions();
+    expect(screen.queryByTestId('cc-toggle-btn')).not.toBeInTheDocument();
+  });
+
+  it('CC button has aria-label="Toggle captions"', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    expect(screen.getByTestId('cc-toggle-btn')).toHaveAttribute(
+      'aria-label',
+      'Toggle captions'
+    );
+  });
+
+  it('CC button has aria-pressed=true when captions are enabled (default)', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    const btn = screen.getByTestId('cc-toggle-btn');
+    expect(btn).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('CC button aria-pressed toggles to false after click', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    const btn = screen.getByTestId('cc-toggle-btn');
+    act(() => { fireEvent.click(btn); });
+    expect(btn).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('CC button aria-pressed toggles back to true on second click', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    const btn = screen.getByTestId('cc-toggle-btn');
+    act(() => { fireEvent.click(btn); });
+    act(() => { fireEvent.click(btn); });
+    expect(btn).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('track has srcLang defaulting to "en"', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    expect(screen.getByTestId('captions-track')).toHaveAttribute('srclang', 'en');
+  });
+
+  it('track has label defaulting to "English"', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    expect(screen.getByTestId('captions-track')).toHaveAttribute('label', 'English');
+  });
+
+  it('video element has crossOrigin=anonymous when captionsUrl is provided', () => {
+    renderWithCaptions(CAPTIONS_URL);
+    const video = screen.getByTestId('video-element');
+    expect(video).toHaveAttribute('crossorigin', 'anonymous');
+  });
+
+  it('video element does NOT have crossOrigin when captionsUrl is absent', () => {
+    renderWithCaptions();
+    const video = screen.getByTestId('video-element');
+    expect(video).not.toHaveAttribute('crossorigin');
   });
 });

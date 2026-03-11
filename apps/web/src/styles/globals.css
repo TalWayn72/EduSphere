@@ -272,6 +272,14 @@
   }
 
   /* Card hover effect */
+  /* WCAG 1.4.3 — Contrast Minimum
+     .card-interactive:hover changes box-shadow and transform ONLY — no background
+     or text color change occurs on hover. The card text (--card-foreground, slate-900
+     on white in light mode) retains its resting contrast ratio of ≥ 7:1 on hover.
+     Dark mode: --card-foreground (210 40% 96%) on --card (222 47% 9%) ≈ 11:1 ✓
+     Hover backgrounds in nav items use bg-muted/60 (--muted at 60% opacity):
+       Light: muted = hsl(210 40% 96%) / 0.6 ≈ #eef2f7 — muted-foreground (215 16% 47%) ≈ 4.6:1 ✓
+       Dark:  muted = hsl(217 33% 14%) / 0.6 ≈ #1a2030 — muted-foreground (215 20% 65%) ≈ 5.1:1 ✓ */
   .card-interactive {
     box-shadow: var(--shadow-card);
     transition: box-shadow var(--duration-fast) var(--ease-out),

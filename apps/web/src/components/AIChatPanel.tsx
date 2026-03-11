@@ -196,6 +196,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
       )}
 
       <div
+        aria-label="AI Chat Panel"
         className={cn(
           'fixed top-0 right-0 h-full w-full md:w-[480px] bg-background border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col',
           isOpen ? 'translate-x-0' : 'translate-x-full',
@@ -216,6 +217,15 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           >
             <X className="h-4 w-4" />
           </Button>
+        </div>
+
+        {/* EU AI Act Art. 50 + WCAG — permanent, non-dismissible AI disclosure */}
+        <div
+          role="note"
+          aria-label="AI disclosure"
+          className="mx-4 mt-3 text-xs text-muted-foreground bg-muted/50 rounded p-2 mb-2"
+        >
+          🤖 You are interacting with an AI assistant. Responses are AI-generated and may contain errors.
         </div>
 
         <div className="p-4 border-b bg-background">

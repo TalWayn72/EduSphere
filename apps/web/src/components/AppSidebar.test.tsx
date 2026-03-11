@@ -223,6 +223,15 @@ describe('AppSidebar', () => {
     expect(screen.getByTestId('powered-by-edusphere')).toHaveTextContent('Powered by EduSphere');
   });
 
+  // WCAG 3.2.6 — Consistent Help
+  it('renders Help & Support nav item (WCAG 3.2.6 — consistent help location)', () => {
+    renderAt();
+    const helpLink = screen.getByTestId('nav-item-help');
+    expect(helpLink).toBeInTheDocument();
+    expect(helpLink).toHaveAttribute('aria-label', 'Help and Support');
+    expect(helpLink).toHaveTextContent('Help & Support');
+  });
+
   it('shows theme toggle for dark mode when resolvedMode is dark', () => {
     vi.mocked(useTheme).mockReturnValue({
       resolvedMode: 'dark',
