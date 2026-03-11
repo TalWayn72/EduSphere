@@ -9,12 +9,11 @@
  * All endpoints are unauthenticated and publicly accessible.
  */
 import { Controller, Get, Header, Logger, Res } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { AeoService } from './aeo.service';
 import type { PublicCourse, FeatureItem, FaqItem } from './aeo.service';
 
-@Throttle({ default: { limit: 60, ttl: 60000 } })
+// Rate limiting is enforced at the gateway level (Hive Gateway / nginx).
 @Controller('aeo')
 export class AeoController {
   private readonly logger = new Logger(AeoController.name);
