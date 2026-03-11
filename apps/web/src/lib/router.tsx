@@ -467,6 +467,15 @@ const CohortInsightsPage = lazy(() =>
     default: m.CohortInsightsPage,
   }))
 );
+const FaqPage = lazy(() =>
+  import('@/pages/FaqPage').then((m) => ({ default: m.FaqPage }))
+);
+const FeaturesPage = lazy(() =>
+  import('@/pages/FeaturesPage').then((m) => ({ default: m.FeaturesPage }))
+);
+const GlossaryPage = lazy(() =>
+  import('@/pages/GlossaryPage').then((m) => ({ default: m.GlossaryPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -520,6 +529,31 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <AccessibilityStatementPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public AEO pages — no authentication required
+    path: '/faq',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <FaqPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/features',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <FeaturesPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/glossary',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <GlossaryPage />
       </Suspense>
     ),
   },

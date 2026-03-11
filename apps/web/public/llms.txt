@@ -1,0 +1,43 @@
+# EduSphere
+
+> AI-powered Learning Management System combining knowledge graph intelligence, adaptive AI tutoring (Chavruta), semantic search, and enterprise LMS capabilities. Supports 100,000+ concurrent users.
+
+EduSphere is a B2B/B2C SaaS educational platform for higher education institutions, enterprise L&D teams, and individual learners. Key differentiators include an Apache AGE knowledge graph for concept relationship mapping, a LangGraph.js-powered AI tutor, and pgvector semantic search.
+
+## Platform Overview
+
+EduSphere delivers personalized learning experiences through AI-driven content adaptation, real-time collaboration, and knowledge graph-based concept connections. Supports SCORM 1.2/2004, xAPI/Tin Can, LTI 1.3, and OpenBadges 3.0.
+
+## Core Features
+
+- [AI Tutoring (Chavruta)](https://app.edusphere.dev/features#ai-tutor): Socratic dialogue AI that adapts to your learning pace and style
+- [Knowledge Graph](https://app.edusphere.dev/features#knowledge-graph): Visual concept network built from your personal learning history
+- [Gamification](https://app.edusphere.dev/features#gamification): 5-level mastery system with streaks, badges, and leaderboards
+- [Live Sessions](https://app.edusphere.dev/features#live-sessions): Real-time collaborative learning with attendance tracking
+- [Enterprise Grade](https://app.edusphere.dev/features#enterprise): Multi-tenant, SSO/SAML/SCIM, GDPR compliant, WCAG 2.2 AA
+
+## Pricing
+
+- Free: $0/month — 100 courses, basic AI tutor (10 msgs/day)
+- Pro: $29/month — Unlimited courses, unlimited AI tutor, knowledge graph access
+- Enterprise: Custom pricing — Multi-tenant management, custom branding, SLA
+
+## Public Resources
+
+- [Features Overview](https://app.edusphere.dev/features)
+- [FAQ](https://app.edusphere.dev/faq)
+- [Educational Glossary](https://app.edusphere.dev/glossary)
+- [Accessibility Statement](https://app.edusphere.dev/accessibility)
+- [Pricing](https://app.edusphere.dev/landing#pricing)
+
+## Standards & Compliance
+
+- GDPR compliant — data processing agreements available
+- WCAG 2.2 AA accessibility certified
+- SCORM 1.2, SCORM 2004, xAPI/Tin Can, LTI 1.3, OpenBadges 3.0
+
+## Contact
+
+- Support: support@edusphere.dev
+- Enterprise sales: enterprise@edusphere.dev
+- Security: security@edusphere.dev

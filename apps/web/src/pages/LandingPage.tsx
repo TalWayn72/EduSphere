@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { PageMeta, SoftwareApplicationSchema } from '@/components/seo';
 import { Link } from 'react-router-dom';
 import {
   Brain,
@@ -536,6 +537,12 @@ function LandingFooter() {
 export function LandingPage() {
   return (
     <div className="min-h-screen font-sans">
+      <PageMeta
+        title="AI-Powered Knowledge Graph Learning Platform"
+        description="EduSphere: personalized AI tutoring (Chavruta), knowledge graphs, gamification, and enterprise LMS. Free for individuals, scalable to 100,000+ users."
+        canonical="https://app.edusphere.dev/landing"
+      />
+      <SoftwareApplicationSchema />
       <LandingNav />
       <main>
         <HeroSection />

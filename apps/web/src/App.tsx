@@ -14,6 +14,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { SkipLinks } from '@/components/a11y/SkipLinks';
 import { registerServiceWorker } from '@/pwa';
+import { WebSiteSchema, OrganizationSchema } from '@/components/seo';
 
 // ── App ──────────────────────────────────────────────────────────────────────
 
@@ -58,6 +59,8 @@ function App() {
 
   return (
     <ThemeProvider>
+      <WebSiteSchema />
+      <OrganizationSchema />
       <SkipLinks />
       <QueryClientProvider client={queryClient}>
         <UrqlProvider value={urqlClient}>
