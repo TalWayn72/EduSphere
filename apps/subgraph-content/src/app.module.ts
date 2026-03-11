@@ -32,6 +32,7 @@ import { VisualAnchorModule } from './visual-anchor/visual-anchor.module';
 import { DocumentVersionModule } from './document-version/document-version.module';
 import { ContentImportModule } from './content-import/content-import.module';
 import { PeerReviewModule } from './peer-review/peer-review.module';
+import { AeoModule } from './aeo/aeo.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { PeerReviewModule } from './peer-review/peer-review.module';
     DocumentVersionModule,
     ContentImportModule,
     PeerReviewModule,
+    AeoModule,
   ],
 })
 export class AppModule {}
