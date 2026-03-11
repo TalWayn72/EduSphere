@@ -169,6 +169,16 @@ vi.mock('./CourseWizardStep3', () => ({
   ),
 }));
 
+// Stub AiCourseCreatorModal — prevents lucide-react Dialog X icon from failing in jsdom
+vi.mock('@/components/AiCourseCreatorModal', () => ({
+  AiCourseCreatorModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+    isOpen ? (
+      <div data-testid="ai-course-modal">
+        <button onClick={onClose}>Close</button>
+      </div>
+    ) : null,
+}));
+
 // Stub sonner toast — prevents real toast system from mounting
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
