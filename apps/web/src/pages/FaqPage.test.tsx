@@ -109,7 +109,7 @@ describe('FaqPage', () => {
     renderFaqPage();
     const searchInput = screen.getByPlaceholderText(/Search questions/i);
     fireEvent.change(searchInput, { target: { value: 'SCORM' } });
-    expect(screen.getByText(/SCORM/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/SCORM/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('search with non-matching term shows "No questions found" empty state', () => {

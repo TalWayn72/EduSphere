@@ -8,7 +8,8 @@ Allow: /glossary
 Allow: /u/
 Allow: /verify/badge/
 Disallow: /dashboard
-Disallow: /admin
+Disallow: /admin/
+Disallow: /oauth/
 Disallow: /settings
 Disallow: /courses/
 Disallow: /api/

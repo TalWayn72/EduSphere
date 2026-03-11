@@ -15,6 +15,7 @@ import { describe, it, expect } from 'vitest';
 import { PageMeta } from './PageMeta';
 import { FAQSchema } from './FAQSchema';
 import { BreadcrumbSchema } from './BreadcrumbSchema';
+import { safeJsonLd } from '@/lib/safe-json-ld';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -163,8 +164,7 @@ describe('FAQSchema', () => {
         },
       ],
     };
-    const json = JSON.stringify(schema);
-    // JSON.stringify escapes < to \u003c, so </script> becomes \u003c/script>
+    const json = safeJsonLd(schema);
     expect(json).not.toContain('</script>');
     // The parsed value recovers the original text safely
     const parsed = JSON.parse(json);
