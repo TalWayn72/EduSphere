@@ -12,6 +12,7 @@
  * N parallel provider calls + N parallel vector reads (vectorised with HNSW).
  */
 import { Injectable, Logger } from '@nestjs/common';
+import type { TenantContext } from '@edusphere/db';
 import { EmbeddingService } from './embedding.service.js';
 import type { SearchResult } from './embedding.types.js';
 
@@ -29,6 +30,7 @@ export class EmbeddingDataLoader {
    */
   async batchLoad(
     conceptNames: readonly string[],
+    tenantCtx: TenantContext,
     limit = DEFAULT_LIMIT
   ): Promise<Map<string, SearchResult[]>> {
     const result = new Map<string, SearchResult[]>();
@@ -60,6 +62,7 @@ export class EmbeddingDataLoader {
         try {
           const hits = await this.embeddingService.semanticSearchByVector(
             vector,
+            tenantCtx,
             limit
           );
           result.set(name, hits);
