@@ -7,6 +7,7 @@ import {
   OrganizationSchema,
   SoftwareApplicationSchema,
 } from '@/components/seo';
+import { safeJsonLd } from '@/lib/safe-json-ld';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -170,7 +171,7 @@ export function FeaturesPage() {
       <Helmet>
         {howToSchemas.map((schema, i) => (
           <script key={i} type="application/ld+json">
-            {JSON.stringify(schema)}
+            {safeJsonLd(schema)}
           </script>
         ))}
       </Helmet>

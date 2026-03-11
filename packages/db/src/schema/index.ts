@@ -186,3 +186,6 @@ export * from './group-challenges';
 
 // Phase 47: Knowledge Graph Credentials + Chavruta Partner Sessions
 export * from './knowledge-credentials';
+
+// Phase 50: B2B Billing, Subscription Plans & YAU Counting
+export * from './billing';

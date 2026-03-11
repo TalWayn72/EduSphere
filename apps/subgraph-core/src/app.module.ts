@@ -17,6 +17,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { SavedSearchModule } from './search/saved-search.module.js';
 import { ManagerModule } from './manager/manager.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { BillingModule } from './billing/billing.module.js';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { OnboardingModule } from './onboarding/onboarding.module';
     SavedSearchModule,
     ManagerModule,
     OnboardingModule,
+    BillingModule,
   ],
 })
 export class AppModule {}

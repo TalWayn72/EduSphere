@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, BookOpen } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta, BreadcrumbSchema, OrganizationSchema } from '@/components/seo';
+import { safeJsonLd } from '@/lib/safe-json-ld';
 import { GLOSSARY_TERMS } from '@/lib/aeo-data';
 import type { GlossaryTerm } from '@/lib/aeo-data';
 import { Input } from '@/components/ui/input';
@@ -103,7 +104,7 @@ export function GlossaryPage() {
         canonical="https://app.edusphere.dev/glossary"
       />
       <Helmet>
-        <script type="application/ld+json">{JSON.stringify(definedTermSetSchema)}</script>
+        <script type="application/ld+json">{safeJsonLd(definedTermSetSchema)}</script>
       </Helmet>
       <BreadcrumbSchema
         items={[

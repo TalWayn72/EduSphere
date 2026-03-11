@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://edusphere.dev/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://edusphere.dev/pricing</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/pilot</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/features/knowledge-graph</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/features/visual-anchoring</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/features/ai-course-builder</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/compliance</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/solutions/universities</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/solutions/enterprises</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://edusphere.dev/solutions/government</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+</urlset>

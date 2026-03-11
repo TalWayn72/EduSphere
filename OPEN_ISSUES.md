@@ -1,9 +1,117 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 11 מרץ 2026 (Phase 50 — WCAG 2.2 AA + Security Compliance ✅ COMPLETE)
+**תאריך עדכון:** 11 מרץ 2026 (Phase 50 ✅ + **B2B GTM Platform ✅ COMPLETE**)
 **מצב פרויקט:** ✅ **Phase 50 ✅** (WCAG 2.2 AA + EU AI Act + Security Compliance) + **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅** | **Phase 50 WCAG 2.2 AA + EU AI Act + Security Compliance ✅**
 **בדיקות:** Security: **1,185 tests** | Web: **4,190** (337+ files) | Knowledge: **598** | Transcription: **95** | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 598 + annotation 144 + collab 180 + core 719+) | סה"כ: **~8,445+ tests** | TypeScript: **0 errors**
+
+---
+
+## AEO-001 — Answer Engine Optimization Implementation
+**Status:** ✅ Phase 1 Complete (2026-03-11)
+**Severity:** 🟡 Medium (growth opportunity)
+
+### Implemented (Phase 1)
+- robots.txt with AI bot rules (GPTbot, ClaudeBot, PerplexityBot)
+- llms.txt + llms-full.txt for AI system guidance
+- react-helmet-async per-page meta tags
+- JSON-LD structured data: Organization, WebSite, FAQPage, BreadcrumbList, HowTo, SoftwareApplication, DefinedTermSet
+- 3 new public pages: /faq (20 Q&As), /glossary (20 terms), /features
+- NestJS AeoModule: sitemap.xml + courses/features/faq API
+- safeJsonLd() XSS protection for all JSON-LD scripts
+- Security: AEO_SECURITY_REPORT.md + aeo-security.spec.ts (51 tests)
+- E2E: 4 Playwright spec files for AEO pages
+
+### Remaining (Phase 2 — Future)
+- Pre-rendering/SSR for public routes (GPTbot/ClaudeBot JS blindspot)
+- Course schema on individual course pages (requires public course catalog)
+- Blog with original research content
+- Instructor public profiles with Person schema
+- Dynamic OG image generation per course
+
+### Files Added
+- apps/web/public/robots.txt
+- apps/web/public/llms.txt
+- apps/web/public/llms-full.txt
+- apps/web/src/components/seo/OrganizationSchema.tsx
+- apps/web/src/components/seo/WebSiteSchema.tsx
+- apps/web/src/components/seo/FAQSchema.tsx
+- apps/web/src/components/seo/BreadcrumbSchema.tsx
+- apps/web/src/components/seo/SoftwareApplicationSchema.tsx
+- apps/web/src/components/seo/PageMeta.tsx
+- apps/web/src/components/seo/index.ts
+- apps/web/src/lib/aeo-data.ts
+- apps/web/src/lib/safe-json-ld.ts
+- apps/web/src/lib/safe-json-ld.test.ts
+- apps/web/src/pages/FaqPage.tsx
+- apps/web/src/pages/GlossaryPage.tsx
+- apps/web/src/pages/FeaturesPage.tsx
+- apps/subgraph-content/src/aeo/aeo.controller.ts
+- apps/subgraph-content/src/aeo/aeo.service.ts
+- apps/subgraph-content/src/aeo/aeo.module.ts
+- apps/subgraph-content/src/aeo/aeo.controller.spec.ts
+- docs/security/AEO_SECURITY_REPORT.md
+- docs/plans/features/AEO-STRATEGY-2026.md
+- tests/security/aeo-security.spec.ts
+- E2E: apps/web/e2e/aeo-faq-page.spec.ts, apps/web/e2e/aeo-glossary-page.spec.ts
+
+### Anti-Recurrence
+- safeJsonLd() test at apps/web/src/lib/safe-json-ld.test.ts verifies </script> escaping
+- tests/security/aeo-security.spec.ts verifies no credentials in llms.txt
+
+---
+
+## B2B GTM Platform — Full Implementation ✅ Complete | HIGH
+**Status:** ✅ Complete | **Date:** 2026-03-11
+**Branch:** feat/compliance-accessibility-security
+
+**Scope:** B2B White-Label LMS: Landing Page + Billing + YAU + Pilot Flow + SEO + Security
+
+### Database (packages/db)
+- `packages/db/src/schema/billing.ts` — 5 tables: subscription_plans, tenant_subscriptions, yau_events, pilot_requests, usage_snapshots
+- `packages/db/src/migrations/0030_b2b_billing.sql` — migration with RLS policies + plan seeds
+- RLS: tenant-scoped policies on tenant_subscriptions, yau_events, usage_snapshots
+- SI-1 compliance: `app.current_user_id` (not `app.current_user`) in all YAU policies
+
+### Backend (apps/subgraph-core)
+- `apps/subgraph-core/src/billing/yau-counter.service.ts` — YAU counting (upsert + NATS at 90% limit)
+- `apps/subgraph-core/src/billing/subscription.service.ts` — subscription lifecycle + pilot creation
+- `apps/subgraph-core/src/billing/pilot.service.ts` — public pilot submission + SUPER_ADMIN approval
+- `apps/subgraph-core/src/billing/billing.resolver.ts` — GraphQL resolvers (5 queries, 3 mutations)
+- `apps/subgraph-core/src/billing/billing.schemas.ts` — Zod validation with HTML stripping (XSS protection)
+- `apps/subgraph-core/src/billing/billing.graphql` — SDL with @requiresRole guards
+- 40 unit tests + memory safety spec (OnModuleDestroy verified on all 3 services)
+
+### Frontend (apps/web)
+- 12 landing page sections: Hero, TrustBar, ComplianceBadges, VsCompetitors, UniqueFeatures, HowPilot, AICourse, ROICalculator, Pricing, PilotCTA, Testimonials, Footer
+- `apps/web/index.html` — full SEO: title, description, OG, Twitter, JSON-LD SoftwareApplication schema
+- `apps/web/public/sitemap.xml` — 10 URLs with priorities
+- Pricing tiers: Starter $12K/yr · Growth $28K/yr · University $65K/yr · Enterprise Custom
+- ROI Calculator: interactive sliders (instructors × hours × rate → savings vs EduSphere cost)
+- Pilot form: React Hook Form + Zod + urql → submitPilotRequest mutation
+- WCAG 2.2 AA: all interactive elements have aria-labels, sufficient contrast
+
+### Security
+- `docs/security/B2B_BILLING_THREAT_MODEL.md` — full STRIDE analysis (22 threats)
+- `tests/security/b2b-billing-security.spec.ts` — 60 security tests (60/60 ✅)
+- Rate limiting: pilot endpoint max 5/IP/hour (SC-01)
+- XSS sanitization: stripHtml() on all pilot form text fields (SC-02)
+- IDOR guard: ORG_ADMIN can only query own tenantId (SC-03)
+- Self-approval prevention: cannot approve own org's pilot (SC-04)
+- YAU RLS policy split into 3 PERMISSIVE policies — no OR-bypass (SC-07)
+
+### E2E Tests
+- `apps/web/e2e/landing-b2b.spec.ts` — 52 tests (hero, trust, compliance, pricing, pilot form)
+- `apps/web/e2e/landing-visual-regression.spec.ts` — 15 tests (toHaveScreenshot all sections)
+- `apps/web/e2e/landing-accessibility.spec.ts` — 35 tests (axe-core WCAG audit)
+
+### Research
+- `docs/product/LMS_PRICING_INTELLIGENCE_2026.md` — full competitive pricing report (11 vendors)
+- **Pricing validation:** $12,000/yr (500 YAU) = 2.5–5x cheaper than D2L/Docebo → HOLD pricing ✅
+- **90-day pilot = top-end differentiator** (industry norm: 30 days) ✅
+- **Critical gap flagged:** SCORM 2004 + LTI 1.3 + xAPI needed for enterprise RFPs (Phase 51 blocker)
+
+**Test counts added:** +40 backend + +17 frontend unit + +102 E2E + +60 security = **+219 tests**
 
 ---
 

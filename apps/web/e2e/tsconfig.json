@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "lib": ["ES2022", "DOM"],
+    "baseUrl": "."
+  },
+  "include": ["**/*.ts"]
+}

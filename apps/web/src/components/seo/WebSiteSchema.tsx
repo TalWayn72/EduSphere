@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { safeJsonLd } from '@/lib/safe-json-ld';
 
 export function WebSiteSchema() {
   const schema = {
@@ -20,7 +21,7 @@ export function WebSiteSchema() {
 
   return (
     <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
+      <script type="application/ld+json">{safeJsonLd(schema)}</script>
     </Helmet>
   );
 }
