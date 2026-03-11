@@ -1,9 +1,61 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 11 מרץ 2026 (BUG-058..062 UI/UX Bugs — nav keys, layout offset, logo, SRS error, language persistence ✅ FIXED)
-**מצב פרויקט:** ✅ **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅**
-**בדיקות:** Security: **1,031 tests** | Web: **4,103** (337 files) | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 582 + annotation 144 + collab 180 + core 719+) | סה"כ: **~6,710+ tests** | TypeScript: **0 errors**
+**תאריך עדכון:** 11 מרץ 2026 (Phase 50 — WCAG 2.2 AA + Security Compliance ✅ COMPLETE)
+**מצב פרויקט:** ✅ **Phase 50 ✅** (WCAG 2.2 AA + EU AI Act + Security Compliance) + **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅** | **Phase 50 WCAG 2.2 AA + EU AI Act + Security Compliance ✅**
+**בדיקות:** Security: **1,185 tests** | Web: **4,190** (337+ files) | Knowledge: **598** | Transcription: **95** | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 598 + annotation 144 + collab 180 + core 719+) | סה"כ: **~8,445+ tests** | TypeScript: **0 errors**
+
+---
+
+## Phase 50 — WCAG 2.2 AA + Security Compliance ✅ Complete | HIGH
+**Status:** ✅ Complete | **Commit:** 72a961b | **Date:** 2026-03-11
+**Branch:** feat/compliance-accessibility-security
+**Tests:** web 4,190/4,190 ✅ | security 1,185/1,185 ✅ | knowledge 598/598 ✅ | transcription 95/95 ✅
+**Files changed:** 56 files, 7,966 insertions
+
+**Deliverables:**
+
+### WCAG 2.2 AA Accessibility
+- **SC 2.5.7** `DragOrderQuestion` — keyboard drag alternative (arrow keys + Enter to move items)
+- **SC 2.1.1** `KnowledgeSkillTree` — full ARIA APG tree widget (role=tree, role=treeitem, keyboard navigation)
+- **SC 3.1.1** `lang` attribute — auto-set on `<html>` from i18n locale on every language change
+- **SC 1.4.1** `MasteryBadge` — text label + color (not color alone to convey mastery level)
+- **SC 1.2.2** `VideoPlayer` — WebVTT captions support (track element, caption toggle button)
+- **SC 3.2.6** `AppSidebar` — Help & Documentation link in consistent navigation location
+- **SC 3.3.7** Onboarding forms — `autoComplete` attributes on all identity fields
+
+### EU AI Act Compliance (Art. 14 + Art. 50)
+- `AIOverrideRequestButton` — human oversight control (Art. 14), visible on all AI-generated content
+- `AITransparencyBadge` — AI disclosure badge (Art. 50), consistent placement across AI features
+- `AIChatPanel` — disclosure banner shown at session start before first AI interaction
+
+### Security
+- HTTP Security Headers middleware (gateway): `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`
+- pgvector RLS cross-tenant fix — `content_embeddings` and `annotation_embeddings` now enforce tenant isolation (OWASP LLM06)
+- Keycloak MFA enforcement — OTP required for INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN roles
+- Linkerd mTLS Kubernetes manifests — all subgraph-to-subgraph communication encrypted
+- K8s NetworkPolicy — deny-all default + explicit allow rules per subgraph
+
+### Compliance Documentation (10 docs in `docs/compliance/`)
+- ROPA (Records of Processing Activities)
+- DPIA (Data Protection Impact Assessment)
+- Breach Notification Procedure
+- EU AI Act Technical Documentation
+- Accessibility Statement (Hebrew + English)
+- ISO 27001 ISMS Policy + Statement of Applicability (SoA)
+- SOC2 Type II Readiness Report
+- Asset Inventory
+- Vendor Risk Register
+
+### Security Tests Added
+- `tests/security/http-security-headers.spec.ts` (+30 tests)
+- `tests/security/keycloak-mfa.spec.ts` (+30 tests)
+- `tests/security/linkerd-mtls.spec.ts` (+30 tests)
+
+**Anti-recurrence:**
+- WCAG: `apps/web/e2e/accessibility.spec.ts` — axe-core scans on every major page
+- EU AI Act: `tests/security/ai-compliance.spec.ts` — asserts disclosure banner + override button presence
+- Security headers: `tests/security/http-security-headers.spec.ts` — asserts all 6 headers present
 
 ---
 
