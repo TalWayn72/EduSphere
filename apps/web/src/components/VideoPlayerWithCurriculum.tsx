@@ -65,6 +65,7 @@ export function VideoPlayerWithCurriculum({
 }: VideoPlayerWithCurriculumProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [captionsEnabled, setCaptionsEnabled] = useState(true);
+  // eslint-disable-next-line no-undef
   const trackRef = useRef<HTMLTrackElement>(null);
 
   const toggleCaptions = useCallback(() => {

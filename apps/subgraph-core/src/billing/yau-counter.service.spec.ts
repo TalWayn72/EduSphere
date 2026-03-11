@@ -11,10 +11,10 @@ const mockSelect = vi.fn();
 const mockUpdate = vi.fn();
 const mockOnConflictDoUpdate = vi.fn().mockResolvedValue([]);
 const mockReturning = vi.fn().mockResolvedValue([]);
-const mockWhere = vi.fn();
-const mockLimit = vi.fn();
-const mockFrom = vi.fn();
-const mockOrderBy = vi.fn();
+const _mockWhere = vi.fn();
+const _mockLimit = vi.fn();
+const _mockFrom = vi.fn();
+const _mockOrderBy = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
   const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;

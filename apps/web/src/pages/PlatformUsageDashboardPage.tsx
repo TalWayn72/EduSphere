@@ -3,7 +3,6 @@
  * Route: /admin/platform-usage
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -52,7 +51,6 @@ function statusEmoji(pct: number): string {
 }
 
 export function PlatformUsageDashboardPage() {
-  const navigate = useNavigate();
   const role = useAuthRole();
   const [mounted, setMounted] = useState(false);
 
@@ -65,20 +63,13 @@ export function PlatformUsageDashboardPage() {
     pause: !mounted,
   });
 
-  if (role && role !== 'SUPER_ADMIN') {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center" data-testid="access-denied">
-        <p className="text-destructive font-semibold">Access Denied — SUPER_ADMIN only</p>
-      </div>
-    );
-  }
-
   const { data, fetching, error } = result;
 
   const rows = [...(data?.platformUsageOverview ?? [])].sort(
     (a, b) => b.seatUtilizationPct - a.seatUtilizationPct
   );
 
+  // handleExportCsv declared before early return to satisfy React hooks ordering rules
   const handleExportCsv = useCallback(() => {
     const header = 'Tenant,Plan,YAU,Seat Limit,Utilization %,Status\n';
     const body = rows
@@ -95,6 +86,14 @@ export function PlatformUsageDashboardPage() {
     a.click();
     URL.revokeObjectURL(url);
   }, [rows]);
+
+  if (role && role !== 'SUPER_ADMIN') {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center" data-testid="access-denied">
+        <p className="text-destructive font-semibold">Access Denied — SUPER_ADMIN only</p>
+      </div>
+    );
+  }
 
   return (
     <AdminLayout

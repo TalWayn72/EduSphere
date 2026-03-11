@@ -11,7 +11,7 @@ import { BadRequestException, UnauthorizedException, NotFoundException } from '@
 const mockSelect = vi.fn();
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
-const mockReturning = vi.fn();
+const _mockReturning = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
   const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;

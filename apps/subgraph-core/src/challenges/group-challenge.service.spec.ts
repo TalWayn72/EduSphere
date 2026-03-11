@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BadRequestException } from '@nestjs/common';
 
 // ── DB mocks ──────────────────────────────────────────────────────────────────
-const { mockWithTenantContext, mockInsert, mockSelect, mockUpdate, mockExecute, mockReturning } = vi.hoisted(() => {
+const { mockWithTenantContext, mockInsert: _mockInsert, mockSelect, mockUpdate: _mockUpdate, mockExecute: _mockExecute, mockReturning } = vi.hoisted(() => {
   const mockReturning = vi.fn();
   const mockInsert = vi.fn(() => ({ values: vi.fn(() => ({ returning: mockReturning })) }));
   const mockSelect = vi.fn();
