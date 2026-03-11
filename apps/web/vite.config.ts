@@ -53,6 +53,11 @@ export default defineConfig({
         target: 'http://localhost:4006',
         changeOrigin: true,
       },
+      '/sitemap.xml': {
+        target: 'http://localhost:4002',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/sitemap\.xml/, '/aeo/sitemap.xml'),
+      },
     },
   },
   build: {
