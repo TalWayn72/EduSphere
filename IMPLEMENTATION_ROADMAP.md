@@ -2021,6 +2021,39 @@ pnpm turbo test 2>/dev/null
 
 ---
 
+## Phase 50 — WCAG 2.2 AA + Security Compliance ✅ Complete
+
+**Status:** ✅ Complete | **Commit:** `72a961b` | **Date:** 2026-03-11 | **Branch:** `feat/compliance-accessibility-security`
+
+### What Was Built
+
+- **WCAG 2.2 AA**: DragOrderQuestion keyboard (SC 2.5.7), KnowledgeSkillTree ARIA APG tree (SC 2.1.1), `lang` attribute sync (SC 3.1.1), MasteryBadge text+color (SC 1.4.1), VideoPlayer WebVTT captions (SC 1.2.2), AppSidebar Help link (SC 3.2.6), onboarding `autoComplete` (SC 3.3.7)
+- **EU AI Act**: `AIOverrideRequestButton` (Art. 14 human oversight), `AITransparencyBadge` (Art. 50 disclosure), `AIChatPanel` disclosure banner
+- **Security**: HTTP Security Headers middleware (gateway), pgvector RLS cross-tenant fix (OWASP LLM06), Keycloak MFA enforcement, Linkerd mTLS manifests, K8s NetworkPolicy
+- **Compliance Docs** (10 docs in `docs/compliance/`): ROPA, DPIA, Breach Notification, EU AI Act Tech Docs, Accessibility Statement (Hebrew), ISO 27001 ISMS + SoA, SOC2 Readiness, Asset Inventory, Vendor Risk Register
+- **Security Tests** (+90 tests): `http-security-headers.spec.ts`, `keycloak-mfa.spec.ts`, `linkerd-mtls.spec.ts`
+
+### Acceptance Criteria
+
+```bash
+# All tests pass
+pnpm turbo test  # web 4,190 ✅ | security 1,185 ✅ | knowledge 598 ✅ | transcription 95 ✅
+
+# TypeScript zero errors
+pnpm turbo typecheck  # ✅
+
+# WCAG validation
+pnpm --filter @edusphere/web test:e2e  # accessibility.spec.ts ✅
+
+# Security headers present
+pnpm test:security  # http-security-headers.spec.ts ✅
+
+# EU AI Act compliance
+pnpm test:security  # ai-compliance.spec.ts ✅
+```
+
+---
+
 > **CRITICAL REMINDER FOR CLAUDE CODE**:
 >
 > - **Never skip phases.** Each phase builds on the previous one.
