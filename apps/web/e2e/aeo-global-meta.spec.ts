@@ -166,11 +166,17 @@ test.describe('Global AEO — Meta Tags & Structured Data', () => {
     const paths = ['/faq', '/features', '/glossary'];
     for (const path of paths) {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      // Wait for React + react-helmet-async to inject the per-page canonical.
-      // The static index.html no longer includes a canonical; PageMeta sets it dynamically.
+      // Wait for the page-specific canonical to be injected by react-helmet-async.
+      // We match on the path segment (e.g. "faq") to avoid reading a stale or
+      // generic canonical that doesn't correspond to this page's PageMeta render.
+      const pathSegment = path.slice(1); // '/faq' → 'faq'
       await page.waitForFunction(
-        () => !!document.querySelector('link[rel="canonical"]'),
-        { timeout: 10000 },
+        (segment) => {
+          const el = document.querySelector('link[rel="canonical"]');
+          return el ? (el.getAttribute('href') ?? '').includes(segment) : false;
+        },
+        pathSegment,
+        { timeout: 15000 },
       );
       const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
       expect(canonical).toBeTruthy();
