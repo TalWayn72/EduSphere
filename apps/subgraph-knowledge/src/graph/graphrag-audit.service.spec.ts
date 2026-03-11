@@ -24,14 +24,13 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((_col: unknown, _val: unknown) => ({ eq: true })),
   count: vi.fn(() => ({ count: true })),
   sql: vi.fn(),
-}));
-
-vi.mock('@edusphere/db/schema', () => ({
-  auditLog: {
-    tenantId: 'tenant_id',
-    action: 'action',
-    createdAt: 'created_at',
-    metadata: 'metadata',
+  schema: {
+    auditLog: {
+      tenantId: 'tenant_id',
+      action: 'action',
+      createdAt: 'created_at',
+      metadata: 'metadata',
+    },
   },
 }));
 

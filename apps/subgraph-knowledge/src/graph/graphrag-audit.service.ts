@@ -9,8 +9,8 @@ import {
   eq,
   count,
   sql,
+  schema,
 } from '@edusphere/db';
-import { auditLog } from '@edusphere/db/schema';
 
 /**
  * GraphragAuditService — append-only audit trail for GraphRAG queries.
@@ -62,7 +62,7 @@ export class GraphragAuditService implements OnModuleDestroy {
    */
   async recordQuery(params: GraphragQueryParams): Promise<void> {
     try {
-      await this.db.insert(auditLog).values({
+      await this.db.insert(schema.auditLog).values({
         tenantId: params.tenantId,
         action: GRAPHRAG_ACTION,
         resourceType: 'GRAPHRAG',
@@ -99,15 +99,15 @@ export class GraphragAuditService implements OnModuleDestroy {
     const rows = await this.db
       .select({
         total: count(),
-        metadata: auditLog.metadata,
+        metadata: schema.auditLog.metadata,
       })
-      .from(auditLog)
+      .from(schema.auditLog)
       .where(
         and(
-          eq(auditLog.tenantId, tenantId),
-          eq(auditLog.action, GRAPHRAG_ACTION),
-          gte(auditLog.createdAt, startDate),
-          lte(auditLog.createdAt, endDate)
+          eq(schema.auditLog.tenantId, tenantId),
+          eq(schema.auditLog.action, GRAPHRAG_ACTION),
+          gte(schema.auditLog.createdAt, startDate),
+          lte(schema.auditLog.createdAt, endDate)
         )
       );
 
@@ -115,14 +115,14 @@ export class GraphragAuditService implements OnModuleDestroy {
 
     // Compute average confidence and top sources across all matching rows
     const allRows = await this.db
-      .select({ metadata: auditLog.metadata })
-      .from(auditLog)
+      .select({ metadata: schema.auditLog.metadata })
+      .from(schema.auditLog)
       .where(
         and(
-          eq(auditLog.tenantId, tenantId),
-          eq(auditLog.action, GRAPHRAG_ACTION),
-          gte(auditLog.createdAt, startDate),
-          lte(auditLog.createdAt, endDate)
+          eq(schema.auditLog.tenantId, tenantId),
+          eq(schema.auditLog.action, GRAPHRAG_ACTION),
+          gte(schema.auditLog.createdAt, startDate),
+          lte(schema.auditLog.createdAt, endDate)
         )
       );
 
