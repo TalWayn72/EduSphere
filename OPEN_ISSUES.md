@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 12 מרץ 2026 (Phase 52 ✅ — B2B GTM + Air-Gapped + Partner Portal + HRIS + Investor Deck — commits ff12192 + 19e2e75)
+**תאריך עדכון:** 12 מרץ 2026 (Phase 53 ✅ — AEO Phase 2 — Course Catalog + Instructor Directory + pre-render + sitemap update)
 
 ---
 
@@ -59,7 +59,7 @@
 ---
 
 ## AEO-001 — Answer Engine Optimization Implementation
-**Status:** ✅ Phase 1 Complete + Session 2 Fixes (2026-03-11) + Session 3 Final (2026-03-12)
+**Status:** ✅ Phase 1 + Phase 2 Complete (2026-03-12) — E2E 30/30 chromium ✅
 **Severity:** 🟡 Medium (growth opportunity)
 
 ### Implemented (Phase 1)
@@ -90,12 +90,22 @@
 - Fixed AeoController: removed @nestjs/throttler + restored gateway rate-limit comment
 - Updated aeo-security.spec.ts to accept gateway-level rate limiting as compliant
 
-### Remaining (Phase 2 — Future)
-- Pre-rendering/SSR for public routes (GPTbot/ClaudeBot JS blindspot)
-- Course schema on individual course pages (requires public course catalog)
-- Blog with original research content
-- Instructor public profiles with Person schema
-- Dynamic OG image generation per course
+### Phase 2 — Complete (2026-03-12 — commit pending)
+- `/catalog` public page — 6 featured courses with CourseSchema JSON-LD × 6 + BreadcrumbList
+- `/instructors` public page — 4 instructor profiles with PersonSchema × 4 + BreadcrumbList
+- CourseSchema.tsx, PersonSchema.tsx, HowToSchema.tsx — new reusable schema components
+- sitemap.xml updated — /landing (1.0), /faq, /features, /catalog (0.9), /instructors (0.8), /glossary, /accessibility (0.7)
+- llms.txt updated with Phase 2 public resources
+- prerender.mjs script for post-build static HTML generation (7 public routes)
+- AeoService enhanced: getCatalog() + getInstructors() + getEnhancedSitemap() endpoints
+- 17 new security tests (aeo-security.spec.ts) — catalog/instructors content safety + XSS guards
+- E2E: aeo-phase2.spec.ts — 30/30 pass, 6 skipped (backend sitemap tests — expected)
+
+### Remaining (Phase 3 — Future)
+- Blog with original research content (requires CMS infrastructure)
+- Dynamic OG image generation per course (requires Vercel OG or similar)
+- Course schema on REAL dynamic course pages (requires public course catalog API)
+- Instructor profiles for REAL users (requires public profile opt-in)
 
 ### Files Added
 - apps/web/public/robots.txt

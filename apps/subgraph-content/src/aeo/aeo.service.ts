@@ -46,6 +46,25 @@ export interface FaqItem {
   answer: string;
 }
 
+export interface CatalogCourse {
+  id: string;
+  name: string;
+  description: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  duration: string;
+  category: string;
+  slug: string;
+}
+
+export interface InstructorProfile {
+  id: string;
+  name: string;
+  jobTitle: string;
+  university: string;
+  description: string;
+  specialization: string;
+}
+
 @Injectable()
 export class AeoService {
   private readonly logger = new Logger(AeoService.name);
@@ -70,12 +89,42 @@ export class AeoService {
     }
   }
 
+  async getEnhancedSitemap(): Promise<SitemapUrl[]> {
+    const staticUrls: SitemapUrl[] = [
+      { loc: `${BASE_URL}/landing`, changefreq: 'weekly', priority: 1.0 },
+      { loc: `${BASE_URL}/features`, changefreq: 'monthly', priority: 0.9 },
+      { loc: `${BASE_URL}/faq`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/glossary`, changefreq: 'weekly', priority: 0.8 },
+      { loc: `${BASE_URL}/catalog`, changefreq: 'weekly', priority: 0.9 },
+      { loc: `${BASE_URL}/instructors`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/pricing`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/pilot`, changefreq: 'monthly', priority: 0.7 },
+      { loc: `${BASE_URL}/accessibility`, changefreq: 'monthly', priority: 0.5 },
+    ];
+    let courseUrls: SitemapUrl[] = [];
+    try {
+      const courses = await this.getPublicCourses();
+      courseUrls = courses.map((c) => ({
+        loc: `${BASE_URL}/courses/${c.id}`,
+        changefreq: 'weekly' as const,
+        priority: 0.7,
+      }));
+    } catch (err) {
+      this.logger.warn({ err }, '[AeoService] Enhanced sitemap course fetch failed — using static URLs only');
+    }
+    return [...staticUrls, ...courseUrls];
+  }
+
   async generateSitemapXml(): Promise<string> {
     const staticUrls: SitemapUrl[] = [
       { loc: `${BASE_URL}/landing`, changefreq: 'weekly', priority: 1.0 },
       { loc: `${BASE_URL}/features`, changefreq: 'monthly', priority: 0.9 },
       { loc: `${BASE_URL}/faq`, changefreq: 'monthly', priority: 0.8 },
       { loc: `${BASE_URL}/glossary`, changefreq: 'weekly', priority: 0.8 },
+      { loc: `${BASE_URL}/catalog`, changefreq: 'weekly', priority: 0.9 },
+      { loc: `${BASE_URL}/instructors`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/pricing`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/pilot`, changefreq: 'monthly', priority: 0.7 },
       { loc: `${BASE_URL}/accessibility`, changefreq: 'monthly', priority: 0.5 },
     ];
 
@@ -112,6 +161,102 @@ export class AeoService {
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${urlEntries}
 </urlset>`;
+  }
+
+  getCatalog(): CatalogCourse[] {
+    return [
+      {
+        id: 'cat-001',
+        name: 'Introduction to Artificial Intelligence',
+        description: 'Master AI fundamentals including machine learning, neural networks, and practical applications.',
+        level: 'beginner',
+        duration: '8 weeks',
+        category: 'Artificial Intelligence',
+        slug: 'intro-to-artificial-intelligence',
+      },
+      {
+        id: 'cat-002',
+        name: 'Advanced Knowledge Graphs',
+        description: 'Build and query knowledge graphs using Apache AGE and Cypher with real-world datasets.',
+        level: 'advanced',
+        duration: '10 weeks',
+        category: 'Data Engineering',
+        slug: 'advanced-knowledge-graphs',
+      },
+      {
+        id: 'cat-003',
+        name: 'Full-Stack Development with NestJS',
+        description: 'Build production-grade APIs with NestJS, GraphQL Federation, and PostgreSQL.',
+        level: 'intermediate',
+        duration: '12 weeks',
+        category: 'Software Engineering',
+        slug: 'full-stack-nestjs',
+      },
+      {
+        id: 'cat-004',
+        name: 'Data Science Essentials',
+        description: 'Hands-on data analysis, visualization, and predictive modelling with Python.',
+        level: 'beginner',
+        duration: '6 weeks',
+        category: 'Data Science',
+        slug: 'data-science-essentials',
+      },
+      {
+        id: 'cat-005',
+        name: 'Cybersecurity Fundamentals',
+        description: 'Learn threat modelling, penetration testing, and secure-by-design principles.',
+        level: 'intermediate',
+        duration: '8 weeks',
+        category: 'Security',
+        slug: 'cybersecurity-fundamentals',
+      },
+      {
+        id: 'cat-006',
+        name: 'Cloud Architecture on AWS',
+        description: 'Design scalable, resilient cloud architectures using AWS services and Infrastructure as Code.',
+        level: 'advanced',
+        duration: '10 weeks',
+        category: 'Cloud Computing',
+        slug: 'cloud-architecture-aws',
+      },
+    ];
+  }
+
+  getInstructors(): InstructorProfile[] {
+    return [
+      {
+        id: 'inst-001',
+        name: 'Dr. Sarah Cohen',
+        jobTitle: 'Professor of Computer Science',
+        university: 'Hebrew University of Jerusalem',
+        description: 'Leading researcher in AI-assisted education and adaptive learning systems with 15 years of teaching experience.',
+        specialization: 'Artificial Intelligence & Machine Learning',
+      },
+      {
+        id: 'inst-002',
+        name: 'Prof. Ariel Ben-David',
+        jobTitle: 'Associate Professor',
+        university: 'Technion — Israel Institute of Technology',
+        description: 'Specializes in distributed systems and cloud-native architectures. Author of three textbooks on microservices.',
+        specialization: 'Distributed Systems & Cloud Architecture',
+      },
+      {
+        id: 'inst-003',
+        name: 'Dr. Miriam Levi',
+        jobTitle: 'Senior Data Scientist',
+        university: 'Tel Aviv University',
+        description: 'Expert in knowledge graph construction and semantic search. Former research lead at a Fortune 500 company.',
+        specialization: 'Knowledge Graphs & Semantic Search',
+      },
+      {
+        id: 'inst-004',
+        name: 'Yonatan Shapiro',
+        jobTitle: 'Principal Security Engineer',
+        university: 'Ben-Gurion University of the Negev',
+        description: 'Cybersecurity practitioner and educator with deep expertise in penetration testing and secure software design.',
+        specialization: 'Cybersecurity & Secure Software Design',
+      },
+    ];
   }
 
   getFeatures(): FeatureItem[] {

@@ -11,7 +11,7 @@
 import { Controller, Get, Header, Logger, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { AeoService } from './aeo.service';
-import type { PublicCourse, FeatureItem, FaqItem } from './aeo.service';
+import type { PublicCourse, FeatureItem, FaqItem, CatalogCourse, InstructorProfile } from './aeo.service';
 
 // Rate limiting is enforced at the gateway level (Hive Gateway / nginx).
 @Controller('aeo')
@@ -52,5 +52,23 @@ export class AeoController {
   @Header('Access-Control-Allow-Origin', '*')
   getFaq(): FaqItem[] {
     return this.aeoService.getFaq();
+  }
+
+  @Get('catalog')
+  @Header('Content-Type', 'application/json')
+  @Header('Cache-Control', 'public, max-age=3600')
+  @Header('Access-Control-Allow-Origin', '*')
+  getCatalog(): CatalogCourse[] {
+    this.logger.debug('[AeoController] public catalog requested');
+    return this.aeoService.getCatalog();
+  }
+
+  @Get('instructors')
+  @Header('Content-Type', 'application/json')
+  @Header('Cache-Control', 'public, max-age=3600')
+  @Header('Access-Control-Allow-Origin', '*')
+  getInstructors(): InstructorProfile[] {
+    this.logger.debug('[AeoController] instructor directory requested');
+    return this.aeoService.getInstructors();
   }
 }

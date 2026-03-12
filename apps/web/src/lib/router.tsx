@@ -498,6 +498,14 @@ const GlossaryPage = lazy(() =>
 const PricingPage = lazy(() =>
   import('@/pages/PricingPage').then((m) => ({ default: m.PricingPage }))
 );
+const CourseCatalogPage = lazy(() =>
+  import('@/pages/CourseCatalogPage').then((m) => ({ default: m.CourseCatalogPage }))
+);
+const InstructorDirectoryPage = lazy(() =>
+  import('@/pages/InstructorDirectoryPage').then((m) => ({
+    default: m.InstructorDirectoryPage,
+  }))
+);
 const PartnerSignupPage = lazy(() =>
   import('@/pages/PartnerSignupPage').then((m) => ({ default: m.PartnerSignupPage }))
 );
@@ -606,6 +614,24 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <PricingPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public course catalog — AEO Phase 2 (no auth required)
+    path: '/catalog',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <CourseCatalogPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public instructor directory — AEO Phase 2 (no auth required)
+    path: '/instructors',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <InstructorDirectoryPage />
       </Suspense>
     ),
   },
