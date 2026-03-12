@@ -58,7 +58,7 @@ export class BadgeIssuerService implements OnModuleDestroy {
   async issueBadge(
     userId: string,
     courseId: string,
-    ctx: TenantContext,
+    _ctx: TenantContext,
   ): Promise<BadgeVC> {
     const issuedAt = new Date().toISOString();
     const assertionId = `urn:uuid:${this.generateId(userId, courseId)}`;
