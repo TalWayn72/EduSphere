@@ -5,6 +5,9 @@ import { AIService } from '../ai/ai.service';
 import { LangGraphService } from '../ai/langgraph.service';
 import { AiLanggraphRunnerService } from '../ai/ai-langgraph-runner.service';
 import { AiLegacyRunnerService } from '../ai/ai-legacy-runner.service';
+import { CourseGeneratorResolver } from './course-generator.resolver.js';
+import { CourseGeneratorService } from '../ai/course-generator.service.js';
+import { LessonPipelineResolver } from './lesson-pipeline.resolver.js';
 
 @Module({
   providers: [
@@ -14,7 +17,10 @@ import { AiLegacyRunnerService } from '../ai/ai-legacy-runner.service';
     LangGraphService,
     AiLanggraphRunnerService,
     AiLegacyRunnerService,
+    CourseGeneratorResolver,
+    CourseGeneratorService,
+    LessonPipelineResolver,
   ],
-  exports: [AgentService, AIService],
+  exports: [AgentService, AIService, CourseGeneratorService],
 })
 export class AgentModule {}

@@ -1,0 +1,25 @@
+enum LessonPipelineArchetype {
+  THEMATIC
+  SEQUENTIAL
+}
+
+type LessonPipelineResult {
+  executionId: ID!
+  status: String!
+  markdownContent: String
+  citations: [String!]!
+  hebrewNerEntities: [String!]!
+  stage: String!
+}
+
+input LessonPipelineInput {
+  prompt: String!
+  archetype: LessonPipelineArchetype!
+  language: String
+  maxCitations: Int
+}
+
+extend type Mutation {
+  generateLesson(input: LessonPipelineInput!): LessonPipelineResult!
+    @authenticated
+}
