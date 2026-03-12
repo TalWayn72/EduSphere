@@ -18,6 +18,15 @@ type Course @key(fields: "id") {
   updatedAt: String!
 }
 
+type ComplianceCourse {
+  id: ID!
+  title: String!
+  description: String!
+  category: String!
+  tags: [String!]!
+  isTemplate: Boolean!
+}
+
 type User @key(fields: "id") {
   id: ID!
 }
@@ -58,6 +67,7 @@ extend type Query {
   adminCourseEnrollments(courseId: ID!): [AdminEnrollmentRecord!]!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  complianceCourses: [ComplianceCourse!]! @authenticated
 }
 
 extend type Mutation {
@@ -79,6 +89,9 @@ extend type Mutation {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   forkCourse(courseId: ID!): Course! @authenticated
+  cloneComplianceCourse(courseId: ID!): ComplianceCourse!
+    @authenticated
+    @requiresScopes(scopes: ["course:write"])
 }
 
 input CreateCourseInput {

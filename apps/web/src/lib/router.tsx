@@ -179,6 +179,11 @@ const CourseLibraryPage = lazy(() =>
     default: m.CourseLibraryPage,
   }))
 );
+const ComplianceLibraryPage = lazy(() =>
+  import('@/pages/ComplianceLibraryPage').then((m) => ({
+    default: m.ComplianceLibraryPage,
+  }))
+);
 const PortalBuilderPage = lazy(() =>
   import('@/pages/PortalBuilderPage').then((m) => ({
     default: m.PortalBuilderPage,
@@ -840,6 +845,11 @@ export const router = createBrowserRouter([
   {
     path: '/library',
     element: guarded(<CourseLibraryPage />),
+  },
+  {
+    // Phase 64 (F-038) — Pre-built compliance course library
+    path: '/library/compliance',
+    element: guarded(<ComplianceLibraryPage />),
   },
   {
     path: '/instructor/earnings',

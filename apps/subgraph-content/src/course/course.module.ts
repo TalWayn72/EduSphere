@@ -3,6 +3,7 @@ import { CourseResolver } from './course.resolver';
 import { CourseService } from './course.service';
 import { EnrollmentService } from './enrollment.service';
 import { AdminEnrollmentService } from './admin-enrollment.service';
+import { ComplianceLibraryService } from './compliance-library.service';
 import { ModuleModule } from '../module/module.module';
 
 @Module({
@@ -12,7 +13,8 @@ import { ModuleModule } from '../module/module.module';
     CourseService,
     EnrollmentService,
     AdminEnrollmentService,
+    ComplianceLibraryService,
   ],
-  exports: [CourseService, EnrollmentService, AdminEnrollmentService],
+  exports: [CourseService, EnrollmentService, AdminEnrollmentService, ComplianceLibraryService],
 })
 export class CourseModule {}
