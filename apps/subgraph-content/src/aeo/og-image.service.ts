@@ -1,5 +1,6 @@
 /**
  * OgImageService — Generates Open Graph 1200×630 PNG images using sharp.
+ * Only called from published content endpoints (courses, blog posts, features).
  *
  * Renders an SVG template then rasterises it via sharp.
  * In-memory LRU cache (max 100 entries) prevents repeated work for the same
