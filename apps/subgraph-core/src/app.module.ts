@@ -18,6 +18,8 @@ import { SavedSearchModule } from './search/saved-search.module.js';
 import { ManagerModule } from './manager/manager.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { BillingModule } from './billing/billing.module.js';
+import { HrisModule } from './integrations/hris/hris.module.js';
+import { PartnerModule } from './partners/partner.module.js';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { BillingModule } from './billing/billing.module.js';
     ManagerModule,
     OnboardingModule,
     BillingModule,
+    HrisModule,
+    PartnerModule,
   ],
 })
 export class AppModule {}
