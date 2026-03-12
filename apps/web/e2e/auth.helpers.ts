@@ -46,6 +46,9 @@ export async function loginInDevMode(page: Page): Promise<void> {
   // so without this guard every test sees Hebrew UI, breaking English assertions.
   await page.addInitScript(() => {
     localStorage.setItem('edusphere_locale', 'en');
+    // Collapse the AppSidebar (64 px) for all E2E tests — ensures the layout
+    // fits narrow mobile-chrome viewports (393 px) without overflow.
+    localStorage.setItem('edusphere-sidebar-collapsed', 'true');
   });
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
   // Click "Sign In (Dev Mode)" → calls auth.login() which:
@@ -55,11 +58,20 @@ export async function loginInDevMode(page: Page): Promise<void> {
   const devBtn = page.locator('[data-testid="dev-login-btn"]');
   await devBtn.waitFor({ timeout: 10_000 });
   await devBtn.click();
-  // Wait for the redirect chain: / → /learn/content-1 (authenticated home route)
-  await page.waitForURL(/\/learn\//, { timeout: 15_000 }).catch(async () => {
-    // Fallback: if the root redirects elsewhere, just wait for settle
-    await page.waitForLoadState('networkidle');
-  });
+  // Wait for redirect away from /login. On some browsers/viewports the app
+  // may redirect to /dashboard or /admin rather than /learn/, so we use a
+  // broad "not /login" predicate instead of a specific path pattern.
+  await page
+    .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+    .catch(() => {
+      // URL never changed — app may already be on the target route
+    });
+  // Always wait for networkidle so React Router client-side navigation
+  // (e.g. / → /learn/content-1) completes before the caller does page.goto().
+  // Without this, a competing React Router navigate() can race with the next
+  // page.goto() call, causing "Target page, context or browser has been closed"
+  // in mobile-chrome.
+  await page.waitForLoadState('networkidle');
 }
 
 // ─── Keycloak OIDC login ─────────────────────────────────────────────────────

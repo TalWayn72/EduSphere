@@ -16,7 +16,7 @@ import { useAuthRole } from '@/hooks/useAuthRole';
 const ALL_PILOT_REQUESTS = `
   query AllPilotRequests {
     allPilotRequests {
-      id orgName orgType contactEmail estimatedUsers status createdAt
+      __typename id orgName orgType contactEmail estimatedUsers status createdAt
     }
   }
 `;

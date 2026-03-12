@@ -31,7 +31,7 @@ const schema = z.object({
   contactName: z.string().min(2).max(200),
   contactEmail: z.string().email().max(255),
   useCase: z.string().min(10).max(2000),
-  estimatedUsers: z.number().int().min(1).max(1_000_000),
+  estimatedUsers: z.number({ error: 'Please enter a valid number of users' }).int().min(1).max(1_000_000),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -83,8 +83,8 @@ export function PilotSignupPage() {
 
                 <div>
                   <Label htmlFor="orgType" className="text-white text-sm font-medium">Organization Type *</Label>
-                  <Select onValueChange={(v) => setValue('orgType', v as FormData['orgType'])} aria-required="true">
-                    <SelectTrigger id="orgType" className="mt-1.5 bg-white/10 border-white/20 text-white">
+                  <Select onValueChange={(v) => setValue('orgType', v as FormData['orgType'])}>
+                    <SelectTrigger id="orgType" aria-required="true" className="mt-1.5 bg-white/10 border-white/20 text-white">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
