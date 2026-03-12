@@ -226,11 +226,9 @@ export function CourseCreatePage() {
     });
 
     if (error) {
-      const msg =
-        error.graphQLErrors?.[0]?.message ??
-        error.message ??
-        'Failed to create course';
-      toast.error(msg);
+      // Always show a user-friendly message — never raw GraphQL error strings
+      // (e.g. database constraint violations, field-level resolver messages).
+      toast.error('Failed to create course. Please try again.');
       return;
     }
 
