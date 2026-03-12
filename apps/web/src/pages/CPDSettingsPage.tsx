@@ -4,7 +4,7 @@
  * Access: ORG_ADMIN, SUPER_ADMIN only
  * F-027: CPD/CE Credit Tracking + Regulatory Export
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -43,10 +43,12 @@ export function CPDSettingsPage() {
   const [selectedCreditTypeId, setSelectedCreditTypeId] = useState('');
   const [creditHours, setCreditHours] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching }] = useQuery<{ cpdCreditTypes: CpdCreditType[] }>({
     query: CPD_CREDIT_TYPES_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const [, createCreditType] = useMutation(CREATE_CPD_CREDIT_TYPE_MUTATION);

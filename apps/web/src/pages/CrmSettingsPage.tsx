@@ -52,9 +52,11 @@ export function CrmSettingsPage() {
   const navigate = useNavigate();
   const role = useAuthRole();
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
+    setMounted(true);
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
@@ -67,12 +69,12 @@ export function CrmSettingsPage() {
     crmConnection: CrmConnectionData | null;
   }>({
     query: CRM_CONNECTION_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [logResult] = useQuery<{ crmSyncLog: CrmSyncEntry[] }>({
     query: CRM_SYNC_LOG_QUERY,
     variables: { limit: 20 },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [, disconnectCrm] = useMutation(DISCONNECT_CRM_MUTATION);
 

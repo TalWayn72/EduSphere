@@ -4,7 +4,7 @@
  * Route: /courses/:courseId/analytics
  * Access: INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN only
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -101,17 +101,19 @@ export function CourseAnalyticsPage() {
   const navigate = useNavigate();
   const role = useAuthRole();
   const [resolving, setResolving] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching, error }] = useQuery<CourseAnalyticsResult>({
     query: COURSE_ANALYTICS_QUERY,
     variables: { courseId },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const [{ data: riskData }] = useQuery<AtRiskResult>({
     query: AT_RISK_LEARNERS_QUERY,
     variables: { courseId },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const [, resolveFlag] = useMutation(RESOLVE_AT_RISK_FLAG_MUTATION);

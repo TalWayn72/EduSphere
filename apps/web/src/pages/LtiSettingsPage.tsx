@@ -92,11 +92,13 @@ export function LtiSettingsPage() {
   } | null>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [{ data, fetching, error }, refetch] = useQuery<{
     ltiPlatforms: LtiPlatform[];
   }>({
     query: LTI_PLATFORMS_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const [, registerPlatform] = useMutation(REGISTER_PLATFORM_MUTATION);

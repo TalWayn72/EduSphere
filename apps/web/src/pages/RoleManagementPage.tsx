@@ -5,7 +5,7 @@
  * Custom roles are persisted in DB via GraphQL (F-113).
  * System roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, STUDENT) are read-only.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useQuery, useMutation } from 'urql';
@@ -52,9 +52,11 @@ export function RoleManagementPage() {
     Partial<RoleRecord> | undefined
   >();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [rolesResult, reexecuteRoles] = useQuery<{ roles: BackendRole[] }>({
     query: LIST_ROLES_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const [, createRole] = useMutation(CREATE_ROLE_MUTATION);

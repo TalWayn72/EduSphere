@@ -76,9 +76,11 @@ export function SecuritySettingsPage() {
     };
   }, []);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [{ data, fetching }] = useQuery({
     query: SECURITY_SETTINGS_QUERY,
-    pause: true,
+    pause: !mounted,
   });
   const [{ fetching: saving }, execUpdate] = useMutation(
     UPDATE_SECURITY_SETTINGS_MUTATION

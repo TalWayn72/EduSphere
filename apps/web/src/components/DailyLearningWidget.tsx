@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { Zap } from 'lucide-react';
 import {
@@ -48,10 +48,12 @@ function parseMicrolessonData(
 export function DailyLearningWidget() {
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching, error }] = useQuery<DailyMicrolessonQueryResult>({
     query: DAILY_MICROLESSON_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const [, markViewed] = useMutation(MARK_CONTENT_VIEWED_MUTATION);

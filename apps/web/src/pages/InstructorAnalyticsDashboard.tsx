@@ -6,7 +6,7 @@
  * Shows aggregate stats across all courses + tabbed sub-panels:
  * Overview · Learner Engagement · At-Risk Learners · AI Usage
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,10 +89,12 @@ function StatCard({
 export function InstructorAnalyticsDashboard() {
   const role = useAuthRole();
   const [activeTab, setActiveTab] = useState<Tab>('Overview');
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching }] = useQuery<OverviewResult>({
     query: INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   if (!ALLOWED_ROLES.has(role ?? '')) {

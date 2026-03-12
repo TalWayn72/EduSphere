@@ -2,7 +2,7 @@
  * GamificationSettingsPage — Configure badges, points, and leaderboards.
  * Route: /admin/gamification
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -63,9 +63,11 @@ export function GamificationSettingsPage() {
   const [editForm, setEditForm] = useState<BadgeFormData>(EMPTY_FORM);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [result, refetch] = useQuery<AdminBadgesResult>({
     query: ADMIN_BADGES_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [, createBadge] = useMutation(CREATE_BADGE_MUTATION);
   const [, updateBadge] = useMutation(UPDATE_BADGE_MUTATION);

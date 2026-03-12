@@ -57,8 +57,10 @@ export function BiExportSettingsPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [tokensResult, refetchTokens] = useQuery<{ biApiTokens: BiApiToken[] }>(
-    { query: BI_API_TOKENS_QUERY, pause: true } // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    { query: BI_API_TOKENS_QUERY, pause: !mounted }
   );
   const [, generateKey] = useMutation<{ generateBIApiKey: string }>(
     GENERATE_BI_API_KEY_MUTATION

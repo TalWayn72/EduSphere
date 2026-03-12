@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
@@ -38,15 +38,18 @@ interface ProgramEnrollment {
 
 export function ProgramsPage(): React.ReactElement {
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [programsResult] = useQuery<{ programs: CredentialProgram[] }>({
     query: PROGRAMS_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [enrollmentsResult] = useQuery<{
     myProgramEnrollments: ProgramEnrollment[];
   }>({
     query: MY_PROGRAM_ENROLLMENTS_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [, enrollMutation] = useMutation(ENROLL_IN_PROGRAM_MUTATION);
 

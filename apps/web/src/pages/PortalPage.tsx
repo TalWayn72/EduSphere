@@ -3,7 +3,7 @@
  * Route: /portal (no auth required — public page)
  * Fetches publicPortal query. If portal not published → redirect to /courses.
  */
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { BlockRenderer } from '@/components/portal-builder/blocks/BlockRenderer';
@@ -36,9 +36,11 @@ function parseBlocks(raw: RawBlock[]): PortalBlock[] {
 
 export function PortalPage() {
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [{ data, fetching, error }] = useQuery({
     query: PUBLIC_PORTAL_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   useEffect(() => {

@@ -2,7 +2,7 @@
  * AnnouncementsPage — Platform-wide announcement management.
  * Route: /admin/announcements
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -57,10 +57,12 @@ export function AnnouncementsPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<AnnouncementFormValues>(BLANK);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [{ data, fetching }, refetch] = useQuery({
     query: ADMIN_ANNOUNCEMENTS_QUERY,
     variables: { limit: 20, offset: 0 },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [{ fetching: creating }, execCreate] = useMutation(
     CREATE_ANNOUNCEMENT_MUTATION

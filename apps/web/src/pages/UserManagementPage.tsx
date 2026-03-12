@@ -90,6 +90,9 @@ export function UserManagementPage() {
     }
   }, [role, navigate]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [{ data, fetching }, refetch] = useQuery({
     query: ADMIN_USERS,
     variables: {
@@ -100,7 +103,7 @@ export function UserManagementPage() {
         | UserRole
         | undefined,
     },
-    pause: true, // adminUsers not in live gateway
+    pause: !mounted,
   });
 
   if (!role || !ADMIN_ROLES.has(role)) return null;

@@ -243,12 +243,16 @@ export function EnrollmentManagementPage() {
   });
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => { setMounted(true); }, []);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [enrollmentsResult, reexecuteEnrollments] = useQuery<{
     adminCourseEnrollments: AdminEnrollmentRecord[];
   }>({
     query: ADMIN_COURSE_ENROLLMENTS_QUERY,
     variables: { courseId: selectedCourseId },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const courses = coursesResult.data?.courses ?? [];
