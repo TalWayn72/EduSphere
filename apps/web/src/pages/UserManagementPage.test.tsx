@@ -329,21 +329,18 @@ describe('UserManagementPage', () => {
       .fn()
       .mockResolvedValue({ error: new Error('network error') });
 
-    // useMutation is called three times in the component (deactivate, reset, update).
-    // Return the error mock only for the reset call (second invocation).
-    vi.mocked(useMutation)
-      .mockReturnValueOnce([
-        { fetching: false, error: undefined },
-        vi.fn().mockResolvedValue({ error: undefined }), // deactivateUser
-      ] as unknown as ReturnType<typeof useMutation>)
-      .mockReturnValueOnce([
-        { fetching: false, error: undefined },
-        mockResetPassword, // resetPassword
-      ] as unknown as ReturnType<typeof useMutation>)
-      .mockReturnValueOnce([
-        { fetching: false, error: undefined },
-        vi.fn().mockResolvedValue({ error: undefined }), // updateUser
-      ] as unknown as ReturnType<typeof useMutation>);
+    // useMutation is called 3× per render (deactivate, reset, update).
+    // With the mounted-guard re-render the component renders twice.
+    // Use mockImplementation (stable across all renders) rather than
+    // mockReturnValueOnce (exhausted after the first 3 calls).
+    let mutCallCount = 0;
+    vi.mocked(useMutation).mockImplementation(() => {
+      const idx = mutCallCount++ % 3; // 0=deactivate, 1=reset, 2=update
+      const executor = idx === 1
+        ? mockResetPassword
+        : vi.fn().mockResolvedValue({ error: undefined });
+      return [{ fetching: false, error: undefined }, executor] as unknown as ReturnType<typeof useMutation>;
+    });
 
     renderPage();
 

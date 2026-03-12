@@ -82,11 +82,11 @@ function setupMocks(
 
   vi.mocked(useAuthRoleModule.useAuthRole).mockReturnValue(role);
 
-  let callCount = 0;
-  vi.mocked(urql.useQuery).mockImplementation(() => {
-    const call = callCount++;
-    if (call === 0) {
-      // tokensResult
+  // Distinguish queries by the `query` string value (mocked as named constants).
+  // Using call-order counters breaks when the mounted-guard triggers extra re-renders.
+  vi.mocked(urql.useQuery).mockImplementation((opts: unknown) => {
+    const options = opts as { query?: string };
+    if (options?.query === 'XAPI_TOKENS_QUERY') {
       return [
         {
           fetching: tokensFetching,
