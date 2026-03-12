@@ -108,7 +108,7 @@ export function PartnerSignupPage() {
 
                 <div>
                   <Label htmlFor="partnerType" className="text-white text-sm font-medium">Partner Type *</Label>
-                  <Select onValueChange={(v) => setValue('partnerType', v as FormData['partnerType'])} aria-required="true">
+                  <Select onValueChange={(v) => setValue('partnerType', v as FormData['partnerType'], { shouldValidate: true, shouldDirty: true })} aria-required="true">
                     <SelectTrigger id="partnerType" className="mt-1.5 bg-white/10 border-white/20 text-white">
                       <SelectValue placeholder="Select partner type" />
                     </SelectTrigger>

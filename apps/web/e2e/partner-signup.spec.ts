@@ -16,6 +16,7 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { BASE_URL } from './env';
+import { routeGraphQL } from './graphql-mock.helpers';
 
 // ─── Anti-regression helpers ──────────────────────────────────────────────────
 
@@ -37,35 +38,20 @@ async function assertNoRawErrors(page: Page): Promise<void> {
  * successful `requestPartner` mutation response.
  */
 async function mockPartnerMutationSuccess(page: Page): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as {
-      query?: string;
-      operationName?: string;
-    };
-    const q = body?.query ?? '';
-    const op = body?.operationName ?? '';
-
+  await routeGraphQL(page, (op, body) => {
+    const q = (body.query as string | undefined) ?? '';
     if (q.includes('requestPartner') || op === 'RequestPartner') {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: {
-            requestPartner: {
-              status: 'PENDING',
-              message: 'Application received',
-              requestId: 'req-e2e-001',
-            },
+      return JSON.stringify({
+        data: {
+          requestPartner: {
+            status: 'PENDING',
+            message: 'Application received',
+            requestId: 'req-e2e-001',
           },
-        }),
+        },
       });
     }
-
-    return route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ data: {} }),
-    });
+    return null;
   });
 }
 
@@ -74,30 +60,15 @@ async function mockPartnerMutationSuccess(page: Page): Promise<void> {
  * error-state path in the form is exercised.
  */
 async function mockPartnerMutationError(page: Page): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as {
-      query?: string;
-      operationName?: string;
-    };
-    const q = body?.query ?? '';
-    const op = body?.operationName ?? '';
-
+  await routeGraphQL(page, (op, body) => {
+    const q = (body.query as string | undefined) ?? '';
     if (q.includes('requestPartner') || op === 'RequestPartner') {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          errors: [{ message: 'Internal server error', extensions: { code: 'INTERNAL_ERROR' } }],
-          data: null,
-        }),
+      return JSON.stringify({
+        errors: [{ message: 'Internal server error', extensions: { code: 'INTERNAL_ERROR' } }],
+        data: null,
       });
     }
-
-    return route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ data: {} }),
-    });
+    return null;
   });
 }
 
@@ -110,9 +81,19 @@ async function fillValidPartnerForm(page: Page): Promise<void> {
   await page.fill('#expectedLearners', '500');
   await page.fill('#description', 'We plan to deliver corporate AI training using EduSphere white-label to our 500 enterprise clients across EMEA.');
 
-  // Open the Select and pick TRAINING_COMPANY
-  await page.click('[id="partnerType"]');
-  await page.getByRole('option', { name: 'Training Company' }).click();
+  // Radix UI Select: locator.press('ArrowDown') opens the dropdown reliably on all
+  // device types (including mobile-chrome with hasTouch:true). Then we click the
+  // specific option by role — React 18 synthetic events reach portals via document-
+  // level delegation, so option.click() fires onValueChange which calls setValue with
+  // { shouldValidate: true } to re-run Zod validation and enable the submit button.
+  const trigger = page.locator('[id="partnerType"]');
+  await trigger.press('ArrowDown');                // open dropdown + focus first item
+  const listbox = page.locator('[role="listbox"]');
+  await listbox.waitFor({ timeout: 5_000 });       // confirm dropdown rendered
+  const trainingOption = page.getByRole('option', { name: 'Training Company' });
+  await trainingOption.waitFor({ timeout: 3_000 });
+  await trainingOption.click();                    // select Training Company → fires onValueChange
+  await page.waitForTimeout(300);                  // allow setValue + re-validation to propagate
 }
 
 // ─── Suite 1: Page renders correctly ─────────────────────────────────────────
@@ -205,7 +186,7 @@ test.describe('Partner Signup — Partner Type Cards', () => {
       'SYSTEM INTEGRATOR',
     ];
     for (const name of typeNames) {
-      await expect(page.getByText(name, { exact: false })).toBeVisible({
+      await expect(page.getByText(name, { exact: false }).first()).toBeVisible({
         timeout: 10_000,
       });
     }

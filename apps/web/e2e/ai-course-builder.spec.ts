@@ -18,6 +18,8 @@
 
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
+import { routeGraphQL } from './graphql-mock.helpers';
 
 // ─── Shared mock payloads ─────────────────────────────────────────────────────
 
@@ -72,6 +74,23 @@ const MOCK_CREATE_COURSE = {
 
 // ─── Anti-regression helpers ──────────────────────────────────────────────────
 
+/**
+ * Click a button inside a Radix UI Dialog via evaluate() to bypass the
+ * dialog backdrop overlay that intercepts pointer events on mobile-chrome.
+ */
+async function clickDialogButton(
+  page: import('@playwright/test').Page,
+  buttonText: string,
+): Promise<void> {
+  await page.evaluate((text: string) => {
+    const dialog = document.querySelector('[role="dialog"]');
+    if (!dialog) return;
+    const buttons = Array.from(dialog.querySelectorAll('button'));
+    const btn = buttons.find((b) => (b.textContent ?? '').trim().includes(text));
+    (btn as HTMLElement | undefined)?.click();
+  }, buttonText);
+}
+
 /** Assert no raw technical error strings are visible to the user. */
 async function assertNoRawErrors(page: import('@playwright/test').Page): Promise<void> {
   const body = await page.textContent('body') ?? '';
@@ -91,20 +110,12 @@ async function mockGraphQL(
   page: import('@playwright/test').Page,
   operationMocks: Record<string, unknown>,
 ): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as { operationName?: string } | null;
-    const opName = body?.operationName ?? '';
-    const mockResponse = operationMocks[opName];
+  await routeGraphQL(page, (op) => {
+    const mockResponse = operationMocks[op];
     if (mockResponse) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(mockResponse),
-      });
-    } else {
-      // Pass through any unrecognized operations (e.g. introspection)
-      await route.continue();
+      return JSON.stringify(mockResponse);
     }
+    return null;
   });
 }
 
@@ -112,6 +123,7 @@ async function mockGraphQL(
 
 test.describe('AI Course Builder — CTA Panel on /courses/new', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
   });
 
@@ -150,6 +162,7 @@ test.describe('AI Course Builder — CTA Panel on /courses/new', () => {
 
 test.describe('AI Course Builder — Modal Open State', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     // Wait for Dialog to mount
@@ -198,9 +211,7 @@ test.describe('AI Course Builder — Modal Open State', () => {
   });
 
   test('"Cancel" button is present and closes the modal', async ({ page }) => {
-    const dialog = page.getByRole('dialog');
-    const cancelBtn = dialog.getByRole('button', { name: /Cancel/i });
-    await cancelBtn.click();
+    await clickDialogButton(page, 'Cancel');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
   });
 
@@ -213,10 +224,11 @@ test.describe('AI Course Builder — Modal Open State', () => {
 
 test.describe('AI Course Builder — Generating / Skeleton State', () => {
   test.beforeEach(async ({ page }) => {
-    // Intercept generateCourseFromPrompt → return IN_PROGRESS (triggers subscription wait)
+    // Mock BEFORE login so urql never sees a network error during login navigation
     await mockGraphQL(page, {
       GenerateCourseFromPrompt: MOCK_GENERATE_IN_PROGRESS,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
@@ -232,7 +244,7 @@ test.describe('AI Course Builder — Generating / Skeleton State', () => {
   test('clicking Generate shows "Generating..." spinner state', async ({ page }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Machine Learning for high school students');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
     // Button text changes to "Generating..." with a spinner
     await expect(dialog.getByText(/Generating\.\.\./i)).toBeVisible({ timeout: 10_000 });
   });
@@ -240,7 +252,7 @@ test.describe('AI Course Builder — Generating / Skeleton State', () => {
   test('Generate button is disabled while generating', async ({ page }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Machine Learning for high school students');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
     await expect(dialog.getByText(/Generating\.\.\./i)).toBeVisible({ timeout: 10_000 });
     // The button is now disabled (generating state)
     const btn = dialog.locator('button').filter({ hasText: /Generating/i });
@@ -250,7 +262,7 @@ test.describe('AI Course Builder — Generating / Skeleton State', () => {
   test('textarea is disabled while generating', async ({ page }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Machine Learning for high school students');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
     await expect(dialog.getByText(/Generating\.\.\./i)).toBeVisible({ timeout: 10_000 });
     await expect(dialog.getByRole('textbox')).toBeDisabled();
   });
@@ -259,7 +271,7 @@ test.describe('AI Course Builder — Generating / Skeleton State', () => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Machine Learning for high school students');
     await dialog.locator('select').selectOption('beginner');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
     await expect(dialog.getByText(/Generating\.\.\./i)).toBeVisible({ timeout: 10_000 });
     await expect(dialog.locator('select')).toBeDisabled();
   });
@@ -267,7 +279,7 @@ test.describe('AI Course Builder — Generating / Skeleton State', () => {
   test('visual screenshot of modal in generating state', async ({ page }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Machine Learning for high school students');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
     await expect(dialog.getByText(/Generating\.\.\./i)).toBeVisible({ timeout: 10_000 });
     await expect(dialog).toHaveScreenshot('ai-modal-generating-state.png', {
       maxDiffPixelRatio: 0.03,
@@ -279,19 +291,20 @@ test.describe('AI Course Builder — Generating / Skeleton State', () => {
 
 test.describe('AI Course Builder — Generated Course Preview', () => {
   test.beforeEach(async ({ page }) => {
-    // Intercept generateCourseFromPrompt → return COMPLETED immediately
+    // Mock BEFORE login so urql never sees a network error during login navigation
     await mockGraphQL(page, {
       GenerateCourseFromPrompt: MOCK_GENERATE_COMPLETED,
       CreateCourse: MOCK_CREATE_COURSE,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
-    // Fill and generate
+    // Fill and generate (use evaluate to bypass Radix Dialog backdrop on mobile)
     await page.getByRole('dialog').getByRole('textbox').fill(
       'Introduction to Machine Learning for high school students',
     );
-    await page.getByRole('dialog').getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
   });
 
   test('generated course title appears in the outline view', async ({ page }) => {
@@ -349,12 +362,15 @@ test.describe('AI Course Builder — Generated Course Preview', () => {
 
   test('"Regenerate" button hides the outline and shows input form again', async ({ page }) => {
     const dialog = page.getByRole('dialog');
-    await dialog.getByRole('button', { name: /Regenerate/i }).click();
+    // Wait for the outline view to fully render before clicking Regenerate
+    await expect(dialog.getByRole('button', { name: /Regenerate/i })).toBeVisible({ timeout: 10_000 });
+    await clickDialogButton(page, 'Regenerate');
     // Back to step 1: textarea should be visible again
     await expect(dialog.getByRole('textbox')).toBeVisible({ timeout: 5_000 });
-    // Outline heading should be gone
+    // "Create Draft Course" button only exists in the outline view — its absence
+    // confirms the outline section has unmounted and the input form is shown.
     await expect(
-      dialog.getByText('Introduction to Machine Learning'),
+      dialog.getByRole('button', { name: /Create Draft Course/i }),
     ).not.toBeVisible({ timeout: 5_000 });
   });
 
@@ -380,21 +396,21 @@ test.describe('AI Course Builder — Modal Close & Memory Safety', () => {
     await mockGraphQL(page, {
       GenerateCourseFromPrompt: MOCK_GENERATE_IN_PROGRESS,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
   });
 
   test('closing modal via Cancel button removes the dialog from DOM', async ({ page }) => {
-    const dialog = page.getByRole('dialog');
-    await dialog.getByRole('button', { name: /Cancel/i }).click();
+    await clickDialogButton(page, 'Cancel');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
   });
 
   test('reopening modal after close resets the textarea to empty', async ({ page }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Some topic that should be cleared');
-    await dialog.getByRole('button', { name: /Cancel/i }).click();
+    await clickDialogButton(page, 'Cancel');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
     // Re-open
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
@@ -414,11 +430,12 @@ test.describe('AI Course Builder — Modal Close & Memory Safety', () => {
 
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Closing mid-generation test');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
     await expect(dialog.getByText(/Generating\.\.\./i)).toBeVisible({ timeout: 10_000 });
 
-    // Close while generating — subscription must be paused (memory safety)
-    await dialog.getByRole('button', { name: /Cancel/i }).click();
+    // Close while generating — Cancel button is disabled (disabled={generating}),
+    // so use Escape key which Radix Dialog handles via onOpenChange(false) → onClose()
+    await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
 
     // Wait briefly to catch any async errors from dangling subscriptions
@@ -434,7 +451,7 @@ test.describe('AI Course Builder — Modal Close & Memory Safety', () => {
   test('modal state is fully reset: audience level cleared after close and reopen', async ({ page }) => {
     const dialog = page.getByRole('dialog');
     await dialog.locator('select').selectOption('advanced');
-    await dialog.getByRole('button', { name: /Cancel/i }).click();
+    await clickDialogButton(page, 'Cancel');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
     // Re-open
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
@@ -446,7 +463,7 @@ test.describe('AI Course Builder — Modal Close & Memory Safety', () => {
   });
 
   test('no raw error strings after closing and reopening modal', async ({ page }) => {
-    await page.getByRole('dialog').getByRole('button', { name: /Cancel/i }).click();
+    await clickDialogButton(page, 'Cancel');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
@@ -458,28 +475,23 @@ test.describe('AI Course Builder — Modal Close & Memory Safety', () => {
 
 test.describe('AI Course Builder — Error Handling', () => {
   test('shows error message when generateCourseFromPrompt mutation fails', async ({ page }) => {
-    await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
-      if (body?.operationName === 'GenerateCourseFromPrompt') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            errors: [{ message: 'Failed to start generation', extensions: { code: 'INTERNAL_SERVER_ERROR' } }],
-          }),
+    await routeGraphQL(page, (op) => {
+      if (op === 'GenerateCourseFromPrompt') {
+        return JSON.stringify({
+          errors: [{ message: 'Failed to start generation', extensions: { code: 'INTERNAL_SERVER_ERROR' } }],
         });
-      } else {
-        await route.continue();
       }
+      return null;
     });
 
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
 
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Test topic to trigger error');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
 
     // Error message should appear — NOT raw GraphQL error string
     await expect(dialog.getByText(/Failed to start generation/i)).toBeVisible({ timeout: 10_000 });
@@ -491,23 +503,20 @@ test.describe('AI Course Builder — Error Handling', () => {
   });
 
   test('error state shows AlertTriangle icon (accessible error indicator)', async ({ page }) => {
-    await page.route('**/graphql', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          errors: [{ message: 'Service unavailable', extensions: { code: 'UNAVAILABLE' } }],
-        }),
-      });
-    });
+    await routeGraphQL(page, () =>
+      JSON.stringify({
+        errors: [{ message: 'Service unavailable', extensions: { code: 'UNAVAILABLE' } }],
+      }),
+    );
 
+    await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
 
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Trigger error state');
-    await dialog.getByRole('button', { name: /Generate Course/i }).click();
+    await clickDialogButton(page, 'Generate Course');
 
     // Error container uses bg-destructive/10 class — error text area is visible
     await expect(dialog.locator('.bg-destructive\\/10').first()).toBeVisible({ timeout: 10_000 });

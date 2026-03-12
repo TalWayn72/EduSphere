@@ -8,7 +8,6 @@ import {
   and,
   eq,
   count,
-  sql,
   schema,
 } from '@edusphere/db';
 

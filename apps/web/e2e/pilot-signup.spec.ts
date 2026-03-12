@@ -19,6 +19,7 @@
 
 import { test, expect } from '@playwright/test';
 import { BASE_URL, RUN_WRITE_TESTS } from './env';
+import { routeGraphQL } from './graphql-mock.helpers';
 
 const PILOT_ROUTE = '/pilot';
 
@@ -31,42 +32,19 @@ const PILOT_ROUTE = '/pilot';
 async function mockRequestPilotSuccess(
   page: import('@playwright/test').Page,
 ): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    const request = route.request();
-    if (request.method() !== 'POST') {
-      await route.continue();
-      return;
-    }
-
-    let parsed: { operationName?: string };
-    try {
-      parsed = JSON.parse(request.postData() ?? '{}') as {
-        operationName?: string;
-      };
-    } catch {
-      await route.continue();
-      return;
-    }
-
-    const op = parsed.operationName ?? '';
+  await routeGraphQL(page, (op) => {
     if (op === 'RequestPilot' || op.toLowerCase().includes('requestpilot')) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: {
-            requestPilot: {
-              status: 'PENDING',
-              message: 'Pilot request submitted successfully.',
-              requestId: 'req-e2e-001',
-            },
+      return JSON.stringify({
+        data: {
+          requestPilot: {
+            status: 'PENDING',
+            message: 'Pilot request submitted successfully.',
+            requestId: 'req-e2e-001',
           },
-        }),
+        },
       });
-      return;
     }
-
-    await route.continue();
+    return null;
   });
 }
 
@@ -76,37 +54,14 @@ async function mockRequestPilotSuccess(
 async function mockRequestPilotError(
   page: import('@playwright/test').Page,
 ): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    const request = route.request();
-    if (request.method() !== 'POST') {
-      await route.continue();
-      return;
-    }
-
-    let parsed: { operationName?: string };
-    try {
-      parsed = JSON.parse(request.postData() ?? '{}') as {
-        operationName?: string;
-      };
-    } catch {
-      await route.continue();
-      return;
-    }
-
-    const op = parsed.operationName ?? '';
+  await routeGraphQL(page, (op) => {
     if (op === 'RequestPilot' || op.toLowerCase().includes('requestpilot')) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: null,
-          errors: [{ message: 'Service temporarily unavailable' }],
-        }),
+      return JSON.stringify({
+        data: null,
+        errors: [{ message: 'Service temporarily unavailable' }],
       });
-      return;
     }
-
-    await route.continue();
+    return null;
   });
 }
 
@@ -133,6 +88,13 @@ test.describe('Pilot Signup Page — Structure', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
+    // Wait for the app to finish auth initialization (Keycloak + i18n) and
+    // render the actual page. On slower browser profiles (e.g. mobile-chrome),
+    // this completes after domcontentloaded, so waiting for the page container
+    // ensures the content is ready before any test assertion.
+    await page
+      .locator('[data-testid="pilot-signup-page"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('pilot signup page loads at /pilot', async ({ page }) => {
@@ -171,7 +133,7 @@ test.describe('Pilot Signup Page — Form Fields', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 10_000 });
+    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
   });
 
   test('Organization Name field is present and required', async ({ page }) => {
@@ -245,7 +207,7 @@ test.describe('Pilot Signup Page — Validation', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 10_000 });
+    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
   });
 
   test('submitting empty form shows validation errors', async ({ page }) => {
@@ -296,7 +258,7 @@ test.describe('Pilot Signup Page — Successful Submission', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 10_000 });
+    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
   });
 
   /** Fill all required fields with valid data. */
@@ -398,7 +360,7 @@ test.describe('Pilot Signup Page — Error Handling', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 10_000 });
+    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
   });
 
   /** Fill minimum valid data so the form passes client validation. */

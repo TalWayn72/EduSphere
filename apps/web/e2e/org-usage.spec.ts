@@ -24,6 +24,8 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
+import { routeGraphQL } from './graphql-mock.helpers';
 
 // ─── GraphQL mock helpers ──────────────────────────────────────────────────────
 
@@ -59,17 +61,11 @@ async function mockUsageResponse(
     },
   };
 
-  await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as { operationName?: string } | null;
-    if (body?.operationName === 'MyTenantUsage' || !body?.operationName) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(payload),
-      });
-    } else {
-      await route.continue();
+  await routeGraphQL(page, (op) => {
+    if (op === 'MyTenantUsage') {
+      return JSON.stringify(payload);
     }
+    return null;
   });
 }
 
@@ -89,6 +85,8 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 
 test.describe('Org Usage Page — Page Load', () => {
   test.beforeEach(async ({ page }) => {
+    // Register mock BEFORE login so urql never sees connection-refused during
+    // the login-time navigation (prevents urql from caching a network error).
     await mockUsageResponse(page, {
       yearlyActiveUsers: 342,
       seatLimit: 500,
@@ -96,6 +94,7 @@ test.describe('Org Usage Page — Page Load', () => {
       overageUsers: 0,
       monthlyActiveUsers: 87,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
   });
 
@@ -125,6 +124,7 @@ test.describe('Org Usage Page — UsageMeter SVG', () => {
       seatUtilizationPct: 68,
       overageUsers: 0,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
   });
@@ -172,6 +172,7 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       seatUtilizationPct: 60,
       overageUsers: 0,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
 
@@ -191,6 +192,7 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       seatUtilizationPct: 95,
       overageUsers: 0,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
 
@@ -209,6 +211,7 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       seatUtilizationPct: 102,
       overageUsers: 10,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
 
@@ -227,6 +230,7 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       seatUtilizationPct: 102,
       overageUsers: 10,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="overage-callout"]').waitFor({ timeout: 15_000 });
 
@@ -244,6 +248,7 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       seatUtilizationPct: 68,
       overageUsers: 0,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
 
@@ -262,6 +267,7 @@ test.describe('Org Usage Page — Visual Regression', () => {
       overageUsers: 0,
       monthlyActiveUsers: 87,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
 
@@ -282,6 +288,7 @@ test.describe('Org Usage Page — Visual Regression', () => {
       overageUsers: 10,
       monthlyActiveUsers: 112,
     });
+    await login(page);
     await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
 
     // Wait for both the meter and the overage callout to render

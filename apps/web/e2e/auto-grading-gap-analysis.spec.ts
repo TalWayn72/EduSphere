@@ -25,6 +25,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { login } from './auth.helpers';
 import { BASE_URL } from './env';
+import { routeGraphQL } from './graphql-mock.helpers';
 
 // ─── Anti-regression helpers ──────────────────────────────────────────────────
 
@@ -47,13 +48,7 @@ async function assertNoRawErrors(page: Page): Promise<void> {
  * ECONNREFUSED when no live gateway is running.
  */
 async function silenceGraphQL(page: Page): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    return route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ data: {} }),
-    });
-  });
+  await routeGraphQL(page, () => null); // empty-data fallback for all ops
 }
 
 // ─── Block 1: AutoGradingResultsPage ─────────────────────────────────────────

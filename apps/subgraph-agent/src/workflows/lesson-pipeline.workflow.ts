@@ -152,7 +152,7 @@ export async function runLessonPipeline(
     ctx = await enrichWithGraph(ctx);
     ctx = await verifyHebrew(ctx);
     ctx = await exportMarkdown(ctx, model);
-  } catch (err) {
+  } catch {
     return {
       executionId,
       status: 'FAILED',

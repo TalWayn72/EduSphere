@@ -9,6 +9,7 @@ import { PortalBlockEditor, type PortalConfig } from './PortalBlockEditor';
 if (typeof PointerEvent === 'undefined') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (globalThis as any).PointerEvent = class PointerEvent extends MouseEvent {
+    // eslint-disable-next-line no-undef
     constructor(type: string, init?: PointerEventInit) {
       super(type, init);
     }
