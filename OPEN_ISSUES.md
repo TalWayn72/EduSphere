@@ -1,6 +1,57 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 12 מרץ 2026 (Phase 50 ✅ + **B2B GTM Platform ✅ COMPLETE** + **AEO Phase 1 + Session 2+3 Fixes ✅** — E2E 17/17 ✅)
+**תאריך עדכון:** 12 מרץ 2026 (Phase 52 ✅ — B2B GTM + Air-Gapped + Partner Portal + HRIS + Investor Deck — commits ff12192 + 19e2e75)
+
+---
+
+## FEAT-PHASE51-52-B2B-GTM | ✅ Complete | HIGH
+
+**Status:** ✅ Complete — committed ff12192 + 19e2e75 (2026-03-12)
+**Severity:** 🟡 Medium → ✅ Resolved
+
+### Phase 51 — B2B GTM Core
+| Deliverable | Status |
+|------------|--------|
+| LandingPage B2B rewrite (12 sections) | ✅ |
+| PilotSignupPage + PilotRequestsAdminPage + PilotBanner | ✅ |
+| PricingPage (4 tiers: $12K/$35K/$65K/Custom) | ✅ |
+| OrgUsagePage + PlatformUsageDashboard + UsageMeter | ✅ |
+| ROIAnalyticsDashboardPage (YAU formula + PDF export) | ✅ |
+| CourseCreatePage AI CTA + QuizBuilderPage AI button | ✅ |
+| SEO: robots.txt, llms.txt, sitemap.xml, JsonLd, usePageTitle | ✅ |
+| Billing schema migration 0030 (YAU + subscriptions + pilots) | ✅ |
+| AEO @Throttle + robots.txt trailing slash + llms.txt sanitized | ✅ |
+
+### Phase 52 — Air-Gapped + Partner Portal + HRIS + Investor Deck
+| Deliverable | Status |
+|------------|--------|
+| LocalInferenceService (AIRGAP_MODE + model hash verification) | ✅ |
+| GraphragAuditService (append-only audit trail, immutable) | ✅ |
+| Helm chart (infrastructure/helm/edusphere-airgapped/) | ✅ |
+| Zarf K3s package (infrastructure/zarf/zarf.yaml) | ✅ |
+| airgap-enforcement.spec.ts (23 security tests) | ✅ |
+| partners + partner_revenue schema (migration 0031) | ✅ |
+| PartnerService (SHA-256 API key, never plaintext) | ✅ |
+| PartnerSignupPage + PartnerDashboardPage (30%/70% split) | ✅ |
+| IHrisAdapter + ScimAdapter (RFC 7643/7644) + Workday/SAP/Banner | ✅ |
+| HrisIntegrationService + HrisConfigPage | ✅ |
+| InvestorDeckPage (10 Guy Kawasaki slides, SUPER_ADMIN) | ✅ |
+
+### Test Totals
+| Suite | Files | Tests |
+|-------|-------|-------|
+| Web | 361 | 4381 ✅ |
+| Security | 45 | 1336 ✅ |
+| Agent | 45 | 712 ✅ |
+| Core | 99 | 845 ✅ |
+
+### Remaining (Phase 53)
+- Stripe B2B invoicing
+- AI auto-grading (GraphRAG + rubrics)
+- AI gap analysis
+- Partner gamification (Bronze→Platinum)
+
+---
 **מצב פרויקט:** ✅ **Phase 50 ✅** (WCAG 2.2 AA + EU AI Act + Security Compliance) + **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅** | **Phase 50 WCAG 2.2 AA + EU AI Act + Security Compliance ✅**
 **בדיקות:** Security: **1,185 tests** | Web: **4,190** (337+ files) | Knowledge: **598** | Transcription: **95** | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 598 + annotation 144 + collab 180 + core 719+) | סה"כ: **~8,445+ tests** | TypeScript: **0 errors**

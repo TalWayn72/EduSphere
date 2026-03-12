@@ -224,6 +224,15 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 
 ## Features
 
+### Recently Added (Phase 51-52 — B2B GTM + Air-Gapped + Partner + HRIS)
+
+- **B2B GTM Platform** — LandingPage B2B rewrite (12 sections), PilotSignupPage, PricingPage (4 tiers: $12K/$35K/$65K/Custom), OrgUsagePage, ROIAnalyticsDashboardPage (YAU formula), billing schema migration 0030
+- **Air-Gapped Deployment** — LocalInferenceService (AIRGAP_MODE + model hash verification), GraphragAuditService (append-only), Helm chart + Zarf K3s package, 23 new security tests
+- **Partner Portal** — partners + partner_revenue schema (migration 0031), PartnerService (SHA-256 API key), PartnerSignupPage + PartnerDashboardPage (30%/70% revenue split)
+- **HRIS Integrations** — IHrisAdapter + ScimAdapter (RFC 7643/7644), Workday/SAP/Banner adapters, HrisIntegrationService + HrisConfigPage
+- **Investor Deck** — InvestorDeckPage (10 Guy Kawasaki slides, SUPER_ADMIN only)
+- **SEO/AEO** — robots.txt AI bot rules, llms.txt, sitemap.xml, JsonLd structured data, usePageTitle hook
+
 ### Recently Added (Session 29 — Phase 29: Visual Anchoring)
 
 - **Visual Anchoring & Asset Linking** — ClamAV-scanned image uploads (WebP-optimised via sharp), text-passage anchors with position tracking, document versioning + rollback, simhash-based anchor sync, `anchorDeleted` real-time subscription, NATS events (`EDUSPHERE.visual.anchor.created/deleted`), offline IndexedDB cache, mobile VisualBottomSheet
@@ -370,8 +379,10 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 48**     | Session closure, P2 debt cleanup, security gate (knowledge-graph-credentials.spec.ts), cohort-insights route wiring, pause:true admin page markers | 1 day    | ✅ Complete    |
 | **Phase 49**     | UI bug batch BUG-058..062 (nav keys, layout offset, logo fallback, SRS error, language persistence) + E2E regression suite | 1 day    | ✅ Complete    |
 | **Phase 50**     | WCAG 2.2 AA (SC 2.5.7, 2.1.1, 3.1.1, 1.4.1, 1.2.2, 3.2.6, 3.3.7), EU AI Act (Art. 14 + Art. 50), HTTP Security Headers, pgvector RLS cross-tenant fix (OWASP LLM06), Keycloak MFA, Linkerd mTLS, K8s NetworkPolicy, 10 compliance docs, +90 security tests | 3 days   | ✅ Complete    |
+| **Phase 51**     | B2B GTM Core — LandingPage rewrite (12 sections), PilotSignupPage + PilotRequestsAdminPage, PricingPage (4 tiers), OrgUsagePage + ROI dashboard, SEO/AEO (robots.txt, llms.txt, sitemap.xml, JsonLd), billing schema migration 0030 | 3 days   | ✅ Complete    |
+| **Phase 52**     | Air-Gapped deployment (LocalInferenceService + GraphragAuditService + Helm/Zarf), Partner Portal (migration 0031 + PartnerService SHA-256 + PartnerSignupPage), HRIS integrations (ScimAdapter RFC 7643/7644 + Workday/SAP/Banner), InvestorDeckPage (10 slides) | 3 days   | ✅ Complete    |
 
-**Current Status:** Phases 1-50 complete ✅ — Backend + Frontend + Mobile fully built. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 8,445+ tests passing across 337+ test files (web 4,190) + 1,185 (security) + 598 (knowledge) + 95 (transcription). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** Phases 1-52 complete ✅ — Backend + Frontend + Mobile fully built. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). B2B GTM platform live. Air-gapped + Partner Portal + HRIS integrations complete. GraphQL federation active across all 6 subgraphs. ~7,274 tests passing (web 4,381 / security 1,336 / agent 712 / core 845). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 

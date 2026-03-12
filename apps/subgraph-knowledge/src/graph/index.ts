@@ -26,3 +26,8 @@ export { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 export { SocialRecommendationsService } from './social-recommendations.service';
 export { SocialRecommendationsDataService } from './social-recommendations-data.service';
 export { GraphModule } from './graph.module';
+export { GapAnalysisService } from './gap-analysis.service';
+export type {
+  KnowledgeGap,
+  GapReport,
+} from './gap-analysis.service';

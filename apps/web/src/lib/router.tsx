@@ -510,6 +510,15 @@ const InvestorDeckPage = lazy(() =>
 const HrisConfigPage = lazy(() =>
   import('@/pages/HrisConfigPage').then((m) => ({ default: m.HrisConfigPage }))
 );
+const AutoGradingResultsPage = lazy(() =>
+  import('@/pages/AutoGradingResultsPage').then((m) => ({ default: m.AutoGradingResultsPage }))
+);
+const GapAnalysisDashboardPage = lazy(() =>
+  import('@/pages/GapAnalysisDashboardPage').then((m) => ({ default: m.GapAnalysisDashboardPage }))
+);
+const StripeInvoicePage = lazy(() =>
+  import('@/pages/admin/StripeInvoicePage').then((m) => ({ default: m.StripeInvoicePage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -1084,6 +1093,21 @@ export const router = createBrowserRouter([
     // Phase 52 — HRIS & Enterprise Integrations config (ORG_ADMIN / SUPER_ADMIN)
     path: '/admin/hris-config',
     element: guarded(<HrisConfigPage />),
+  },
+  {
+    // Phase 53 — AI auto-grading results (INSTRUCTOR | ORG_ADMIN | SUPER_ADMIN)
+    path: '/admin/auto-grading',
+    element: guarded(<AutoGradingResultsPage />),
+  },
+  {
+    // Phase 53 — Knowledge gap analysis dashboard (ORG_ADMIN | SUPER_ADMIN)
+    path: '/admin/gap-analysis',
+    element: guarded(<GapAnalysisDashboardPage />),
+  },
+  {
+    // Phase 53 — Stripe invoice management (SUPER_ADMIN only)
+    path: '/admin/invoices',
+    element: guarded(<StripeInvoicePage />),
   },
   {
     path: '/',

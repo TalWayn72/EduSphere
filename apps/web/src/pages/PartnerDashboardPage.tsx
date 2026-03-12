@@ -8,6 +8,7 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { PartnerTierBadge } from '@/components/partners/PartnerTierBadge';
 
 const PARTNER_DASHBOARD_QUERY = `
   query PartnerDashboard {
@@ -95,6 +96,9 @@ export function PartnerDashboardPage() {
                 >
                   {partnerStatus}
                 </span>
+                <div className="mt-3">
+                  <PartnerTierBadge tier="GOLD" />
+                </div>
               </CardContent>
             </Card>
 
