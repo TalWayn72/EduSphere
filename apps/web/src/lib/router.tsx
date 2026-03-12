@@ -437,6 +437,9 @@ const AssessmentResultPage = lazy(() =>
     default: m.AssessmentResultPage,
   }))
 );
+const AssessmentResultsDetailPage = lazy(
+  () => import('@/pages/AssessmentResultsDetailPage')
+);
 const GroupChallengesPage = lazy(() =>
   import('@/pages/GroupChallengesPage').then((m) => ({
     default: m.GroupChallengesPage,
@@ -778,6 +781,11 @@ export const router = createBrowserRouter([
     // View aggregated results for a 360° campaign
     path: '/assessments/:id/results',
     element: guarded(<AssessmentResultPage />),
+  },
+  {
+    // Phase 60 — 360° multi-rater detail view with recharts radar + rater breakdown table
+    path: '/assessments/:id/results-detail',
+    element: guarded(<AssessmentResultsDetailPage />),
   },
   {
     path: '/assessment/:assessmentId',
