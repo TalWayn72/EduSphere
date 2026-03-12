@@ -1,9 +1,10 @@
 # EduSphere — Agent Memory
 
-## Current State (2026-03-12 — Phases 51-64 COMPLETE ✅)
+## Current State (2026-03-12 — Phases 51-64 COMPLETE ✅ + Phase 54 Final Closure)
 
-**Branch:** `feat/compliance-accessibility-security` | **HEAD:** `28190f4`
+**Branch:** `feat/compliance-accessibility-security` | **HEAD:** `5b11628`
 **Tests:** web 4427/4431 (367/368 files) | security 1370/1370 | TypeScript: 0 errors
+**E2E:** 414/414 passing (chromium + mobile-chrome) — 207 per project
 **Note:** 4 "failures" are pre-existing OOM worker crashes in AnnotationCard.test.ts / safe-json-ld.test.ts (jsdom env) — not logic failures
 
 | Phase | Scope | Commit |
@@ -12,6 +13,7 @@
 | 52 | Air-Gapped + Partner Portal + HRIS + Investor Deck | `ff12192` |
 | 53 | AI Auto-Grading + Gap Analysis + Stripe + Partner Tiers | `171ebfe` |
 | 54 | 8 E2E Playwright specs (protocol closure) | `02bc032` |
+| 54-fix | mobile-chrome stability (sidebar collapse, auth wait, schema) | `5b11628` |
 | 55 | Wire 27 admin/settings pages (remove pause:true) | `757c8f8` |
 | 56 | HRIS cron + Partner API middleware + AEO pre-render | `73c5ee4` |
 | 57 | Full i18n (10 langs including He) | `11fe7f4` |
@@ -21,6 +23,13 @@
 | 61+62 | OpenBadges 3.0 VC + SCORM 2004 Export | `97f4152` |
 | 63+64 | No-Code Portal Builder + Compliance Library | `a2f737c` |
 | fixes | Mounted-guard test fixes + doc sync | `28190f4` |
+
+### Phase 54 E2E Mobile-Chrome Stability Patterns (2026-03-12)
+- **Radix Dialog backdrop on mobile**: `page.evaluate((text) => { btn?.click(); })` — bypass `fixed inset-0 z-50` overlay
+- **AppSidebar hides content on 393px**: `localStorage.setItem('edusphere-sidebar-collapsed', 'true')` in `addInitScript`
+- **Post-login URL race**: `waitForURL((url) => !url.includes('/login'))` + `waitForLoadState('networkidle')`
+- **overflow-x table on mobile**: `scrollIntoViewIfNeeded()` + DOM `element.click()` in `clickByTestId` helper
+- **webkit/firefox browsers**: blocked by corporate TLS proxy — opt-in via `PLAYWRIGHT_ALL_BROWSERS=true`
 
 ### Key Test Patterns (React 19 + urql)
 - **Mounted-guard data**: use `await screen.findByText(...)` not `getByText` — effect runs async
