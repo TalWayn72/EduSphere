@@ -1,6 +1,47 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 12 מרץ 2026 (Phase 64 ✅ + AEO Phase 2 ✅ + BUG-059 dark-mode contrast ✅)
+**תאריך עדכון:** 12 מרץ 2026 (Phase 64 ✅ + AEO Phase 2 ✅ + BUG-059 dark-mode contrast ✅ + BUG-065 language-save permanent fix ✅)
+
+---
+
+## BUG-065 — שמירת העדפות שפה נכשלה (Language Preference Save Failure — Recurring)
+
+**סטטוס:** ✅ Fixed (2026-03-12)
+**חומרה:** 🔴 Critical (recurring — 10+ previous "fixes" that didn't address root cause)
+**קומפוננטות:** `apps/subgraph-core/src/challenges/challenges.graphql`, Docker/supervisord, subgraph-core
+
+### תסמין (Symptom)
+Every attempt to save language preferences in Settings showed: "שמירת העדפות שפה נכשלה". The error recurred after every container restart.
+
+### שרשרת גורמים (Root Cause Chain)
+1. `challenges.graphql` line 1 imported `"@requiresRole"` from `https://specs.apollo.dev/federation/v2.7`
+2. `@requiresRole` is a **LOCAL custom directive** (defined in `user.graphql`) — NOT a Federation spec element
+3. NestJS loads ALL `.graphql` files via `typePaths: ['./**/*.graphql']`; Docker mounts `src/` into the container
+4. On startup: `[GraphQLValidationFailed] Cannot import unknown element "@requiresRole"`
+5. supervisord marked subgraph-core as **FATAL** → crashed on every start
+6. Gateway returned `ECONNREFUSED 127.0.0.1:4001` for all core operations
+7. `updateUserPreferences` mutation failed → `result.error` → `toast.error(t('language.error'))`
+
+### תיקון (Fix)
+`apps/subgraph-core/src/challenges/challenges.graphql` line 1 — removed `"@requiresRole"` from `@link` import:
+```graphql
+# BEFORE: import: [..., "@requiresScopes", "@requiresRole"]
+# AFTER:  import: [..., "@requiresScopes"]
+```
+Then: `docker exec edusphere-all-in-one supervisorctl restart subgraph-core`
+
+### בדיקות E2E שנוספו (Tests Added)
+- `apps/web/e2e/language-save-regression.spec.ts` (6 tests — success toast, no error toast, logout/login persistence, visual snapshot)
+- `tests/security/federation-link-imports.spec.ts` (6 tests — CI gate: no SDL file may import custom directives from Federation spec URL)
+
+### Screenshots
+- `docs/screenshots/settings-language-save-success.png` — success toast
+- `docs/screenshots/login-page-hebrew-after-logout.png` — Hebrew login page after logout
+- `docs/screenshots/dashboard-hebrew-after-login.png` — Hebrew dashboard after re-login
+- `docs/screenshots/settings-hebrew-persisted-after-relogin.png` — Hebrew selected after re-login
+
+### מניעת הישנות (Anti-Recurrence)
+`tests/security/federation-link-imports.spec.ts` — CI gate blocks any SDL file from importing custom directives from Federation spec URL. Custom directives must be defined locally with `directive @name(...) on FIELD_DEFINITION`.
 
 ---
 

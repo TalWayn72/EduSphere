@@ -1,4 +1,4 @@
-extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@requires", "@provides", "@authenticated", "@requiresScopes", "@requiresRole"])
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@requires", "@provides", "@authenticated", "@requiresScopes"])
 
 enum ChallengeType {
   QUIZ
