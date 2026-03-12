@@ -1,5 +1,34 @@
 # EduSphere — Agent Memory
 
+## Current State (2026-03-12 — Phases 51-64 COMPLETE ✅)
+
+**Branch:** `feat/compliance-accessibility-security` | **HEAD:** `28190f4`
+**Tests:** web 4427/4431 (367/368 files) | security 1370/1370 | TypeScript: 0 errors
+**Note:** 4 "failures" are pre-existing OOM worker crashes in AnnotationCard.test.ts / safe-json-ld.test.ts (jsdom env) — not logic failures
+
+| Phase | Scope | Commit |
+|-------|-------|--------|
+| 51 | B2B GTM Core (Pilot, YAU, Pricing, ROI, SEO) | `6479a82` |
+| 52 | Air-Gapped + Partner Portal + HRIS + Investor Deck | `ff12192` |
+| 53 | AI Auto-Grading + Gap Analysis + Stripe + Partner Tiers | `171ebfe` |
+| 54 | 8 E2E Playwright specs (protocol closure) | `02bc032` |
+| 55 | Wire 27 admin/settings pages (remove pause:true) | `757c8f8` |
+| 56 | HRIS cron + Partner API middleware + AEO pre-render | `73c5ee4` |
+| 57 | Full i18n (10 langs including He) | `11fe7f4` |
+| 58 | Lesson Pipeline Builder (LangGraph + Canvas UI) | `a57affd` |
+| 59 | Instructor Marketplace + Revenue Sharing (F-031) | `4840b7d` |
+| 60 | 360° Multi-Rater Assessments (F-030) | `df3403c` |
+| 61+62 | OpenBadges 3.0 VC + SCORM 2004 Export | `97f4152` |
+| 63+64 | No-Code Portal Builder + Compliance Library | `a2f737c` |
+| fixes | Mounted-guard test fixes + doc sync | `28190f4` |
+
+### Key Test Patterns (React 19 + urql)
+- **Mounted-guard data**: use `await screen.findByText(...)` not `getByText` — effect runs async
+- **useMutation mock discrimination**: `String(mutation).includes('keywordFromQuery')` not call-count
+- **Pre-existing OOM**: AnnotationCard.test.ts + safe-json-ld.test.ts — jsdom worker crash, ignore
+
+---
+
 ## Session 19 COMPLETE: BUG-054 — React setState-during-render on lesson creation (04 Mar 2026)
 
 ### master HEAD: `b1125d3` | BUG-054 code fix complete (uncommitted — pending deployment verification)
