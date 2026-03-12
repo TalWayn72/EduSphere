@@ -3,6 +3,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 import { MarketplaceService } from './marketplace.service.js';
+import { InstructorPayoutService } from './instructor-payout.service.js';
 import type { CourseListingFiltersInput } from './marketplace.types.js';
 
 interface GqlContext {
@@ -23,7 +24,10 @@ function requireAuth(ctx: GqlContext): TenantContext {
 
 @Resolver()
 export class MarketplaceResolver {
-  constructor(private readonly marketplaceService: MarketplaceService) {}
+  constructor(
+    private readonly marketplaceService: MarketplaceService,
+    private readonly payoutService: InstructorPayoutService,
+  ) {}
 
   @Query('courseListings')
   async getCourseListings(
@@ -157,6 +161,39 @@ export class MarketplaceResolver {
       auth.email,
       name
     );
+  }
+
+  @Query('myPayouts')
+  async getMyPayouts(@Context() ctx: GqlContext) {
+    const tenantCtx = requireAuth(ctx);
+    const rows = await this.payoutService.getPayoutHistory(tenantCtx.userId, tenantCtx);
+    return rows.map((r) => ({
+      id: r.id,
+      periodMonth: r.periodMonth,
+      grossRevenue: r.grossRevenue,
+      platformCut: r.platformCut,
+      instructorPayout: r.instructorPayout,
+      status: r.status,
+      paidAt: r.paidAt?.toISOString() ?? null,
+    }));
+  }
+
+  @Query('allPayouts')
+  async getAllPayouts(
+    @Args('month') month: string | undefined,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    const rows = await this.payoutService.getAllPayouts(month, tenantCtx);
+    return rows.map((r) => ({
+      id: r.id,
+      periodMonth: r.periodMonth,
+      grossRevenue: r.grossRevenue,
+      platformCut: r.platformCut,
+      instructorPayout: r.instructorPayout,
+      status: r.status,
+      paidAt: r.paidAt?.toISOString() ?? null,
+    }));
   }
 
   @Mutation('requestPayout')
