@@ -19,6 +19,12 @@ type ScormImportResult {
   version: ScormVersion
 }
 
+type ScormExportResult {
+  downloadUrl: String!
+  expiresAt: String!
+  fileSizeBytes: Int!
+}
+
 extend type Query {
   myScormSession(contentItemId: ID!): ScormSession @authenticated
 }
@@ -29,4 +35,7 @@ extend type Mutation {
   finishScormSession(sessionId: ID!, data: String!): Boolean! @authenticated
   importScormPackage(fileKey: String!): ScormImportResult! @authenticated
   exportCourseAsScorm(courseId: ID!): String! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+  exportCourseAsScorm2004(courseId: ID!): ScormExportResult!
+    @authenticated
+    @requiresScopes(scopes: ["course:write"])
 }
