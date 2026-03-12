@@ -160,18 +160,19 @@ describe('XapiSettingsPage', () => {
     expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
   });
 
-  it('renders token rows with descriptions', () => {
+  it('renders token rows with descriptions', async () => {
     setupMocks({ tokens: MOCK_TOKENS });
     renderPage();
-    expect(screen.getByText('Rustici SCORM Cloud')).toBeInTheDocument();
-    expect(screen.getByText('Old Token')).toBeInTheDocument();
+    // findByText waits for mounted-guard re-render to complete
+    expect(await screen.findByText('Rustici SCORM Cloud')).toBeInTheDocument();
+    expect(await screen.findByText('Old Token')).toBeInTheDocument();
   });
 
-  it('shows Active / Revoked status badges on tokens', () => {
+  it('shows Active / Revoked status badges on tokens', async () => {
     setupMocks({ tokens: MOCK_TOKENS });
     renderPage();
-    expect(screen.getByText('Active')).toBeInTheDocument();
-    expect(screen.getByText('Revoked')).toBeInTheDocument();
+    expect(await screen.findByText('Active')).toBeInTheDocument();
+    expect(await screen.findByText('Revoked')).toBeInTheDocument();
   });
 
   it('opens the Generate Token modal when clicking Generate button', () => {
