@@ -13,7 +13,7 @@ import { z } from 'zod';
  * Equivalent to server-side DOMPurify with allowedTags: [].
  */
 const stripHtml = (val: string): string =>
-  val.replace(/<[^>]*>/g, '').trim();
+  val.replace(/<[^>]*>/g, '').replace(/</g, '').replace(/>/g, '').trim();
 
 export const OrgTypeEnum = z.enum([
   'UNIVERSITY',

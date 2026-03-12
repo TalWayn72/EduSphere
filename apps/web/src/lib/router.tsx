@@ -535,6 +535,12 @@ const GapAnalysisDashboardPage = lazy(() =>
 const StripeInvoicePage = lazy(() =>
   import('@/pages/admin/StripeInvoicePage').then((m) => ({ default: m.StripeInvoicePage }))
 );
+const BlogListPage = lazy(() =>
+  import('@/pages/BlogListPage').then((m) => ({ default: m.BlogListPage }))
+);
+const BlogPostPage = lazy(() =>
+  import('@/pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -640,6 +646,24 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <InstructorDirectoryPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public blog list — AEO Phase 3 (no auth required)
+    path: '/blog',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <BlogListPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public blog post detail — AEO Phase 3 (no auth required)
+    path: '/blog/:slug',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <BlogPostPage />
       </Suspense>
     ),
   },

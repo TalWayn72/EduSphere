@@ -17,7 +17,7 @@ import { z } from 'zod';
  * Prevents stored XSS when user-supplied pilot form data is displayed in admin UI.
  */
 const stripHtml = (val: string): string =>
-  val.replace(/<[^>]*>/g, '').trim();
+  val.replace(/<[^>]*>/g, '').replace(/</g, '').replace(/>/g, '').trim();
 
 export const OrgTypeEnum = z.enum([
   'UNIVERSITY',

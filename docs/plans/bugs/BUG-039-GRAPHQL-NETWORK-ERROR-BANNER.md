@@ -1,7 +1,5 @@
 # Plan: Fix Recurring GraphQL Network Error Banner — Permanent Fix
 
-> **DOCUMENT STORAGE RULE:** After plan mode exits, immediately move this file to `docs/plans/`.
-
 ---
 
 ## Context

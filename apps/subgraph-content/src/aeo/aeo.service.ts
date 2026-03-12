@@ -100,6 +100,11 @@ export class AeoService {
       { loc: `${BASE_URL}/pricing`, changefreq: 'monthly', priority: 0.8 },
       { loc: `${BASE_URL}/pilot`, changefreq: 'monthly', priority: 0.7 },
       { loc: `${BASE_URL}/accessibility`, changefreq: 'monthly', priority: 0.5 },
+      { loc: `${BASE_URL}/blog`, changefreq: 'weekly', priority: 0.9 },
+      { loc: `${BASE_URL}/blog/knowledge-graphs-in-education`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/blog/ai-tutoring-chavruta-method`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/blog/scorm-future-xapi-lti`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/blog/compliance-learning-automation`, changefreq: 'monthly', priority: 0.8 },
     ];
     let courseUrls: SitemapUrl[] = [];
     try {
@@ -126,6 +131,11 @@ export class AeoService {
       { loc: `${BASE_URL}/pricing`, changefreq: 'monthly', priority: 0.8 },
       { loc: `${BASE_URL}/pilot`, changefreq: 'monthly', priority: 0.7 },
       { loc: `${BASE_URL}/accessibility`, changefreq: 'monthly', priority: 0.5 },
+      { loc: `${BASE_URL}/blog`, changefreq: 'weekly', priority: 0.9 },
+      { loc: `${BASE_URL}/blog/knowledge-graphs-in-education`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/blog/ai-tutoring-chavruta-method`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/blog/scorm-future-xapi-lti`, changefreq: 'monthly', priority: 0.8 },
+      { loc: `${BASE_URL}/blog/compliance-learning-automation`, changefreq: 'monthly', priority: 0.8 },
     ];
 
     let courseUrls: SitemapUrl[] = [];

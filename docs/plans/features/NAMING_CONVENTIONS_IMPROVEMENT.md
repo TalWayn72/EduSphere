@@ -1,6 +1,6 @@
 # PLAN: Project Naming Conventions Audit & Improvement
 
-> **MOVE BEFORE EXECUTION:** This file must be moved to `docs/plans/features/NAMING_CONVENTIONS_IMPROVEMENT.md` before any implementation begins (CLAUDE.md iron rule).
+**Status:** ✅ Complete — conventions adopted in CLAUDE.md
 
 ---
 

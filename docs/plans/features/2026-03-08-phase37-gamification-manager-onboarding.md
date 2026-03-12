@@ -1,7 +1,6 @@
 # Phase 37: Gamification Completion + Manager Dashboard + Onboarding + Production Hardening
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-> **Document Storage:** After plan mode exits, move to `docs/plans/features/2026-03-08-phase37-gamification-manager-onboarding.md` (CLAUDE.md iron rule)
+**Status:** ✅ Complete — see OPEN_ISSUES.md
 
 **Goal:** Close all 10 open items from Phase 36 post-session audit: complete gamification (streaks/challenges/leaderboard), ship Manager Dashboard, deliver full Onboarding flow (student + instructor), fix Marketplace SDL gap, harden Redis rate limiting, add OWASP ZAP DAST CI, update visual regression baselines, and sync all documentation.
 

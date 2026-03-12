@@ -1,7 +1,6 @@
 # Phase 38: Assessment / Certificate / Marketplace / Quiz / SRS — UI Completion
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-> **Document Storage:** After plan mode exits, move to `docs/plans/features/2026-03-08-phase38-certificates-marketplace-quiz-srs.md` (CLAUDE.md iron rule)
+**Status:** ✅ Complete — see OPEN_ISSUES.md
 
 **Goal:** Close all real gaps surfaced by Phase 38 exploration: add certificate presigned-URL download, fix CourseListing JOIN/filter gap, build CertificatesPage + QuizBuilderPage, update MarketplacePage to show real course data, and add mobile SRS + Certificate screens.
 

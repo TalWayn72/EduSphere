@@ -187,7 +187,7 @@ export class EmbeddingStoreService implements OnModuleDestroy {
     ctx: TenantContext
   ): Promise<SearchResult[]> {
     return withTenantContext(this.db, ctx, async (tx) => {
-      const term = `%${query.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
+      const term = `%${query.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
       const rows = await tx
         .select({
           id: schema.transcript_segments.id,

@@ -12,3 +12,5 @@ export type { BreadcrumbItem } from './BreadcrumbSchema';
 export type { CourseSchemaProps } from './CourseSchema';
 export type { PersonSchemaProps } from './PersonSchema';
 export type { HowToSchemaProps, HowToStep } from './HowToSchema';
+export { ArticleSchema } from './ArticleSchema';
+export type { ArticleSchemaProps } from './ArticleSchema';

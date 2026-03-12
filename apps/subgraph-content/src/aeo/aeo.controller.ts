@@ -8,17 +8,21 @@
  *
  * All endpoints are unauthenticated and publicly accessible.
  */
-import { Controller, Get, Header, Logger, Res } from '@nestjs/common';
+import { Controller, Get, Header, Logger, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { AeoService } from './aeo.service';
 import type { PublicCourse, FeatureItem, FaqItem, CatalogCourse, InstructorProfile } from './aeo.service';
+import { OgImageService } from './og-image.service';
 
 // Rate limiting is enforced at the gateway level (Hive Gateway / nginx).
 @Controller('aeo')
 export class AeoController {
   private readonly logger = new Logger(AeoController.name);
 
-  constructor(private readonly aeoService: AeoService) {}
+  constructor(
+    private readonly aeoService: AeoService,
+    private readonly ogImageService: OgImageService,
+  ) {}
 
   @Get('sitemap.xml')
   @Header('Content-Type', 'application/xml; charset=utf-8')
@@ -70,5 +74,38 @@ export class AeoController {
   getInstructors(): InstructorProfile[] {
     this.logger.debug('[AeoController] instructor directory requested');
     return this.aeoService.getInstructors();
+  }
+
+  @Get('og')
+  async getOgImage(
+    @Query('title') rawTitle: string = 'EduSphere',
+    @Query('description') rawDesc: string = '',
+    @Query('type') rawType: string = 'default',
+    @Res() res: Response,
+  ): Promise<void> {
+    const title = (rawTitle ?? 'EduSphere').slice(0, 80);
+    const description = (rawDesc ?? '').slice(0, 160);
+    const type: 'course' | 'blog' | 'default' = (
+      ['course', 'blog', 'default'] as const
+    ).includes(rawType as 'course' | 'blog' | 'default')
+      ? (rawType as 'course' | 'blog' | 'default')
+      : 'default';
+
+    const maxAge = type === 'course' ? 3600 : 86400;
+    this.logger.debug(
+      `[AeoController] og image requested — title="${title}" type="${type}"`,
+    );
+    const buffer = await this.ogImageService.generateOgImage(
+      title,
+      description,
+      type,
+    );
+
+    res.set({
+      'Content-Type': 'image/png',
+      'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 24}`,
+      'X-Content-Type-Options': 'nosniff',
+    });
+    res.end(buffer);
   }
 }

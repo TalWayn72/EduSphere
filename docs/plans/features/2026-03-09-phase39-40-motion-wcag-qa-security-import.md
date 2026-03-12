@@ -1,7 +1,6 @@
 # Phase 39 + 40 — Motion Design, WCAG 2.2, QA Upgrade, Security Hardening v2 + Smart Content Import + Tech Stack Hygiene
 
-> **For Claude:** REQUIRED SUB-SKILL: Use `executing-plans` + `dispatching-parallel-agents` + `interaction-design` + `accessibility-compliance`
-> **Document Storage:** After plan mode exits, move to `docs/plans/features/2026-03-09-phase39-40-motion-wcag-qa-security-import.md`
+**Status:** ✅ Complete — see OPEN_ISSUES.md
 
 ---
 
@@ -1583,7 +1582,7 @@ Tests: unit (pipeline router, OCR accuracy, ZIP security, image processing),
 | Phase 39/40 implementation plan | `docs/plans/features/2026-03-09-phase39-40-motion-wcag-qa-security-import.md` | This plan file (moved from claude/plans/) |
 | Motion design ADR | `docs/architecture/ADR-012-motion-design-stack.md` | Why Remotion+GSAP+Framer over pure CSS; Remotion as build tool decision |
 | WCAG 2.2 compliance report | `docs/compliance/WCAG-2.2-COMPLIANCE.md` | 9 new criteria, EAA legal status, axe test results, Argos baselines |
-| Smart Content Import PRD | `docs/product/PHASE40-SMART-CONTENT-IMPORT-PRD.md` | Market research, competitive gap analysis, UX flow, quota management |
+| Smart Content Import PRD | `docs/plans/features/2026-03-09-phase39-40-motion-wcag-qa-security-import.md` (§Phase 40) | ✅ Implemented — covered in this plan file, Phase 40 complete |
 | OCR pipeline architecture | `docs/ai/OCR-INGESTION-PIPELINE.md` | 3-tier OCR strategy, accuracy benchmarks, Docker microservices, security rules |
 | Semgrep custom rules guide | `docs/security/SEMGREP-CUSTOM-RULES.md` | 5 EduSphere-specific rules, usage in CI, false positive handling |
 | SBOM management guide | `docs/security/SBOM-CYCLONEDX.md` | How to generate, where artifact is stored, SOC2/SLSA compliance note |
@@ -1660,8 +1659,8 @@ gantt
 | Future Phase | Pre-Work Doc | Owner Agent | Target |
 |---|---|---|---|
 | **Phase 41** — Expo SDK 55 + RN 0.83 | `docs/plans/features/2026-Q2-phase41-mobile-upgrade.md` | D5 | Before Phase 40 closes |
-| **Phase 41** — xAPI / LRS integration | `docs/product/XAPI-LRS-REQUIREMENTS.md` | D4 | Q2 2026 |
-| **Phase 42** — White-label per tenant | `docs/product/WHITE-LABEL-ARCHITECTURE.md` | D3 | Q2 2026 |
+| **Phase 41** — xAPI / LRS integration | `docs/plans/features/2026-03-09-phase41-xapi-drive-import.md` | D4 | ✅ Complete |
+| **Phase 42** — White-label per tenant | `docs/plans/features/2026-03-09-phase42-white-label-runtime.md` | D3 | ✅ Complete |
 | **Phase 42** — PostgreSQL 16 → 17 | `docs/deployment/PG17-MIGRATION-PLAN.md` | D2 | Before Phase 42 |
 | **Q2 2026** — Drizzle ORM v1 stable | `docs/reference/DRIZZLE-V1-MIGRATION.md` | D3 | When v1 exits beta |
 | **Ongoing** — SBOM quarterly review | `docs/security/SBOM-CYCLONEDX.md` | D2 | Every 3 months |

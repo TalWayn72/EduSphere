@@ -1,6 +1,6 @@
 # MS-Word Style Annotation/Comment System — Implementation Plan
 
-> **Move to project after plan approval:** `docs/plans/word-style-annotations.md`
+**Status:** ✅ Complete — implemented in Phase 45
 
 ---
 
