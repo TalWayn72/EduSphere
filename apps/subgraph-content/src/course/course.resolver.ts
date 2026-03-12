@@ -14,6 +14,7 @@ import type { TenantContext } from '@edusphere/db';
 import { CourseService } from './course.service';
 import { EnrollmentService } from './enrollment.service';
 import { AdminEnrollmentService } from './admin-enrollment.service';
+import { ComplianceLibraryService } from './compliance-library.service';
 import { ModuleLoader } from '../module/module.loader';
 
 const tracer = trace.getTracer('subgraph-content');
@@ -44,6 +45,7 @@ export class CourseResolver {
     private readonly courseService: CourseService,
     private readonly enrollmentService: EnrollmentService,
     private readonly adminEnrollmentService: AdminEnrollmentService,
+    private readonly complianceLibraryService: ComplianceLibraryService,
     private readonly moduleLoader: ModuleLoader
   ) {}
 
@@ -235,6 +237,27 @@ export class CourseResolver {
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.adminEnrollmentService.bulkEnroll(courseId, userIds, tenantCtx);
+  }
+
+  // ── Compliance Library (F-038) ───────────────────────────────
+
+  @Query('complianceCourses')
+  getComplianceCourses(@Context() ctx: GqlContext) {
+    requireAuth(ctx);
+    return this.complianceLibraryService.getComplianceCourses();
+  }
+
+  @Mutation('cloneComplianceCourse')
+  async cloneComplianceCourse(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.complianceLibraryService.cloneComplianceCourse(
+      courseId,
+      tenantCtx.tenantId,
+      tenantCtx.userId
+    );
   }
 
   // ── Field Resolvers ──────────────────────────────────────────

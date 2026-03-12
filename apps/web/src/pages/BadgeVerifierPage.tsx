@@ -7,7 +7,8 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Award, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, XCircle, Award, Loader2, Download } from 'lucide-react';
 import { gqlClient } from '@/lib/graphql';
 import { VERIFY_BADGE_QUERY } from '@/lib/graphql/badge.queries';
 
@@ -28,6 +29,40 @@ interface VerifyBadgeResponse {
     readonly error?: string | null;
     readonly assertion?: BadgeAssertionResult | null;
   };
+}
+
+function downloadVcJson(
+  assertionId: string,
+  assertion: BadgeAssertionResult,
+): void {
+  const vcJson = {
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://purl.imsglobal.org/spec/ob/v3p0/context.json',
+    ],
+    type: ['VerifiableCredential', 'OpenBadgeCredential'],
+    id: `urn:assertion:${assertionId}`,
+    issuer: 'did:web:edusphere.ai',
+    issuanceDate: assertion.issuedAt,
+    credentialSubject: {
+      id: `did:user:${assertion.recipientId}`,
+      achievement: {
+        id: assertion.verifyUrl,
+        type: 'Achievement',
+        name: assertion.badgeName,
+        description: assertion.badgeDescription,
+      },
+    },
+  };
+  const blob = new Blob([JSON.stringify(vcJson, null, 2)], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `badge-${assertionId}.json`;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 function anonymizeRecipient(recipientId: string): string {
@@ -177,6 +212,21 @@ export function BadgeVerifierPage(): React.ReactElement {
                       </dd>
                     </div>
                   </dl>
+                )}
+
+                {result.valid && assertion && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 w-full"
+                    onClick={() =>
+                      downloadVcJson(assertionId ?? '', assertion)
+                    }
+                    aria-label="Download VC JSON"
+                  >
+                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                    Download VC JSON
+                  </Button>
                 )}
               </>
             )}

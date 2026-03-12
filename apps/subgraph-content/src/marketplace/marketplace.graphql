@@ -62,6 +62,16 @@ type PaymentIntentResult {
   paymentIntentId: String!
 }
 
+type InstructorPayout {
+  id: ID!
+  periodMonth: String!
+  grossRevenue: Int!
+  platformCut: Int!
+  instructorPayout: Int!
+  status: String!
+  paidAt: String
+}
+
 extend type Query {
   courseListings(
     tenantId: ID!
@@ -71,6 +81,8 @@ extend type Query {
   ): CourseListingConnection! @authenticated
   myPurchases: [MarketplacePurchase!]! @authenticated
   instructorEarnings: EarningsSummary! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  myPayouts: [InstructorPayout!]! @authenticated
+  allPayouts(month: String): [InstructorPayout!]! @authenticated @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
 }
 
 extend type Mutation {

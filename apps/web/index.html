@@ -4,9 +4,78 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EduSphere - Knowledge Graph Educational Platform</title>
+
+    <!-- Primary Meta Tags -->
+    <title>EduSphere — AI-Native LMS for Universities &amp; Enterprises | Knowledge Graph + Visual Anchoring</title>
+    <meta name="description" content="The only LMS with Knowledge Graph AI, Visual Anchoring, and Air-Gapped deployment. Replace Canvas, D2L, or Blackboard with EduSphere. Starting at $12,000/year. 90-day pilot available." />
+    <meta name="keywords" content="LMS, learning management system, university LMS, enterprise LMS, AI LMS, knowledge graph, SCORM, LTI, FERPA, Canvas alternative, D2L alternative, Blackboard alternative, white label LMS, air-gapped LMS" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="EduSphere" />
+    <!-- canonical managed per-page by react-helmet-async (PageMeta component) -->
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://edusphere.dev/" />
+    <meta property="og:title" content="EduSphere — AI-Native LMS for Universities &amp; Enterprises" />
+    <meta property="og:description" content="Knowledge Graph AI. Visual Anchoring. Air-Gapped Ready. The LMS that beats Canvas on every metric. 90-day pilot, no credit card." />
+    <meta property="og:image" content="https://edusphere.dev/og-image.png" />
+    <meta property="og:site_name" content="EduSphere" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://edusphere.dev/" />
+    <meta name="twitter:title" content="EduSphere — AI-Native LMS" />
+    <meta name="twitter:description" content="Replace Canvas with an AI-native LMS. Knowledge Graph + Visual Anchoring + Air-Gapped." />
+    <meta name="twitter:image" content="https://edusphere.dev/og-image.png" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "EduSphere",
+      "applicationCategory": "EducationalApplication",
+      "description": "AI-Native Learning Management System with Knowledge Graph, Visual Anchoring, and Air-Gapped deployment",
+      "url": "https://edusphere.dev",
+      "offers": [
+        {"@type": "Offer", "name": "Starter", "price": "12000", "priceCurrency": "USD", "billingPeriod": "P1Y"},
+        {"@type": "Offer", "name": "Growth", "price": "28000", "priceCurrency": "USD", "billingPeriod": "P1Y"},
+        {"@type": "Offer", "name": "University", "price": "65000", "priceCurrency": "USD", "billingPeriod": "P1Y"}
+      ],
+      "featureList": ["Knowledge Graph AI", "Visual Anchoring", "Air-Gapped Deployment", "SCORM 2004", "LTI 1.3", "FERPA Compliant", "GDPR Compliant", "WCAG 2.2 AA"],
+      "operatingSystem": "Web, iOS, Android",
+      "screenshot": "https://edusphere.dev/og-image.png"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "EduSphere",
+      "url": "https://edusphere.dev",
+      "logo": "https://edusphere.dev/og-image.png",
+      "description": "AI-powered learning platform with knowledge graph intelligence, adaptive AI tutoring, and enterprise LMS capabilities.",
+      "sameAs": ["https://twitter.com/edusphere", "https://linkedin.com/company/edusphere"],
+      "knowsAbout": ["Online Education", "AI Tutoring", "Knowledge Graphs", "Corporate Learning", "SCORM", "LTI"]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "EduSphere",
+      "url": "https://edusphere.dev",
+      "description": "AI-powered knowledge graph learning platform for universities and enterprises.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {"@type": "EntryPoint", "urlTemplate": "https://edusphere.dev/search?q={search_term_string}"},
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- FOUC Prevention — apply theme + locale direction before React hydrates -->
     <script>
-      // Prevent Flash of Unstyled Content — apply theme + locale direction before React hydrates
       (function() {
         try {
           var prefs = JSON.parse(localStorage.getItem('edusphere-user-prefs') || '{}');
@@ -27,6 +96,7 @@
         } catch(e) {}
       })();
     </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">

@@ -82,11 +82,11 @@ function setupMocks(
 
   vi.mocked(useAuthRoleModule.useAuthRole).mockReturnValue(role);
 
-  let callCount = 0;
-  vi.mocked(urql.useQuery).mockImplementation(() => {
-    const call = callCount++;
-    if (call === 0) {
-      // tokensResult
+  // Distinguish queries by the `query` string value (mocked as named constants).
+  // Using call-order counters breaks when the mounted-guard triggers extra re-renders.
+  vi.mocked(urql.useQuery).mockImplementation((opts: unknown) => {
+    const options = opts as { query?: string };
+    if (options?.query === 'XAPI_TOKENS_QUERY') {
       return [
         {
           fetching: tokensFetching,
@@ -160,18 +160,19 @@ describe('XapiSettingsPage', () => {
     expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
   });
 
-  it('renders token rows with descriptions', () => {
+  it('renders token rows with descriptions', async () => {
     setupMocks({ tokens: MOCK_TOKENS });
     renderPage();
-    expect(screen.getByText('Rustici SCORM Cloud')).toBeInTheDocument();
-    expect(screen.getByText('Old Token')).toBeInTheDocument();
+    // findByText waits for mounted-guard re-render to complete
+    expect(await screen.findByText('Rustici SCORM Cloud')).toBeInTheDocument();
+    expect(await screen.findByText('Old Token')).toBeInTheDocument();
   });
 
-  it('shows Active / Revoked status badges on tokens', () => {
+  it('shows Active / Revoked status badges on tokens', async () => {
     setupMocks({ tokens: MOCK_TOKENS });
     renderPage();
-    expect(screen.getByText('Active')).toBeInTheDocument();
-    expect(screen.getByText('Revoked')).toBeInTheDocument();
+    expect(await screen.findByText('Active')).toBeInTheDocument();
+    expect(await screen.findByText('Revoked')).toBeInTheDocument();
   });
 
   it('opens the Generate Token modal when clicking Generate button', () => {

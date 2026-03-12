@@ -6,11 +6,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Download } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+import { AiCourseCreatorModal } from '@/components/AiCourseCreatorModal';
 // Step 1 is shown immediately — keep eager
 import { CourseWizardStep1 } from './CourseWizardStep1';
 // Steps 2–4 are lazy: avoids pulling TipTap+KaTeX (~450 KB) on initial page load.
@@ -48,6 +49,29 @@ export const courseSchema = z.object({
 });
 
 export type CourseSchemaValues = z.infer<typeof courseSchema>;
+
+// ── GraphQL: SCORM export mutation ────────────────────────────────────────────
+const EXPORT_SCORM_MUTATION = `
+  mutation ExportScorm($courseId: ID!) {
+    exportCourseAsScorm2004(courseId: $courseId) {
+      downloadUrl
+      expiresAt
+      fileSizeBytes
+    }
+  }
+`;
+
+interface ExportScormResult {
+  exportCourseAsScorm2004: {
+    downloadUrl: string;
+    expiresAt: string;
+    fileSizeBytes: number;
+  };
+}
+
+interface ExportScormVariables {
+  courseId: string;
+}
 
 // ── GraphQL types ─────────────────────────────────────────────────────────────
 interface CreateCourseResult {
@@ -100,6 +124,7 @@ export function CourseCreatePage() {
   ];
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   const form = useForm<CourseSchemaValues>({
     resolver: zodResolver(courseSchema),
@@ -118,7 +143,48 @@ export function CourseCreatePage() {
     CreateCourseVariables
   >(CREATE_COURSE_MUTATION);
 
+  const [exportScormResult, executeExportScorm] = useMutation<
+    ExportScormResult,
+    ExportScormVariables
+  >(EXPORT_SCORM_MUTATION);
+
   const isSubmitting = createResult.fetching;
+  const isExporting = exportScormResult.fetching;
+
+  const handleExportScorm = async () => {
+    const courseId = form.getValues('title')
+      ? DRAFT_COURSE_ID
+      : DRAFT_COURSE_ID;
+    const { data, error } = await executeExportScorm({ courseId });
+    if (error) {
+      const msg =
+        error.graphQLErrors?.[0]?.message ??
+        error.message ??
+        'Failed to export SCORM package';
+      toast.error(msg);
+      return;
+    }
+    if (data?.exportCourseAsScorm2004) {
+      const { downloadUrl, expiresAt } = data.exportCourseAsScorm2004;
+      const expiry = new Date(expiresAt).toLocaleTimeString();
+      toast.success(
+        `SCORM 2004 package ready — link expires at ${expiry}`,
+        {
+          description: (
+            <a
+              href={downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-indigo-400"
+            >
+              Download SCORM package
+            </a>
+          ),
+          duration: 15000,
+        }
+      );
+    }
+  };
 
   // Sync RHF values into wizard state for non-RHF steps to read
   const syncWizardData = () => {
@@ -261,6 +327,36 @@ export function CourseCreatePage() {
             </p>
           </div>
 
+          {step === 0 && (
+            <>
+              {/* AI Course Builder CTA */}
+              <div
+                data-testid="ai-builder-cta"
+                className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">✨</span>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-indigo-300">
+                      AI Course Builder — Build in 10 Minutes
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-400">
+                      Describe your course → AI creates all modules, lessons, and quiz questions automatically.
+                    </p>
+                  </div>
+                  <Button
+                    data-testid="launch-ai-builder-btn"
+                    onClick={() => setShowAiModal(true)}
+                    className="bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    Launch AI Builder →
+                  </Button>
+                </div>
+              </div>
+              <AiCourseCreatorModal open={showAiModal} onClose={() => setShowAiModal(false)} />
+            </>
+          )}
+
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}
           </Form>
@@ -317,10 +413,24 @@ export function CourseCreatePage() {
           </div>
         )}
         {step === STEPS.length - 1 && (
-          <div className="flex justify-start">
+          <div className="flex justify-between items-center gap-2 flex-wrap">
             <Button variant="outline" onClick={() => setStep(lastContentStep)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('wizard.backToMedia')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleExportScorm}
+              disabled={isExporting}
+              data-testid="export-scorm-btn"
+              className="border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10"
+            >
+              {isExporting ? (
+                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-400 mr-2 inline-block" />
+              ) : (
+                <Download className="h-4 w-4 mr-2" />
+              )}
+              Export as SCORM 2004
             </Button>
           </div>
         )}

@@ -16,6 +16,14 @@ vi.mock('@edusphere/db', () => ({
   })),
   // closeAllPools defined inside factory so no outer-variable hoisting issue
   closeAllPools: vi.fn().mockResolvedValue(undefined),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({
+        select: (...args: unknown[]) => mockSelect(...args),
+        delete: (...args: unknown[]) => mockDelete(...args),
+        execute: (...args: unknown[]) => mockExecute(...args),
+      })
+  ),
   schema: {
     content_embeddings: { id: 'id', segment_id: 'segment_id' },
     annotation_embeddings: { id: 'id', annotation_id: 'annotation_id' },
@@ -184,6 +192,12 @@ describe('EmbeddingStoreService', () => {
   });
 
   describe('ilikeFallback()', () => {
+    const mockTenantCtx = {
+      tenantId: 'tenant-uuid-001',
+      userId: 'user-uuid-001',
+      userRole: 'STUDENT' as const,
+    };
+
     it('maps results to SearchResult shape with similarity 0.75', async () => {
       mockSelect.mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
@@ -194,7 +208,7 @@ describe('EmbeddingStoreService', () => {
           }),
         }),
       });
-      const results = await service.ilikeFallback('match', 5);
+      const results = await service.ilikeFallback('match', 5, mockTenantCtx);
       expect(results).toHaveLength(1);
       expect(results[0]!.similarity).toBe(0.75);
       expect(results[0]!.type).toBe('transcript_segment');
@@ -208,7 +222,7 @@ describe('EmbeddingStoreService', () => {
           }),
         }),
       });
-      const results = await service.ilikeFallback('nomatch', 5);
+      const results = await service.ilikeFallback('nomatch', 5, mockTenantCtx);
       expect(results).toEqual([]);
     });
   });

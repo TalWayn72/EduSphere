@@ -196,14 +196,16 @@ export default defineConfig({
         ...(process.env.CI ? {} : { channel: 'chrome' }),
       },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // Firefox and WebKit are opt-in only.
+    // They require `npx playwright install firefox webkit` which is blocked by the
+    // corporate TLS proxy in this environment. CI also installs chromium only.
+    // Enable via: PLAYWRIGHT_ALL_BROWSERS=true pnpm test:e2e
+    ...(process.env.PLAYWRIGHT_ALL_BROWSERS === 'true'
+      ? [
+          { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+          { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+        ]
+      : []),
     {
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] },

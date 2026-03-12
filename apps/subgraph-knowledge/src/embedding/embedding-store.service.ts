@@ -10,7 +10,9 @@ import {
   eq,
   sql,
   closeAllPools,
+  withTenantContext,
 } from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 import type { EmbeddingRecord, SearchResult } from './embedding.types.js';
 
 type ContentRow = {
@@ -124,60 +126,83 @@ export class EmbeddingStoreService implements OnModuleDestroy {
     return mapContent(row);
   }
 
+  /**
+   * OWASP LLM06 / SI-9: All pgvector similarity queries MUST be wrapped in
+   * withTenantContext() so that PostgreSQL RLS session variables are set before
+   * any query executes.  Without this, RLS policies on media_assets (which back
+   * transcript_segments → content_embeddings) are not enforced and a tenant
+   * could retrieve another tenant's embedding results.
+   */
   async searchByVector(
     vecStr: string,
     limit: number,
+    ctx: TenantContext,
     minSimilarity = 0
   ): Promise<SearchResult[]> {
-    if (minSimilarity > 0) {
-      const rows = (await this.db.execute<SimRow>(sql`
-        SELECT 'content' AS type, ce.id, ce.segment_id,
+    return withTenantContext(this.db, ctx, async (tx) => {
+      if (minSimilarity > 0) {
+        const rows = (await tx.execute<SimRow>(sql`
+          SELECT 'content' AS type, ce.id, ce.segment_id,
+            1 - (ce.embedding <=> ${vecStr}::vector) AS similarity
+          FROM content_embeddings ce
+          JOIN transcript_segments ts ON ts.id = ce.segment_id
+          JOIN transcripts tr ON tr.id = ts.transcript_id
+          JOIN media_assets ma ON ma.id = tr.asset_id
+          WHERE 1 - (ce.embedding <=> ${vecStr}::vector) >= ${minSimilarity}
+            AND ma.tenant_id = current_setting('app.current_tenant', TRUE)::uuid
+          ORDER BY ce.embedding <=> ${vecStr}::vector ASC
+          LIMIT ${limit}
+        `)) as unknown as SimRow[];
+        return rows.map((r) => ({
+          id: r.id,
+          refId: r.segment_id,
+          type: r.type,
+          similarity: parseFloat(r.similarity),
+        }));
+      }
+
+      const rows = (await tx.execute<SimRow>(sql`
+        SELECT ce.id, ce.segment_id,
           1 - (ce.embedding <=> ${vecStr}::vector) AS similarity
         FROM content_embeddings ce
-        WHERE 1 - (ce.embedding <=> ${vecStr}::vector) >= ${minSimilarity}
+        JOIN transcript_segments ts ON ts.id = ce.segment_id
+        JOIN transcripts tr ON tr.id = ts.transcript_id
+        JOIN media_assets ma ON ma.id = tr.asset_id
+        WHERE ma.tenant_id = current_setting('app.current_tenant', TRUE)::uuid
         ORDER BY ce.embedding <=> ${vecStr}::vector ASC
         LIMIT ${limit}
       `)) as unknown as SimRow[];
       return rows.map((r) => ({
         id: r.id,
         refId: r.segment_id,
-        type: r.type,
+        type: 'transcript_segment',
         similarity: parseFloat(r.similarity),
       }));
-    }
-
-    const rows = (await this.db.execute<SimRow>(sql`
-      SELECT ce.id, ce.segment_id,
-        1 - (ce.embedding <=> ${vecStr}::vector) AS similarity
-      FROM content_embeddings ce
-      JOIN transcript_segments ts ON ts.id = ce.segment_id
-      ORDER BY ce.embedding <=> ${vecStr}::vector ASC
-      LIMIT ${limit}
-    `)) as unknown as SimRow[];
-    return rows.map((r) => ({
-      id: r.id,
-      refId: r.segment_id,
-      type: 'transcript_segment',
-      similarity: parseFloat(r.similarity),
-    }));
+    });
   }
 
-  async ilikeFallback(query: string, limit: number): Promise<SearchResult[]> {
-    const term = `%${query.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
-    const rows = await this.db
-      .select({
-        id: schema.transcript_segments.id,
-        text: schema.transcript_segments.text,
-      })
-      .from(schema.transcript_segments)
-      .where(sql`${schema.transcript_segments.text} ILIKE ${term}`)
-      .limit(limit);
-    return rows.map((r) => ({
-      id: r.id,
-      refId: r.id,
-      type: 'transcript_segment',
-      similarity: 0.75,
-    }));
+  async ilikeFallback(
+    query: string,
+    limit: number,
+    ctx: TenantContext
+  ): Promise<SearchResult[]> {
+    return withTenantContext(this.db, ctx, async (tx) => {
+      const term = `%${query.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
+      const rows = await tx
+        .select({
+          id: schema.transcript_segments.id,
+          text: schema.transcript_segments.text,
+        })
+        .from(schema.transcript_segments)
+        .where(sql`${schema.transcript_segments.text} ILIKE ${term}`)
+        .limit(limit);
+      return rows.map((r) => ({
+        id: r.id,
+        refId: r.id,
+        type: 'transcript_segment',
+        similarity: 0.75,
+      }));
+    });
   }
 
   async delete(id: string): Promise<boolean> {

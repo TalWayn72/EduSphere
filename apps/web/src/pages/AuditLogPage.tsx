@@ -2,7 +2,7 @@
  * AuditLogPage — Admin action audit trail.
  * Route: /admin/audit
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -39,6 +39,8 @@ export function AuditLogPage() {
   const [since, setSince] = useState('');
   const [until, setUntil] = useState('');
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [result] = useQuery<AuditLogResult>({
     query: ADMIN_AUDIT_LOG_QUERY,
     variables: {
@@ -48,7 +50,7 @@ export function AuditLogPage() {
       since: since || undefined,
       until: until || undefined,
     },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   if (!role || !ADMIN_ROLES.has(role)) {

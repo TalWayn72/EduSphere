@@ -20,6 +20,12 @@ const MOCK_EMBED = {
   similarity: 0.9,
 };
 
+const MOCK_GQL_CTX = {
+  tenantId: 'tenant-uuid-001',
+  userId: 'user-uuid-001',
+  role: 'STUDENT',
+};
+
 describe('EmbeddingResolver', () => {
   let resolver: EmbeddingResolver;
 
@@ -65,9 +71,10 @@ describe('EmbeddingResolver', () => {
         MOCK_EMBED,
       ]);
       const query = [0.1, 0.2, 0.3];
-      const result = await resolver.semanticSearch(query, 5, 0.8);
+      const result = await resolver.semanticSearch(query, 5, 0.8, MOCK_GQL_CTX);
       expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
         query,
+        { tenantId: 'tenant-uuid-001', userId: 'user-uuid-001', userRole: 'STUDENT' },
         5,
         0.8
       );
@@ -76,9 +83,10 @@ describe('EmbeddingResolver', () => {
 
     it('uses default limit=10 and minSimilarity=0.7 when not provided', async () => {
       mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
-      await resolver.semanticSearch([0.1, 0.2]);
+      await resolver.semanticSearch([0.1, 0.2], 10, 0.7, MOCK_GQL_CTX);
       expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
         [0.1, 0.2],
+        { tenantId: 'tenant-uuid-001', userId: 'user-uuid-001', userRole: 'STUDENT' },
         10,
         0.7
       );
@@ -91,11 +99,13 @@ describe('EmbeddingResolver', () => {
       const result = await resolver.semanticSearchByContentItem(
         'content-1',
         [0.1, 0.2],
-        3
+        3,
+        MOCK_GQL_CTX
       );
       // Resolver ignores contentItemId and delegates entirely to semanticSearchByVector
       expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
         [0.1, 0.2],
+        { tenantId: 'tenant-uuid-001', userId: 'user-uuid-001', userRole: 'STUDENT' },
         3,
         0.7
       );
@@ -104,9 +114,10 @@ describe('EmbeddingResolver', () => {
 
     it('uses default limit=5 when not provided', async () => {
       mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
-      await resolver.semanticSearchByContentItem('content-1', [0.1]);
+      await resolver.semanticSearchByContentItem('content-1', [0.1], 5, MOCK_GQL_CTX);
       expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
         [0.1],
+        { tenantId: 'tenant-uuid-001', userId: 'user-uuid-001', userRole: 'STUDENT' },
         5,
         0.7
       );

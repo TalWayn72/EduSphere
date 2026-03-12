@@ -2,7 +2,7 @@
  * AdminDashboardPage — Platform overview for ORG_ADMIN / SUPER_ADMIN.
  * Route: /admin
  */
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
@@ -53,9 +53,11 @@ export function AdminDashboardPage() {
   const role = useAuthRole();
   const { t } = useTranslation('admin');
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [result] = useQuery<{ adminOverview: AdminOverviewData }>({
     query: ADMIN_OVERVIEW_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   const quickLinks = useMemo(

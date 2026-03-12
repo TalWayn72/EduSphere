@@ -5,7 +5,7 @@
  * Displays a grid of available role-play scenarios.
  * Instructors can create custom scenarios.
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
@@ -55,8 +55,10 @@ export function ScenariosPage() {
   const [activeScenario, setActiveScenario] = useState<ScenarioTemplate | null>(
     null
   );
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
-  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY, pause: true }); // TODO(Phase-49): resolver not yet in supergraph — wire when available
+  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY, pause: !mounted });
 
   const scenarios: ScenarioTemplate[] =
     (result.data?.scenarioTemplates as ScenarioTemplate[] | undefined) ?? [];

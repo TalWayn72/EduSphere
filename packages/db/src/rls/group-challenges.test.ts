@@ -8,7 +8,7 @@ import {
   peerMatchRequests,
 } from '../schema/group-challenges';
 
-const ROOT = resolve(__dirname, '../../../../..');
+const ROOT = resolve(__dirname, '../../../..');
 const read = (p: string) => {
   const full = resolve(ROOT, p);
   return existsSync(full) ? readFileSync(full, 'utf-8') : '';

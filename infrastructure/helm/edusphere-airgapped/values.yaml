@@ -1,0 +1,48 @@
+# Air-Gapped deployment values
+airgap:
+  enabled: true
+  modelHash: ""  # SHA-256 of pinned model weights — REQUIRED in production
+  ollamaUrl: "http://ollama:11434"
+  ollamaModel: "llama3"
+
+# Disable ALL external URL references when airgap.enabled=true
+externalServices:
+  openai:
+    enabled: false
+  anthropic:
+    enabled: false
+  keycloak:
+    url: "http://keycloak:8080"  # Must be self-hosted
+
+# Local inference
+ollama:
+  enabled: true
+  image:
+    repository: ollama/ollama
+    tag: "0.1.29"
+  resources:
+    requests:
+      memory: "8Gi"
+      cpu: "2"
+    limits:
+      memory: "16Gi"
+      cpu: "4"
+
+# PostgreSQL (self-hosted, no cloud)
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16"
+
+# NATS (self-hosted)
+nats:
+  enabled: true
+  image:
+    repository: nats
+    tag: "2.10"
+
+# Node env
+env:
+  AIRGAP_MODE: "true"
+  NODE_ENV: "production"

@@ -142,9 +142,15 @@ describe('EmbeddingService / EmbeddingStoreService — memory safety', () => {
       .mockResolvedValue([]);
     const { svc, store } = makeServices();
 
-    await svc.semanticSearch('graph theory', 'tenant-1', 5);
+    const mockTenantCtx = {
+      tenantId: 'tenant-uuid-001',
+      userId: 'user-uuid-001',
+      userRole: 'STUDENT' as const,
+    };
 
-    expect(mockIlike).toHaveBeenCalledWith('graph theory', 5);
+    await svc.semanticSearch('graph theory', mockTenantCtx, 5);
+
+    expect(mockIlike).toHaveBeenCalledWith('graph theory', 5, mockTenantCtx);
     mockIlike.mockRestore();
     await store.onModuleDestroy();
   });

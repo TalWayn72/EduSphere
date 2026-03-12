@@ -106,5 +106,41 @@ describe('MasteryBadge', () => {
       expect(dot).toBeInTheDocument();
       expect(dot?.className).toContain('rounded-full');
     });
+
+    it('color dot has aria-hidden="true" (supplementary — text label is primary indicator)', () => {
+      render(<MasteryBadge level="mastered" />);
+      const badge = screen.getByTestId('mastery-badge-mastered');
+      const dot = badge.querySelector('[aria-hidden="true"]');
+      expect(dot).toBeInTheDocument();
+    });
+  });
+
+  // WCAG 1.4.1 — Use of Color
+  describe('WCAG 1.4.1 — text label visible (not color alone)', () => {
+    it.each([
+      ['none', 'Not Started', 0],
+      ['attempted', 'Attempted', 1],
+      ['familiar', 'Familiar', 2],
+      ['proficient', 'Proficient', 3],
+      ['mastered', 'Mastered', 4],
+    ] as const)('level "%s" shows visible text label "%s"', (level, expectedLabel) => {
+      render(<MasteryBadge level={level} />);
+      expect(screen.getByText(expectedLabel)).toBeInTheDocument();
+    });
+
+    it.each([
+      ['none', 'Not Started', 0],
+      ['attempted', 'Attempted', 1],
+      ['familiar', 'Familiar', 2],
+      ['proficient', 'Proficient', 3],
+      ['mastered', 'Mastered', 4],
+    ] as const)('level "%s" has aria-label with level name and number', (level, label, num) => {
+      render(<MasteryBadge level={level} />);
+      const badge = screen.getByTestId(`mastery-badge-${level}`);
+      expect(badge).toHaveAttribute(
+        'aria-label',
+        `Mastery: ${label} (level ${num} of 4)`
+      );
+    });
   });
 });

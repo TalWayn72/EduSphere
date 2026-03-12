@@ -4,7 +4,7 @@
  * Two-panel: left = block palette, right = canvas drop zone.
  * TOP toolbar: title input, Save Draft + Publish/Unpublish buttons.
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { toast } from 'sonner';
@@ -40,7 +40,9 @@ function parseServerBlocks(
 }
 
 export function PortalBuilderPage() {
-  const [{ data }] = useQuery({ query: MY_PORTAL_QUERY, pause: true }); // TODO(Phase-49): resolver not yet in supergraph — wire when available
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const [{ data }] = useQuery({ query: MY_PORTAL_QUERY, pause: !mounted });
   const [, saveMutation] = useMutation(SAVE_PORTAL_LAYOUT_MUTATION);
   const [, publishMutation] = useMutation(PUBLISH_PORTAL_MUTATION);
   const [, unpublishMutation] = useMutation(UNPUBLISH_PORTAL_MUTATION);

@@ -53,14 +53,16 @@ export function ScimSettingsPage() {
   const [copied, setCopied] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [tokensResult, refetchTokens] = useQuery<{ scimTokens: ScimToken[] }>({
     query: SCIM_TOKENS_QUERY,
-    pause: true,
+    pause: !mounted,
   });
   const [logResult] = useQuery<{ scimSyncLog: ScimSyncEntry[] }>({
     query: SCIM_SYNC_LOG_QUERY,
     variables: { limit: 50 },
-    pause: true,
+    pause: !mounted,
   });
   const [, generateToken] = useMutation(GENERATE_SCIM_TOKEN_MUTATION);
   const [, revokeToken] = useMutation(REVOKE_SCIM_TOKEN_MUTATION);

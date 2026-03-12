@@ -66,18 +66,18 @@ export function PipelineConfigPanel({ node, assets, onClose }: Props) {
 
   return (
     <div
-      className="w-80 border-l bg-white overflow-y-auto flex flex-col shrink-0"
+      className="w-80 border-l bg-card overflow-y-auto flex flex-col shrink-0"
       data-testid="config-panel"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <div>
           <div className="font-medium text-sm">{node.labelHe}</div>
-          <div className="text-xs text-gray-400">{node.label}</div>
+          <div className="text-xs text-muted-foreground">{node.label}</div>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+          className="text-muted-foreground hover:text-foreground text-lg leading-none"
           aria-label={t('pipeline.closeSettings')}
           data-testid="config-panel-close"
         >
@@ -87,16 +87,16 @@ export function PipelineConfigPanel({ node, assets, onClose }: Props) {
 
       {/* Enable / Disable */}
       <div className="px-4 py-3 border-b flex items-center justify-between">
-        <span className="text-sm text-gray-600">{t('pipeline.enableModule')}</span>
+        <span className="text-sm text-muted-foreground">{t('pipeline.enableModule')}</span>
         <button
           role="switch"
           aria-checked={node.enabled}
           onClick={() => toggleNode(node.id)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${node.enabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${node.enabled ? 'bg-blue-600' : 'bg-muted'}`}
           data-testid="node-toggle"
         >
           <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${node.enabled ? 'translate-x-6' : 'translate-x-1'}`}
+            className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${node.enabled ? 'translate-x-6' : 'translate-x-1'}`}
           />
         </button>
       </div>
@@ -186,7 +186,7 @@ export function PipelineConfigPanel({ node, assets, onClose }: Props) {
         {['NER_SOURCE_LINKING', 'CONTENT_CLEANING', 'STRUCTURED_NOTES', 'PUBLISH_SHARE'].includes(
           node.moduleType
         ) && (
-          <p className="text-xs text-gray-500">{t('pipeline.autoModule')}</p>
+          <p className="text-xs text-muted-foreground">{t('pipeline.autoModule')}</p>
         )}
       </div>
     </div>
@@ -207,12 +207,12 @@ function Field({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-1 text-xs font-medium text-gray-700 mb-1">
+      <label className="flex items-center gap-1 text-xs font-medium text-foreground mb-1">
         {label}
         {tooltip && (
           <span
             title={tooltip}
-            className="cursor-help text-gray-400 hover:text-gray-600 ml-1"
+            className="cursor-help text-muted-foreground hover:text-foreground ml-1"
             aria-label={tooltip}
             data-testid="field-tooltip"
           >
@@ -349,7 +349,7 @@ function IngestionConfig({
           }`}
         >
           <span>📂</span>
-          <span className="text-gray-600 flex-1 truncate">
+          <span className="text-muted-foreground flex-1 truncate">
             {uploadedFileName ?? t('pipeline.chooseFile')}
           </span>
           <input

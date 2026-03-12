@@ -155,4 +155,28 @@ export class ScormResolver {
     };
     return this.exportService.exportCourse(courseId, tenantCtx);
   }
+
+  @Mutation('exportCourseAsScorm2004')
+  async exportCourseAsScorm2004(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GraphQLContext
+  ): Promise<{ downloadUrl: string; expiresAt: string; fileSizeBytes: number }> {
+    const auth = this.requireAuth(ctx);
+    this.logger.log(
+      `exportCourseAsScorm2004: courseId=${courseId} userId=${auth.userId} tenantId=${auth.tenantId}`
+    );
+    const tenantCtx: TenantContext = {
+      tenantId: auth.tenantId,
+      userId: auth.userId,
+      userRole: (auth.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
+    };
+    const result = await this.exportService.exportCourse(courseId, tenantCtx);
+    // exportCourse returns a presigned URL string; wrap it in ScormExportResult shape
+    const expiresAt = new Date(Date.now() + 86_400 * 1000).toISOString();
+    return {
+      downloadUrl: result,
+      expiresAt,
+      fileSizeBytes: 0,
+    };
+  }
 }

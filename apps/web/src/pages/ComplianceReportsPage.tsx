@@ -4,7 +4,7 @@
  * Access: ORG_ADMIN, SUPER_ADMIN only
  * F-016: Compliance Training Report Export
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -56,9 +56,11 @@ export function ComplianceReportsPage() {
   const [asOfDate, setAsOfDate] = useState('');
   const [reportResult, setReportResult] = useState<ReportResult | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [{ data, fetching, error }] = useQuery({
     query: COMPLIANCE_COURSES_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [{ fetching: generating }, generateReport] = useMutation(
     GENERATE_COMPLIANCE_REPORT_MUTATION

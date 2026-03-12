@@ -1,0 +1,110 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresScopes"])
+
+scalar JSON
+
+type SubscriptionPlan {
+  id: ID!
+  name: String!
+  priceUsdCents: Int!
+  billingPeriodMonths: Int!
+  maxYau: Int
+  features: JSON!
+  isActive: Boolean!
+}
+
+type TenantSubscription {
+  id: ID!
+  tenantId: ID!
+  plan: SubscriptionPlan!
+  status: SubscriptionStatus!
+  pilotEndsAt: String
+  currentPeriodStart: String!
+  currentPeriodEnd: String!
+  yauCount: Int!
+  maxYau: Int
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PILOT
+}
+
+type UsageSnapshot {
+  tenantId: ID!
+  yauCount: Int!
+  activeUsersCount: Int!
+  coursesCount: Int!
+  storageGb: Float!
+  computedAt: String!
+}
+
+type PilotRequest {
+  id: ID!
+  orgName: String!
+  orgType: OrgType!
+  contactName: String!
+  contactEmail: String!
+  estimatedUsers: Int
+  useCase: String
+  status: PilotRequestStatus!
+  createdAt: String!
+}
+
+enum OrgType {
+  UNIVERSITY
+  COLLEGE
+  CORPORATE
+  GOVERNMENT
+  DEFENSE
+}
+
+enum PilotRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+extend type Query {
+  mySubscription: TenantSubscription @authenticated
+
+  myUsage: UsageSnapshot @authenticated
+
+  allPilotRequests(status: PilotRequestStatus): [PilotRequest!]!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
+
+  allTenantSubscriptions: [TenantSubscription!]!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
+
+  tenantUsage(tenantId: ID!): UsageSnapshot
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+}
+
+extend type Mutation {
+  submitPilotRequest(input: PilotRequestInput!): PilotRequest!
+
+  approvePilotRequest(requestId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
+
+  rejectPilotRequest(requestId: ID!, reason: String): Boolean!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
+}
+
+input PilotRequestInput {
+  orgName: String!
+  orgType: OrgType!
+  contactName: String!
+  contactEmail: String!
+  contactPhone: String
+  estimatedUsers: Int!
+  useCase: String!
+}

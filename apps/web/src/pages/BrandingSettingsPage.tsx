@@ -53,9 +53,11 @@ export function BrandingSettingsPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [queryResult] = useQuery<BrandingQueryResult>({
     query: TENANT_BRANDING_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [mutResult, updateBranding] = useMutation(
     UPDATE_TENANT_BRANDING_MUTATION

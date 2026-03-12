@@ -12,3 +12,8 @@ export type {
   GenerateCourseOptions,
   CourseGenerationRecord,
 } from './course-generator.service.js';
+export { AutoGradingService } from './auto-grading.service.js';
+export type {
+  GradingRubric,
+  GradingResult,
+} from './auto-grading.service.js';

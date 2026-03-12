@@ -27,6 +27,7 @@ import {
   Swords,
   UserCheck,
   Lightbulb,
+  HelpCircle,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -212,6 +213,27 @@ export function AppSidebar() {
 
       {/* Bottom section */}
       <div className="py-3 flex flex-col gap-1">
+        {/* WCAG 3.2.6 — Consistent Help: Help & Support link appears in the same
+            location (bottom of sidebar) on every page that uses this navigation. */}
+        <NavLink
+          to="/help"
+          title={collapsed ? 'Help & Support' : undefined}
+          data-testid="nav-item-help"
+          aria-label="Help and Support"
+          className={({ isActive }) =>
+            [
+              'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
+              'transition-colors hover:bg-muted/60',
+              isActive
+                ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
+                : 'text-muted-foreground border-l-2 border-transparent',
+            ].join(' ')
+          }
+        >
+          <HelpCircle className="h-4 w-4 shrink-0" aria-hidden />
+          {!collapsed && <span>Help &amp; Support</span>}
+        </NavLink>
+
         {/* Settings */}
         <NavLink
           to="/settings"

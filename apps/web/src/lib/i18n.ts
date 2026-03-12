@@ -42,11 +42,18 @@ const ViteLocaleBackend = {
   },
 };
 
-/** Sets document.dir and document.lang based on the active locale */
+/**
+ * Sets document.dir and document.lang based on the active locale.
+ * WCAG 3.1.1 — both attributes must be kept in sync on every locale change.
+ * The <html lang="en"> default in index.html is the static baseline; this
+ * function overrides it dynamically whenever the user switches language.
+ */
 export function applyDocumentDirection(locale: string): void {
   const dir = RTL_LOCALES.has(locale as 'he') ? 'rtl' : 'ltr';
-  document.documentElement.dir = dir;
-  document.documentElement.lang = locale;
+  // Set dir first to minimise layout shift
+  document.documentElement.setAttribute('dir', dir);
+  // WCAG 3.1.1: lang must reflect the current locale at all times
+  document.documentElement.setAttribute('lang', locale);
 }
 
 export async function initI18n(initialLocale?: string): Promise<void> {

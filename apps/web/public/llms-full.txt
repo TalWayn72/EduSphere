@@ -1,0 +1,124 @@
+# EduSphere — Full Reference
+
+> AI-powered Learning Management System combining knowledge graph intelligence, adaptive AI tutoring (Chavruta), semantic search, and enterprise LMS capabilities. Supports 100,000+ concurrent users.
+
+EduSphere is a B2B/B2C SaaS educational platform for higher education institutions, enterprise L&D teams, and individual learners. Key differentiators include an Apache AGE knowledge graph for concept relationship mapping, a LangGraph.js-powered AI tutor, and pgvector semantic search.
+
+## Platform Overview
+
+EduSphere delivers personalized learning experiences through AI-driven content adaptation, real-time collaboration, and knowledge graph-based concept connections. The platform is built on a GraphQL Federation architecture with 6 independent subgraphs, enabling horizontal scaling to 100,000+ concurrent users. All data is protected with multi-tenant row-level security (RLS) in PostgreSQL and encrypted at rest and in transit.
+
+## Core Features (Detailed)
+
+### AI Tutoring (Chavruta)
+EduSphere's AI tutor is named Chavruta, inspired by the traditional Jewish learning partner method. It uses a LangGraph.js state machine with 4 stages: assess → quiz → explain → debate. The tutor conducts Socratic dialogue, identifies knowledge gaps, adapts explanations to the learner's current level, and automatically links new concepts to the learner's personal knowledge graph. The AI backend uses Vercel AI SDK v6 for LLM abstraction, supporting Ollama (development) and OpenAI/Anthropic Claude (production).
+
+### Knowledge Graph
+Powered by Apache AGE (A Graph Extension for PostgreSQL) using the Cypher query language, EduSphere builds a visual semantic network of everything a learner has studied. Concepts are stored as nodes, relationships (prerequisites, related-to, part-of) as edges. pgvector with HNSW indexes provides semantic similarity search over 768-dimensional nomic-embed-text embeddings. The knowledge graph enables "find concepts related to machine learning within 3 hops" queries and powers AI tutor recommendations.
+
+### Gamification System
+EduSphere's gamification includes a 5-level mastery progression (Novice → Beginner → Intermediate → Advanced → Expert), daily streaks, XP points, OpenBadges 3.0-certified verifiable digital badges, team and cohort leaderboards, and push notifications for achievements. Studies show gamification increases course completion rates by 40-60%. Badges are issued as OpenBadges 3.0 assertions with cryptographic verification available at /verify/badge/:assertionId.
+
+### Enterprise Features
+Multi-tenant architecture with PostgreSQL RLS ensures complete data isolation between organizations. SSO via SAML 2.0, OpenID Connect (OIDC), and LDAP/Active Directory. SCIM 2.0 for automated user provisioning from HR systems (Workday, BambooHR, SAP SuccessFactors). GDPR and FERPA compliant with data export (portability), deletion (right to erasure), and consent management. WCAG 2.2 AA accessibility certified. SLA: 99.9% uptime for Enterprise tier.
+
+### Live Sessions
+Real-time instructor-led learning events powered by NATS JetStream for event streaming. Instructors schedule sessions, take attendance, and share content. Students receive push notifications and can join from web or mobile. Session recordings are stored in MinIO for later review. Attendance and engagement data feeds into compliance and CPD reporting.
+
+### Multi-Language Support
+50+ languages supported with full RTL (right-to-left) for Hebrew and Arabic. Automatic locale detection, per-tenant language configuration, localized email notifications, and Keycloak-integrated locale preferences.
+
+## Integration Capabilities
+
+### Authentication & Identity
+- Keycloak OIDC/OAuth 2.0 as identity provider
+- SAML 2.0 SSO for enterprise IdPs (Okta, Entra ID, Google Workspace)
+- SCIM 2.0 for automated user provisioning and deprovisioning
+- LDAP/Active Directory synchronization
+
+### E-Learning Standards
+- SCORM 1.2 and SCORM 2004 (versions 3 and 4) course import and tracking
+- xAPI (Tin Can API) statement generation for all learning activities
+- LTI 1.3 as both Tool Provider and Tool Consumer
+- OpenBadges 3.0 digital credential issuance and verification
+
+### Infrastructure
+- GraphQL Federation v2.7 via Hive Gateway
+- NATS JetStream for real-time event streaming
+- MinIO S3-compatible object storage for media assets
+- Jaeger/OpenTelemetry distributed tracing
+- Prometheus + Grafana monitoring
+
+## Admin Capabilities
+
+- Multi-tenant management dashboard
+- White-label custom domain, branding, colors, logo, fonts
+- Portal builder for custom learner landing pages
+- User management (create, invite, deactivate, role assignment)
+- Role-based access control (STUDENT, INSTRUCTOR, RESEARCHER, ORG_ADMIN, SUPER_ADMIN)
+- Compliance and CPD (Continuing Professional Development) reporting
+- At-risk learner detection with AI-powered intervention suggestions
+- Cohort insights and cross-cohort analytics
+- Audit log with tamper-evident records
+- BI export (CSV, JSON) with MinIO pre-signed URLs
+- Enrollment management and bulk enrollment
+- Custom gamification settings (XP multipliers, badge criteria)
+- SCIM provisioning configuration
+- LTI 1.3 tool registration
+
+## Pricing
+
+- Free: $0/month — 100 courses, basic AI tutor (10 msgs/day), 1 GB storage
+- Pro: $29/month — Unlimited courses, unlimited AI tutor, knowledge graph, 50 GB storage
+- Enterprise: Custom pricing — All Pro features + multi-tenant, SSO, SCIM, SLA, white-label, dedicated support
+
+## Glossary
+
+### Knowledge Graph
+A structured data model representing educational concepts as nodes and their relationships (prerequisites, related-to, part-of) as directed edges. EduSphere's knowledge graph is powered by Apache AGE using Cypher queries.
+
+### AI Tutoring
+Conversational AI using large language models (LLMs) to provide personalized, Socratic instruction. EduSphere's AI tutor adapts its explanations to the learner's knowledge level and builds concept connections automatically.
+
+### Chavruta Method
+A traditional Jewish pedagogical method (Hebrew: חַבְרוּתָא) where two partners study together through dialogue and debate. EduSphere's AI Chavruta tutor digitally implements this Socratic approach.
+
+### Spaced Repetition
+A learning technique scheduling reviews at increasing intervals based on recall performance. EduSphere uses spaced repetition for knowledge graph concept reinforcement.
+
+### Mastery Learning
+An instructional strategy requiring learners to demonstrate competence before advancing. EduSphere implements a 5-level mastery progression tracked through quizzes, projects, and AI assessments.
+
+### SCORM
+Sharable Content Object Reference Model — the global e-learning interoperability standard. EduSphere supports SCORM 1.2 and SCORM 2004.
+
+### xAPI
+Experience API (Tin Can) — a modern e-learning standard tracking learning experiences beyond LMS boundaries. Stores statements in a Learning Record Store (LRS).
+
+### LTI
+Learning Tools Interoperability — an IMS Global standard for securely integrating external tools with LMS platforms. EduSphere supports LTI 1.3.
+
+### Gamification
+Application of game-design elements (points, badges, leaderboards) to educational contexts. Increases course completion rates by 40-60%.
+
+### pgvector
+A PostgreSQL extension enabling vector similarity search over high-dimensional embeddings for semantic search and AI-powered recommendations.
+
+### Apache AGE
+A PostgreSQL extension adding graph database functionality using Cypher query language for knowledge graph traversal.
+
+## Public Resources
+
+- [Features Overview](https://app.edusphere.dev/features)
+- [FAQ](https://app.edusphere.dev/faq)
+- [Educational Glossary](https://app.edusphere.dev/glossary)
+- [Accessibility Statement](https://app.edusphere.dev/accessibility)
+- [Pricing](https://app.edusphere.dev/landing#pricing)
+- [Badge Verification](https://app.edusphere.dev/verify/badge/:assertionId)
+
+## Contact
+
+- Support: support@edusphere.dev
+- Enterprise sales: enterprise@edusphere.dev
+- Security: security@edusphere.dev
+- General: hello@edusphere.dev

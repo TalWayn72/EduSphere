@@ -101,6 +101,16 @@ vi.mock('@/lib/graphql/content.queries', () => ({
 vi.mock('lucide-react', () => ({
   Trash2: () => <span>TrashIcon</span>,
   PlusCircle: () => <span>PlusIcon</span>,
+  X: () => <span>CloseIcon</span>,
+  Sparkles: () => <span>SparklesIcon</span>,
+}));
+
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
+    open ? <div role="dialog">{children}</div> : null,
+  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
 }));
 
 // ── Subject under test ────────────────────────────────────────────────────────

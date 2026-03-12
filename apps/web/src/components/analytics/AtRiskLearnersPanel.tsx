@@ -3,7 +3,7 @@
  * risk score, days since active, and risk factor badges.
  * "Send Nudge" is a placeholder button (disabled) — backend not yet wired.
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,10 +32,12 @@ interface Props {
 }
 
 export function AtRiskLearnersPanel({ courseId }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [{ data, fetching }] = useQuery<AtRiskResult>({
     query: AT_RISK_LEARNERS_QUERY,
     variables: { courseId },
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
 
   if (fetching) {

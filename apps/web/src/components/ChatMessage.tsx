@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Bot, User } from 'lucide-react';
 import type { Message } from '@/types/chat';
+import { AITransparencyBadge } from '@/components/ai/AITransparencyBadge';
 
 interface ChatMessageProps {
   message: Message;
@@ -110,7 +111,7 @@ export function ChatMessage({
         {isAgent ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
       </div>
       <div className="flex flex-col gap-1 flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-semibold">
             {isAgent ? agentName : 'You'}
           </span>
@@ -120,6 +121,7 @@ export function ChatMessage({
               minute: '2-digit',
             })}
           </span>
+          {isAgent && <AITransparencyBadge type="chat" />}
         </div>
         <div className="text-sm text-foreground space-y-2">
           {paragraphs.map((paragraph, idx) => (

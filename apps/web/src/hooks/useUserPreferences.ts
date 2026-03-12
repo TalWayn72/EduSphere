@@ -46,7 +46,7 @@ export function useUserPreferences(): UseUserPreferencesReturn {
   const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY, pause: !mounted });
   const [tenantLangResult] = useQuery<TenantLanguageSettingsResult>({
     query: MY_TENANT_LANGUAGE_SETTINGS_QUERY,
-    pause: true, // TODO(Phase-49): resolver not yet in supergraph — wire when available
+    pause: !mounted,
   });
   const [{ fetching }, updatePreferences] = useMutation(
     UPDATE_USER_PREFERENCES_MUTATION

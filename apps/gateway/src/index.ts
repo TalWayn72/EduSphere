@@ -12,6 +12,7 @@ import {
   PREMIUM_MAX_REQUESTS,
   MAX_REQUESTS,
 } from './middleware/rate-limit.js';
+import { applySecurityHeaders } from './middleware/security-headers.js';
 import {
   depthLimitRule,
   complexityLimitRule,
@@ -231,6 +232,9 @@ const gateway = createGatewayRuntime({
 const port = parseInt(process.env.PORT || '4000');
 
 const server = createServer(async (req, res) => {
+  // OWASP ASVS V14.4: Apply security headers to every response.
+  applySecurityHeaders(res);
+
   // Extract rate-limit key from raw HTTP headers (before Yoga parsing)
   const tenantHeader =
     req.headers['x-tenant-id'] ??

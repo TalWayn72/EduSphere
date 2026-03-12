@@ -34,12 +34,12 @@ const STATUS_COLOR: Record<string, string> = {
   RUNNING: 'bg-blue-50 border-blue-200 text-blue-700',
   COMPLETED: 'bg-green-50 border-green-200 text-green-700',
   FAILED: 'bg-red-50 border-red-200 text-red-700',
-  CANCELLED: 'bg-gray-50 border-gray-200 text-gray-600',
+  CANCELLED: 'bg-muted border-border text-muted-foreground',
 };
 
 export function PipelineRunStatus({ run, onCancel }: Props) {
   const colorClass =
-    STATUS_COLOR[run.status] ?? 'bg-gray-50 border-gray-200 text-gray-600';
+    STATUS_COLOR[run.status] ?? 'bg-muted border-border text-muted-foreground';
   const statusLabel = STATUS_LABEL[run.status] ?? run.status;
 
   const summary = extractOutput(run.results, 'SUMMARIZATION', 'shortSummary') as string | null;
@@ -85,7 +85,7 @@ export function PipelineRunStatus({ run, onCancel }: Props) {
           {run.results.map((r) => (
             <span
               key={r.id}
-              className="text-xs px-2 py-0.5 rounded-full bg-white border"
+              className="text-xs px-2 py-0.5 rounded-full bg-card border"
             >
               ✓ {r.moduleName}
             </span>
@@ -121,7 +121,7 @@ export function PipelineRunStatus({ run, onCancel }: Props) {
             />
           )}
           {!summary && !transcript && !notes && (
-            <p className="text-gray-500">Pipeline הסתיים. חזור לשיעור לצפייה בתוצאות.</p>
+            <p className="text-muted-foreground">Pipeline הסתיים. חזור לשיעור לצפייה בתוצאות.</p>
           )}
         </div>
       )}
@@ -142,7 +142,7 @@ function ResultBlock({
     <div data-testid={testId}>
       <span className="font-semibold">{title}</span>
       {content && (
-        <p className="mt-0.5 text-gray-700 whitespace-pre-line leading-relaxed">{content}</p>
+        <p className="mt-0.5 text-foreground whitespace-pre-line leading-relaxed">{content}</p>
       )}
     </div>
   );

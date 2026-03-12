@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { Link } from 'react-router-dom';
 import { BarChart3, ChevronDown, BookOpen, PlusCircle } from 'lucide-react';
@@ -60,10 +60,12 @@ export function SkillGapWidget() {
   const [createOpen, setCreateOpen] = useState(false);
   const [newRole, setNewRole] = useState('');
   const [newConcepts, setNewConcepts] = useState('');
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const [{ data: profilesData, fetching: profilesFetching }] = useQuery<{
     skillProfiles: SkillProfile[];
-  }>({ query: SKILL_PROFILES_QUERY, pause: true }); // TODO(Phase-49): resolver not yet in supergraph — wire when available
+  }>({ query: SKILL_PROFILES_QUERY, pause: !mounted });
 
   const [{ data: reportData, fetching: reportFetching }] = useQuery<{
     skillGapAnalysis: SkillGapReport;

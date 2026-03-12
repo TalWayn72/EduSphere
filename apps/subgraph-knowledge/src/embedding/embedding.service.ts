@@ -6,6 +6,7 @@ import {
   sql,
   closeAllPools,
 } from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 import type {
   EmbeddingRecord,
   SearchResult,
@@ -87,9 +88,13 @@ export class EmbeddingService implements OnModuleDestroy {
 
   // -- Semantic Search -------------------------------------------------------
 
+  /**
+   * OWASP LLM06 / SI-9: tenantCtx is now required so that all pgvector
+   * similarity queries are executed inside withTenantContext() (RLS enforced).
+   */
   async semanticSearch(
     queryText: string,
-    tenantId: string,
+    tenantCtx: TenantContext,
     limit = 10
   ): Promise<SearchResult[]> {
     const hasProvider = this.provider
@@ -101,7 +106,7 @@ export class EmbeddingService implements OnModuleDestroy {
         'No embedding provider -- semantic search falling back to ILIKE'
       );
       return this.store
-        ? this.store.ilikeFallback(queryText, limit)
+        ? this.store.ilikeFallback(queryText, limit, tenantCtx)
         : this.fallbackIlike(queryText, limit);
     }
 
@@ -113,24 +118,25 @@ export class EmbeddingService implements OnModuleDestroy {
         `Embedding provider error (${String(err)}) -- using ILIKE fallback`
       );
       return this.store
-        ? this.store.ilikeFallback(queryText, limit)
+        ? this.store.ilikeFallback(queryText, limit, tenantCtx)
         : this.fallbackIlike(queryText, limit);
     }
 
     const vecStr = `[${vector.join(',')}]`;
     return this.store
-      ? this.store.searchByVector(vecStr, limit)
+      ? this.store.searchByVector(vecStr, limit, tenantCtx)
       : this.fallbackVectorSearch(vecStr, limit);
   }
 
   async semanticSearchByVector(
     queryVector: number[],
+    tenantCtx: TenantContext,
     limit = 10,
     minSimilarity = 0.7
   ): Promise<SearchResult[]> {
     const vecStr = `[${queryVector.join(',')}]`;
     return this.store
-      ? this.store.searchByVector(vecStr, limit, minSimilarity)
+      ? this.store.searchByVector(vecStr, limit, tenantCtx, minSimilarity)
       : this.fallbackVectorSearch(vecStr, limit, minSimilarity);
   }
 

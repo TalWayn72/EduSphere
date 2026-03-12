@@ -13,6 +13,13 @@ vi.mock('./embedding.service', () => ({
 
 import { EmbeddingDataLoader } from './embedding.dataloader.js';
 import { EmbeddingService } from './embedding.service.js';
+import type { TenantContext } from '@edusphere/db';
+
+const mockTenantCtx: TenantContext = {
+  tenantId: 'tenant-test-1',
+  userId: 'user-test-1',
+  userRole: 'STUDENT',
+};
 
 describe('EmbeddingDataLoader', () => {
   let loader: EmbeddingDataLoader;
@@ -24,7 +31,7 @@ describe('EmbeddingDataLoader', () => {
 
   describe('batchLoad()', () => {
     it('returns empty Map for empty input without calling provider', async () => {
-      const result = await loader.batchLoad([]);
+      const result = await loader.batchLoad([], mockTenantCtx);
       expect(result.size).toBe(0);
       expect(mockCallEmbeddingProvider).not.toHaveBeenCalled();
     });
@@ -35,7 +42,7 @@ describe('EmbeddingDataLoader', () => {
         { id: 'emb-1', refId: 'seg-1', type: 'content', similarity: 0.9 },
       ]);
 
-      await loader.batchLoad(['conceptA', 'conceptB']);
+      await loader.batchLoad(['conceptA', 'conceptB'], mockTenantCtx);
 
       expect(mockCallEmbeddingProvider).toHaveBeenCalledTimes(2);
       expect(mockCallEmbeddingProvider).toHaveBeenCalledWith('conceptA');
@@ -48,7 +55,7 @@ describe('EmbeddingDataLoader', () => {
         { id: 'emb-1', refId: 'seg-1', type: 'content', similarity: 0.85 },
       ]);
 
-      const result = await loader.batchLoad(['conceptA', 'conceptB']);
+      const result = await loader.batchLoad(['conceptA', 'conceptB'], mockTenantCtx);
 
       expect(result.size).toBe(2);
       expect(result.has('conceptA')).toBe(true);
@@ -61,7 +68,7 @@ describe('EmbeddingDataLoader', () => {
         { id: 'emb-x', refId: 'seg-x', type: 'content', similarity: 0.92 },
       ]);
 
-      const result = await loader.batchLoad(['React']);
+      const result = await loader.batchLoad(['React'], mockTenantCtx);
 
       const hits = result.get('React');
       expect(hits).toHaveLength(1);
@@ -71,7 +78,7 @@ describe('EmbeddingDataLoader', () => {
     it('handles provider failure gracefully — sets empty array for failed concept', async () => {
       mockCallEmbeddingProvider.mockRejectedValue(new Error('provider down'));
 
-      const result = await loader.batchLoad(['FailConcept']);
+      const result = await loader.batchLoad(['FailConcept'], mockTenantCtx);
 
       expect(result.size).toBe(1);
       expect(result.get('FailConcept')).toEqual([]);
@@ -82,7 +89,7 @@ describe('EmbeddingDataLoader', () => {
       mockCallEmbeddingProvider.mockResolvedValue([0.1, 0.2]);
       mockSemanticSearchByVector.mockRejectedValue(new Error('db error'));
 
-      const result = await loader.batchLoad(['Algebra']);
+      const result = await loader.batchLoad(['Algebra'], mockTenantCtx);
 
       expect(result.size).toBe(1);
       expect(result.get('Algebra')).toEqual([]);
@@ -97,7 +104,7 @@ describe('EmbeddingDataLoader', () => {
         { id: 'e1', refId: 's1', type: 'content', similarity: 0.8 },
       ]);
 
-      const result = await loader.batchLoad(['conceptA', 'conceptB']);
+      const result = await loader.batchLoad(['conceptA', 'conceptB'], mockTenantCtx);
 
       expect(result.get('conceptA')).toHaveLength(1);
       expect(result.get('conceptB')).toEqual([]);

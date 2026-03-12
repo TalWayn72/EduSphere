@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Award, Download } from 'lucide-react';
+import { Award, Download, Share2 } from 'lucide-react';
 import { MY_OPEN_BADGES_QUERY } from '@/lib/graphql/badges.queries';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -119,17 +119,29 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
               </p>
             )}
           </div>
-          {assertion.vcDocument && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 shrink-0"
-              onClick={() => downloadVC(assertion.id, assertion.vcDocument!)}
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {assertion.vcDocument && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => downloadVC(assertion.id, assertion.vcDocument!)}
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download VC
+              </Button>
+            )}
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(assertion.shareUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Share ${assertion.badgeName} to LinkedIn`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground"
             >
-              <Download className="h-3.5 w-3.5" />
-              Download VC
-            </Button>
-          )}
+              <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+              Share to LinkedIn
+            </a>
+          </div>
         </div>
       </CardContent>
     </Card>

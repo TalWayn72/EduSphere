@@ -197,4 +197,29 @@ describe('ScormResolver', () => {
         )
     ).not.toThrow();
   });
+
+  // Test 10: exportCourseAsScorm2004 wraps presigned URL into ScormExportResult shape
+  it('exportCourseAsScorm2004 — returns ScormExportResult with downloadUrl, expiresAt, fileSizeBytes', async () => {
+    const presignedUrl =
+      'https://minio/scorm-exports/tenant-abc/course-1-123.zip?X-Amz-Signature=xyz';
+    mockExportService.exportCourse.mockResolvedValue(presignedUrl);
+
+    const result = await resolver.exportCourseAsScorm2004(
+      'course-1',
+      AUTH_CTX as never
+    );
+
+    expect(result.downloadUrl).toBe(presignedUrl);
+    expect(typeof result.expiresAt).toBe('string');
+    expect(result.expiresAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(typeof result.fileSizeBytes).toBe('number');
+  });
+
+  // Test 11: exportCourseAsScorm2004 throws UnauthorizedException when not authenticated
+  it('exportCourseAsScorm2004 — throws UnauthorizedException when not authenticated', async () => {
+    const ctx = makeCtx();
+    await expect(
+      resolver.exportCourseAsScorm2004('course-1', ctx as never)
+    ).rejects.toThrow(UnauthorizedException);
+  });
 });

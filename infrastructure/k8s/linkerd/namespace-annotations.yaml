@@ -1,0 +1,17 @@
+# Annotates all EduSphere namespaces for Linkerd mTLS injection.
+# Apply with: kubectl apply -f namespace-annotations.yaml
+# All pods created in the 'edusphere' namespace will automatically receive
+# the Linkerd proxy sidecar, enabling mutual TLS for all inter-pod traffic.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: edusphere
+  annotations:
+    linkerd.io/inject: enabled
+    config.linkerd.io/proxy-cpu-request: "100m"
+    config.linkerd.io/proxy-memory-request: "20Mi"
+    config.linkerd.io/proxy-cpu-limit: "500m"
+    config.linkerd.io/proxy-memory-limit: "128Mi"
+  labels:
+    app.kubernetes.io/managed-by: linkerd
+    security.edusphere.io/mtls: enforced

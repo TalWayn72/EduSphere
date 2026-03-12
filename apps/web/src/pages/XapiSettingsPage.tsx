@@ -65,14 +65,16 @@ export function XapiSettingsPage() {
     };
   }, []);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [tokensResult, refetchTokens] = useQuery<{ xapiTokens: XapiToken[] }>({
     query: XAPI_TOKENS_QUERY,
-    pause: true,
+    pause: !mounted,
   });
   const [statementsResult] = useQuery<{ xapiStatements: XapiStatement[] }>({
     query: XAPI_STATEMENTS_QUERY,
     variables: { limit: 20 },
-    pause: true,
+    pause: !mounted,
   });
   const [, generateToken] = useMutation(GENERATE_XAPI_TOKEN_MUTATION);
   const [, revokeToken] = useMutation(REVOKE_XAPI_TOKEN_MUTATION);

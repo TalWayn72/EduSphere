@@ -10,7 +10,7 @@
   "accessTokenLifespan": 900,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
-  "ssoSessionMaxLifespan": 36000,
+  "ssoSessionMaxLifespan": 28800,
   "ssoSessionIdleTimeoutRememberMe": 0,
   "ssoSessionMaxLifespanRememberMe": 0,
   "offlineSessionIdleTimeout": 2592000,
@@ -1994,6 +1994,7 @@
       }
     ]
   },
+  "passwordPolicy": "length(12) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1) and notUsername(undefined) and notEmail(undefined) and passwordHistory(5)",
   "internationalizationEnabled": false,
   "authenticationFlows": [
     {
@@ -2050,7 +2051,7 @@
         {
           "authenticator": "auth-otp-form",
           "authenticatorFlow": false,
-          "requirement": "ALTERNATIVE",
+          "requirement": "REQUIRED",
           "priority": 30,
           "autheticatorFlow": false,
           "userSetupAllowed": false
@@ -2058,7 +2059,7 @@
         {
           "authenticator": "webauthn-authenticator",
           "authenticatorFlow": false,
-          "requirement": "DISABLED",
+          "requirement": "ALTERNATIVE",
           "priority": 40,
           "autheticatorFlow": false,
           "userSetupAllowed": false
@@ -2070,6 +2071,33 @@
           "priority": 50,
           "autheticatorFlow": false,
           "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+      "alias": "MFA - Privileged Role OTP",
+      "description": "Conditional OTP enforcement for ORG_ADMIN and SUPER_ADMIN realm roles (ISO 27001, SOC 2)",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorConfig": "privileged-role-condition",
+          "authenticator": "conditional-user-role",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": true
         }
       ]
     },
@@ -2522,6 +2550,14 @@
         {
           "authenticatorFlow": true,
           "requirement": "CONDITIONAL",
+          "priority": 15,
+          "autheticatorFlow": true,
+          "flowAlias": "MFA - Privileged Role OTP",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
           "priority": 20,
           "autheticatorFlow": true,
           "flowAlias": "Browser - Conditional 2FA",
@@ -2652,6 +2688,15 @@
     }
   ],
   "authenticatorConfig": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef0123456789",
+      "alias": "privileged-role-condition",
+      "config": {
+        "conditionProvider": "conditional-user-role",
+        "roles": "ORG_ADMIN,SUPER_ADMIN",
+        "negate": "false"
+      }
+    },
     {
       "id": "2986121b-ef0b-48cc-a4b3-2008ddc971fd",
       "alias": "browser-conditional-credential",

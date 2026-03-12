@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { unlink } from 'fs/promises';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { createDatabaseConnection, schema, eq } from '@edusphere/db';
+import { minioConfig } from '@edusphere/config';
 import type {
   MediaUploadedEvent,
   TranscriptionCompletedEvent,
@@ -14,6 +16,7 @@ import { ConceptExtractor } from '../knowledge/concept-extractor';
 import { GraphBuilder } from '../knowledge/graph-builder';
 import { HlsService } from '../hls/hls.service';
 import { TranslationService } from '../translation/translation.service';
+import { formatToWebVTT } from '../webvtt-formatter';
 
 /**
  * Core transcription orchestrator.
@@ -34,6 +37,8 @@ import { TranslationService } from '../translation/translation.service';
 export class TranscriptionService {
   private readonly logger = new Logger(TranscriptionService.name);
   private readonly db = createDatabaseConnection();
+  private readonly s3: S3Client;
+  private readonly bucket = minioConfig.bucket;
 
   constructor(
     private readonly whisper: WhisperClient,
@@ -43,7 +48,19 @@ export class TranscriptionService {
     private readonly graphBuilder: GraphBuilder,
     private readonly hlsService: HlsService,
     private readonly translationService: TranslationService
-  ) {}
+  ) {
+    this.s3 = new S3Client({
+      endpoint: minioConfig.endpoint,
+      region: minioConfig.region,
+      credentials: {
+        accessKeyId: minioConfig.accessKey,
+        secretAccessKey: minioConfig.secretKey,
+      },
+      forcePathStyle: true,
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
+    });
+  }
 
   async transcribeFile(event: MediaUploadedEvent): Promise<void> {
     const { fileKey, assetId, courseId, tenantId } = event;
@@ -70,6 +87,16 @@ export class TranscriptionService {
       const { transcriptId, segmentIds } = await this.persistTranscript(
         assetId,
         result.text,
+        result.language ?? 'en',
+        result.segments
+      );
+
+      // Step 4b: Generate + upload primary-language WebVTT (WCAG 1.2.2)
+      await this.uploadVtt(
+        assetId,
+        courseId,
+        tenantId,
+        transcriptId,
         result.language ?? 'en',
         result.segments
       );
@@ -245,6 +272,49 @@ export class TranscriptionService {
       .update(schema.media_assets)
       .set({ transcription_status: status, updated_at: new Date() })
       .where(eq(schema.media_assets.id, assetId));
+  }
+
+  /**
+   * Generates WebVTT from Whisper segments, uploads to MinIO at
+   * `captions/{tenantId}/{courseId}/{assetId}/{language}.vtt`, and stores the
+   * key on the transcript row. Non-throwing — VTT failure must not block the
+   * transcription pipeline.
+   */
+  private async uploadVtt(
+    assetId: string,
+    courseId: string,
+    tenantId: string,
+    transcriptId: string,
+    language: string,
+    segments: Array<{ start: number; end: number; text: string }>
+  ): Promise<void> {
+    try {
+      const vtt = formatToWebVTT(segments);
+      const vttKey = `captions/${tenantId}/${courseId}/${assetId}/${language}.vtt`;
+
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: vttKey,
+          Body: vtt,
+          ContentType: 'text/vtt',
+        })
+      );
+
+      await this.db
+        .update(schema.transcripts)
+        .set({ vtt_key: vttKey, updated_at: new Date() })
+        .where(eq(schema.transcripts.id, transcriptId));
+
+      this.logger.log(
+        `VTT uploaded: assetId=${assetId} language=${language} key=${vttKey}`
+      );
+    } catch (err) {
+      this.logger.error(
+        { err, assetId, language },
+        'VTT upload failed (non-fatal) — captions will be unavailable for this asset'
+      );
+    }
   }
 
   private async updateAssetHlsManifest(

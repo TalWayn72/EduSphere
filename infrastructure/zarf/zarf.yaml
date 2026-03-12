@@ -1,0 +1,37 @@
+kind: ZarfPackageConfig
+metadata:
+  name: edusphere-airgapped
+  description: "EduSphere Air-Gapped deployment package for K3s"
+  version: "1.0.0"
+
+components:
+  - name: edusphere-core
+    required: true
+    description: "Core EduSphere services"
+    charts:
+      - name: edusphere-airgapped
+        localPath: ../helm/edusphere-airgapped
+        namespace: edusphere
+        version: 1.0.0
+    images:
+      - ghcr.io/edusphere/gateway:latest
+      - ghcr.io/edusphere/subgraph-core:latest
+      - ghcr.io/edusphere/subgraph-content:latest
+      - ghcr.io/edusphere/subgraph-agent:latest
+      - ghcr.io/edusphere/subgraph-knowledge:latest
+      - ghcr.io/edusphere/web:latest
+
+  - name: ollama-local
+    required: true
+    description: "Local Ollama inference server (no internet required)"
+    images:
+      - ollama/ollama:0.1.29
+
+  - name: infrastructure
+    required: true
+    description: "PostgreSQL + NATS + MinIO + Keycloak (all self-hosted)"
+    images:
+      - postgres:16
+      - nats:2.10
+      - minio/minio:RELEASE.2024-01-01T00-00-00Z
+      - quay.io/keycloak/keycloak:24.0

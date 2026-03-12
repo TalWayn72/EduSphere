@@ -1,7 +1,6 @@
 # Phase 45 — Social Learning Experience
 
-> **For Claude:** REQUIRED SUB-SKILL: Use `executing-plans` + `dispatching-parallel-agents` + `subagent-driven-development`
-> **Document Storage:** After plan mode exits, move to `docs/plans/features/2026-03-09-phase45-social-learning.md`
+**Status:** ✅ Complete — see OPEN_ISSUES.md
 
 ---
 

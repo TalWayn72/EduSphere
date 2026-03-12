@@ -155,4 +155,104 @@ describe('DragOrderQuestion', () => {
     // dragOver should not throw
     expect(() => fireEvent.dragOver(items[0]!)).not.toThrow();
   });
+
+  // ── WCAG 2.5.7 — Keyboard-accessible Up/Down buttons ────────────────────
+
+  it('renders sr-only keyboard instruction', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(
+      screen.getByText(
+        'Keyboard users: use the up and down buttons to reorder items'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('renders Move up and Move down buttons for each item', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(screen.getByRole('button', { name: 'Move Observe up' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Move Observe down' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Move Conclude up' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Move Conclude down' })).toBeInTheDocument();
+  });
+
+  it('Move up button is disabled on the first item', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(
+      screen.getByRole('button', { name: 'Move Observe up' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Move Observe down' })
+    ).not.toBeDisabled();
+  });
+
+  it('Move down button is disabled on the last item', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(
+      screen.getByRole('button', { name: 'Move Conclude down' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Move Conclude up' })
+    ).not.toBeDisabled();
+  });
+
+  it('clicking Move down on first item calls onChange with correct reordering', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Move Observe down' }));
+    expect(onChangeMock).toHaveBeenCalledWith(['b', 'a', 'c', 'd']);
+  });
+
+  it('clicking Move up on second item calls onChange with correct reordering', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Move Hypothesize up' }));
+    expect(onChangeMock).toHaveBeenCalledWith(['b', 'a', 'c', 'd']);
+  });
+
+  it('clicking Move up on last item moves it to second-to-last', () => {
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Move Conclude up' }));
+    expect(onChangeMock).toHaveBeenCalledWith(['a', 'b', 'd', 'c']);
+  });
+
+  it('keyboard buttons are all disabled when prop disabled=true', () => {
+    render(
+      <DragOrderQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
+    );
+    const upButtons = screen.getAllByRole('button', { name: /Move .+ up/ });
+    const downButtons = screen.getAllByRole('button', { name: /Move .+ down/ });
+    [...upButtons, ...downButtons].forEach((btn) => {
+      expect(btn).toBeDisabled();
+    });
+  });
+
+  it('keyboard move does not call onChange when disabled', () => {
+    render(
+      <DragOrderQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Move Hypothesize down' }));
+    expect(onChangeMock).not.toHaveBeenCalled();
+  });
 });

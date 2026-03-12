@@ -1,6 +1,6 @@
 # Phase 36: Technical Debt Clearance + Personalized Recommendations + Lesson Pipeline — Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+**Status:** ✅ Complete — see OPEN_ISSUES.md
 
 **Goal:** Close all critical and medium technical debt from Phase 35 audit, wire real recommendations from the knowledge subgraph, implement the XP/gamification foundation, harden Lighthouse CI, and deliver the Lesson Pipeline Builder MVP.
 

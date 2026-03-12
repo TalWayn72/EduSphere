@@ -7,6 +7,7 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { db, sql } from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 import { EmbeddingDataLoader } from '../embedding/embedding.dataloader';
 import type { SkillGapItem } from './skill-gap.service';
 
@@ -24,9 +25,17 @@ export class SkillGapRecommendations {
   ): Promise<SkillGapItem[]> {
     if (gapConcepts.length === 0) return [];
 
+    // Build minimal TenantContext from tenantId for RLS enforcement (SI-9)
+    const tenantCtx: TenantContext = {
+      tenantId: _tenantId,
+      userId: 'system',
+      userRole: 'STUDENT',
+    };
+
     // Single batched call — all concepts embedded + searched in parallel
     const resultMap = await this.embeddingDataLoader.batchLoad(
       gapConcepts,
+      tenantCtx,
       RECS_PER_CONCEPT
     );
 

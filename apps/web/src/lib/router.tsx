@@ -179,6 +179,11 @@ const CourseLibraryPage = lazy(() =>
     default: m.CourseLibraryPage,
   }))
 );
+const ComplianceLibraryPage = lazy(() =>
+  import('@/pages/ComplianceLibraryPage').then((m) => ({
+    default: m.ComplianceLibraryPage,
+  }))
+);
 const PortalBuilderPage = lazy(() =>
   import('@/pages/PortalBuilderPage').then((m) => ({
     default: m.PortalBuilderPage,
@@ -437,6 +442,9 @@ const AssessmentResultPage = lazy(() =>
     default: m.AssessmentResultPage,
   }))
 );
+const AssessmentResultsDetailPage = lazy(
+  () => import('@/pages/AssessmentResultsDetailPage')
+);
 const GroupChallengesPage = lazy(() =>
   import('@/pages/GroupChallengesPage').then((m) => ({
     default: m.GroupChallengesPage,
@@ -466,6 +474,72 @@ const CohortInsightsPage = lazy(() =>
   import('@/pages/CohortInsightsPage').then((m) => ({
     default: m.CohortInsightsPage,
   }))
+);
+const PilotSignupPage = lazy(() =>
+  import('@/pages/PilotSignupPage').then((m) => ({ default: m.PilotSignupPage }))
+);
+const PilotRequestsAdminPage = lazy(() =>
+  import('@/pages/PilotRequestsAdminPage').then((m) => ({ default: m.PilotRequestsAdminPage }))
+);
+const OrgUsagePage = lazy(() =>
+  import('@/pages/OrgUsagePage').then((m) => ({ default: m.OrgUsagePage }))
+);
+const PlatformUsageDashboardPage = lazy(() =>
+  import('@/pages/PlatformUsageDashboardPage').then((m) => ({
+    default: m.PlatformUsageDashboardPage,
+  }))
+);
+const ROIAnalyticsDashboardPage = lazy(() =>
+  import('@/pages/ROIAnalyticsDashboardPage').then((m) => ({
+    default: m.ROIAnalyticsDashboardPage,
+  }))
+);
+const FaqPage = lazy(() =>
+  import('@/pages/FaqPage').then((m) => ({ default: m.FaqPage }))
+);
+const FeaturesPage = lazy(() =>
+  import('@/pages/FeaturesPage').then((m) => ({ default: m.FeaturesPage }))
+);
+const GlossaryPage = lazy(() =>
+  import('@/pages/GlossaryPage').then((m) => ({ default: m.GlossaryPage }))
+);
+const PricingPage = lazy(() =>
+  import('@/pages/PricingPage').then((m) => ({ default: m.PricingPage }))
+);
+const CourseCatalogPage = lazy(() =>
+  import('@/pages/CourseCatalogPage').then((m) => ({ default: m.CourseCatalogPage }))
+);
+const InstructorDirectoryPage = lazy(() =>
+  import('@/pages/InstructorDirectoryPage').then((m) => ({
+    default: m.InstructorDirectoryPage,
+  }))
+);
+const PartnerSignupPage = lazy(() =>
+  import('@/pages/PartnerSignupPage').then((m) => ({ default: m.PartnerSignupPage }))
+);
+const PartnerDashboardPage = lazy(() =>
+  import('@/pages/PartnerDashboardPage').then((m) => ({ default: m.PartnerDashboardPage }))
+);
+const InvestorDeckPage = lazy(() =>
+  import('@/pages/InvestorDeckPage').then((m) => ({ default: m.InvestorDeckPage }))
+);
+const HrisConfigPage = lazy(() =>
+  import('@/pages/HrisConfigPage').then((m) => ({ default: m.HrisConfigPage }))
+);
+const AutoGradingResultsPage = lazy(() =>
+  import('@/pages/AutoGradingResultsPage').then((m) => ({ default: m.AutoGradingResultsPage }))
+);
+const GapAnalysisDashboardPage = lazy(() =>
+  import('@/pages/GapAnalysisDashboardPage').then((m) => ({ default: m.GapAnalysisDashboardPage }))
+);
+const StripeInvoicePage = lazy(() =>
+  import('@/pages/admin/StripeInvoicePage').then((m) => ({ default: m.StripeInvoicePage }))
+);
+const BlogListPage = lazy(() =>
+  import('@/pages/BlogListPage').then((m) => ({ default: m.BlogListPage }))
+);
+const BlogPostPage = lazy(() =>
+  import('@/pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage }))
 );
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
@@ -520,6 +594,76 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <AccessibilityStatementPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public AEO pages — no authentication required
+    path: '/faq',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <FaqPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/features',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <FeaturesPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/glossary',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <GlossaryPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public pricing page — no authentication required
+    path: '/pricing',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PricingPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public course catalog — AEO Phase 2 (no auth required)
+    path: '/catalog',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <CourseCatalogPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public instructor directory — AEO Phase 2 (no auth required)
+    path: '/instructors',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <InstructorDirectoryPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public blog list — AEO Phase 3 (no auth required)
+    path: '/blog',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <BlogListPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public blog post detail — AEO Phase 3 (no auth required)
+    path: '/blog/:slug',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <BlogPostPage />
       </Suspense>
     ),
   },
@@ -668,6 +812,11 @@ export const router = createBrowserRouter([
     element: guarded(<AssessmentResultPage />),
   },
   {
+    // Phase 60 — 360° multi-rater detail view with recharts radar + rater breakdown table
+    path: '/assessments/:id/results-detail',
+    element: guarded(<AssessmentResultsDetailPage />),
+  },
+  {
     path: '/assessment/:assessmentId',
     element: guarded(<AssessmentPage />),
   },
@@ -720,6 +869,11 @@ export const router = createBrowserRouter([
   {
     path: '/library',
     element: guarded(<CourseLibraryPage />),
+  },
+  {
+    // Phase 64 (F-038) — Pre-built compliance course library
+    path: '/library/compliance',
+    element: guarded(<ComplianceLibraryPage />),
   },
   {
     path: '/instructor/earnings',
@@ -877,6 +1031,9 @@ export const router = createBrowserRouter([
   { path: '/admin/bi-export', element: guarded(<BiExportSettingsPage />) },
   { path: '/admin/cpd', element: guarded(<CpdSettingsPage />) },
   { path: '/admin/analytics', element: guarded(<TenantAnalyticsPage />) },
+  { path: '/admin/usage', element: guarded(<OrgUsagePage />) },
+  { path: '/admin/platform-usage', element: guarded(<PlatformUsageDashboardPage />) },
+  { path: '/admin/roi-analytics', element: guarded(<ROIAnalyticsDashboardPage />) },
   {
     // Manager Dashboard — MANAGER / ORG_ADMIN / SUPER_ADMIN only
     path: '/manager',
@@ -966,6 +1123,59 @@ export const router = createBrowserRouter([
     // Cohort Insights — GAP-7: cross-cohort institutional knowledge
     path: '/cohort-insights',
     element: guarded(<CohortInsightsPage />),
+  },
+  {
+    // Public partner program signup — no auth required
+    path: '/partners',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PartnerSignupPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Partner revenue + API key dashboard
+    path: '/partner/dashboard',
+    element: guarded(<PartnerDashboardPage />),
+  },
+  {
+    // Internal investor deck — SUPER_ADMIN only (role guard inside component)
+    path: '/internal/investor-deck',
+    element: guarded(<InvestorDeckPage />),
+  },
+  {
+    // Public B2B pilot signup — no auth required
+    path: '/pilot',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PilotSignupPage />
+      </Suspense>
+    ),
+  },
+  {
+    // SUPER_ADMIN pilot request management
+    path: '/admin/pilot-requests',
+    element: guarded(<PilotRequestsAdminPage />),
+  },
+  {
+    // Phase 52 — HRIS & Enterprise Integrations config (ORG_ADMIN / SUPER_ADMIN)
+    path: '/admin/hris-config',
+    element: guarded(<HrisConfigPage />),
+  },
+  {
+    // Phase 53 — AI auto-grading results (INSTRUCTOR | ORG_ADMIN | SUPER_ADMIN)
+    path: '/admin/auto-grading',
+    element: guarded(<AutoGradingResultsPage />),
+  },
+  {
+    // Phase 53 — Knowledge gap analysis dashboard (ORG_ADMIN | SUPER_ADMIN)
+    path: '/admin/gap-analysis',
+    element: guarded(<GapAnalysisDashboardPage />),
+  },
+  {
+    // Phase 53 — Stripe invoice management (SUPER_ADMIN only)
+    path: '/admin/invoices',
+    element: guarded(<StripeInvoicePage />),
   },
   {
     path: '/',

@@ -1,5 +1,7 @@
 # Phase 46 — Group Challenges + Knowledge-Graph Peer Matching
 
+**Status:** ✅ Complete — see OPEN_ISSUES.md
+
 ## Goal
 Complete the Social Learning loop started in Phase 45 by adding:
 1. Group Challenges — collaborative learning objectives with leaderboard

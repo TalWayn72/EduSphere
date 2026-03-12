@@ -1,0 +1,41 @@
+User-agent: *
+Allow: /landing
+Allow: /accessibility
+Allow: /portal
+Allow: /faq
+Allow: /features
+Allow: /glossary
+Allow: /u/
+Allow: /verify/badge/
+Disallow: /dashboard
+Disallow: /admin/
+Disallow: /oauth/
+Disallow: /settings
+Disallow: /courses/
+Disallow: /api/
+Disallow: /graphql
+
+User-agent: GPTbot
+Allow: /
+Crawl-delay: 10
+
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 10
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 10
+
+User-agent: Applebot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://app.edusphere.dev/sitemap.xml
