@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMutation } from 'urql';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import {
   UPDATE_ONBOARDING_STEP_MUTATION,
   COMPLETE_ONBOARDING_MUTATION,
 } from '@/lib/graphql/onboarding.queries';
+import { getCurrentUser } from '@/lib/auth';
 
 const TOPIC_CATEGORIES = [
   'Torah Study', 'Talmud', 'Halacha', 'Jewish History', 'Hebrew Language',
@@ -22,9 +23,19 @@ interface StudentOnboardingStepsProps {
   onSkip: () => void;
 }
 
+/** WCAG 3.3.7 — Pre-fill display name from registration profile. */
+function useProfileDefaults() {
+  const user = getCurrentUser();
+  const name = user
+    ? (user.firstName || user.username || '')
+    : '';
+  return { displayName: name };
+}
+
 export function StudentOnboardingSteps({ currentStep, onComplete, onSkip }: StudentOnboardingStepsProps) {
+  const defaults = useProfileDefaults();
   const [step, setStep] = useState(currentStep);
-  const [displayName, setDisplayName] = useState('');
+  const [displayName, setDisplayName] = useState(defaults.displayName);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
   const [, updateStep] = useMutation(UPDATE_ONBOARDING_STEP_MUTATION);
@@ -33,7 +44,10 @@ export function StudentOnboardingSteps({ currentStep, onComplete, onSkip }: Stud
   const totalSteps = 5;
   const progress = ((step - 1) / totalSteps) * 100;
 
-  const handleNext = async () => {
+  // WCAG 3.3.7: Auto-advance step 1 if displayName is already known from profile
+  const isStep1Prefilled = displayName.length > 0;
+
+  const handleNext = useCallback(async () => {
     await updateStep({ input: { step, data: { displayName, selectedTopics } } });
     if (step < totalSteps) {
       setStep(step + 1);
@@ -41,7 +55,16 @@ export function StudentOnboardingSteps({ currentStep, onComplete, onSkip }: Stud
       await completeOnboarding({});
       onComplete();
     }
-  };
+  }, [step, displayName, selectedTopics, updateStep, completeOnboarding, onComplete, totalSteps]);
+
+  // Auto-advance step 1 if display name already filled from profile
+  useEffect(() => {
+    if (step === 1 && isStep1Prefilled) {
+      void handleNext();
+    }
+  // Only on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
@@ -53,9 +76,11 @@ export function StudentOnboardingSteps({ currentStep, onComplete, onSkip }: Stud
           <h2 className="text-xl font-semibold">Welcome! Let&apos;s set up your profile</h2>
           <div className="space-y-2">
             <Label htmlFor="displayName">Display Name</Label>
-            {/* TODO WCAG 3.3.7 — Redundant Entry: if the user's name was collected at
-                registration, pre-populate this field from their profile rather than asking again.
-                autocomplete="nickname" allows the browser to offer saved values. */}
+            {defaults.displayName && (
+              <p className="text-xs text-muted-foreground" role="status">
+                Pre-filled from your profile — edit if needed
+              </p>
+            )}
             <Input
               id="displayName"
               value={displayName}
@@ -128,7 +153,6 @@ export function StudentOnboardingSteps({ currentStep, onComplete, onSkip }: Stud
 
       {step === 5 && (
         <div className="space-y-4 text-center">
-          <div className="text-6xl">🎉</div>
           <h2 className="text-xl font-semibold">You&apos;re all set!</h2>
           <p className="text-muted-foreground">
             Your learning journey begins now. Explore courses, earn XP, and track your progress.

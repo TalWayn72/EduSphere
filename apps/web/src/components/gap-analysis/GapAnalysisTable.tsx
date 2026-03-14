@@ -40,13 +40,13 @@ export function GapAnalysisTable({ gaps }: { gaps: GapItem[] }) {
       <CardHeader><CardTitle>Knowledge Gaps</CardTitle></CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table data-testid="critical-gaps-table" className="w-full text-sm">
+          <table data-testid="critical-gaps-table" className="w-full text-sm" aria-label="Knowledge gap analysis results">
             <thead>
               <tr className="border-b text-left text-muted-foreground">
-                <th className="pb-3 pr-4 font-medium">Concept</th>
-                <th className="pb-3 pr-4 font-medium">Status</th>
-                <th className="pb-3 pr-4 font-medium">Relevance</th>
-                <th className="pb-3 font-medium">Recommended Content</th>
+                <th scope="col" className="pb-3 pr-4 font-medium">Concept</th>
+                <th scope="col" className="pb-3 pr-4 font-medium">Status</th>
+                <th scope="col" className="pb-3 pr-4 font-medium">Relevance</th>
+                <th scope="col" className="pb-3 font-medium">Recommended Content</th>
               </tr>
             </thead>
             <tbody>

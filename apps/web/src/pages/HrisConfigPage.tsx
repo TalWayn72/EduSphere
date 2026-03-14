@@ -79,6 +79,8 @@ export function HrisConfigPage() {
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [baseUrlError, setBaseUrlError] = useState('');
+  const [baseUrlTouched, setBaseUrlTouched] = useState(false);
 
   if (!ADMIN_ROLES.has(role ?? '')) {
     return (
@@ -174,13 +176,34 @@ export function HrisConfigPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="base-url">Base URL</Label>
+              <Label htmlFor="base-url">
+                Base URL <span aria-hidden="true" className="text-destructive">*</span>
+                <span className="sr-only">(required)</span>
+              </Label>
               <Input
                 id="base-url"
                 placeholder="https://your-hris-instance.example.com"
                 value={baseUrl}
-                onChange={(e) => setBaseUrl(e.target.value)}
+                required
+                aria-required="true"
+                aria-invalid={baseUrlTouched && baseUrlError ? 'true' : undefined}
+                aria-describedby={baseUrlError ? 'base-url-error' : undefined}
+                onChange={(e) => {
+                  setBaseUrl(e.target.value);
+                  const val = e.target.value.trim();
+                  if (val && !/^https?:\/\/.+/i.test(val)) {
+                    setBaseUrlError('Please enter a valid URL starting with http:// or https://');
+                  } else {
+                    setBaseUrlError('');
+                  }
+                }}
+                onBlur={() => setBaseUrlTouched(true)}
               />
+              {baseUrlTouched && baseUrlError && (
+                <p id="base-url-error" className="text-sm text-destructive" role="alert">
+                  {baseUrlError}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -194,12 +217,17 @@ export function HrisConfigPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="client-secret">Client Secret / API Token</Label>
+                <Label htmlFor="client-secret">
+                  Client Secret / API Token <span aria-hidden="true" className="text-destructive">*</span>
+                  <span className="sr-only">(required)</span>
+                </Label>
                 <Input
                   id="client-secret"
                   type="password"
                   placeholder="••••••••"
                   value={clientSecret}
+                  required
+                  aria-required="true"
                   onChange={(e) => setClientSecret(e.target.value)}
                 />
               </div>
@@ -251,14 +279,15 @@ export function HrisConfigPage() {
               <table
                 className="w-full text-sm"
                 data-testid="sync-history-table"
+                aria-label="HRIS synchronization history"
               >
                 <thead>
                   <tr className="border-b text-left text-muted-foreground">
-                    <th className="pb-2 font-medium">Type</th>
-                    <th className="pb-2 font-medium">Timestamp</th>
-                    <th className="pb-2 font-medium">Users Synced</th>
-                    <th className="pb-2 font-medium">Errors</th>
-                    <th className="pb-2 font-medium">Status</th>
+                    <th scope="col" className="pb-2 font-medium">Type</th>
+                    <th scope="col" className="pb-2 font-medium">Timestamp</th>
+                    <th scope="col" className="pb-2 font-medium">Users Synced</th>
+                    <th scope="col" className="pb-2 font-medium">Errors</th>
+                    <th scope="col" className="pb-2 font-medium">Status</th>
                   </tr>
                 </thead>
                 <tbody>

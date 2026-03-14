@@ -1,6 +1,7 @@
 /**
  * HrisIntegrationService — Phase 52
  * Orchestrates all HRIS adapters and delegates sync operations.
+ * SI-3: Credentials encrypted via encryptField/decryptField before storage/after retrieval.
  * Memory safety: OnModuleDestroy implemented (no resources to clean currently).
  */
 import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
@@ -8,6 +9,11 @@ import { ScimAdapter } from './scim.adapter.js';
 import { WorkdayAdapter } from './workday.adapter.js';
 import { SapAdapter } from './sap.adapter.js';
 import { BannerAdapter } from './banner.adapter.js';
+import {
+  decryptHrisCredentials,
+  encryptHrisCredentials,
+  redactHrisConfig,
+} from './hris-credential.helper.js';
 import type { IHrisAdapter, HrisConfig, HrisSyncResult } from './hris-adapter.interface.js';
 
 @Injectable()
@@ -41,19 +47,26 @@ export class HrisIntegrationService implements OnModuleDestroy {
     return adapter;
   }
 
+  /** Encrypt credentials for safe DB storage. Call before persisting config. */
+  encryptConfigForStorage(config: HrisConfig): HrisConfig {
+    return encryptHrisCredentials(config);
+  }
+
   async testConnection(config: HrisConfig): Promise<boolean> {
     const adapter = this.getAdapter(config.type);
-    const result = await adapter.testConnection(config);
-    this.logger.log({ type: config.type, tenantId: config.tenantId, result }, 'HRIS testConnection');
+    const decrypted = decryptHrisCredentials(config);
+    const result = await adapter.testConnection(decrypted);
+    this.logger.log({ ...redactHrisConfig(config), result }, 'HRIS testConnection');
     return result;
   }
 
   async syncTenant(config: HrisConfig): Promise<HrisSyncResult> {
     const adapter = this.getAdapter(config.type);
-    const result = await adapter.syncUsers(config, config.tenantId);
+    const decrypted = decryptHrisCredentials(config);
+    const result = await adapter.syncUsers(decrypted, config.tenantId);
     this.logger.log(
-      { type: config.type, tenantId: config.tenantId, result },
-      'HRIS syncTenant complete'
+      { ...redactHrisConfig(config), result },
+      'HRIS syncTenant complete',
     );
     return result;
   }

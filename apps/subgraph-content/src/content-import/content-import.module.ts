@@ -6,8 +6,10 @@ import { FirecrawlClient } from './firecrawl.client';
 import { GoogleDriveClient } from './google-drive.client';
 import { ContentImportResolver } from './content-import.resolver';
 import { ScormExportService } from './scorm-export.service';
+import { ClamavModule } from '../clamav/clamav.module';
 
 @Module({
+  imports: [ClamavModule],
   providers: [
     ContentImportService,
     DriveIngestionService,

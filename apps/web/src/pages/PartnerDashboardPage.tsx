@@ -78,7 +78,8 @@ export function PartnerDashboardPage() {
     <AdminLayout title="Partner Dashboard" description="Revenue analytics and API access for EduSphere Partners">
       <div data-testid="partner-dashboard-page">
         {fetching && (
-          <div className="space-y-4" data-testid="partner-skeleton">
+          <div className="space-y-4" data-testid="partner-skeleton" role="status" aria-label="Loading partner dashboard">
+            <span className="sr-only">Loading partner dashboard data...</span>
             <Skeleton className="h-24 w-full rounded-lg" />
             <Skeleton className="h-64 w-full rounded-lg" />
             <Skeleton className="h-32 w-full rounded-lg" />
@@ -87,8 +88,9 @@ export function PartnerDashboardPage() {
 
         {error && !fetching && (
           <Card>
-            <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load partner data. Please try again later.
+            <CardContent className="py-8 text-center text-destructive text-sm" role="alert">
+              <p className="font-semibold mb-1">Unable to load partner data</p>
+              <p>Please check your connection and try again later.</p>
             </CardContent>
           </Card>
         )}

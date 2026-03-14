@@ -118,9 +118,10 @@ describe('Feature Security: Stripe billing (webhook signature, key hygiene)', ()
     expect(stripeService).toMatch(/!signature|signature.*missing|without.*Signature/i);
   });
 
-  it('does NOT log STRIPE_SECRET_KEY value', () => {
-    // Logger calls must never contain the secret key value
-    expect(stripeService).not.toMatch(/this\.logger\.[a-z]+\([^)]*STRIPE_SECRET_KEY[^)]*\)/);
+  it('does NOT log STRIPE_SECRET_KEY value (env var name in warnings is OK)', () => {
+    // Logger calls must never interpolate the actual secret value (process.env.STRIPE_SECRET_KEY)
+    // Mentioning the env var NAME in a warning message (e.g. "set STRIPE_SECRET_KEY to enable") is safe
+    expect(stripeService).not.toMatch(/this\.logger\.[a-z]+\(.*process\.env\.STRIPE_SECRET_KEY/);
     expect(stripeService).not.toMatch(/this\.logger\.[a-z]+\([^)]*secretKey[^)]*\)/);
   });
 

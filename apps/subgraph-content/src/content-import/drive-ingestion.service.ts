@@ -21,6 +21,7 @@ import { minioConfig } from '@edusphere/config';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { GoogleDriveClient } from './google-drive.client';
 import type { DriveFile } from './google-drive.client';
+import { ClamavService } from '../clamav/clamav.service';
 
 interface DriveImportInput {
   folderId: string;
@@ -39,7 +40,10 @@ export class DriveIngestionService implements OnModuleDestroy {
   readonly activeJobs = new Map<string, AbortController>();
   private readonly MAX_ACTIVE_JOBS = 50;
 
-  constructor(private readonly driveClient: GoogleDriveClient) {
+  constructor(
+    private readonly driveClient: GoogleDriveClient,
+    private readonly clamav: ClamavService,
+  ) {
     this.bucket = minioConfig.bucket;
     this.s3 = new S3Client({
       endpoint: `http://${minioConfig.endpoint}:${minioConfig.port}`,
@@ -104,8 +108,25 @@ export class DriveIngestionService implements OnModuleDestroy {
   private async ingestFile(
     jobId: string, file: DriveFile, input: DriveImportInput, tenantId: string, userId: string,
   ): Promise<void> {
-    const fileKey = `${tenantId}/${input.courseId}/${randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const fileKey = `${tenantId}/${input.courseId}/${randomUUID()}-${sanitizedName}`;
     const buffer = await this.driveClient.downloadFile(file.id, input.accessToken);
+
+    // ClamAV scan — reject infected files, graceful degradation if scanner unavailable
+    const scanResult = await this.clamav.scanBuffer(buffer, sanitizedName);
+    if (scanResult.isInfected) {
+      this.logger.error(
+        { jobId, fileName: sanitizedName, tenantId, userId, viruses: scanResult.viruses },
+        '[DriveIngestion] INFECTED file rejected — skipping import',
+      );
+      return;
+    }
+    if (scanResult.hasError) {
+      this.logger.warn(
+        { jobId, fileName: sanitizedName, tenantId },
+        '[DriveIngestion] ClamAV unavailable — proceeding without scan',
+      );
+    }
 
     await this.s3.send(new PutObjectCommand({ Bucket: this.bucket, Key: fileKey, Body: buffer, ContentType: file.mimeType }));
 

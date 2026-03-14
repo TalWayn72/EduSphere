@@ -42,7 +42,10 @@ export function GenerateInvoiceDialog({ open, onClose, onGenerate }: Props) {
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <label htmlFor="inv-tenant" className="text-sm font-medium">Tenant ID</label>
+            <label htmlFor="inv-tenant" className="text-sm font-medium">
+              Tenant ID <span aria-hidden="true" className="text-destructive">*</span>
+              <span className="sr-only">(required)</span>
+            </label>
             <input
               id="inv-tenant"
               data-testid="invoice-tenant-input"
@@ -50,6 +53,8 @@ export function GenerateInvoiceDialog({ open, onClose, onGenerate }: Props) {
               value={tenantId}
               onChange={(e) => setTenantId(e.target.value)}
               placeholder="tenant-uuid"
+              required
+              aria-required="true"
             />
           </div>
           <div className="flex gap-3">

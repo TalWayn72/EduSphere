@@ -40,6 +40,12 @@ function scoreColor(pct: number): string {
   return 'text-red-700 bg-red-50 border-red-200';
 }
 
+function scoreLabel(pct: number): { icon: string; text: string } {
+  if (pct >= 80) return { icon: '\u2713', text: 'Pass' };
+  if (pct >= 60) return { icon: '\u26A0', text: 'Partial' };
+  return { icon: '\u2717', text: 'Fail' };
+}
+
 function overallScore(results: GradingResult[]): number {
   if (results.length === 0) return 0;
   const total = results.reduce((acc, r) => acc + r.score, 0);
@@ -107,22 +113,29 @@ export function AutoGradingResultsPage() {
             <Card data-testid="overall-score-summary">
               <CardHeader><CardTitle>Overall Score</CardTitle></CardHeader>
               <CardContent>
-                <p className={`text-4xl font-bold ${overall >= 80 ? 'text-green-700' : overall >= 60 ? 'text-yellow-700' : 'text-red-700'}`}>
-                  {overall}%
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {results.reduce((a, r) => a + r.score, 0)} / {results.reduce((a, r) => a + r.maxScore, 0)} points
-                </p>
+                <div aria-live="polite" aria-atomic="true">
+                  <p className={`text-4xl font-bold ${overall >= 80 ? 'text-green-700' : overall >= 60 ? 'text-yellow-700' : 'text-red-700'}`}>
+                    <span aria-hidden="true">{scoreLabel(overall).icon} </span>
+                    {overall}%
+                    <span className="ml-2 text-lg font-semibold">{scoreLabel(overall).text}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {results.reduce((a, r) => a + r.score, 0)} / {results.reduce((a, r) => a + r.maxScore, 0)} points
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
             {results.map((r) => {
               const pct = r.maxScore > 0 ? Math.round((r.score / r.maxScore) * 100) : 0;
+              const label = scoreLabel(pct);
               return (
                 <Card key={r.questionId} data-testid={`grading-result-${r.questionId}`} className={`border ${scoreColor(pct)}`}>
                   <CardHeader>
                     <CardTitle className="text-base">
+                      <span aria-hidden="true">{label.icon} </span>
                       Question {r.questionId.toUpperCase()} — {r.score}/{r.maxScore} ({pct}%)
+                      <span className="ml-2 text-sm font-medium">({label.text})</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">

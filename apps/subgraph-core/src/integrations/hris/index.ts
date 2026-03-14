@@ -4,3 +4,8 @@ export { WorkdayAdapter } from './workday.adapter.js';
 export { SapAdapter } from './sap.adapter.js';
 export { BannerAdapter } from './banner.adapter.js';
 export * from './hris-adapter.interface.js';
+export {
+  encryptHrisCredentials,
+  decryptHrisCredentials,
+  redactHrisConfig,
+} from './hris-credential.helper.js';

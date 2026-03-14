@@ -7,7 +7,7 @@
  *
  * SECURITY: Never log stripe secret keys. Validate webhook signatures.
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import {
   createStripeClient,
@@ -25,12 +25,25 @@ export interface InvoiceResult {
 }
 
 @Injectable()
-export class StripeInvoiceService implements OnModuleDestroy {
+export class StripeInvoiceService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(StripeInvoiceService.name);
   private stripe: StripeClient | null;
 
   constructor() {
     this.stripe = createStripeClient();
+  }
+
+  onModuleInit(): void {
+    if (this.stripe) {
+      this.logger.log(
+        '[StripeInvoiceService] Stripe client initialized — billing features active',
+      );
+    } else {
+      this.logger.warn(
+        '[StripeInvoiceService] STRIPE_SECRET_KEY not configured — billing running in STUB mode. ' +
+        'Set STRIPE_SECRET_KEY env var to enable real Stripe integration.',
+      );
+    }
   }
 
   async onModuleDestroy(): Promise<void> {

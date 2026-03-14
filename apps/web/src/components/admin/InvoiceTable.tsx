@@ -13,15 +13,15 @@ const STATUS_BADGE: Record<InvoiceStatus, string> = {
 export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
   return (
     <div className="overflow-x-auto">
-      <table data-testid="invoice-history-table" className="w-full text-sm">
+      <table data-testid="invoice-history-table" className="w-full text-sm" aria-label="Invoice history">
         <thead>
           <tr className="border-b text-left text-muted-foreground">
-            <th className="pb-3 pr-4 font-medium">Tenant</th>
-            <th className="pb-3 pr-4 font-medium">Plan</th>
-            <th className="pb-3 pr-4 font-medium">Year</th>
-            <th className="pb-3 pr-4 font-medium">Amount</th>
-            <th className="pb-3 pr-4 font-medium">Status</th>
-            <th className="pb-3 font-medium">PDF</th>
+            <th scope="col" className="pb-3 pr-4 font-medium">Tenant</th>
+            <th scope="col" className="pb-3 pr-4 font-medium">Plan</th>
+            <th scope="col" className="pb-3 pr-4 font-medium">Year</th>
+            <th scope="col" className="pb-3 pr-4 font-medium">Amount</th>
+            <th scope="col" className="pb-3 pr-4 font-medium">Status</th>
+            <th scope="col" className="pb-3 font-medium">PDF</th>
           </tr>
         </thead>
         <tbody>
