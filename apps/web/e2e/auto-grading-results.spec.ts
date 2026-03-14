@@ -33,6 +33,7 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 
 const MOCK_GRADING_RESULTS = [
   {
+    __typename: 'GradingResult',
     questionId: 'q1',
     score: 8,
     maxScore: 10,
@@ -40,6 +41,7 @@ const MOCK_GRADING_RESULTS = [
     suggestions: ['Review chapter 3 for deeper coverage'],
   },
   {
+    __typename: 'GradingResult',
     questionId: 'q2',
     score: 5,
     maxScore: 10,

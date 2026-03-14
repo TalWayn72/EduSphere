@@ -17,15 +17,16 @@ import { routeGraphQL } from './graphql-mock.helpers';
 // ─── Shared mock data ───────────────────────────────────────────────────────
 
 const MOCK_GRADING = [
-  { questionId: 'q1', score: 8, maxScore: 10, explanation: 'Good answer.', suggestions: [] },
-  { questionId: 'q2', score: 5, maxScore: 10, explanation: 'Needs work.', suggestions: ['Study more'] },
+  { __typename: 'GradingResult', questionId: 'q1', score: 8, maxScore: 10, explanation: 'Good answer.', suggestions: [] },
+  { __typename: 'GradingResult', questionId: 'q2', score: 5, maxScore: 10, explanation: 'Needs work.', suggestions: ['Study more'] },
 ];
 
 const MOCK_PROFILES = [
-  { id: 'role-1', roleName: 'Data Engineer', description: 'Data role', requiredConceptsCount: 10 },
+  { __typename: 'SkillProfile', id: 'role-1', roleName: 'Data Engineer', description: 'Data role', requiredConceptsCount: 10 },
 ];
 
 const MOCK_GAP_REPORT = {
+  __typename: 'SkillGapReport',
   roleId: 'role-1',
   roleName: 'Data Engineer',
   totalRequired: 10,
@@ -33,32 +34,33 @@ const MOCK_GAP_REPORT = {
   gapCount: 3,
   completionPercentage: 70,
   gaps: [
-    { conceptName: 'Spark', isMastered: false, recommendedContentItems: ['c-1'], recommendedContentTitles: ['Spark Course'], relevanceScore: 0.9 },
-    { conceptName: 'Kafka', isMastered: false, recommendedContentItems: ['c-2'], recommendedContentTitles: ['Kafka Course'], relevanceScore: 0.7 },
-    { conceptName: 'SQL', isMastered: true, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0.3 },
+    { __typename: 'SkillGap', conceptName: 'Spark', isMastered: false, recommendedContentItems: ['c-1'], recommendedContentTitles: ['Spark Course'], relevanceScore: 0.9 },
+    { __typename: 'SkillGap', conceptName: 'Kafka', isMastered: false, recommendedContentItems: ['c-2'], recommendedContentTitles: ['Kafka Course'], relevanceScore: 0.7 },
+    { __typename: 'SkillGap', conceptName: 'SQL', isMastered: true, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0.3 },
   ],
 };
 
 const MOCK_PROPOSALS = [
   {
-    id: 'prop-1', annotationId: 'ann-1', content: 'Federation resolves via @key.',
+    __typename: 'AnnotationProposal', id: 'prop-1', annotationId: 'ann-1', content: 'Federation resolves via @key.',
     description: 'Clarification.', authorName: 'Alice', courseId: 'c-1',
     courseName: 'GraphQL Mastery', contentTimestamp: 60, submittedAt: new Date().toISOString(), status: 'pending',
   },
 ];
 
 const MOCK_PARTNER = {
+  __typename: 'PartnerDashboard',
   status: 'ACTIVE',
   apiKey: 'esph_live_abc123def456ghi789',
   revenueByMonth: [
-    { month: '2026-01', grossRevenue: 10000, platformCut: 3000, payout: 7000, status: 'PAID' },
-    { month: '2026-02', grossRevenue: 12500, platformCut: 3750, payout: 8750, status: 'PENDING' },
+    { __typename: 'PartnerRevenue', month: '2026-01', grossRevenue: 10000, platformCut: 3000, payout: 7000, status: 'PAID' },
+    { __typename: 'PartnerRevenue', month: '2026-02', grossRevenue: 12500, platformCut: 3750, payout: 8750, status: 'PENDING' },
   ],
 };
 
 const MOCK_INVOICES = [
-  { id: 'inv-1', tenant: 'Acme Corp', plan: 'ENTERPRISE', year: 2026, amount: 24000, status: 'paid', pdfUrl: 'https://example.com/inv-1.pdf' },
-  { id: 'inv-2', tenant: 'Edu Holdings', plan: 'PROFESSIONAL', year: 2026, amount: 12000, status: 'draft', pdfUrl: '#' },
+  { __typename: 'Invoice', id: 'inv-1', tenant: 'Acme Corp', plan: 'ENTERPRISE', year: 2026, amount: 24000, status: 'paid', pdfUrl: 'https://example.com/inv-1.pdf' },
+  { __typename: 'Invoice', id: 'inv-2', tenant: 'Edu Holdings', plan: 'PROFESSIONAL', year: 2026, amount: 12000, status: 'draft', pdfUrl: '#' },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

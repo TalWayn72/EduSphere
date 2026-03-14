@@ -32,12 +32,13 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 // ─── Mock data ──────────────────────────────────────────────────────────────
 
 const MOCK_DASHBOARD = {
+  __typename: 'PartnerDashboard',
   status: 'ACTIVE',
   apiKey: 'esph_live_abc123def456ghi789',
   revenueByMonth: [
-    { month: '2026-01', grossRevenue: 10000, platformCut: 3000, payout: 7000, status: 'PAID' },
-    { month: '2026-02', grossRevenue: 12500, platformCut: 3750, payout: 8750, status: 'PAID' },
-    { month: '2026-03', grossRevenue: 15000, platformCut: 4500, payout: 10500, status: 'PENDING' },
+    { __typename: 'PartnerRevenue', month: '2026-01', grossRevenue: 10000, platformCut: 3000, payout: 7000, status: 'PAID' },
+    { __typename: 'PartnerRevenue', month: '2026-02', grossRevenue: 12500, platformCut: 3750, payout: 8750, status: 'PAID' },
+    { __typename: 'PartnerRevenue', month: '2026-03', grossRevenue: 15000, platformCut: 4500, payout: 10500, status: 'PENDING' },
   ],
 };
 
@@ -53,7 +54,7 @@ function mockPartnerWithData(page: Page): Promise<void> {
     }
     if (q.includes('regeneratePartnerApiKey') || op === 'RegeneratePartnerApiKey') {
       return JSON.stringify({
-        data: { regeneratePartnerApiKey: { apiKey: NEW_API_KEY } },
+        data: { regeneratePartnerApiKey: { __typename: 'PartnerApiKeyResult', apiKey: NEW_API_KEY } },
       });
     }
     return null;
@@ -155,7 +156,8 @@ test.describe('Partner Dashboard — API Key Regeneration', () => {
   test('regenerate button shows confirmation dialog', async ({ page }) => {
     const regenBtn = page.locator('[data-testid="regenerate-key-btn"]');
     await expect(regenBtn).toBeVisible({ timeout: 10_000 });
-    await regenBtn.click();
+    await regenBtn.scrollIntoViewIfNeeded();
+    await regenBtn.click({ force: true });
 
     // Confirmation dialog should appear
     await expect(
@@ -164,13 +166,17 @@ test.describe('Partner Dashboard — API Key Regeneration', () => {
   });
 
   test('confirmation dialog warns about invalidating current key', async ({ page }) => {
-    await page.locator('[data-testid="regenerate-key-btn"]').click();
+    const regenBtn2 = page.locator('[data-testid="regenerate-key-btn"]');
+    await regenBtn2.scrollIntoViewIfNeeded();
+    await regenBtn2.click({ force: true });
     const dialogBody = (await page.textContent('[role="dialog"]')) ?? '';
     expect(dialogBody).toMatch(/permanently invalidate/i);
   });
 
   test('confirming regeneration shows new key in plain text', async ({ page }) => {
-    await page.locator('[data-testid="regenerate-key-btn"]').click();
+    const regenBtn2 = page.locator('[data-testid="regenerate-key-btn"]');
+    await regenBtn2.scrollIntoViewIfNeeded();
+    await regenBtn2.click({ force: true });
     await page.locator('[data-testid="confirm-regenerate-btn"]').click();
 
     // Wait for mutation to resolve and new key to display
@@ -179,7 +185,9 @@ test.describe('Partner Dashboard — API Key Regeneration', () => {
   });
 
   test('new key notice is shown after regeneration', async ({ page }) => {
-    await page.locator('[data-testid="regenerate-key-btn"]').click();
+    const regenBtn2 = page.locator('[data-testid="regenerate-key-btn"]');
+    await regenBtn2.scrollIntoViewIfNeeded();
+    await regenBtn2.click({ force: true });
     await page.locator('[data-testid="confirm-regenerate-btn"]').click();
 
     await expect(

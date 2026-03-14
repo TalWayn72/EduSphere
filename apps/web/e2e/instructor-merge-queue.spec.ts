@@ -33,6 +33,7 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 
 const MOCK_PROPOSALS = [
   {
+    __typename: 'AnnotationProposal',
     id: 'prop-1',
     annotationId: 'ann-1',
     content: 'GraphQL Federation resolves entities via @key directive.',
@@ -45,6 +46,7 @@ const MOCK_PROPOSALS = [
     status: 'pending',
   },
   {
+    __typename: 'AnnotationProposal',
     id: 'prop-2',
     annotationId: 'ann-2',
     content: 'RLS policies use SET LOCAL for per-transaction tenant isolation.',
@@ -75,14 +77,14 @@ function mockMergeQueueWithData(page: Page): Promise<void> {
       const vars = body.variables as Record<string, string> | undefined;
       approvedIds.push(vars?.proposalId ?? '');
       return JSON.stringify({
-        data: { approveAnnotationProposal: { id: vars?.proposalId, status: 'approved' } },
+        data: { approveAnnotationProposal: { __typename: 'AnnotationProposal', id: vars?.proposalId, status: 'approved' } },
       });
     }
     if (q.includes('rejectAnnotationProposal') || op === 'RejectAnnotationProposal') {
       const vars = body.variables as Record<string, string> | undefined;
       rejectedIds.push(vars?.proposalId ?? '');
       return JSON.stringify({
-        data: { rejectAnnotationProposal: { id: vars?.proposalId, status: 'rejected' } },
+        data: { rejectAnnotationProposal: { __typename: 'AnnotationProposal', id: vars?.proposalId, status: 'rejected' } },
       });
     }
     return null;

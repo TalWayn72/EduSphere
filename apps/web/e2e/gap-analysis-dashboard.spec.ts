@@ -32,11 +32,12 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 // ─── Mock data ──────────────────────────────────────────────────────────────
 
 const MOCK_PROFILES = [
-  { id: 'role-1', roleName: 'Data Engineer', description: 'Data pipeline role', requiredConceptsCount: 10 },
-  { id: 'role-2', roleName: 'ML Engineer', description: 'Machine learning role', requiredConceptsCount: 8 },
+  { __typename: 'SkillProfile', id: 'role-1', roleName: 'Data Engineer', description: 'Data pipeline role', requiredConceptsCount: 10 },
+  { __typename: 'SkillProfile', id: 'role-2', roleName: 'ML Engineer', description: 'Machine learning role', requiredConceptsCount: 8 },
 ];
 
 const MOCK_GAP_REPORT = {
+  __typename: 'SkillGapReport',
   roleId: 'role-1',
   roleName: 'Data Engineer',
   totalRequired: 10,
@@ -45,6 +46,7 @@ const MOCK_GAP_REPORT = {
   completionPercentage: 70,
   gaps: [
     {
+      __typename: 'SkillGap',
       conceptName: 'Apache Spark Optimization',
       isMastered: false,
       recommendedContentItems: ['c-1'],
@@ -52,6 +54,7 @@ const MOCK_GAP_REPORT = {
       relevanceScore: 0.95,
     },
     {
+      __typename: 'SkillGap',
       conceptName: 'Data Lakehouse Architecture',
       isMastered: false,
       recommendedContentItems: ['c-2'],
@@ -59,6 +62,7 @@ const MOCK_GAP_REPORT = {
       relevanceScore: 0.72,
     },
     {
+      __typename: 'SkillGap',
       conceptName: 'Stream Processing',
       isMastered: true,
       recommendedContentItems: [],

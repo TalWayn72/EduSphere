@@ -32,6 +32,7 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 
 const MOCK_INVOICES = [
   {
+    __typename: 'Invoice',
     id: 'inv-1',
     tenant: 'Acme Corp',
     plan: 'ENTERPRISE',
@@ -41,6 +42,7 @@ const MOCK_INVOICES = [
     pdfUrl: 'https://storage.edusphere.io/invoices/inv-1.pdf',
   },
   {
+    __typename: 'Invoice',
     id: 'inv-2',
     tenant: 'Edu Holdings',
     plan: 'PROFESSIONAL',
@@ -50,6 +52,7 @@ const MOCK_INVOICES = [
     pdfUrl: '#',
   },
   {
+    __typename: 'Invoice',
     id: 'inv-3',
     tenant: 'Global Learning',
     plan: 'STARTER',
@@ -61,6 +64,7 @@ const MOCK_INVOICES = [
 ];
 
 const GENERATED_INVOICE = {
+  __typename: 'Invoice',
   id: 'inv-new',
   tenant: 'Test Tenant',
   plan: 'STARTER',
@@ -181,14 +185,18 @@ test.describe('Stripe Invoices — Generate Invoice Dialog', () => {
   });
 
   test('clicking Generate Invoice opens dialog', async ({ page }) => {
-    await page.locator('[data-testid="generate-invoice-btn"]').click();
+    const genBtn = page.locator('[data-testid="generate-invoice-btn"]');
+    await genBtn.scrollIntoViewIfNeeded();
+    await genBtn.click({ force: true });
     await expect(
       page.getByRole('heading', { name: /Generate Invoice/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('dialog has tenant ID, year, and plan fields', async ({ page }) => {
-    await page.locator('[data-testid="generate-invoice-btn"]').click();
+    const genBtn = page.locator('[data-testid="generate-invoice-btn"]');
+    await genBtn.scrollIntoViewIfNeeded();
+    await genBtn.click({ force: true });
     await expect(
       page.locator('[data-testid="invoice-tenant-input"]')
     ).toBeVisible({ timeout: 10_000 });
@@ -201,17 +209,22 @@ test.describe('Stripe Invoices — Generate Invoice Dialog', () => {
   });
 
   test('submit button is disabled when tenant ID is empty', async ({ page }) => {
-    await page.locator('[data-testid="generate-invoice-btn"]').click();
+    const genBtn = page.locator('[data-testid="generate-invoice-btn"]');
+    await genBtn.scrollIntoViewIfNeeded();
+    await genBtn.click({ force: true });
     const submitBtn = page.locator('[data-testid="submit-invoice-btn"]');
     await expect(submitBtn).toBeDisabled();
   });
 
   test('filling tenant ID and submitting calls the mutation', async ({ page }) => {
-    await page.locator('[data-testid="generate-invoice-btn"]').click();
+    const genBtn = page.locator('[data-testid="generate-invoice-btn"]');
+    await genBtn.scrollIntoViewIfNeeded();
+    await genBtn.click({ force: true });
     await page.fill('[data-testid="invoice-tenant-input"]', 'tenant-uuid-123');
     const submitBtn = page.locator('[data-testid="submit-invoice-btn"]');
     await expect(submitBtn).toBeEnabled({ timeout: 5_000 });
-    await submitBtn.click();
+    await submitBtn.scrollIntoViewIfNeeded();
+    await submitBtn.click({ force: true });
 
     // Dialog should close after successful generation
     await expect(

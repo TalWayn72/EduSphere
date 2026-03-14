@@ -92,7 +92,7 @@ export class LessonPipelineResolver {
 
     // Extract auth header for forwarding to knowledge subgraph
     const authHeader =
-      (ctx as Record<string, unknown>)['authorization'] as string | undefined;
+      (ctx as unknown as Record<string, unknown>)['authorization'] as string | undefined;
     const searchFn = this.createSearchFn(authHeader);
 
     this.logger.log(

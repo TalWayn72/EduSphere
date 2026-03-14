@@ -113,8 +113,7 @@ export class PushDispatchService implements OnModuleDestroy {
     // web-push is an optional peer dependency — require dynamically.
     // If not installed, log a warning and skip.
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
       const webpush = require('web-push') as { setVapidDetails: (s: string, pub: string, priv: string) => void; sendNotification: (sub: unknown, payload: string) => Promise<unknown> };
       webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
