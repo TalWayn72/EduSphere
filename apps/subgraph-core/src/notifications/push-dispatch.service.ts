@@ -95,16 +95,48 @@ export class PushDispatchService implements OnModuleDestroy {
     title: string,
     body: string
   ): Promise<void> {
-    // web-push package is not installed; VAPID keys are required for real delivery.
-    // When web-push + VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY are configured, replace
-    // this stub with: webpush.sendNotification(sub, JSON.stringify({ title, body }))
-    const sub = JSON.parse(subscriptionJson) as { endpoint?: string };
-    this.logger.debug(
-      `[PushDispatchService] Web push stub — endpoint domain logged only: ${
-        sub.endpoint ? new URL(sub.endpoint).hostname : 'unknown'
-      } — title=${title} body=${body}`
-    );
-    // No-op until VAPID keys are provisioned.
+    const vapidPublicKey = process.env['VAPID_PUBLIC_KEY'];
+    const vapidPrivateKey = process.env['VAPID_PRIVATE_KEY'];
+    const vapidSubject = process.env['VAPID_SUBJECT'] ?? 'mailto:admin@edusphere.dev';
+
+    if (!vapidPublicKey || !vapidPrivateKey) {
+      // Graceful fallback: log and skip when VAPID keys are not configured.
+      const sub = JSON.parse(subscriptionJson) as { endpoint?: string };
+      this.logger.debug(
+        `[PushDispatchService] Web push stub (no VAPID keys) — domain: ${
+          sub.endpoint ? new URL(sub.endpoint).hostname : 'unknown'
+        }`
+      );
+      return;
+    }
+
+    // web-push is an optional peer dependency — require dynamically.
+    // If not installed, log a warning and skip.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const webpush = require('web-push') as { setVapidDetails: (s: string, pub: string, priv: string) => void; sendNotification: (sub: unknown, payload: string) => Promise<unknown> };
+      webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+
+      const subscription = JSON.parse(subscriptionJson) as {
+        endpoint: string;
+        keys: { p256dh: string; auth: string };
+      };
+
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({ title, body })
+      );
+
+      this.logger.log(
+        '[PushDispatchService] Web push sent successfully'
+      );
+    } catch (err) {
+      this.logger.warn(
+        { err },
+        '[PushDispatchService] Web push delivery failed or web-push not installed'
+      );
+    }
   }
 
   private timeout(ms: number): Promise<never> {

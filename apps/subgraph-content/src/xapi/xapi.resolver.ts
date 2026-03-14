@@ -3,20 +3,35 @@
  * All business logic delegated to XapiTokenService and XapiStatementService.
  */
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { UnauthorizedException, Logger } from '@nestjs/common';
+import { UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
+import { z } from 'zod';
+import {
+  createDatabaseConnection,
+  schema,
+  withTenantContext,
+  eq,
+  and,
+  lt,
+} from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 import { XapiTokenService } from './xapi-token.service.js';
 import { XapiStatementService } from './xapi-statement.service.js';
 import { XapiExportService } from './xapi-export.service.js';
 import type { GraphQLContext } from '../auth/auth.middleware.js';
 
+const clearStatementsSchema = z.object({
+  olderThanDays: z.number().int().min(0).max(3650),
+});
+
 @Resolver()
 export class XapiResolver {
   private readonly logger = new Logger(XapiResolver.name);
+  private readonly db = createDatabaseConnection();
 
   constructor(
     private readonly tokenService: XapiTokenService,
     private readonly statementService: XapiStatementService,
-    private readonly exportService: XapiExportService
+    private readonly exportService: XapiExportService,
   ) {}
 
   @Query('xapiTokens')
@@ -93,17 +108,50 @@ export class XapiResolver {
 
   @Mutation('clearXapiStatements')
   async clearXapiStatements(
-    @Args('olderThanDays') _olderThanDays: number,
-    @Context() ctx: GraphQLContext
+    @Args('olderThanDays') olderThanDays: number,
+    @Context() ctx: GraphQLContext,
   ): Promise<number> {
     const auth = ctx.authContext;
     if (!auth?.tenantId)
       throw new UnauthorizedException('Authentication required');
-    this.logger.log(
-      { tenantId: auth.tenantId, olderThanDays: _olderThanDays },
-      'clearXapiStatements'
+
+    const parsed = clearStatementsSchema.safeParse({ olderThanDays });
+    if (!parsed.success) {
+      throw new BadRequestException(parsed.error.issues[0]?.message ?? 'Invalid input');
+    }
+
+    const tenantId = auth.tenantId;
+    const userId = auth.userId ?? 'unknown';
+    this.logger.log({ tenantId, userId, olderThanDays }, 'clearXapiStatements');
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
+
+    const tenantCtx: TenantContext = { tenantId, userId, userRole: 'SUPER_ADMIN' };
+    const deleted = await withTenantContext(this.db, tenantCtx, async (tx) => {
+      const conditions = [eq(schema.xapiStatements.tenantId, tenantId)];
+      if (olderThanDays > 0) {
+        conditions.push(lt(schema.xapiStatements.storedAt, cutoffDate));
+      }
+      const result = await tx
+        .delete(schema.xapiStatements)
+        .where(and(...conditions))
+        .returning({ id: schema.xapiStatements.id });
+      return result.length;
+    });
+
+    // Audit log entry for compliance
+    await withTenantContext(this.db, tenantCtx, async (tx) =>
+      tx.insert(schema.auditLog).values({
+        tenantId,
+        userId,
+        action: 'XAPI_STATEMENTS_CLEARED',
+        resourceType: 'xapi_statements',
+        metadata: { olderThanDays, deletedCount: deleted, cutoffDate: cutoffDate.toISOString() },
+      }),
     );
-    // TODO: implement bulk delete in XapiStatementService (Phase 41 B-series)
-    return 0;
+
+    this.logger.log({ tenantId, deleted, olderThanDays }, 'xAPI statements cleared');
+    return deleted;
   }
 }

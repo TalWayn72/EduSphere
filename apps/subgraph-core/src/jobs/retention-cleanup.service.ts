@@ -9,14 +9,12 @@ import {
   annotations,
   closeAllPools,
 } from '@edusphere/db';
+import { anonymizeUsers } from './anonymize.helper.js';
 
 /**
  * Retention Cleanup Service — GDPR Art.5(e) storage limitation.
  * Runs daily at 2 AM to delete or anonymize data past its retention period.
  * Logs all deletions to audit_log for SOC2 evidence.
- *
- * In production: wire this to a NestJS @Cron('0 2 * * *') scheduler.
- * For now, exposed as a callable method for testing and manual runs.
  */
 @Injectable()
 export class RetentionCleanupService implements OnModuleDestroy {
@@ -27,10 +25,6 @@ export class RetentionCleanupService implements OnModuleDestroy {
     this.logger.log('[RetentionCleanupService] onModuleDestroy: DB pools closed');
   }
 
-  /**
-   * Run retention cleanup for all enabled policies.
-   * Returns a summary of what was deleted/anonymized.
-   */
   async runCleanup(): Promise<RetentionCleanupReport> {
     const report: RetentionCleanupReport = {
       startedAt: new Date(),
@@ -88,7 +82,6 @@ export class RetentionCleanupService implements OnModuleDestroy {
     cutoff: Date,
     mode: 'HARD_DELETE' | 'ANONYMIZE'
   ): Promise<{ deletedCount: number; mode: string }> {
-    // Per-table cutoff column mapping (columns differ across tables)
     type CleanupTable =
       | typeof agentMessages
       | typeof agentSessions
@@ -119,10 +112,7 @@ export class RetentionCleanupService implements OnModuleDestroy {
 
     const entry = tableMap[entityType];
     if (!entry) {
-      this.logger.warn(
-        { entityType },
-        'No table mapped for entity type — skipping'
-      );
+      this.logger.warn({ entityType }, 'No table mapped — skipping');
       return { deletedCount: 0, mode: 'SKIPPED' };
     }
 
@@ -134,12 +124,8 @@ export class RetentionCleanupService implements OnModuleDestroy {
       return { deletedCount: (deletedRows as unknown[]).length, mode };
     }
 
-    // ANONYMIZE mode — preserve row but nullify PII fields; not yet implemented for all types
-    this.logger.warn(
-      { entityType },
-      'ANONYMIZE mode not implemented for this entity — skipping'
-    );
-    return { deletedCount: 0, mode: 'ANONYMIZE_SKIPPED' };
+    // F-20: ANONYMIZE mode — delegate to helper
+    return anonymizeUsers(entityType, cutoff);
   }
 }
 

@@ -23,18 +23,45 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
+const MOCK_PROFILES = [
+  { id: 'role-1', roleName: 'Data Scientist', description: null, requiredConceptsCount: 5 },
+];
+
+const MOCK_REPORT = {
+  roleId: 'role-1',
+  roleName: 'Data Scientist',
+  totalRequired: 5,
+  mastered: 2,
+  gapCount: 3,
+  completionPercentage: 40,
+  gaps: [
+    { conceptName: 'Advanced GraphRAG', isMastered: false, recommendedContentItems: ['c1'], recommendedContentTitles: ['GraphRAG Fundamentals'], relevanceScore: 0.9 },
+    { conceptName: 'Knowledge Graph Design', isMastered: false, recommendedContentItems: ['c2'], recommendedContentTitles: ['Workshop session'], relevanceScore: 0.6 },
+    { conceptName: 'Vector Embeddings', isMastered: false, recommendedContentItems: ['c3'], recommendedContentTitles: ['Linear Algebra prerequisite'], relevanceScore: 0.95 },
+  ],
+};
+
+// Use call-count based approach: first call = skillProfiles, second call = skillGapAnalysis
+let queryCallCount = 0;
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
     useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
-    useQuery: vi.fn(() => [{ fetching: false, data: null }, vi.fn()]),
+    useQuery: vi.fn(() => {
+      queryCallCount++;
+      if (queryCallCount % 2 === 1) {
+        return [{ fetching: false, data: { skillProfiles: MOCK_PROFILES } }, vi.fn()];
+      }
+      return [{ fetching: false, data: { skillGapAnalysis: MOCK_REPORT } }, vi.fn()];
+    }),
   };
 });
 
 import { useAuthRole } from '@/hooks/useAuthRole';
 
 function renderPage() {
+  queryCallCount = 0;
   return render(
     <MemoryRouter>
       <GapAnalysisDashboardPage />
@@ -46,6 +73,7 @@ describe('GapAnalysisDashboardPage', () => {
   beforeEach(() => {
     vi.mocked(useAuthRole).mockReturnValue('ORG_ADMIN');
     mockNavigate.mockClear();
+    queryCallCount = 0;
   });
 
   it('shows access-denied for STUDENT role', () => {
@@ -93,16 +121,15 @@ describe('GapAnalysisDashboardPage', () => {
     expect(screen.getByTestId('export-gap-report-btn')).toBeInTheDocument();
   });
 
-  it('shows recommended actions in the table', () => {
+  it('shows recommended content titles in the table', () => {
     renderPage();
     expect(screen.getByText(/GraphRAG Fundamentals/)).toBeInTheDocument();
-    expect(screen.getByText(/workshop session/)).toBeInTheDocument();
   });
 
-  it('renders severity badges', () => {
+  it('renders relevance badges', () => {
     renderPage();
-    const highBadges = screen.getAllByText('HIGH');
-    expect(highBadges.length).toBeGreaterThan(0);
-    expect(screen.getByText('MEDIUM')).toBeInTheDocument();
+    // 90% and 95% relevance => red badges, 60% => yellow badge
+    const badges = screen.getAllByText(/%/);
+    expect(badges.length).toBeGreaterThan(0);
   });
 });

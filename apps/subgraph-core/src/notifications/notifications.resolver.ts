@@ -86,6 +86,46 @@ export class NotificationsResolver {
   }
 
   /**
+   * F-11: Register a W3C Push API subscription for Web Push delivery.
+   * Convenience wrapper around registerPushToken with platform=WEB.
+   */
+  @Mutation('registerPushSubscription')
+  async registerPushSubscription(
+    @Args('subscriptionJson') subscriptionJson: string,
+    @Context() context: GraphQLContext
+  ): Promise<PushTokenDto> {
+    const authCtx = context.authContext;
+    if (!authCtx?.userId || !authCtx.tenantId) {
+      throw new UnauthorizedException(
+        'Authentication required for push subscription registration'
+      );
+    }
+
+    // Validate that subscriptionJson is valid JSON with required fields
+    try {
+      const parsed = JSON.parse(subscriptionJson) as {
+        endpoint?: string;
+        keys?: { p256dh?: string; auth?: string };
+      };
+      if (!parsed.endpoint || !parsed.keys?.p256dh || !parsed.keys?.auth) {
+        throw new Error('Missing required fields');
+      }
+    } catch {
+      throw new UnauthorizedException(
+        'Invalid push subscription JSON — must include endpoint and keys'
+      );
+    }
+
+    return this.pushTokenService.registerToken(
+      authCtx.userId,
+      authCtx.tenantId,
+      'WEB',
+      undefined,
+      subscriptionJson
+    );
+  }
+
+  /**
    * Remove all registered push tokens for the authenticated user on a given platform.
    */
   @Mutation('unregisterPushToken')

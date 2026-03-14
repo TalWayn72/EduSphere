@@ -11,8 +11,6 @@ import type {
   LtiLoginRequest,
   LtiPlatformConfig,
   LtiStatePayload,
-  LtiPlatformDto,
-  RegisterLtiPlatformInput,
 } from './lti.types';
 
 // ── In-memory state store (replace with Redis in production) ──────────────────
@@ -288,52 +286,6 @@ export class LtiService {
     return crypto.randomBytes(16).toString('hex');
   }
 
-  // ── Platform management (env-config stubs — replace with DB in production) ─
-
-  /** Returns the configured LTI platform as a DTO (env-based, single-platform). */
-  async getPlatforms(tenantId: string): Promise<LtiPlatformDto[]> {
-    const cfg = this.getPlatformConfig();
-    if (!cfg.issuer) return [];
-    return [
-      {
-        id: `env-${tenantId}`,
-        tenantId,
-        platformName: 'LMS Platform',
-        platformUrl: cfg.issuer,
-        clientId: cfg.clientId,
-        authLoginUrl: cfg.authEndpoint,
-        authTokenUrl: cfg.authEndpoint,
-        keySetUrl: cfg.jwksUri,
-        deploymentId: process.env['LTI_DEPLOYMENT_ID'] ?? '',
-        isActive: true,
-      },
-    ];
-  }
-
-  /** Registers an LTI platform (stored in env for single-tenant; use DB for multi-tenant). */
-  async registerPlatform(
-    tenantId: string,
-    input: RegisterLtiPlatformInput
-  ): Promise<LtiPlatformDto> {
-    return {
-      id: `env-${tenantId}-${Date.now()}`,
-      tenantId,
-      ...input,
-      isActive: true,
-    };
-  }
-
-  /** Toggles an LTI platform's active state (no-op for env-backed config). */
-  async togglePlatform(
-    id: string,
-    tenantId: string,
-    isActive: boolean
-  ): Promise<LtiPlatformDto> {
-    const platforms = await this.getPlatforms(tenantId);
-    const platform = platforms[0];
-    if (!platform) {
-      throw new BadRequestException(`LTI platform ${id} not found`);
-    }
-    return { ...platform, id, isActive };
-  }
+  // ── Platform management (delegated to LtiPlatformService for DB-backed ops) ─
+  // See lti-platform.service.ts for getPlatforms, registerPlatform, togglePlatform
 }

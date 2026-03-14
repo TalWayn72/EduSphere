@@ -553,8 +553,9 @@ describe('B2B Admin Frontend — Forced Browsing Prevention (T-10)', () => {
       .join('\n');
     if (!allSdl.includes('myTenantUsage')) return;
     const start = allSdl.indexOf('myTenantUsage');
-    // Slice narrowly to this field only
-    const block = allSdl.slice(start, start + 200);
+    // Slice narrowly to this field's line only (not neighboring fields)
+    const lineEnd = allSdl.indexOf('\n', start);
+    const block = allSdl.slice(start, lineEnd > start ? lineEnd : start + 100);
     // myTenantUsage is tenant-scoped self-service — does not require SUPER_ADMIN
     // (protection is tenant isolation via RLS + JWT context, not role restriction)
     expect(block).not.toContain('@requiresRole');

@@ -87,7 +87,7 @@ describe('AgentsPage', () => {
       makeMutationMock({
         startAgentSession: {
           id: 'session-1',
-          templateType: 'CHAVRUTA',
+          templateType: 'CHAVRUTA_DEBATE',
           status: 'ACTIVE',
           contextContentId: null,
           createdAt: new Date().toISOString(),

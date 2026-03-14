@@ -22,12 +22,34 @@ type AdminDashboardStats {
   storageUsedMb: Float!
 }
 
+type AtRiskThresholds {
+  inactivityDays: Int!
+  minCompletionPct: Float!
+  minQuizScorePct: Float!
+}
+
+input AtRiskThresholdsInput {
+  inactivityDays: Int!
+  minCompletionPct: Float!
+  minQuizScorePct: Float!
+}
+
 type Query {
   adminOverview: AdminOverview!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   adminDashboardStats: AdminDashboardStats!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  atRiskThresholds: AtRiskThresholds!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  saveAtRiskThresholds(input: AtRiskThresholdsInput!): AtRiskThresholds!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }

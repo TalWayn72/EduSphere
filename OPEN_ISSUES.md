@@ -8439,3 +8439,66 @@ Commit: `ae622ce`
 - `OAuthCallbackPage.test.tsx` — 2 tests (render, postMessage)
 
 **E2E specs:** `apps/web/e2e/xapi-settings.spec.ts`, `apps/web/e2e/drive-import.spec.ts` ✅ — included in Phase 54 E2E closure (Sprint D1 complete)
+
+---
+
+## FEAT-WIRE-001: Wire 21 Stub/Mock Features to Real Implementations
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 2026-03-14
+
+### Problem
+21 features across the platform had UI that displayed mock data or called stub services that returned fake data. Users saw convincing UIs that did nothing real.
+
+### Features Wired (21 total)
+
+#### Group A — subgraph-core (7 features):
+| ID | Feature | Before | After |
+|----|---------|--------|-------|
+| F-05 | myTenantUsage | Query didn't exist | Real resolver aggregating tenant data |
+| F-06 | platformLiveStats | Query didn't exist | Cross-tenant aggregation (SUPER_ADMIN only) |
+| F-07 | partnerDashboard + API key regen | Mock revenue + no-op button | Real query + SHA-256 hashed key |
+| F-09 | Stripe billing | All stubs returning fake IDs | Graceful degradation (real when STRIPE_SECRET_KEY set) |
+| F-11 | Web Push | sendWebPush() was no-op | Real web-push with VAPID (when installed) |
+| F-18 | At-Risk thresholds | Local state only | Saved to tenant_settings JSONB |
+| F-20 | GDPR ANONYMIZE | Skipped entirely | SHA-256 irreversible anonymization + audit log |
+
+#### Group B — subgraph-content (3 features):
+| ID | Feature | Before | After |
+|----|---------|--------|-------|
+| F-13 | Google Drive import | Files listed, never processed | Download → MinIO → DB record → NATS event |
+| F-14 | xAPI clearStatements | Returned 0 always | Real Drizzle DELETE + audit log |
+| F-15 | LTI platforms | env-backed single platform | DB-backed multi-tenant CRUD |
+
+#### Group C — subgraph-knowledge + agent (4 features):
+| ID | Feature | Before | After |
+|----|---------|--------|-------|
+| F-08 | myTopMasteryTopics | SDL existed, no resolver | Real resolver querying mastery tables |
+| F-12 | OCR ingestion | Empty string stub | Calls TesseractOcrService |
+| F-16 | Lesson citations | 3 fake citations | pgvector semantic search |
+| F-21 | Chavruta type | 'CHAVRUTA' (wrong) | 'CHAVRUTA_DEBATE' (matches schema) |
+
+#### Group D — Frontend wiring (7 features):
+| ID | Feature | Before | After |
+|----|---------|--------|-------|
+| F-01 | AutoGradingResults | MOCK_RESULTS | Real useQuery + loading/empty/error states |
+| F-02 | GapAnalysis | MOCK_GAPS | Wired to existing skillGapAnalysis resolver |
+| F-04 | MergeQueue | Local state approve/reject | Real mutations + reject dialog |
+| F-05b | OrgUsage | No year selector | Year dropdown + useQuery |
+| F-06b | InvestorDeck | Missing BUG-052 guard | Mounted guard + skeleton |
+| F-07b | PartnerDashboard | MOCK_REVENUE | Real query + key regen mutation |
+| F-17b | StripeInvoice | MOCK_INVOICES | Real query + generate dialog |
+| F-19 | Mobile language | AsyncStorage only | GraphQL mutation sync |
+
+### Security
+- 94 new security tests (tests/security/feature-wiring-security.spec.ts)
+- All SI-1..SI-10 invariants verified
+- 3 known gaps documented: HRIS encryptField, Drive ClamAV scan, platformLiveStats resolver gate
+
+### Tests Added
+- 52 frontend unit tests (5 test files updated)
+- 94 security static analysis tests (1 new file)
+- 11 new backend service files with Pino logging
+
+### Anti-Recurrence
+- tests/security/feature-wiring-security.spec.ts guards all 10 security areas
+- Frontend tests verify real query wiring (no more MOCK_ constants)

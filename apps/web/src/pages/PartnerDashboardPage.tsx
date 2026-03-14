@@ -3,12 +3,15 @@
  * Route: /partner/dashboard (protected)
  */
 import React, { useState, useEffect } from 'react';
-import { useQuery } from 'urql';
+import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PartnerTierBadge } from '@/components/partners/PartnerTierBadge';
+import { PartnerRevenueTable } from '@/components/partners/PartnerRevenueTable';
+import { ApiKeySection } from '@/components/partners/ApiKeySection';
 
 const PARTNER_DASHBOARD_QUERY = `
   query PartnerDashboard {
@@ -26,6 +29,12 @@ const PARTNER_DASHBOARD_QUERY = `
   }
 `;
 
+const REGENERATE_KEY_MUTATION = `
+  mutation RegeneratePartnerApiKey {
+    regeneratePartnerApiKey { apiKey }
+  }
+`;
+
 interface RevenueRow {
   month: string;
   grossRevenue: number;
@@ -34,18 +43,11 @@ interface RevenueRow {
   status: 'PAID' | 'PENDING' | 'PROCESSING';
 }
 
-const MOCK_REVENUE: RevenueRow[] = Array.from({ length: 12 }, (_, i) => {
-  const d = new Date();
-  d.setMonth(d.getMonth() - (11 - i));
-  const gross = Math.round(1000 + Math.random() * 4000);
-  return {
-    month: d.toLocaleString('default', { month: 'long', year: 'numeric' }),
-    grossRevenue: gross,
-    platformCut: Math.round(gross * 0.3),
-    payout: Math.round(gross * 0.7),
-    status: i < 11 ? 'PAID' : 'PENDING',
-  };
-});
+interface PartnerDashboardData {
+  status: string;
+  apiKey: string;
+  revenueByMonth: RevenueRow[];
+}
 
 const STATUS_BADGE: Record<string, string> = {
   ACTIVE: 'bg-green-100 text-green-800',
@@ -53,42 +55,56 @@ const STATUS_BADGE: Record<string, string> = {
   SUSPENDED: 'bg-red-100 text-red-800',
 };
 
-const ROW_STATUS_BADGE: Record<string, string> = {
-  PAID: 'bg-green-100 text-green-800',
-  PENDING: 'bg-yellow-100 text-yellow-800',
-  PROCESSING: 'bg-blue-100 text-blue-800',
-};
-
 export function PartnerDashboardPage() {
   usePageTitle('Partner Dashboard');
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  const [result] = useQuery({
+  const [result] = useQuery<{ myPartnerDashboard: PartnerDashboardData }>({
     query: PARTNER_DASHBOARD_QUERY,
     pause: !mounted,
   });
 
-  const partnerStatus = result.data?.myPartnerDashboard?.status ?? 'ACTIVE';
-  const revenue: RevenueRow[] = result.data?.myPartnerDashboard?.revenueByMonth ?? MOCK_REVENUE;
-  const fetching = result.fetching;
+  const [regenResult, regenerateKey] = useMutation(REGENERATE_KEY_MUTATION);
+
+  const { data, fetching, error } = result;
+  const dashboard = data?.myPartnerDashboard;
+  const partnerStatus = dashboard?.status ?? 'ACTIVE';
+  const revenue = dashboard?.revenueByMonth ?? [];
+  const apiKey = dashboard?.apiKey ?? '';
+  const newKey = regenResult.data?.regeneratePartnerApiKey?.apiKey as string | undefined;
 
   return (
     <AdminLayout title="Partner Dashboard" description="Revenue analytics and API access for EduSphere Partners">
       <div data-testid="partner-dashboard-page">
         {fetching && (
-          <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" aria-label="Loading" />
+          <div className="space-y-4" data-testid="partner-skeleton">
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <Skeleton className="h-32 w-full rounded-lg" />
           </div>
         )}
 
-        {!fetching && (
+        {error && !fetching && (
+          <Card>
+            <CardContent className="py-8 text-center text-destructive text-sm">
+              Failed to load partner data. Please try again later.
+            </CardContent>
+          </Card>
+        )}
+
+        {!fetching && !error && !dashboard && (
+          <Card>
+            <CardContent className="py-12 text-center text-muted-foreground">
+              <p className="text-sm" data-testid="empty-state">No partner account found.</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {!fetching && dashboard && (
           <>
-            {/* Partner status */}
             <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Partner Status</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>Partner Status</CardTitle></CardHeader>
               <CardContent>
                 <span
                   data-testid="partner-status-badge"
@@ -96,73 +112,18 @@ export function PartnerDashboardPage() {
                 >
                   {partnerStatus}
                 </span>
-                <div className="mt-3">
-                  <PartnerTierBadge tier="GOLD" />
-                </div>
+                <div className="mt-3"><PartnerTierBadge tier="GOLD" /></div>
               </CardContent>
             </Card>
 
-            {/* Revenue Table */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Revenue (Last 12 Months)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table data-testid="revenue-table" className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b text-left text-muted-foreground">
-                        <th className="pb-3 pr-4 font-medium">Month</th>
-                        <th className="pb-3 pr-4 font-medium">Gross Revenue</th>
-                        <th className="pb-3 pr-4 font-medium">Platform Cut (30%)</th>
-                        <th className="pb-3 pr-4 font-medium">Your Payout (70%)</th>
-                        <th className="pb-3 font-medium">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {revenue.map((row) => (
-                        <tr key={row.month} className="border-b hover:bg-muted/30">
-                          <td className="py-3 pr-4">{row.month}</td>
-                          <td className="py-3 pr-4">${row.grossRevenue.toLocaleString()}</td>
-                          <td className="py-3 pr-4 text-muted-foreground">${row.platformCut.toLocaleString()}</td>
-                          <td className="py-3 pr-4 font-semibold text-green-700">${row.payout.toLocaleString()}</td>
-                          <td className="py-3">
-                            <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${ROW_STATUS_BADGE[row.status] ?? ''}`}>
-                              {row.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+            <PartnerRevenueTable revenue={revenue} />
 
-            {/* API Key Section */}
-            <Card data-testid="api-key-section">
-              <CardHeader>
-                <CardTitle>Your API Key</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <code className="flex-1 rounded bg-muted px-4 py-2 font-mono text-sm">
-                    esph_•••••••••••••••••
-                  </code>
-                  <Button variant="outline" size="sm" onClick={() => undefined}>
-                    Regenerate
-                  </Button>
-                </div>
-                <div className="mt-4 flex gap-4 text-sm">
-                  <a href="/api/v1/partner/usage" className="text-primary underline underline-offset-2">
-                    /api/v1/partner/usage
-                  </a>
-                  <a href="/docs/partner-api" className="text-primary underline underline-offset-2">
-                    API Documentation
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
+            <ApiKeySection
+              currentKey={newKey ?? apiKey}
+              showPlain={!!newKey}
+              onRegenerate={() => void regenerateKey({})}
+              regenerating={regenResult.fetching}
+            />
           </>
         )}
       </div>

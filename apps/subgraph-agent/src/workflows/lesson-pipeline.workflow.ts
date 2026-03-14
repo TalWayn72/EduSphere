@@ -40,6 +40,12 @@ export interface LessonPipelineResult {
   stage: string;
 }
 
+/** Callback for semantic search — injected by the resolver at runtime. */
+export type CitationSearchFn = (
+  query: string,
+  limit: number
+) => Promise<{ id: string; text: string; similarity: number; source?: string }[]>;
+
 interface PipelineContext {
   input: LessonPipelineInput;
   parsedTopic: string;
@@ -51,6 +57,7 @@ interface PipelineContext {
   status: LessonPipelineStatus;
   currentStage: string;
   error: string | null;
+  searchFn?: CitationSearchFn;
 }
 
 // ── Stage implementations ─────────────────────────────────────────────────────
@@ -70,14 +77,26 @@ async function parsePrompt(ctx: PipelineContext, model: LanguageModel): Promise<
 }
 
 async function fetchCitations(ctx: PipelineContext): Promise<PipelineContext> {
-  // Stub: in production, queries Sefaria API + pgvector for relevant sources
   const maxCitations = ctx.input.maxCitations ?? 5;
-  const stubCitations: LessonCitation[] = Array.from({ length: Math.min(maxCitations, 3) }, (_, i) => ({
-    source: 'Talmud Bavli',
-    reference: `Tractate ${ctx.parsedTopic} ${i + 1}a`,
-    text: `Citation ${i + 1} related to ${ctx.parsedTopic}`,
-  }));
-  return { ...ctx, citations: stubCitations, currentStage: 'generateOutline' };
+
+  // Use real pgvector semantic search when a search function is provided
+  if (ctx.searchFn) {
+    try {
+      const results = await ctx.searchFn(ctx.parsedTopic, maxCitations);
+      const citations: LessonCitation[] = results.map((r) => ({
+        source: r.source ?? 'Knowledge Base',
+        reference: r.id,
+        text: r.text,
+      }));
+      return { ...ctx, citations, currentStage: 'generateOutline' };
+    } catch {
+      // Search failed — return empty citations rather than fake data
+      return { ...ctx, citations: [], currentStage: 'generateOutline' };
+    }
+  }
+
+  // No search function provided — return empty array (not fake data)
+  return { ...ctx, citations: [], currentStage: 'generateOutline' };
 }
 
 async function generateOutline(ctx: PipelineContext, model: LanguageModel): Promise<PipelineContext> {
@@ -130,7 +149,8 @@ async function exportMarkdown(ctx: PipelineContext, model: LanguageModel): Promi
 export async function runLessonPipeline(
   input: LessonPipelineInput,
   model: LanguageModel,
-  executionId: string
+  executionId: string,
+  searchFn?: CitationSearchFn
 ): Promise<LessonPipelineResult> {
   let ctx: PipelineContext = {
     input,
@@ -143,6 +163,7 @@ export async function runLessonPipeline(
     status: 'IN_PROGRESS',
     currentStage: 'parsePrompt',
     error: null,
+    searchFn,
   };
 
   try {

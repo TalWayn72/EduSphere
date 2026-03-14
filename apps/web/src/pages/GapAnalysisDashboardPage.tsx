@@ -1,49 +1,70 @@
 /**
  * GapAnalysisDashboardPage — Knowledge gap analysis for ORG_ADMIN / SUPER_ADMIN.
  * Route: /admin/gap-analysis
+ * Wired to skillGapAnalysis + skillProfiles queries from subgraph-knowledge.
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthRole } from '@/hooks/useAuthRole';
+import { SKILL_GAP_ANALYSIS_QUERY, SKILL_PROFILES_QUERY } from '@/lib/graphql/knowledge-tier3.queries';
+import { GapAnalysisTable } from '@/components/gap-analysis/GapAnalysisTable';
 
 const ALLOWED_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
-type GapType = 'NOT_STARTED' | 'LOW_MASTERY' | 'MISSING_PREREQUISITE';
-type Severity = 'HIGH' | 'MEDIUM' | 'LOW';
-
-interface KnowledgeGap {
-  topicId: string;
-  topicName: string;
-  gapType: GapType;
-  severity: Severity;
-  affectedUserCount: number;
-  recommendedAction: string;
+interface SkillProfile {
+  id: string;
+  roleName: string;
+  description: string | null;
+  requiredConceptsCount: number;
 }
 
-const MOCK_GAPS: KnowledgeGap[] = [
-  { topicId: 't1', topicName: 'Advanced GraphRAG', gapType: 'NOT_STARTED', severity: 'HIGH', affectedUserCount: 45, recommendedAction: 'Assign "GraphRAG Fundamentals" course' },
-  { topicId: 't2', topicName: 'Knowledge Graph Design', gapType: 'LOW_MASTERY', severity: 'MEDIUM', affectedUserCount: 23, recommendedAction: 'Schedule workshop session' },
-  { topicId: 't3', topicName: 'Vector Embeddings', gapType: 'MISSING_PREREQUISITE', severity: 'HIGH', affectedUserCount: 67, recommendedAction: 'Complete "Linear Algebra" prerequisite first' },
-];
-
-const GAP_TYPE_BADGE: Record<GapType, string> = {
-  NOT_STARTED: 'bg-gray-100 text-gray-700',
-  LOW_MASTERY: 'bg-yellow-100 text-yellow-700',
-  MISSING_PREREQUISITE: 'bg-red-100 text-red-700',
-};
-
-const SEVERITY_BADGE: Record<Severity, string> = {
-  HIGH: 'bg-red-100 text-red-700',
-  MEDIUM: 'bg-yellow-100 text-yellow-700',
-  LOW: 'bg-green-100 text-green-700',
-};
+interface SkillGapReport {
+  roleId: string;
+  roleName: string;
+  totalRequired: number;
+  mastered: number;
+  gapCount: number;
+  completionPercentage: number;
+  gaps: Array<{
+    conceptName: string;
+    isMastered: boolean;
+    recommendedContentItems: string[];
+    recommendedContentTitles: string[];
+    relevanceScore: number;
+  }>;
+}
 
 export function GapAnalysisDashboardPage() {
   const navigate = useNavigate();
   const role = useAuthRole();
+  const [mounted, setMounted] = useState(false);
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const [profilesResult] = useQuery<{ skillProfiles: SkillProfile[] }>({
+    query: SKILL_PROFILES_QUERY,
+    pause: !mounted,
+  });
+
+  const [gapResult] = useQuery<{ skillGapAnalysis: SkillGapReport }>({
+    query: SKILL_GAP_ANALYSIS_QUERY,
+    variables: { roleId: selectedRoleId },
+    pause: !mounted || !selectedRoleId,
+  });
+
+  // Auto-select first profile when loaded
+  useEffect(() => {
+    const profiles = profilesResult.data?.skillProfiles;
+    if (profiles && profiles.length > 0 && !selectedRoleId) {
+      setSelectedRoleId(profiles[0]?.id ?? '');
+    }
+  }, [profilesResult.data, selectedRoleId]);
 
   if (!role || !ALLOWED_ROLES.has(role)) {
     navigate('/dashboard');
@@ -54,81 +75,74 @@ export function GapAnalysisDashboardPage() {
     );
   }
 
-  const totalGaps = MOCK_GAPS.length;
-  const totalAffected = MOCK_GAPS.reduce((a, g) => a + g.affectedUserCount, 0);
-  const coveragePct = Math.max(0, 100 - Math.round((totalAffected / 300) * 100));
+  const { fetching: profilesFetching, error: profilesError } = profilesResult;
+  const profiles = profilesResult.data?.skillProfiles ?? [];
+  const report = gapResult.data?.skillGapAnalysis;
+  const gapFetching = gapResult.fetching;
+  const gapError = gapResult.error;
+  const isLoading = profilesFetching || gapFetching;
 
   return (
     <AdminLayout title="Gap Analysis Dashboard" description="Knowledge gaps across your organisation">
       <div data-testid="gap-analysis-page" className="space-y-6">
-        {/* Summary card */}
-        <Card data-testid="gap-summary-card">
-          <CardHeader>
-            <CardTitle>Tenant Coverage</CardTitle>
-          </CardHeader>
-          <CardContent className="flex gap-8">
-            <div>
-              <p className="text-3xl font-bold text-primary">{coveragePct}%</p>
-              <p className="text-sm text-muted-foreground">Topics covered</p>
-            </div>
-            <div>
-              <p data-testid="total-gaps-count" className="text-3xl font-bold text-destructive">{totalGaps}</p>
-              <p className="text-sm text-muted-foreground">Active gaps</p>
-            </div>
-          </CardContent>
-        </Card>
+        {isLoading && (
+          <div className="space-y-4" data-testid="gap-skeleton">
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+          </div>
+        )}
 
-        {/* Critical gaps table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Knowledge Gaps</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table data-testid="critical-gaps-table" className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-muted-foreground">
-                    <th className="pb-3 pr-4 font-medium">Topic</th>
-                    <th className="pb-3 pr-4 font-medium">Gap Type</th>
-                    <th className="pb-3 pr-4 font-medium">Severity</th>
-                    <th className="pb-3 pr-4 font-medium">Affected Users</th>
-                    <th className="pb-3 font-medium">Recommended Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {MOCK_GAPS.map((gap) => (
-                    <tr key={gap.topicId} className="border-b hover:bg-muted/30">
-                      <td className="py-3 pr-4 font-medium">{gap.topicName}</td>
-                      <td className="py-3 pr-4">
-                        <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${GAP_TYPE_BADGE[gap.gapType]}`}>
-                          {gap.gapType}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4">
-                        <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${SEVERITY_BADGE[gap.severity]}`}>
-                          {gap.severity}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4">{gap.affectedUserCount}</td>
-                      <td className="py-3 text-muted-foreground">{gap.recommendedAction}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+        {(profilesError || gapError) && !isLoading && (
+          <Card>
+            <CardContent className="py-8 text-center text-destructive text-sm">
+              Failed to load gap analysis data. Please try again later.
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Export */}
-        <div className="flex justify-end">
-          <Button
-            data-testid="export-gap-report-btn"
-            variant="outline"
-            onClick={() => window.print()}
-          >
-            Export Report
-          </Button>
-        </div>
+        {!isLoading && !profilesError && profiles.length === 0 && (
+          <Card>
+            <CardContent className="py-12 text-center text-muted-foreground">
+              <p className="text-sm" data-testid="empty-state">
+                No skill profiles found. Create a skill profile to begin gap analysis.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isLoading && profiles.length > 0 && report && (
+          <>
+            <Card data-testid="gap-summary-card">
+              <CardHeader><CardTitle>Skill Gap Summary</CardTitle></CardHeader>
+              <CardContent className="flex gap-8">
+                <div>
+                  <p className="text-3xl font-bold text-primary">
+                    {Math.round(report.completionPercentage)}%
+                  </p>
+                  <p className="text-sm text-muted-foreground">Completion</p>
+                </div>
+                <div>
+                  <p data-testid="total-gaps-count" className="text-3xl font-bold text-destructive">
+                    {report.gapCount}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Active gaps</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold">{report.mastered}/{report.totalRequired}</p>
+                  <p className="text-sm text-muted-foreground">Mastered</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <GapAnalysisTable gaps={report.gaps} />
+
+            <div className="flex justify-end">
+              <Button data-testid="export-gap-report-btn" variant="outline" onClick={() => window.print()}>
+                Export Report
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </AdminLayout>
   );

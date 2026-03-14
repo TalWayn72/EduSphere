@@ -4,7 +4,7 @@
  */
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException, Logger } from '@nestjs/common';
-import { LtiService } from './lti.service';
+import { LtiPlatformService } from './lti-platform.service';
 import type { LtiPlatformDto, RegisterLtiPlatformInput } from './lti.types';
 import type { GraphQLContext } from '../auth/auth.middleware';
 
@@ -18,7 +18,7 @@ interface AuthRequired {
 export class LtiResolver {
   private readonly logger = new Logger(LtiResolver.name);
 
-  constructor(private readonly ltiService: LtiService) {}
+  constructor(private readonly platformService: LtiPlatformService) {}
 
   private requireAuth(ctx: GraphQLContext): AuthRequired {
     const auth = ctx.authContext;
@@ -37,7 +37,7 @@ export class LtiResolver {
     @Context() ctx: GraphQLContext
   ): Promise<LtiPlatformDto[]> {
     const { tenantId } = this.requireAuth(ctx);
-    return this.ltiService.getPlatforms(tenantId);
+    return this.platformService.getPlatforms(tenantId);
   }
 
   @Mutation('registerLtiPlatform')
@@ -47,7 +47,7 @@ export class LtiResolver {
   ): Promise<LtiPlatformDto> {
     const { tenantId, userId } = this.requireAuth(ctx);
     this.logger.log('registerLtiPlatform by userId=' + userId);
-    return this.ltiService.registerPlatform(tenantId, input);
+    return this.platformService.registerPlatform(tenantId, input);
   }
 
   @Mutation('toggleLtiPlatform')
@@ -65,6 +65,6 @@ export class LtiResolver {
         ' by userId=' +
         userId
     );
-    return this.ltiService.togglePlatform(id, tenantId, isActive);
+    return this.platformService.togglePlatform(id, tenantId, isActive);
   }
 }

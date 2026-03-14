@@ -23,16 +23,42 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
+const MOCK_INVOICES = [
+  { id: 'inv-001', tenant: 'Acme University', plan: 'ENTERPRISE', year: 2025, amount: 12000, status: 'paid', pdfUrl: 'https://example.com/inv-001.pdf' },
+  { id: 'inv-002', tenant: 'TechCorp Inc', plan: 'PROFESSIONAL', year: 2025, amount: 4800, status: 'overdue', pdfUrl: '' },
+  { id: 'inv-003', tenant: 'Global Learn', plan: 'STARTER', year: 2026, amount: 1200, status: 'draft', pdfUrl: '#' },
+];
+
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
     useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
-    useQuery: vi.fn(() => [{ fetching: false, data: null }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { fetching: false, data: { invoices: MOCK_INVOICES }, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => open ? <div>{children}</div> : null,
+  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
+  DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 import { useAuthRole } from '@/hooks/useAuthRole';
+import * as urql from 'urql';
+
+function resetUrqlMock() {
+  vi.mocked(urql.useQuery).mockReturnValue([
+    { fetching: false, data: { invoices: MOCK_INVOICES }, error: undefined },
+    vi.fn(),
+  ] as never);
+}
 
 function renderPage() {
   return render(
@@ -46,6 +72,7 @@ describe('StripeInvoicePage', () => {
   beforeEach(() => {
     vi.mocked(useAuthRole).mockReturnValue('SUPER_ADMIN');
     mockNavigate.mockClear();
+    resetUrqlMock();
   });
 
   it('shows access-denied for ORG_ADMIN', () => {
@@ -99,5 +126,21 @@ describe('StripeInvoicePage', () => {
     expect(screen.getByText('paid')).toBeInTheDocument();
     expect(screen.getByText('overdue')).toBeInTheDocument();
     expect(screen.getByText('draft')).toBeInTheDocument();
+  });
+
+  it('shows empty state when no invoices', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      { fetching: false, data: { invoices: [] }, error: undefined },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+  });
+
+  it('shows Download link for invoices with valid PDF URL', () => {
+    renderPage();
+    // inv-001 has valid pdfUrl, should show Download link
+    expect(screen.getByTestId('download-pdf-inv-001')).toBeInTheDocument();
   });
 });

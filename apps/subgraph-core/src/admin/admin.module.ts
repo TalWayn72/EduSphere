@@ -11,6 +11,8 @@ import { CustomRoleResolver } from './custom-role.resolver';
 import { CustomRoleService } from './custom-role.service';
 import { NotificationTemplatesResolver } from './notification-templates.resolver';
 import { NotificationTemplatesService } from './notification-templates.service';
+import { AtRiskThresholdsResolver } from './at-risk-thresholds.resolver';
+import { AtRiskThresholdsService } from './at-risk-thresholds.service';
 
 @Module({
   providers: [
@@ -26,7 +28,9 @@ import { NotificationTemplatesService } from './notification-templates.service';
     CustomRoleService,
     NotificationTemplatesResolver,
     NotificationTemplatesService,
+    AtRiskThresholdsResolver,
+    AtRiskThresholdsService,
   ],
-  exports: [AdminOverviewService],
+  exports: [AdminOverviewService, AtRiskThresholdsService],
 })
 export class AdminModule {}
