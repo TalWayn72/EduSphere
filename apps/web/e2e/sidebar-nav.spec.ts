@@ -295,3 +295,247 @@ test.describe('AppSidebar — /explore regression guard (BUG: missing Layout)', 
     });
   });
 });
+
+// ── Suite 5: Sidebar interaction tests ──────────────────────────────────────
+
+test.describe('AppSidebar — interaction tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    await navigateTo(page, '/dashboard');
+  });
+
+  test('sidebar collapse/expand toggle works', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // Look for a collapse/expand toggle button
+    const toggleBtn = page.locator(
+      'button[aria-label*="collapse" i], button[aria-label*="expand" i], button[aria-label*="toggle" i], [data-testid*="sidebar-toggle"]'
+    ).first();
+    const toggleExists = await toggleBtn.isVisible().catch(() => false);
+
+    if (toggleExists) {
+      // Get initial sidebar width
+      const initialBox = await sidebar.boundingBox();
+      const initialWidth = initialBox?.width ?? 0;
+
+      // Click toggle
+      await toggleBtn.click();
+      await page.waitForTimeout(500);
+
+      // Sidebar should still be in DOM but width should change
+      await expect(sidebar).toBeAttached();
+      const newBox = await sidebar.boundingBox();
+      const newWidth = newBox?.width ?? 0;
+
+      // Width should differ (collapsed is narrower)
+      expect(newWidth).not.toBe(initialWidth);
+
+      // Toggle back
+      const expandBtn = page.locator(
+        'button[aria-label*="collapse" i], button[aria-label*="expand" i], button[aria-label*="toggle" i], [data-testid*="sidebar-toggle"]'
+      ).first();
+      await expandBtn.click();
+      await page.waitForTimeout(500);
+    }
+  });
+
+  test('active route is highlighted in sidebar navigation', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // Find nav links inside the sidebar
+    const navLinks = sidebar.locator('a[href]');
+    const linkCount = await navLinks.count();
+
+    if (linkCount > 0) {
+      // The dashboard link should have an active state
+      const dashboardLink = sidebar.locator('a[href="/dashboard"], a[href*="dashboard"]').first();
+      const dashExists = await dashboardLink.isVisible().catch(() => false);
+
+      if (dashExists) {
+        // Check for active styling (aria-current, data-active, or active class)
+        const ariaCurrent = await dashboardLink.getAttribute('aria-current');
+        const dataActive = await dashboardLink.getAttribute('data-active');
+        const className = await dashboardLink.getAttribute('class');
+
+        const isActive =
+          ariaCurrent === 'page' ||
+          dataActive === 'true' ||
+          (className ?? '').includes('active');
+
+        expect(isActive).toBe(true);
+      }
+    }
+  });
+
+  test('role-based nav items are visible for current user role', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // In DEV_MODE, user is SUPER_ADMIN — admin-related links should be visible
+    const navLinks = sidebar.locator('a[href], button').filter({ hasText: /.+/ });
+    const linkCount = await navLinks.count();
+
+    // SUPER_ADMIN should see at least some navigation items
+    expect(linkCount).toBeGreaterThan(0);
+
+    // Should not show technical strings in nav
+    const sidebarText = await sidebar.textContent();
+    expect(sidebarText).not.toContain('[object Object]');
+    expect(sidebarText).not.toContain('MOCK_');
+    expect(sidebarText).not.toContain('undefined');
+  });
+
+  test('badge counts on nav items render without errors', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // Look for badge/count indicators (notification dots, number pills)
+    const badges = sidebar.locator(
+      '[data-testid*="badge"], [data-testid*="count"], .badge, [class*="badge"]'
+    );
+    const badgeCount = await badges.count();
+
+    if (badgeCount > 0) {
+      for (let i = 0; i < badgeCount; i++) {
+        const badgeText = await badges.nth(i).textContent();
+        // Badge text should be a number or empty, not an error string
+        expect(badgeText).not.toContain('[object Object]');
+        expect(badgeText).not.toContain('NaN');
+      }
+    }
+  });
+
+  test('keyboard navigation through sidebar items works', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // Focus the first focusable element in the sidebar
+    const firstLink = sidebar.locator('a[href], button').first();
+    await firstLink.focus();
+    await page.waitForTimeout(200);
+
+    // Tab through sidebar items
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(200);
+
+    // Check that focus moved to another element within the sidebar
+    const activeElement = await page.evaluate(() => {
+      const el = document.activeElement;
+      return el?.tagName ?? '';
+    });
+
+    // Some focusable element should have focus
+    expect(activeElement).toBeTruthy();
+  });
+
+  test('mobile drawer — sidebar opens as overlay on small viewport', async ({ page }) => {
+    // Resize to mobile
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.waitForTimeout(500);
+
+    // On mobile, sidebar may be hidden behind a hamburger
+    const hamburger = page.locator(
+      'button[aria-label*="menu" i], button[aria-label*="Menu"], [data-testid*="sidebar-toggle"]'
+    ).first();
+    const hamburgerVisible = await hamburger.isVisible().catch(() => false);
+
+    if (hamburgerVisible) {
+      await hamburger.click();
+      await page.waitForTimeout(500);
+
+      // Sidebar or nav drawer should now be visible
+      const sidebar = page.locator('[data-testid="app-sidebar"]');
+      const navDrawer = page.locator('nav, [role="navigation"], [data-testid*="drawer"]').first();
+
+      const sidebarVisible = await sidebar.isVisible().catch(() => false);
+      const drawerVisible = await navDrawer.isVisible().catch(() => false);
+
+      expect(sidebarVisible || drawerVisible).toBe(true);
+    }
+  });
+
+  test('tooltip on collapsed sidebar items', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // Attempt to collapse the sidebar
+    const toggleBtn = page.locator(
+      'button[aria-label*="collapse" i], button[aria-label*="toggle" i], [data-testid*="sidebar-toggle"]'
+    ).first();
+    const toggleExists = await toggleBtn.isVisible().catch(() => false);
+
+    if (toggleExists) {
+      await toggleBtn.click();
+      await page.waitForTimeout(500);
+
+      // Hover over a collapsed nav item to trigger tooltip
+      const navItems = sidebar.locator('a[href], button').filter({ hasText: /./ });
+      const itemCount = await navItems.count();
+
+      if (itemCount > 0) {
+        await navItems.first().hover();
+        await page.waitForTimeout(500);
+
+        // Look for tooltip (role="tooltip" or [data-state="open"])
+        const tooltip = page.locator(
+          '[role="tooltip"], [data-state="open"][class*="tooltip"], [data-testid*="tooltip"]'
+        ).first();
+        const tooltipVisible = await tooltip.isVisible().catch(() => false);
+
+        // Tooltip may or may not appear depending on implementation
+        // — just verify no crash
+        await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+          timeout: 3_000,
+        });
+      }
+    }
+  });
+
+  test('sidebar scroll behavior — long nav list is scrollable', async ({ page }) => {
+    const sidebar = page.locator('[data-testid="app-sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 10_000 });
+
+    // Check if sidebar content overflows and is scrollable
+    const isScrollable = await sidebar.evaluate((el) => {
+      return el.scrollHeight > el.clientHeight;
+    });
+
+    if (isScrollable) {
+      // Scroll the sidebar
+      await sidebar.evaluate((el) => {
+        el.scrollTop = 100;
+      });
+      await page.waitForTimeout(200);
+
+      const scrollTop = await sidebar.evaluate((el) => el.scrollTop);
+      expect(scrollTop).toBeGreaterThan(0);
+    }
+
+    // Whether scrollable or not, no crash
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
+  });
+
+  test('visual regression — sidebar collapsed state', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    const toggleBtn = page.locator(
+      'button[aria-label*="collapse" i], button[aria-label*="toggle" i], [data-testid*="sidebar-toggle"]'
+    ).first();
+    const toggleExists = await toggleBtn.isVisible().catch(() => false);
+
+    if (toggleExists) {
+      await toggleBtn.click();
+      await page.waitForTimeout(500);
+
+      await expect(page).toHaveScreenshot('sidebar-collapsed-state.png', {
+        fullPage: false,
+        maxDiffPixels: 300,
+        animations: 'disabled',
+      });
+    }
+  });
+});

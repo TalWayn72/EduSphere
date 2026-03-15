@@ -165,3 +165,164 @@ test.describe('Push Notifications — mutation routing', () => {
     }
   });
 });
+
+// ── Suite 3: Error handling and edge cases ──────────────────────────────────
+
+test.describe('Push Notifications — error handling', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(injectPushMocks());
+    await login(page);
+  });
+
+  test('notifications page handles GraphQL network failure gracefully', async ({
+    page,
+  }) => {
+    // Simulate complete network failure on GraphQL endpoint
+    await page.route(GRAPHQL_URL, async (route) => {
+      await route.abort('connectionrefused');
+    });
+
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    // Must not show raw error strings or crash overlay
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('ERR_CONNECTION_REFUSED');
+    expect(body).not.toContain('fetch failed');
+    expect(body).not.toContain('NetworkError');
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+
+    await expect(page).toHaveScreenshot(
+      'push-notifications-network-error.png',
+      { fullPage: false, maxDiffPixels: 200, animations: 'disabled' }
+    );
+  });
+
+  test('notifications page handles GraphQL 500 server error gracefully', async ({
+    page,
+  }) => {
+    await page.route(GRAPHQL_URL, async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('notification') || body.includes('pushToken')) {
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [
+              {
+                message: 'Internal Server Error: NATS stream unavailable',
+                extensions: { code: 'INTERNAL_SERVER_ERROR' },
+              },
+            ],
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    // Internal error details must not leak to user
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('NATS stream unavailable');
+    expect(body).not.toContain('INTERNAL_SERVER_ERROR');
+    expect(body).not.toContain('500');
+  });
+
+  test('no raw i18n keys visible on notifications page', async ({ page }) => {
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.textContent('body')) ?? '';
+    // i18n keys follow dot-notation patterns like "notifications.title"
+    const i18nKeyPattern = /\b[a-z]+\.[a-z]+\.[a-z]+\b/;
+    const suspectKeys = body.match(i18nKeyPattern);
+    // Allow known patterns (e.g. domain names) but flag obvious i18n keys
+    if (suspectKeys) {
+      for (const key of suspectKeys) {
+        expect(key).not.toMatch(/^(notifications|push|common)\./);
+      }
+    }
+  });
+
+  test('notification permission denied state renders user-friendly message', async ({
+    page,
+  }) => {
+    // Override push mock to simulate permission denied
+    await page.addInitScript(async () => {
+      Object.defineProperty(window, 'Notification', {
+        value: {
+          permission: 'denied' as NotificationPermission,
+          requestPermission: async () => 'denied' as NotificationPermission,
+        },
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    // Must not crash or show raw error
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('NotAllowedError');
+
+    await expect(page).toHaveScreenshot(
+      'push-notifications-permission-denied.png',
+      { fullPage: false, maxDiffPixels: 200, animations: 'disabled' }
+    );
+  });
+
+  test('notifications page with empty notification list renders empty state', async ({
+    page,
+  }) => {
+    await page.route(GRAPHQL_URL, async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('notification')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              notifications: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
+            },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    // Page should render without crash — empty state is acceptable
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('[object Object]');
+
+    await expect(page).toHaveScreenshot(
+      'push-notifications-empty-state.png',
+      { fullPage: false, maxDiffPixels: 200, animations: 'disabled' }
+    );
+  });
+});

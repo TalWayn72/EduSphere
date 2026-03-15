@@ -104,4 +104,26 @@ describe('ScormExportButton', () => {
     fireEvent.click(btn);
     await waitFor(() => expect(btn).toBeDisabled());
   });
+
+  it('shows "Exporting..." text while export is in progress', async () => {
+    mockExportScorm.mockReturnValue(new Promise(() => {}));
+    render(<ScormExportButton {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
+    await waitFor(() =>
+      expect(screen.getByText('Exporting...')).toBeInTheDocument()
+    );
+  });
+
+  it('does not render error message initially', () => {
+    render(<ScormExportButton {...defaultProps} />);
+    expect(screen.queryByText(/export failed/i)).not.toBeInTheDocument();
+  });
+
+  it('re-enables button after export completes', async () => {
+    render(<ScormExportButton {...defaultProps} />);
+    const btn = screen.getByRole('button', { name: /export/i });
+    fireEvent.click(btn);
+    await waitFor(() => expect(btn).not.toBeDisabled());
+    expect(screen.getByText('Export as SCORM 2004')).toBeInTheDocument();
+  });
 });

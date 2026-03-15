@@ -175,4 +175,58 @@ describe('ScenarioPlayer', () => {
       expect(screen.getAllByText('The Beginning')[0]).toBeInTheDocument();
     });
   });
+
+  it('has accessible breadcrumb navigation with aria-label', () => {
+    render(
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
+    );
+    const nav = screen.getByRole('navigation', { name: 'Scenario path' });
+    expect(nav).toHaveAttribute('aria-label', 'Scenario path');
+  });
+
+  it('shows NEUTRAL ending when endingType is undefined (defaults to NEUTRAL)', () => {
+    render(
+      <ScenarioPlayer
+        rootContentItemId="root-1"
+        initialNode={makeNode({
+          isEndNode: true,
+          endingType: undefined,
+          choices: [],
+        })}
+      />
+    );
+    expect(
+      screen.getByText('You have reached the end of this scenario branch.')
+    ).toBeInTheDocument();
+  });
+
+  it('does not show raw i18n keys in the output', () => {
+    render(
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
+    );
+    const html = document.body.innerHTML;
+    expect(html).not.toMatch(/\bt\(\s*['"][^'"]+['"]\s*\)/);
+  });
+
+  it('sets isComplete when mutation returns null nextNode', async () => {
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false } as never,
+      vi.fn().mockResolvedValue({
+        data: { recordScenarioChoice: null },
+        error: undefined,
+      }),
+    ]);
+
+    render(
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Go left' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('You have reached the end of this scenario branch.')
+      ).toBeInTheDocument();
+    });
+  });
 });

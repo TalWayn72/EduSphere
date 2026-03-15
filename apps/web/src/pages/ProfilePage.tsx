@@ -77,7 +77,7 @@ function getInitials(
 }
 
 export function ProfilePage() {
-  const { t } = useTranslation(['common', 'dashboard']);
+  const { t } = useTranslation(['dashboard', 'common']);
   const navigate = useNavigate();
   const localUser = getCurrentUser();
 

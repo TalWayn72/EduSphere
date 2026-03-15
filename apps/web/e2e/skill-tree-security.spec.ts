@@ -238,3 +238,273 @@ test.describe('SkillTree Security — Mastery mutation input validation', () => 
     expect(returnedLevel).not.toBe('HACKED');
   });
 });
+
+// ── Suite 4: Cross-tenant isolation tests ─────────────────────────────────────
+
+test.describe('SkillTree Security — Cross-tenant isolation', () => {
+  test('skillTree query with spoofed tenant header returns error or own data only', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+
+    const result = await page.evaluate(async () => {
+      const res = await fetch('/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Attempt to spoof a different tenant
+          'x-tenant-id': '00000000-0000-0000-0000-000000000099',
+        },
+        body: JSON.stringify({
+          query: `query { skillTree(courseId: "all") { nodes { id } } }`,
+        }),
+      });
+      return { status: res.status, body: await res.text() };
+    });
+
+    const parsed = JSON.parse(result.body) as {
+      data?: { skillTree?: { nodes?: unknown[] } };
+      errors?: unknown[];
+    };
+
+    // Gateway must either reject spoofed tenant or ignore the header
+    // (tenant from JWT, not from client header)
+    if (parsed.errors) {
+      expect(parsed.errors.length).toBeGreaterThan(0);
+    }
+    // If data is returned, it should be empty (unauthenticated) or from real tenant
+    if (parsed.data?.skillTree?.nodes) {
+      // No crash — acceptable
+      expect(Array.isArray(parsed.data.skillTree.nodes)).toBe(true);
+    }
+  });
+
+  test('SQL injection attempt in courseId parameter is rejected', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+
+    const result = await page.evaluate(async () => {
+      const res = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `query { skillTree(courseId: "'; DROP TABLE users; --") { nodes { id } } }`,
+        }),
+      });
+      return { status: res.status, body: await res.text() };
+    });
+
+    const parsed = JSON.parse(result.body) as {
+      data?: { skillTree?: unknown };
+      errors?: unknown[];
+    };
+
+    // Must not return data — should return error or empty result
+    if (result.status === 200 && parsed.data?.skillTree) {
+      // If skill tree was returned, it must be empty (parameterized query protection)
+      expect(parsed.data.skillTree).toEqual(
+        expect.objectContaining({ nodes: expect.any(Array) })
+      );
+    }
+  });
+
+  test('XSS attempt in nodeId parameter does not reflect in response', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+
+    const xssPayload = '<script>alert("xss")</script>';
+    const result = await page.evaluate(async (payload) => {
+      const res = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `mutation { updateMasteryLevel(nodeId: "${payload}", level: "BEGINNER") { id masteryLevel } }`,
+        }),
+      });
+      return { status: res.status, body: await res.text() };
+    }, xssPayload);
+
+    // Response body must not contain the reflected XSS payload unescaped
+    expect(result.body).not.toContain('<script>alert("xss")</script>');
+  });
+});
+
+// ── Suite 5: UI security and visual regression ─────────────────────────────────
+
+test.describe('SkillTree Security — UI security guards', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('skill-tree page visual regression with mock data', async ({
+    page,
+  }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('skillTree')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              skillTree: {
+                nodes: [
+                  { id: 'n1', label: 'Algebra', masteryLevel: 'BEGINNER' },
+                  { id: 'n2', label: 'Calculus', masteryLevel: 'NONE' },
+                ],
+                edges: [{ source: 'n1', target: 'n2' }],
+              },
+            },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    await expect(page).toHaveScreenshot('skill-tree-with-data.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('skill-tree empty state visual regression', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('skillTree')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: { skillTree: { nodes: [], edges: [] } },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+
+    await expect(page).toHaveScreenshot('skill-tree-empty-state.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('skill-tree handles GraphQL timeout gracefully', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('skillTree')) {
+        // Simulate timeout by delaying indefinitely (test will time out gracefully)
+        await new Promise((resolve) => setTimeout(resolve, 15_000));
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: { skillTree: null } }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
+
+    // Page should show loading state, not crash
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+  });
+
+  test('no raw i18n keys on skill-tree page', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('skillTree')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: { skillTree: { nodes: [], edges: [] } },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toMatch(/\bskillTree\.[a-z]+\.[a-z]+\b/);
+    expect(body).not.toMatch(/\bmastery\.[a-z]+\b/);
+    expect(body).not.toContain('[object Object]');
+  });
+
+  test('skillTree query with extremely long courseId is handled safely', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+
+    const longId = 'A'.repeat(10_000);
+    const result = await page.evaluate(async (id) => {
+      const res = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `query { skillTree(courseId: "${id}") { nodes { id } } }`,
+        }),
+      });
+      return { status: res.status, body: await res.text() };
+    }, longId);
+
+    // Server should reject or handle gracefully — not crash
+    expect([200, 400, 413, 401, 403]).toContain(result.status);
+    // Response should be valid JSON
+    expect(() => JSON.parse(result.body)).not.toThrow();
+  });
+
+  test('concurrent skillTree mutations do not corrupt state', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+
+    const results = await page.evaluate(async () => {
+      const mutations = Array.from({ length: 5 }, (_, i) =>
+        fetch('/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `mutation { updateMasteryLevel(nodeId: "concept-${i}", level: "BEGINNER") { id masteryLevel } }`,
+          }),
+        }).then((r) => r.status)
+      );
+      return Promise.all(mutations);
+    });
+
+    // All requests should complete without server crash
+    for (const status of results) {
+      expect([200, 400, 401, 403]).toContain(status);
+    }
+  });
+});

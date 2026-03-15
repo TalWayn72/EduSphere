@@ -124,4 +124,38 @@ describe('GoalPathPanel', () => {
     render(<GoalPathPanel goal={GOAL} />);
     expect(screen.getByText('0/4 steps completed')).toBeInTheDocument();
   });
+
+  it('renders incomplete nodes without green styling', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { data: { myLearningPath: MOCK_PATH }, fetching: false },
+      vi.fn(),
+    ] as never);
+    const { container } = render(<GoalPathPanel goal={GOAL} />);
+    const mutedSpans = container.querySelectorAll('.bg-muted');
+    expect(mutedSpans.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('does not show raw i18n keys in the output', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { data: { myLearningPath: MOCK_PATH }, fetching: false },
+      vi.fn(),
+    ] as never);
+    render(<GoalPathPanel goal={GOAL} />);
+    const html = document.body.innerHTML;
+    expect(html).not.toMatch(/\bt\(\s*['"][^'"]+['"]\s*\)/);
+  });
+
+  it('renders all completed steps as 4/4 when all nodes are done', () => {
+    const allDonePath = {
+      ...MOCK_PATH,
+      completedSteps: 4,
+      nodes: MOCK_PATH.nodes.map((n) => ({ ...n, isCompleted: true })),
+    };
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { data: { myLearningPath: allDonePath }, fetching: false },
+      vi.fn(),
+    ] as never);
+    render(<GoalPathPanel goal={GOAL} />);
+    expect(screen.getByText('4/4 steps completed')).toBeInTheDocument();
+  });
 });
