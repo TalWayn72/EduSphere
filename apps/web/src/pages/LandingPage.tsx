@@ -9,6 +9,7 @@ import { ComplianceBadgesSection } from '@/components/landing/ComplianceBadgesSe
 import { VsCompetitorsSection } from '@/components/landing/VsCompetitorsSection';
 import { UniqueFeaturesSection } from '@/components/landing/UniqueFeaturesSection';
 import { HowPilotWorksSection } from '@/components/landing/HowPilotWorksSection';
+import { VideoSection } from '@/components/landing/VideoSection';
 import { AICourseBuildSection } from '@/components/landing/AICourseBuildSection';
 import { ROICalculatorSection } from '@/components/landing/ROICalculatorSection';
 import { PricingSection } from '@/components/landing/PricingSection';
@@ -90,6 +91,7 @@ export function LandingPage() {
         <ComplianceBadgesSection />
         <VsCompetitorsSection />
         <UniqueFeaturesSection />
+        <VideoSection />
         <HowPilotWorksSection />
         <AICourseBuildSection />
         <ROICalculatorSection />
