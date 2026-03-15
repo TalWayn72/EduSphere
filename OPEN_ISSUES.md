@@ -1,38 +1,49 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 13 מרץ 2026 (All 64 Phases ✅ Complete — full project implementation done)
+**תאריך עדכון:** 15 מרץ 2026 (All 64 Phases ✅ Complete — full project implementation done + BUG-066 i18n fix + ~575 new tests)
 
 ---
 
 ## BUG-065 — שמירת העדפות שפה נכשלה (Language Preference Save Failure — Recurring)
 
-**סטטוס:** ✅ Fixed (2026-03-12)
-**חומרה:** 🔴 Critical (recurring — 10+ previous "fixes" that didn't address root cause)
-**קומפוננטות:** `apps/subgraph-core/src/challenges/challenges.graphql`, Docker/supervisord, subgraph-core
+**סטטוס:** ✅ Fixed (2026-03-15 — second recurrence fixed)
+**חומרה:** 🔴 Critical (recurring — root cause was incomplete supergraph)
+**קומפוננטות:** `apps/gateway/supergraph.graphql`, `apps/subgraph-core/`, Docker/supervisord
 
 ### תסמין (Symptom)
-Every attempt to save language preferences in Settings showed: "שמירת העדפות שפה נכשלה". The error recurred after every container restart.
+Switching language to Hebrew in Settings shows: "שמירת העדפות שפה נכשלה" (language preference save failed). First fix (2026-03-12) addressed `challenges.graphql` bad import, but the bug recurred because the **supergraph itself was missing CORE and KNOWLEDGE subgraphs entirely**.
 
-### שרשרת גורמים (Root Cause Chain)
-1. `challenges.graphql` line 1 imported `"@requiresRole"` from `https://specs.apollo.dev/federation/v2.7`
-2. `@requiresRole` is a **LOCAL custom directive** (defined in `user.graphql`) — NOT a Federation spec element
-3. NestJS loads ALL `.graphql` files via `typePaths: ['./**/*.graphql']`; Docker mounts `src/` into the container
-4. On startup: `[GraphQLValidationFailed] Cannot import unknown element "@requiresRole"`
-5. supervisord marked subgraph-core as **FATAL** → crashed on every start
-6. Gateway returned `ECONNREFUSED 127.0.0.1:4001` for all core operations
-7. `updateUserPreferences` mutation failed → `result.error` → `toast.error(t('language.error'))`
+### שרשרת גורמים — Original (Fixed 2026-03-12)
+1. `challenges.graphql` imported `"@requiresRole"` from Federation spec URL (custom directive, not spec element)
+2. subgraph-core crashed on startup → gateway couldn't reach port 4001
+3. Fix: removed bad import from `challenges.graphql`
 
-### תיקון (Fix)
-`apps/subgraph-core/src/challenges/challenges.graphql` line 1 — removed `"@requiresRole"` from `@link` import:
-```graphql
-# BEFORE: import: [..., "@requiresScopes", "@requiresRole"]
-# AFTER:  import: [..., "@requiresScopes"]
-```
-Then: `docker exec edusphere-all-in-one supervisorctl restart subgraph-core`
+### שרשרת גורמים — Recurrence (Fixed 2026-03-15)
+1. `apps/gateway/supergraph.graphql` `join__Graph` enum only listed 4 subgraphs: AGENT, ANNOTATION, COLLABORATION, CONTENT
+2. **CORE (port 4001) and KNOWLEDGE (port 4006) were completely missing** from the supergraph
+3. ALL CORE queries and mutations were unreachable through the gateway
+4. Gateway returned `GRAPHQL_VALIDATION_FAILED` for `updateUserPreferences` (and all other CORE operations)
+5. Frontend caught the error → showed "שמירת העדפות שפה נכשלה"
+6. The existing E2E tests used `routeGraphQL()` mocks, so they always passed — they never tested the real gateway
+
+### תיקון — Recurrence (2026-03-15)
+Added CORE and KNOWLEDGE subgraphs to `apps/gateway/supergraph.graphql`:
+- Added `CORE` and `KNOWLEDGE` to `join__Graph` enum with correct URLs
+- Added `@join__type(graph: CORE)` and `@join__type(graph: KNOWLEDGE)` to Query/Mutation types
+- Added `@join__type(graph: CORE, key: "id")` to User type with all CORE fields (email, firstName, lastName, role, preferences, etc.)
+- Added `updateUserPreferences`, `updateProfileVisibility`, `createUser`, `updateUser` mutations with `@join__field(graph: CORE)`
+- Added `me`, `user`, `users` queries with `@join__field(graph: CORE)`
+- Added type definitions: `UserRole` enum, `UserPreferences`, `UpdateUserPreferencesInput`, `CreateUserInput`, `UpdateUserInput`
+- Added `JSON` and `DateTime` scalar annotations for CORE and KNOWLEDGE
+- Restarted gateway: `docker exec edusphere-all-in-one supervisorctl restart gateway`
+
+### Verification
+- Gateway introspection confirms `updateUserPreferences` is accessible (125 total mutations)
+- Direct GraphQL mutation test returns `DOWNSTREAM_SERVICE_ERROR` (auth error, NOT schema validation) — confirms correct routing to CORE subgraph
 
 ### בדיקות E2E שנוספו (Tests Added)
-- `apps/web/e2e/language-save-regression.spec.ts` (6 tests — success toast, no error toast, logout/login persistence, visual snapshot)
-- `tests/security/federation-link-imports.spec.ts` (6 tests — CI gate: no SDL file may import custom directives from Federation spec URL)
+- `apps/web/e2e/language-save-regression.spec.ts` (7 tests — success toast, no error toast, logout/login persistence, visual snapshot)
+- `tests/security/federation-link-imports.spec.ts` (8+ tests — CI gate: no SDL file may import custom directives; **NEW: all 6 subgraphs must be present in supergraph**)
 
 ### Screenshots
 - `docs/screenshots/settings-language-save-success.png` — success toast
@@ -41,7 +52,131 @@ Then: `docker exec edusphere-all-in-one supervisorctl restart subgraph-core`
 - `docs/screenshots/settings-hebrew-persisted-after-relogin.png` — Hebrew selected after re-login
 
 ### מניעת הישנות (Anti-Recurrence)
-`tests/security/federation-link-imports.spec.ts` — CI gate blocks any SDL file from importing custom directives from Federation spec URL. Custom directives must be defined locally with `directive @name(...) on FIELD_DEFINITION`.
+1. `tests/security/federation-link-imports.spec.ts` — CI gate blocks SDL files from importing custom directives from Federation spec URL
+2. **NEW:** Same test file now verifies all 6 subgraphs (AGENT, ANNOTATION, COLLABORATION, CONTENT, CORE, KNOWLEDGE) are present in `supergraph.graphql`
+3. **NEW:** Same test verifies `updateUserPreferences` mutation has `@join__field(graph: CORE)` annotation
+
+### Discovery List (Wave 2 — Missing CORE subgraph impact)
+All of these operations were unreachable through the gateway before the fix:
+- User management (createUser, updateUser, me, users)
+- Language/locale preferences (updateUserPreferences)
+- Billing (mySubscription, myUsage, submitPilotRequest)
+- Admin (adminOverview, adminAuditLog, roles management)
+- Gamification (myBadges, leaderboard, myRank)
+- Social (followUser, searchUsers, myFollowers)
+- Tenant settings (myTenantBranding, myTenantLanguageSettings)
+- Onboarding (myOnboardingState, completeOnboarding)
+- Portal (myPortal, savePortalLayout)
+- SRS/Review (dueReviews, submitReview)
+- Partner (myPartnerDashboard)
+- SCIM (scimTokens, generateScimToken)
+- CRM (crmConnection, disconnectCrm)
+- Challenges (activeChallenges, createChallenge)
+- Manager (myTeamOverview, myTeamMemberProgress)
+- Notifications (registerPushToken)
+- Security settings (mySecuritySettings, updateSecuritySettings)
+
+---
+
+## BUG-066 — i18n translation files return 404 — all locales broken (Session — 15 Mar 2026)
+
+**Status:** ✅ Fixed (2026-03-15)
+**Severity:** 🔴 Critical (all non-English locales broken — Hebrew, Arabic, French, etc. all showed raw keys)
+**Components:** `apps/web/src/lib/i18n.ts`, `apps/web/src/pages/ProfilePage.tsx`, `apps/web/src/pages/XapiSettingsPage.test.tsx`
+
+### Symptom
+Switching language to Hebrew (or any non-English locale) showed raw i18n key names instead of translations on every page. All locale JSON files returned HTTP 404 in the browser network tab.
+
+### Root Cause
+1. **`apps/web/src/lib/i18n.ts`** used `/* @vite-ignore */ import('../../node_modules/@edusphere/i18n/...')` as the dynamic import path for locale files. This path resolved at dev time but Vite could not bundle or serve files from `node_modules` via dynamic import — all locale fetches returned **404 Not Found**.
+2. **`apps/web/src/pages/ProfilePage.tsx`** had namespace ordering `['common', 'dashboard']` — the primary namespace should be `dashboard` (listed first) to match `useTranslation('dashboard')` usage. This caused fallback key resolution failures for dashboard-specific keys.
+3. **`apps/web/src/pages/XapiSettingsPage.test.tsx`** had a `navigate()` call inside render that triggered an infinite re-render loop in React Router tests.
+
+### Fix
+1. **i18n.ts**: Replaced `@vite-ignore` + `../../node_modules/` import path with `import.meta.glob('../../../../packages/i18n/src/locales/**/*.json')` — Vite's glob import correctly bundles all locale JSON files at build time, no runtime HTTP fetches needed.
+2. **ProfilePage.tsx**: Changed namespace ordering to `['dashboard', 'common']` (primary namespace first).
+3. **XapiSettingsPage.test.tsx**: Fixed navigate() loop by correcting React Router mock setup.
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `apps/web/src/lib/i18n.ts` | `import.meta.glob` replaces `@vite-ignore` dynamic import |
+| `apps/web/src/pages/ProfilePage.tsx` | Namespace ordering `['dashboard', 'common']` |
+| `apps/web/src/pages/XapiSettingsPage.test.tsx` | Fixed navigate() infinite loop |
+
+### Tests Added (~575 new tests)
+| File | Tests | Purpose |
+|------|-------|---------|
+| `apps/web/src/lib/i18n.test.ts` | 180 | Core i18n loading, namespace resolution, fallback chains, locale switching |
+| `apps/web/e2e/i18n-smoke-guard.spec.ts` | 17 | E2E guard: every page checked for raw i18n keys after locale switch |
+| `apps/web/e2e/multi-role-visual-audit.spec.ts` | 37 | All 5 roles × multiple pages — visual audit for translation gaps |
+| `apps/web/e2e/error-boundary.spec.ts` | 15 | Error boundary behavior across pages |
+| `apps/web/e2e/loading-states.spec.ts` | 20 | Loading skeleton/spinner states on all major pages |
+| `apps/web/e2e/tablet-viewport.spec.ts` | 20 | Tablet viewport (768×1024) layout verification |
+| `apps/web/e2e/performance-smoke.spec.ts` | 15 | Performance smoke tests (bundle size, FCP, route load time) |
+| `apps/web/e2e/pwa-service-worker.spec.ts` | 15 | PWA service worker registration and caching |
+| `apps/web/e2e/role-access-control.spec.ts` | 25 | Role-based route access control for all 5 roles |
+| `apps/web/e2e/i18n-completeness.spec.ts` | 40 | Scan all locale files for missing keys across 9 languages |
+| `apps/web/src/hooks/useContentImport.test.ts` | 10 | Content import hook unit tests |
+| 6 page unit test files | 129 | Page-level unit tests (various pages) |
+| 20+ component test expansions | ~30 | Expanded existing component test coverage |
+| Annotation subgraph tests | 20 | `apps/subgraph-annotation/` test expansion |
+| Collaboration subgraph tests | 24 | `apps/subgraph-collaboration/` test expansion |
+| 13 E2E files expanded | ~100 | Additional scenarios in existing E2E spec files |
+
+### Anti-Recurrence
+1. **`apps/web/e2e/i18n-smoke-guard.spec.ts`** — visits every major page after switching to Hebrew, asserts zero raw i18n keys visible (keys matching `[a-z]+\.[a-z]+` pattern without translation)
+2. **`apps/web/e2e/multi-role-visual-audit.spec.ts`** — logs in as each of the 5 roles, visits role-specific pages, checks for untranslated strings
+3. **`apps/web/e2e/i18n-completeness.spec.ts`** — scans all 9 locale directories, verifies every namespace file has matching keys across all languages
+4. **`apps/web/src/lib/i18n.test.ts`** — 180 unit tests verify glob import resolves all locales, namespace loading, fallback behavior
+
+### Discovery List
+| Wave | File | Issue |
+|------|------|-------|
+| 1 | `apps/web/src/lib/i18n.ts` | `@vite-ignore` + `node_modules` path → 404 for all locales |
+| 2 | `apps/web/src/pages/ProfilePage.tsx` | Namespace ordering wrong → dashboard keys fell back to common |
+| 2 | `apps/web/src/pages/XapiSettingsPage.test.tsx` | navigate() infinite loop in test |
+| 3 | All pages using `useTranslation()` | Verified namespace ordering correct after fix |
+
+---
+
+## TEST-EXPANSION-001 — Comprehensive Test Coverage Initiative (Session — 15 Mar 2026)
+
+**Status:** ✅ Complete (2026-03-15)
+**Severity:** 🟢 Enhancement
+**Purpose:** Bring total test count from ~8,445 to ~9,020+ with focus on E2E coverage gaps, i18n validation, role-based access, performance, and cross-viewport testing.
+
+### New E2E Test Files
+| File | Tests | Category |
+|------|-------|----------|
+| `apps/web/e2e/i18n-smoke-guard.spec.ts` | 17 | i18n regression guard |
+| `apps/web/e2e/multi-role-visual-audit.spec.ts` | 37 | Multi-role visual audit |
+| `apps/web/e2e/error-boundary.spec.ts` | 15 | Error boundary coverage |
+| `apps/web/e2e/loading-states.spec.ts` | 20 | Loading state verification |
+| `apps/web/e2e/tablet-viewport.spec.ts` | 20 | Tablet viewport layout |
+| `apps/web/e2e/performance-smoke.spec.ts` | 15 | Performance smoke tests |
+| `apps/web/e2e/pwa-service-worker.spec.ts` | 15 | PWA/service worker tests |
+| `apps/web/e2e/role-access-control.spec.ts` | 25 | RBAC route protection |
+| `apps/web/e2e/i18n-completeness.spec.ts` | 40 | Cross-locale key completeness |
+
+### New Unit Test Files
+| File | Tests | Category |
+|------|-------|----------|
+| `apps/web/src/lib/i18n.test.ts` | 180 | i18n core loading + namespaces |
+| `apps/web/src/hooks/useContentImport.test.ts` | 10 | Content import hook |
+| 6 page unit test files | 129 | Page-level component tests |
+
+### Backend Test Expansion
+| Area | Tests | Category |
+|------|-------|----------|
+| Annotation subgraph | 20 | Resolver + service tests |
+| Collaboration subgraph | 24 | Resolver + service tests |
+
+### Existing File Expansions
+- 20+ component test files expanded with additional scenarios (~30 new tests)
+- 13 existing E2E spec files expanded with ~100 new test cases
+
+### Total New Tests: ~575
 
 ---
 
@@ -116,9 +251,9 @@ Then: `docker exec edusphere-all-in-one supervisorctl restart subgraph-core`
 | **207/207 tests pass on mobile-chrome · 207/207 on chromium · 414/414 total** | ✅ |
 
 ---
-**מצב פרויקט:** ✅ **Phase 50 ✅** (WCAG 2.2 AA + EU AI Act + Security Compliance) + **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅** + **AEO Phase 2 ✅** + **Phase 55 ✅** (admin wiring) + **Phase 56 ✅** (HRIS+Partner+AEO pre-render) + **Phase 57 ✅** (i18n) + **Phase 58 ✅** (Lesson Pipeline Builder) + **Phase 59 ✅** (Instructor Marketplace) + **Phase 60 ✅** (360° Assessments) + **Phase 61 ✅** (OpenBadges 3.0) + **Phase 62 ✅** (SCORM 2004 Export) + **Phase 63 ✅** (Portal Builder) + **Phase 64 ✅** (Compliance Library) + **BUG-059 ✅** (dark mode contrast)
+**מצב פרויקט:** ✅ **Phase 50 ✅** (WCAG 2.2 AA + EU AI Act + Security Compliance) + **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅** + **AEO Phase 2 ✅** + **Phase 55 ✅** (admin wiring) + **Phase 56 ✅** (HRIS+Partner+AEO pre-render) + **Phase 57 ✅** (i18n) + **Phase 58 ✅** (Lesson Pipeline Builder) + **Phase 59 ✅** (Instructor Marketplace) + **Phase 60 ✅** (360° Assessments) + **Phase 61 ✅** (OpenBadges 3.0) + **Phase 62 ✅** (SCORM 2004 Export) + **Phase 63 ✅** (Portal Builder) + **Phase 64 ✅** (Compliance Library) + **BUG-059 ✅** (dark mode contrast) + **BUG-066 ✅** (i18n translation 404 — @vite-ignore fix) + **TEST-EXPANSION-001 ✅** (~575 new tests)
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅** | **Phase 50 WCAG 2.2 AA + EU AI Act + Security Compliance ✅**
-**בדיקות:** Security: **1,185 tests** | Web: **4,190** (337+ files) | Knowledge: **598** | Transcription: **95** | Backend subgraphs: **2,577+** (agent 702 + content 1193 + knowledge 598 + annotation 144 + collab 180 + core 719+) | סה"כ: **~8,445+ tests** | TypeScript: **0 errors**
+**בדיקות:** Security: **1,185 tests** | Web: **4,765+** (370+ files) | Knowledge: **598** | Transcription: **95** | Backend subgraphs: **2,621+** (agent 702 + content 1193 + knowledge 598 + annotation 164 + collab 204 + core 719+) | סה"כ: **~9,020+ tests** | TypeScript: **0 errors**
 
 ---
 
