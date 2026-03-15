@@ -27,6 +27,7 @@ export function ROICalculatorSection() {
 
   return (
     <section
+      id="roi"
       data-testid="roi-calculator-section"
       className="bg-white py-20"
       aria-label="ROI Calculator"
@@ -81,7 +82,7 @@ export function ROICalculatorSection() {
               </div>
             ))}
             <div className="rounded-xl bg-green-50 border border-green-200 px-5 py-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-green-600 mb-1">Net ROI</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1">Net ROI</p>
               <p className="text-3xl font-extrabold text-green-700">{netROI > 0 ? '+' : ''}{netROI}%</p>
             </div>
             <Button className="bg-indigo-600 hover:bg-indigo-500 text-white w-full" asChild>

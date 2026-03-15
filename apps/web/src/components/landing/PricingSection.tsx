@@ -34,7 +34,7 @@ const PLANS = [
     desc: 'For universities and large enterprises',
     features: ['Everything in Growth', 'Multi-campus deployment', 'FERPA + GDPR compliance pack', 'VPAT / HECVAT documentation', 'Training & onboarding', 'Priority SLA 99.95%', 'Quarterly business reviews'],
     cta: 'Request Demo',
-    href: '/demo',
+    href: '/pilot',
     popular: true,
     dark: false,
   },
@@ -45,7 +45,7 @@ const PLANS = [
     desc: 'Air-Gapped, on-premise, or hybrid',
     features: ['Everything in University', 'Air-Gapped deployment', 'On-premise option', 'Custom integrations', 'Dedicated infrastructure', 'White-glove onboarding', 'Custom SLA'],
     cta: 'Contact Sales',
-    href: '/contact',
+    href: '/pilot',
     popular: false,
     dark: true,
   },
@@ -87,7 +87,7 @@ export function PricingSection() {
               </Tooltip>
             </TooltipProvider>
           </p>
-          <p className="mt-2 text-sm text-slate-400">Annual billing &middot; All plans include White-label INCLUDED</p>
+          <p className="mt-2 text-sm text-slate-500">Annual billing &middot; All plans include White-label INCLUDED</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-16">
@@ -111,18 +111,18 @@ export function PricingSection() {
                 <h3 className={`font-bold text-lg mb-1 ${plan.dark ? 'text-white' : 'text-slate-900'}`}>
                   {plan.name}
                 </h3>
-                <p className={`text-xs mb-4 ${plan.dark ? 'text-slate-400' : 'text-slate-500'}`}>{plan.desc}</p>
+                <p className={`text-xs mb-4 ${plan.dark ? 'text-slate-300' : 'text-slate-500'}`}>{plan.desc}</p>
                 <div className="mb-1">
                   <span className={`text-3xl font-extrabold ${plan.dark ? 'text-white' : 'text-slate-900'}`}>
                     {plan.price}
                   </span>
-                  {plan.price !== 'Custom' && <span className={`text-sm ml-1 ${plan.dark ? 'text-slate-400' : 'text-slate-500'}`}>/year</span>}
+                  {plan.price !== 'Custom' && <span className={`text-sm ml-1 ${plan.dark ? 'text-slate-300' : 'text-slate-500'}`}>/year</span>}
                 </div>
                 <div className="mb-5">
-                  <Badge variant="outline" className={`text-xs ${plan.dark ? 'border-slate-600 text-slate-300' : 'border-indigo-200 text-indigo-700'}`}>
+                  <Badge variant="outline" className={`text-xs ${plan.dark ? 'border-slate-500 text-slate-200' : 'border-indigo-200 text-indigo-700'}`}>
                     {plan.yau}
                   </Badge>
-                  <Badge variant="outline" className={`ml-2 text-xs ${plan.dark ? 'border-green-700 text-green-400' : 'border-green-200 text-green-700'}`}>
+                  <Badge variant="outline" className={`ml-2 text-xs ${plan.dark ? 'border-green-600 text-green-300' : 'border-green-200 text-green-700'}`}>
                     White-label INCLUDED
                   </Badge>
                 </div>

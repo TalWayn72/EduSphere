@@ -31,6 +31,7 @@ const TESTIMONIALS = [
 export function TestimonialsSection() {
   return (
     <section
+      id="testimonials"
       data-testid="testimonials-section"
       className="bg-slate-50 py-20"
       aria-label="Customer testimonials"

@@ -43,6 +43,7 @@ export function AICourseBuildSection() {
 
   return (
     <section
+      id="ai-course-builder"
       data-testid="ai-course-build-section"
       className="bg-slate-900 py-20 text-white"
       aria-label="AI Course Builder"
@@ -83,7 +84,7 @@ export function AICourseBuildSection() {
           {/* Counter */}
           <div className="text-center lg:text-left">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-              <p className="text-sm text-slate-400 font-medium mb-2 uppercase tracking-wider">
+              <p className="text-sm text-slate-300 font-medium mb-2 uppercase tracking-wider">
                 Estimated instructor hours saved
               </p>
               <div
@@ -93,8 +94,8 @@ export function AICourseBuildSection() {
               >
                 {count.toLocaleString()}
               </div>
-              <p className="text-slate-400 text-sm">hours/year</p>
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="text-slate-300 text-sm">hours/year</p>
+              <p className="mt-4 text-xs text-slate-400">
                 Based on 5 instructors × 8 hrs/week × 60% reduction in course creation time
               </p>
             </div>
@@ -104,7 +105,7 @@ export function AICourseBuildSection() {
                 className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold w-full lg:w-auto"
                 asChild
               >
-                <a href="/demo#course-builder">See AI Course Builder Demo</a>
+                <a href="#pilot-cta">See AI Course Builder Demo</a>
               </Button>
             </div>
           </div>

@@ -131,6 +131,24 @@ const AccessibilityStatementPage = lazy(() =>
     default: m.AccessibilityStatementPage,
   }))
 );
+const AboutPage = lazy(() =>
+  import('@/pages/AboutPage').then((m) => ({ default: m.AboutPage }))
+);
+const PrivacyPage = lazy(() =>
+  import('@/pages/PrivacyPage').then((m) => ({ default: m.PrivacyPage }))
+);
+const TermsPage = lazy(() =>
+  import('@/pages/TermsPage').then((m) => ({ default: m.TermsPage }))
+);
+const CareersPage = lazy(() =>
+  import('@/pages/CareersPage').then((m) => ({ default: m.CareersPage }))
+);
+const ContactPage = lazy(() =>
+  import('@/pages/ContactPage').then((m) => ({ default: m.ContactPage }))
+);
+const SolutionsPage = lazy(() =>
+  import('@/pages/SolutionsPage').then((m) => ({ default: m.SolutionsPage }))
+);
 const ProgramsPage = lazy(() =>
   import('@/pages/ProgramsPage').then((m) => ({ default: m.ProgramsPage }))
 );
@@ -183,6 +201,9 @@ const ComplianceLibraryPage = lazy(() =>
   import('@/pages/ComplianceLibraryPage').then((m) => ({
     default: m.ComplianceLibraryPage,
   }))
+);
+const CompliancePage = lazy(() =>
+  import('@/pages/CompliancePage').then((m) => ({ default: m.CompliancePage }))
 );
 const PortalBuilderPage = lazy(() =>
   import('@/pages/PortalBuilderPage').then((m) => ({
@@ -585,6 +606,81 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <LandingPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Demo request → redirect to pilot signup (same form)
+    path: '/demo',
+    element: <Navigate to="/pilot" replace />,
+  },
+  {
+    path: '/contact',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <ContactPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public compliance overview — static page with section anchors (#ferpa, #wcag, etc.)
+    path: '/compliance',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <CompliancePage />
+      </Suspense>
+    ),
+  },
+  {
+    // Feature sub-pages → redirect to main features page
+    path: '/features/:featureSlug',
+    element: <Navigate to="/features" replace />,
+  },
+  {
+    path: '/solutions/:solutionSlug',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <SolutionsPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/solutions',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <SolutionsPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/privacy',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <PrivacyPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/terms',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <TermsPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/about',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <AboutPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/careers',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <CareersPage />
       </Suspense>
     ),
   },
@@ -1191,6 +1287,6 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <Navigate to="/dashboard" replace />,
+    element: <SmartRoot />,
   },
 ]);

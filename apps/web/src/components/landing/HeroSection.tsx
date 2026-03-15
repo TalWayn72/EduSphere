@@ -74,8 +74,7 @@ export function HeroSection() {
           </Button>
           <Button
             size="lg"
-            variant="outline"
-            className="border-white/50 text-white hover:bg-white/10 font-semibold px-8"
+            className="bg-transparent border border-white/50 text-white hover:bg-white/15 hover:text-white font-semibold px-8"
             asChild
           >
             <Link to="/pilot">Start 90-Day Pilot</Link>

@@ -32,6 +32,7 @@ const FEATURES = [
 export function UniqueFeaturesSection() {
   return (
     <section
+      id="features"
       data-testid="unique-features-section"
       className="bg-white py-20"
       aria-label="Unique features"
