@@ -172,6 +172,8 @@ COPY apps ./apps
 # Install + build (cached unless packages/apps change)
 # Build all services including web frontend (served via vite preview inside container)
 RUN pnpm install --no-frozen-lockfile
+# Clear stale build artifacts to force fresh build (prevents .dockerignore bypass)
+RUN rm -rf apps/web/dist apps/web/.vite .turbo
 RUN pnpm turbo build --filter='./packages/*' --filter='./apps/subgraph-*' --filter='./apps/gateway' --filter='./apps/transcription-worker' --filter='./apps/web'
 
 # ═══════════════════════════════════════════════════════════════

@@ -48,6 +48,8 @@ services:
       - ollama_data:/root/.ollama
       # Persist mcp-nats installation for Claude Code MCP server
       - nats_mcp_data:/tmp/nats-test
+      # Mount local web build output (fixes stale Docker build cache issue)
+      - ./apps/web/dist:/app/apps/web/dist:ro
       # ── Permanent fix mounts (survive container restart without image rebuild) ──
       # Entrypoint: always uses the committed startup.sh from source
       - ./infrastructure/docker/startup.sh:/startup.sh:ro
