@@ -125,10 +125,11 @@ RUN cd /opt && \
     rm keycloak-26.5.3.tar.gz
 
 # ═══════════════════════════════════════════════════════════════
-# STAGE 6: Ollama
+# STAGE 6: Ollama (copied from official image — avoids corporate proxy failures)
 # ═══════════════════════════════════════════════════════════════
 
-RUN curl -fsSL https://ollama.com/install.sh | sh
+COPY --from=ollama/ollama:latest /usr/bin/ollama /usr/local/bin/ollama
+RUN mkdir -p /var/log/ollama
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 7: Configure PostgreSQL 18 — AGE + pgvector + edusphere DB
