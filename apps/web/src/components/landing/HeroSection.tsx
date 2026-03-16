@@ -51,7 +51,7 @@ export function HeroSection() {
 
       {/* Layer 4 — content */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center w-full">
-        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-200 mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-100 mb-8">
           <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" aria-hidden="true" />
           AI-Native LMS — Now Replacing Canvas, D2L &amp; Blackboard
         </div>
@@ -72,15 +72,14 @@ export function HeroSection() {
           >
             <Link to="/pilot">Request Demo</Link>
           </Button>
-          <Button
-            size="lg"
-            className="bg-transparent border border-white/50 text-white hover:bg-white/15 hover:text-white font-semibold px-8"
-            asChild
+          <Link
+            to="/pilot"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md h-11 px-8 border border-white/50 text-white hover:bg-white/15 font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <Link to="/pilot">Start 90-Day Pilot</Link>
-          </Button>
+            Start 90-Day Pilot
+          </Link>
         </div>
-        <p className="mt-6 text-xs text-indigo-400">
+        <p className="mt-6 text-xs text-indigo-300">
           No credit card required &middot; Full feature access &middot; Dedicated onboarding specialist
         </p>
       </div>

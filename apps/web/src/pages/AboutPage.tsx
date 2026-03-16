@@ -35,31 +35,31 @@ export function AboutPage() {
       />
 
       {/* Nav */}
-      <nav aria-label="About page navigation" className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+      <nav aria-label="About page navigation" className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-gray-100 dark:border-slate-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2" aria-label="Back to home">
             <Brain className="h-7 w-7 text-indigo-600" aria-hidden="true" />
-            <span className="text-xl font-bold text-gray-900">EduSphere</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">EduSphere</span>
           </Link>
-          <Link to="/" className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">
+          <Link to="/" className="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-indigo-600 transition-colors">
             &larr; Home
           </Link>
         </div>
       </nav>
 
-      <main>
+      <main className="dark:bg-slate-900">
         {/* Hero */}
-        <section aria-labelledby="about-heading" className="bg-gradient-to-br from-indigo-50 to-white py-20 text-center">
+        <section aria-labelledby="about-heading" className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-900 dark:to-slate-800 py-20 text-center">
           <div className="max-w-3xl mx-auto px-4">
-            <h1 id="about-heading" className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-4">About EduSphere</h1>
-            <p className="text-lg text-slate-600">Building the future of learning with AI and Knowledge Graphs</p>
+            <h1 id="about-heading" className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mb-4">About EduSphere</h1>
+            <p className="text-lg text-slate-600 dark:text-slate-300">Building the future of learning with AI and Knowledge Graphs</p>
           </div>
         </section>
 
         {/* Mission */}
         <section aria-labelledby="mission-heading" className="max-w-4xl mx-auto px-4 py-16">
-          <h2 id="mission-heading" className="text-2xl font-bold text-slate-900 mb-4">Our Mission</h2>
-          <p className="text-slate-600 leading-relaxed">
+          <h2 id="mission-heading" className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Our Mission</h2>
+          <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
             EduSphere exists to democratize education through AI. We believe every learner deserves a personalised,
             adaptive experience — powered by knowledge graphs that map understanding, AI tutors that never sleep,
             and analytics that help educators focus on what matters most: their students.
@@ -72,7 +72,7 @@ export function AboutPage() {
             {STATS.map((s) => (
               <div key={s.label}>
                 <p className="text-3xl font-extrabold text-white">{s.value}</p>
-                <p className="text-indigo-200 text-sm mt-1">{s.label}</p>
+                <p className="text-indigo-100 text-sm mt-1">{s.label}</p>
               </div>
             ))}
           </div>
@@ -80,30 +80,30 @@ export function AboutPage() {
 
         {/* Team */}
         <section aria-labelledby="team-heading" className="max-w-5xl mx-auto px-4 py-16">
-          <h2 id="team-heading" className="text-2xl font-bold text-slate-900 mb-8 text-center">Leadership Team</h2>
+          <h2 id="team-heading" className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">Leadership Team</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {TEAM.map((m) => (
               <article key={m.name} className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mb-3" aria-hidden="true">
                   <span className="text-indigo-600 font-bold text-lg">{m.initials}</span>
                 </div>
-                <p className="font-semibold text-slate-900">{m.name}</p>
-                <p className="text-sm text-slate-500">{m.role}</p>
+                <p className="font-semibold text-slate-900 dark:text-white">{m.name}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-300">{m.role}</p>
               </article>
             ))}
           </div>
         </section>
 
         {/* Values */}
-        <section aria-labelledby="values-heading" className="bg-slate-50 py-16">
+        <section aria-labelledby="values-heading" className="bg-slate-50 dark:bg-slate-900 py-16">
           <div className="max-w-5xl mx-auto px-4">
-            <h2 id="values-heading" className="text-2xl font-bold text-slate-900 mb-8 text-center">Our Values</h2>
+            <h2 id="values-heading" className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">Our Values</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {VALUES.map((v) => (
-                <div key={v.title} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div key={v.title} className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
                   <v.icon className="h-8 w-8 text-indigo-600 mb-3" aria-hidden="true" />
-                  <h3 className="font-semibold text-slate-900 mb-1">{v.title}</h3>
-                  <p className="text-sm text-slate-600">{v.desc}</p>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{v.title}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{v.desc}</p>
                 </div>
               ))}
             </div>

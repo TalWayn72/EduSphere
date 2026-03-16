@@ -166,7 +166,7 @@ export function InstructorDirectoryPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               Meet Our Instructors
             </h1>
-            <p className="text-indigo-200 text-lg max-w-2xl mx-auto">
+            <p className="text-indigo-100 text-lg max-w-2xl mx-auto">
               World-class educators from leading research institutions and Fortune 500 companies,
               bringing real-world expertise to your organization.
             </p>

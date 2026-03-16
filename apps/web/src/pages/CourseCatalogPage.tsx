@@ -161,7 +161,7 @@ export function CourseCatalogPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               Featured Learning Programs
             </h1>
-            <p className="text-indigo-200 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
               Explore our curated courses designed for modern professionals. AI-powered
               personalization adapts every course to your learning pace.
             </p>

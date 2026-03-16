@@ -77,7 +77,7 @@ export function ROICalculatorSection() {
               { label: 'EduSphere annual cost', value: formatCurrency(annualCost) },
             ].map(({ label, value, highlight }) => (
               <div key={label} className={`rounded-xl px-5 py-4 ${highlight ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200'}`}>
-                <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${highlight ? 'text-indigo-200' : 'text-slate-500'}`}>{label}</p>
+                <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${highlight ? 'text-indigo-100' : 'text-slate-500'}`}>{label}</p>
                 <p className={`text-2xl font-extrabold ${highlight ? 'text-white' : 'text-slate-900'}`}>{value}</p>
               </div>
             ))}

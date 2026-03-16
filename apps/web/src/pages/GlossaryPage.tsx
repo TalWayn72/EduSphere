@@ -122,7 +122,7 @@ export function GlossaryPage() {
               <BookOpen className="h-10 w-10 text-indigo-300" aria-hidden="true" />
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">EdTech Glossary</h1>
-            <p className="text-indigo-200 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-indigo-100 text-lg mb-8 max-w-xl mx-auto">
               Definitions of key terms in AI learning, educational technology, and e-learning
               standards.
             </p>

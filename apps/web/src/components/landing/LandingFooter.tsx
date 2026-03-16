@@ -82,7 +82,7 @@ export function LandingFooter() {
           <p className="text-sm">
             &copy; 2026 EduSphere. Built for institutions that take learning seriously.
           </p>
-          <div className="flex items-center gap-4 text-xs text-slate-500">
+          <div className="flex items-center gap-4 text-xs text-slate-400">
             <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
             <span aria-hidden="true">&middot;</span>
             <a href="/terms" className="hover:text-white transition-colors">Terms</a>

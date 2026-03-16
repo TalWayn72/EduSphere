@@ -113,7 +113,7 @@ export function FaqPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               Frequently Asked Questions
             </h1>
-            <p className="text-indigo-200 text-lg mb-8">
+            <p className="text-indigo-100 text-lg mb-8">
               Everything you need to know about EduSphere.
             </p>
             <div className="relative max-w-xl mx-auto">

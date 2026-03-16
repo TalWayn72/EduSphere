@@ -36,7 +36,7 @@ export function BlogListPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               EduSphere Blog
             </h1>
-            <p className="text-indigo-200 text-lg">
+            <p className="text-indigo-100 text-lg">
               AI education insights, learning science, and platform updates.
             </p>
           </div>

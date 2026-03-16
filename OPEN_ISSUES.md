@@ -1,6 +1,71 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 15 מרץ 2026 (All 64 Phases ✅ Complete — full project implementation done + BUG-066 i18n fix + ~575 new tests)
+**תאריך עדכון:** 16 מרץ 2026 (All 64 Phases ✅ Complete — full project implementation done + BUG-067 WCAG contrast audit)
+
+---
+
+## BUG-067 — Full-App WCAG AA Color Contrast Audit (56+ violations fixed)
+
+**סטטוס:** ✅ Fixed (2026-03-16)
+**חומרה:** 🔴 Critical (invisible "Start 90-Day Pilot" button + 56+ contrast violations)
+**SC:** WCAG 2.2 SC 1.4.3 (Contrast Minimum), SC 1.4.11 (Non-text Contrast)
+
+### תסמין (Symptom)
+1. "Start 90-Day Pilot" button in HeroSection was invisible — white text on white/indigo background
+2. 56+ low-contrast text instances across 20+ files (light + dark modes)
+
+### שרשרת גורמים — Root Cause
+1. **HeroSection button:** `<Button>` default variant applied `bg-primary` via shadcn/ui. `tailwind-merge` cannot resolve conflicts between CSS-variable classes (`bg-primary`) and standard classes (`bg-transparent`). Both classes stayed in DOM; `bg-primary` (indigo) won, rendering white text on indigo as a solid block.
+2. **Tailwind v4 dark mode:** `darkMode: ['class']` in `tailwind.config.js` is **ignored** by Tailwind CSS v4.2.0. Class-based dark mode requires `@custom-variant dark (&:where(.dark, .dark *));` in CSS. Without it, all `dark:` utility classes had zero effect.
+3. **Low-contrast text:** `text-slate-400`/`text-gray-400`/`text-indigo-200`/`text-white/30` used on dark backgrounds — all below 4.5:1 AA ratio.
+
+### תיקון (Fix)
+**Round 1 — Critical:**
+- `HeroSection.tsx:75` — Replaced `<Button>` with plain `<Link>` to bypass tailwind-merge conflict entirely
+- `globals.css` — Added `@custom-variant dark (&:where(.dark, .dark *));` after `@import "tailwindcss"`
+- `globals.css` — Light mode `--primary`: 67% → 58% lightness (WCAG AA 6.4:1 with white)
+
+**Round 2 — Low-contrast text (20+ files):**
+| File | Fix |
+|------|-----|
+| `VideoSection.tsx` | `text-slate-300`→`text-slate-200`, `text-slate-400`→`text-slate-300` |
+| `AICourseBuildSection.tsx` | `text-slate-400`→`text-slate-300`, `border-white/10`→`border-white/20`, `text-indigo-200`→`text-indigo-100` |
+| `PilotCTASection.tsx` | 5× `placeholder:text-white/70`→`/80`, `text-indigo-200`→`text-indigo-100` |
+| `ROICalculatorSection.tsx` | `text-indigo-200`→`text-indigo-100` (on bg-indigo-600) |
+| `HowPilotWorksSection.tsx` | `text-slate-500`→`text-slate-600`, `text-indigo-400`→`text-indigo-600` |
+| `TrustBar.tsx` | `text-slate-400`→`text-slate-600`, added `dark:bg-slate-800 dark:text-slate-300` |
+| `VsCompetitorsSection.tsx` | `text-slate-400`→`text-slate-500` |
+| `LandingFooter.tsx` | `text-slate-500`→`text-slate-400` |
+| `RoleplaySimulator.tsx` | 3× `text-gray-400`→`text-gray-300`, `placeholder-gray-400`→`-300`, 2× `border-gray-800`→`-700` |
+| `RoleplayEvaluationReport.tsx` | 3× `text-gray-400`→`text-gray-300`, button `text-gray-300`→`-200` |
+| `CourseCard.tsx` | `text-white/30`→`text-white/60` |
+| `VideoPlayerWithCurriculum.tsx` | `text-white/50`→`text-white/70` |
+| `PilotSignupPage.tsx` | 5× `placeholder:text-white/70`→`/80` |
+| `PartnerSignupPage.tsx` | 5× `placeholder:text-white/70`→`/80` |
+| `PricingPage.tsx` | `text-slate-500 dark:text-slate-300`→`text-slate-400` (on bg-slate-900) |
+| `LandingPage.tsx` | Log In button added `text-gray-700 dark:text-white` |
+| `AboutPage.tsx` | Full dark mode support: `dark:bg-slate-900`, `dark:text-white`, `dark:text-slate-300`, `dark:bg-slate-800`, `dark:border-slate-700` |
+| `ContactPage.tsx` | Full dark mode support: `dark:bg-slate-900`, `dark:bg-slate-800`, `dark:bg-slate-700`, `dark:text-white`, `dark:text-slate-200` |
+| Multiple pages | `text-indigo-200`→`text-indigo-100` where on dark backgrounds |
+
+### אימות (Verification)
+- axe-core audit: **0 fixable violations** across 15 pages × 2 modes (light + dark) = 30 audits
+- Only remaining: 2-3 Remotion player internal elements (third-party, `aria-hidden`, unfixable)
+- HeroSection button: `color: rgb(255, 255, 255)`, `bg: rgba(0, 0, 0, 0)` — confirmed visible
+- Screenshots: `docs/screenshots/contrast-hero-light.png`, `docs/screenshots/contrast-hero-dark.png`
+
+### בדיקות שנוספו (Tests Added)
+- `apps/web/e2e/contrast-visual-audit.spec.ts` — ~36 test cases:
+  - Landing page hero + full-scroll (light + dark) with Remotion exclusion
+  - Form pages: PilotSignupPage, PartnerSignupPage (light + dark)
+  - Public pages: Pricing, Features, Compliance, Login, About, FAQ (light + dark)
+  - Auth pages: Dashboard, Courses, Explore, Agents, Settings, Admin (light + dark)
+  - Visual regression screenshots: 6 baseline tests (light + dark × 3 pages)
+
+### מניעת הישנות (Anti-Recurrence)
+1. `contrast-visual-audit.spec.ts` — CI gate: axe-core color-contrast on all pages
+2. Visual regression baselines prevent accidental contrast regressions
+3. `@custom-variant dark` in `globals.css` — class-based dark mode now works correctly in Tailwind v4
 
 ---
 

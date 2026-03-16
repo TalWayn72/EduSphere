@@ -37,7 +37,7 @@ export function CareersPage() {
       <section className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white py-24 text-center">
         <div className="mx-auto max-w-3xl px-6">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Join Our Team</h1>
-          <p className="mt-4 text-lg text-indigo-200">Help us build the future of AI-powered education</p>
+          <p className="mt-4 text-lg text-indigo-100">Help us build the future of AI-powered education</p>
         </div>
       </section>
 

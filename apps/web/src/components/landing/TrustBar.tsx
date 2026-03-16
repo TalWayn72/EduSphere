@@ -53,7 +53,7 @@ export function TrustBar() {
             <div
               key={i}
               role="listitem"
-              className="w-32 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-xs font-medium"
+              className="w-32 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-medium"
               aria-label={label}
             >
               {label}

@@ -124,7 +124,7 @@ export function PricingPage() {
             Accessibility
           </Link>
         </div>
-        <p className="mt-6 text-xs text-slate-600">
+        <p className="mt-6 text-xs text-slate-400">
           © {new Date().getFullYear()} EduSphere. All rights reserved.
         </p>
       </footer>

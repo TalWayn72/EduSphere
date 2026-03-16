@@ -289,7 +289,7 @@ export function FeaturesPage() {
         <div className="bg-indigo-700 py-16 text-center text-white">
           <div className="max-w-2xl mx-auto px-4">
             <h2 className="text-3xl font-extrabold mb-4">Ready to Transform Learning?</h2>
-            <p className="text-indigo-200 mb-8">
+            <p className="text-indigo-100 mb-8">
               Start free. Upgrade anytime. No credit card required.
             </p>
             <Button

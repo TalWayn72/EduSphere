@@ -21,9 +21,9 @@ export function ContactPage() {
   };
 
   return (
-    <div data-testid="contact-page" className="min-h-screen bg-gray-50">
+    <div data-testid="contact-page" className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <PageMeta title="Contact Us | EduSphere" description="Get in touch with the EduSphere team." />
-      <nav className="border-b bg-white px-6 py-4" aria-label="Contact page navigation">
+      <nav className="border-b bg-white dark:bg-slate-800 dark:border-slate-700 px-6 py-4" aria-label="Contact page navigation">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold text-indigo-600">
           <Brain className="h-6 w-6" aria-hidden="true" />
           EduSphere
@@ -31,42 +31,42 @@ export function ContactPage() {
       </nav>
 
       <main className="mx-auto max-w-4xl px-6 py-16">
-        <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Contact Us</h1>
+        <h1 className="mb-8 text-center text-4xl font-bold text-gray-900 dark:text-white">Contact Us</h1>
 
         <div className="mb-12 grid gap-6 sm:grid-cols-3">
           {INFO_CARDS.map(({ Icon, label, value }) => (
-            <div key={label} className="flex flex-col items-center rounded-xl bg-white p-6 shadow-sm">
+            <div key={label} className="flex flex-col items-center rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm">
               <Icon className="mb-3 h-8 w-8 text-indigo-600" aria-hidden="true" />
-              <h2 className="text-sm font-medium text-gray-500">{label}</h2>
-              <p className="mt-1 font-semibold text-gray-900">{value}</p>
+              <h2 className="text-sm font-medium text-gray-500 dark:text-slate-300">{label}</h2>
+              <p className="mt-1 font-semibold text-gray-900 dark:text-white">{value}</p>
             </div>
           ))}
         </div>
 
         {submitted ? (
-          <div role="status" className="rounded-xl bg-green-50 p-8 text-center">
-            <p className="text-lg font-semibold text-green-800">Thank you! We&apos;ll be in touch soon.</p>
+          <div role="status" className="rounded-xl bg-green-50 dark:bg-green-900/30 p-8 text-center">
+            <p className="text-lg font-semibold text-green-800 dark:text-green-300">Thank you! We&apos;ll be in touch soon.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="rounded-xl bg-white p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="rounded-xl bg-white dark:bg-slate-800 p-8 shadow-sm">
             <div className="mb-4">
-              <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">Name</label>
-              <input id="name" type="text" required className="w-full rounded-lg border px-4 py-2" />
+              <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-200">Name</label>
+              <input id="name" type="text" required className="w-full rounded-lg border px-4 py-2 dark:text-white dark:placeholder:text-slate-400 dark:bg-slate-700 dark:border-slate-600" />
             </div>
             <div className="mb-4">
-              <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">Email</label>
-              <input id="email" type="email" required className="w-full rounded-lg border px-4 py-2" />
+              <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-200">Email</label>
+              <input id="email" type="email" required className="w-full rounded-lg border px-4 py-2 dark:text-white dark:placeholder:text-slate-400 dark:bg-slate-700 dark:border-slate-600" />
             </div>
             <div className="mb-4">
-              <label htmlFor="subject" className="mb-1 block text-sm font-medium text-gray-700">Subject</label>
-              <select id="subject" required className="w-full rounded-lg border px-4 py-2">
+              <label htmlFor="subject" className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-200">Subject</label>
+              <select id="subject" required className="w-full rounded-lg border px-4 py-2 dark:text-white dark:bg-slate-700 dark:border-slate-600">
                 <option value="">Select a subject</option>
                 {SUBJECTS.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div className="mb-6">
-              <label htmlFor="message" className="mb-1 block text-sm font-medium text-gray-700">Message</label>
-              <textarea id="message" rows={4} required className="w-full rounded-lg border px-4 py-2" />
+              <label htmlFor="message" className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-200">Message</label>
+              <textarea id="message" rows={4} required className="w-full rounded-lg border px-4 py-2 dark:text-white dark:placeholder:text-slate-400 dark:bg-slate-700 dark:border-slate-600" />
             </div>
             <button type="submit" className="w-full rounded-lg bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700">
               Send Message

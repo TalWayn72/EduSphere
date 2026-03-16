@@ -37,7 +37,7 @@ function LandingNav() {
           <a href="#pilot-cta" className="hover:text-indigo-600 transition-colors">Pilot</a>
         </div>
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild className="text-gray-700 dark:text-white">
             <Link to="/login">Log In</Link>
           </Button>
           <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white" asChild>
