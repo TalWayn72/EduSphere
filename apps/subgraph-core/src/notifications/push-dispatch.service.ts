@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
-import type { PushTokenService } from './push-token.service';
+import { PushTokenService } from './push-token.service';
 
 /**
  * PushDispatchService delivers push notifications to registered devices.
