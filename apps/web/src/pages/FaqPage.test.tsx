@@ -24,6 +24,10 @@ import { FaqPage } from './FaqPage';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 vi.mock('react-helmet-async', () => ({
   HelmetProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Helmet: ({ children }: { children: React.ReactNode }) => <>{children}</>,

@@ -14,8 +14,8 @@ import {
   Globe,
   Wifi,
   Lock,
-  ArrowLeft,
 } from 'lucide-react';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const SECTIONS = [
   {
@@ -105,34 +105,16 @@ const SECTIONS = [
 
 export function CompliancePage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-slate-900 text-white py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            to="/landing"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 text-sm transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Back to Home
-          </Link>
-          <h1 className="text-4xl font-bold mb-4">Compliance & Security</h1>
-          <p className="text-slate-300 text-lg max-w-2xl">
-            EduSphere is built for institutions that take security, privacy, and
-            accessibility seriously. Explore our compliance certifications and
-            security posture below.
-          </p>
-        </div>
-      </header>
-
-      {/* Navigation pills */}
-      <nav className="sticky top-0 z-40 bg-white border-b border-gray-200 py-3" aria-label="Compliance sections">
+    <PublicLayout>
+      <div className="min-h-screen bg-white dark:bg-background">
+        {/* Navigation pills */}
+      <nav className="sticky top-0 z-40 bg-white dark:bg-background border-b border-gray-200 dark:border-border py-3" aria-label="Compliance sections">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-2">
           {SECTIONS.map((s) => (
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+              className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-muted text-slate-700 dark:text-muted-foreground hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
             >
               {s.title.split(' ')[0]}
             </a>
@@ -152,17 +134,17 @@ export function CompliancePage() {
               aria-labelledby={`${section.id}-heading`}
             >
               <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-indigo-50 rounded-xl flex-shrink-0">
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0">
                   <Icon className="h-6 w-6 text-indigo-600" aria-hidden="true" />
                 </div>
                 <div>
                   <h2
                     id={`${section.id}-heading`}
-                    className="text-2xl font-bold text-gray-900"
+                    className="text-2xl font-bold text-gray-900 dark:text-foreground"
                   >
                     {section.title}
                   </h2>
-                  <p className="mt-2 text-gray-600 leading-relaxed">
+                  <p className="mt-2 text-gray-600 dark:text-muted-foreground leading-relaxed">
                     {section.description}
                   </p>
                 </div>
@@ -171,7 +153,7 @@ export function CompliancePage() {
                 {section.items.map((item) => (
                   <li
                     key={item}
-                    className="flex items-start gap-2 text-gray-700"
+                    className="flex items-start gap-2 text-gray-700 dark:text-foreground"
                   >
                     <ShieldCheck
                       className="h-4 w-4 text-green-500 mt-1 flex-shrink-0"
@@ -186,11 +168,11 @@ export function CompliancePage() {
         })}
 
         {/* CTA */}
-        <div className="text-center py-12 border-t border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="text-center py-12 border-t border-gray-200 dark:border-border">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-4">
             Ready to learn more?
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-muted-foreground mb-6">
             Contact our team for a detailed security review or to request our SOC
             2 report.
           </p>
@@ -203,14 +185,15 @@ export function CompliancePage() {
             </Link>
             <Link
               to="/pilot"
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="px-6 py-3 border border-gray-300 dark:border-border text-gray-700 dark:text-foreground rounded-lg hover:bg-gray-50 dark:hover:bg-accent transition-colors font-medium"
             >
               Start Free Pilot
             </Link>
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
 

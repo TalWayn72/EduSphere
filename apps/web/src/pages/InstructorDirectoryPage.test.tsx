@@ -5,6 +5,10 @@ import React from 'react';
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 vi.mock('@/components/seo', () => ({
   PageMeta: () => <div data-testid="page-meta" />,
   PersonSchema: () => <div data-testid="person-schema" />,

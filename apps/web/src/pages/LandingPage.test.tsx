@@ -1,5 +1,6 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { LandingPage } from './LandingPage';
 
@@ -23,6 +24,11 @@ vi.mock('react-router-dom', async () => {
     ),
   };
 });
+
+// Mock PublicLayout — nav and footer are tested in their own test files
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
 
 function renderLanding() {
   return render(
@@ -91,29 +97,9 @@ describe('LandingPage', () => {
     expect(section).toHaveTextContent('90');
   });
 
-  it('renders the footer with institutional tagline', () => {
+  it('renders inside PublicLayout wrapper', () => {
     renderLanding();
-    const footer = screen.getByTestId('landing-footer');
-    expect(footer).toBeInTheDocument();
-    expect(footer).toHaveTextContent(/© 2026 EduSphere/i);
-    expect(footer).toHaveTextContent(/institutions/i);
-  });
-
-  it('renders navigation header', () => {
-    renderLanding();
-    const nav = screen.getByTestId('landing-nav');
-    expect(nav).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: /Log In/i }).length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('mobile nav toggle opens and closes the menu', () => {
-    renderLanding();
-    const toggle = screen.getByRole('button', { name: /Open menu/i });
-    expect(toggle).toBeInTheDocument();
-    fireEvent.click(toggle);
-    expect(screen.getByRole('button', { name: /Close menu/i })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Close menu/i }));
-    expect(screen.getByRole('button', { name: /Open menu/i })).toBeInTheDocument();
+    expect(screen.getByTestId('public-layout')).toBeInTheDocument();
   });
 
   it('does not show raw technical strings or error messages', () => {
@@ -135,8 +121,7 @@ describe('LandingPage', () => {
       'vs-competitors-section',
       'pricing-section',
       'pilot-cta-section',
-      'landing-footer',
-      'landing-nav',
+      'public-layout',
     ];
     for (const id of requiredIds) {
       expect(screen.getByTestId(id), `Missing data-testid="${id}"`).toBeInTheDocument();

@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
@@ -18,8 +19,8 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('@/components/landing/LandingFooter', () => ({
-  LandingFooter: () => <footer data-testid="landing-footer" />,
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
 }));
 
 import { PrivacyPage } from './PrivacyPage';
@@ -54,12 +55,9 @@ describe('PrivacyPage', () => {
     expect(screen.getByText('8. Contact Us')).toBeInTheDocument();
   });
 
-  it('contains a link back to home', () => {
+  it('renders inside PublicLayout wrapper', () => {
     renderPage();
-    const homeLink = screen
-      .getAllByRole('link')
-      .find((l) => l.getAttribute('href') === '/');
-    expect(homeLink).toBeTruthy();
+    expect(screen.getByTestId('public-layout')).toBeInTheDocument();
   });
 
   it('has no raw i18n keys visible', () => {

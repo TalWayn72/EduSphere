@@ -5,6 +5,10 @@ import React from 'react';
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 vi.mock('react-helmet-async', () => ({
   Helmet: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="helmet">{children}</div>

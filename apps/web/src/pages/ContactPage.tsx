@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Brain, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const SUBJECTS = ['General', 'Sales', 'Support', 'Partnership'] as const;
 
@@ -21,16 +20,10 @@ export function ContactPage() {
   };
 
   return (
-    <div data-testid="contact-page" className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <PublicLayout navVariant="minimal">
       <PageMeta title="Contact Us | EduSphere" description="Get in touch with the EduSphere team." />
-      <nav className="border-b bg-white dark:bg-slate-800 dark:border-slate-700 px-6 py-4" aria-label="Contact page navigation">
-        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-indigo-600">
-          <Brain className="h-6 w-6" aria-hidden="true" />
-          EduSphere
-        </Link>
-      </nav>
 
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <div className="mx-auto max-w-4xl px-6 py-16">
         <h1 className="mb-8 text-center text-4xl font-bold text-gray-900 dark:text-white">Contact Us</h1>
 
         <div className="mb-12 grid gap-6 sm:grid-cols-3">
@@ -73,10 +66,8 @@ export function ContactPage() {
             </button>
           </form>
         )}
-      </main>
-
-      <LandingFooter />
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
 

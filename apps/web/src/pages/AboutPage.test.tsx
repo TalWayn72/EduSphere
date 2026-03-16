@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
@@ -19,8 +20,8 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('@/components/landing/LandingFooter', () => ({
-  LandingFooter: () => <footer data-testid="landing-footer" />,
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
 }));
 
 // Import after mocks
@@ -62,13 +63,9 @@ describe('AboutPage', () => {
     expect(screen.getByText('Amit Shapira')).toBeInTheDocument();
   });
 
-  it('contains a link back to home', () => {
+  it('renders inside PublicLayout wrapper', () => {
     renderPage();
-    const homeLinks = screen.getAllByRole('link');
-    const homeTo = homeLinks.some(
-      (l) => l.getAttribute('href') === '/' || l.textContent?.includes('Home')
-    );
-    expect(homeTo).toBe(true);
+    expect(screen.getByTestId('public-layout')).toBeInTheDocument();
   });
 
   it('has no raw i18n keys visible', () => {

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Brain, GraduationCap, Building2, Shield, BookOpen } from 'lucide-react';
+import { GraduationCap, Building2, Shield, BookOpen } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PublicLayout } from '@/components/PublicLayout';
 
 interface Solution {
   Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
@@ -39,16 +39,10 @@ const SOLUTIONS: Solution[] = [
 
 export function SolutionsPage() {
   return (
-    <div data-testid="solutions-page" className="min-h-screen bg-gray-50">
+    <PublicLayout navVariant="minimal">
       <PageMeta title="Solutions | EduSphere" description="EduSphere solutions for universities, enterprises, government, and training companies." />
-      <nav className="border-b bg-white px-6 py-4" aria-label="Solutions page navigation">
-        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-indigo-600">
-          <Brain className="h-6 w-6" aria-hidden="true" />
-          EduSphere
-        </Link>
-      </nav>
 
-      <main className="mx-auto max-w-6xl px-6 py-16">
+      <div className="mx-auto max-w-6xl px-6 py-16">
         <h1 className="mb-4 text-center text-4xl font-bold text-gray-900">Solutions for Every Sector</h1>
         <p className="mx-auto mb-12 max-w-2xl text-center text-lg text-gray-600">
           From higher education to defense — EduSphere adapts to your compliance, scale, and integration needs.
@@ -81,10 +75,8 @@ export function SolutionsPage() {
             </article>
           ))}
         </div>
-      </main>
-
-      <LandingFooter />
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
 

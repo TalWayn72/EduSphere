@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { PageMeta, FAQSchema, BreadcrumbSchema, OrganizationSchema } from '@/components/seo';
 import { FAQ_ITEMS } from '@/lib/aeo-data';
 import { Input } from '@/components/ui/input';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const CATEGORIES = [
   { id: 'all', label: 'All Questions' },
@@ -50,7 +51,7 @@ function AccordionItem({ question, answer, isOpen, onToggle, index }: AccordionI
         {isOpen ? (
           <ChevronUp className="h-5 w-5 text-indigo-600 flex-shrink-0" aria-hidden="true" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-gray-400 flex-shrink-0" aria-hidden="true" />
+          <ChevronDown className="h-5 w-5 text-gray-400 dark:text-muted-foreground flex-shrink-0" aria-hidden="true" />
         )}
       </button>
       {isOpen && (
@@ -106,6 +107,7 @@ export function FaqPage() {
       />
       <OrganizationSchema />
 
+      <PublicLayout navVariant="minimal">
       <div className="min-h-screen bg-gray-50 dark:bg-background">
         {/* Header */}
         <div className="bg-indigo-700 text-white py-16">
@@ -118,7 +120,7 @@ export function FaqPage() {
             </p>
             <div className="relative max-w-xl mx-auto">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-muted-foreground"
                 aria-hidden="true"
               />
               <Input
@@ -126,7 +128,7 @@ export function FaqPage() {
                 placeholder="Search questions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white text-gray-900 border-0"
+                className="pl-10 bg-white dark:bg-background text-gray-900 dark:text-foreground border-0"
                 aria-label="Search frequently asked questions"
               />
             </div>
@@ -201,6 +203,7 @@ export function FaqPage() {
           </div>
         </main>
       </div>
+      </PublicLayout>
     </>
   );
 }

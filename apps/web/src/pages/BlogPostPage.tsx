@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getBlogPost } from '@/lib/blog-data';
 import { PageMeta, ArticleSchema, BreadcrumbSchema, PersonSchema } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const BASE_URL = 'https://app.edusphere.dev';
 
@@ -50,7 +51,7 @@ export function BlogPostPage() {
   const ogImage = `${BASE_URL}/aeo/og?title=${encodeURIComponent(post.title)}&type=blog`;
 
   return (
-    <>
+    <PublicLayout navVariant="minimal">
       <PageMeta
         title={post.title}
         description={post.description}
@@ -105,7 +106,7 @@ export function BlogPostPage() {
           <article className="prose-sm">{renderBody(post.bodyMarkdown)}</article>
         </main>
       </div>
-    </>
+    </PublicLayout>
   );
 }
 

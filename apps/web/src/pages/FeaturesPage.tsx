@@ -10,6 +10,7 @@ import {
 import { safeJsonLd } from '@/lib/safe-json-ld';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { PublicLayout } from '@/components/PublicLayout';
 
 interface HowToStep {
   step: number;
@@ -184,6 +185,7 @@ export function FeaturesPage() {
       <OrganizationSchema />
       <SoftwareApplicationSchema />
 
+      <PublicLayout>
       <div className="min-h-screen bg-gray-50 dark:bg-background">
         {/* Header */}
         <div className="bg-white dark:bg-card border-b border-gray-100 dark:border-border py-16">
@@ -302,6 +304,7 @@ export function FeaturesPage() {
           </div>
         </div>
       </div>
+      </PublicLayout>
     </>
   );
 }

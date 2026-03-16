@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card';
 import { BookOpen, ShieldAlert } from 'lucide-react';
 import { usePublicBranding } from '@/hooks/usePublicBranding';
+import { PublicLayout } from '@/components/PublicLayout';
 
 export function Login() {
   const { t } = useTranslation('auth');
@@ -30,6 +31,7 @@ export function Login() {
   };
 
   return (
+    <PublicLayout navVariant="minimal" showFooter={false}>
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
@@ -88,5 +90,6 @@ export function Login() {
         </CardContent>
       </Card>
     </div>
+    </PublicLayout>
   );
 }

@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { FollowButton } from '@/components/FollowButton';
 import { FollowersList } from '@/components/FollowersList';
 import { PUBLIC_PROFILE_QUERY } from '@/lib/graphql/profile.queries';
+import { PublicLayout } from '@/components/PublicLayout';
 
 interface PublicCourse {
   id: string;
@@ -106,24 +107,28 @@ export function PublicProfilePage() {
 
   if (fetching) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-      </div>
+      <PublicLayout navVariant="minimal">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+        </div>
+      </PublicLayout>
     );
   }
 
   if (error || !data?.publicProfile) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-4">
-        <Lock className="h-16 w-16 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Profile Not Available</h1>
-        <p className="text-muted-foreground max-w-sm">
-          This profile is private or does not exist.
-        </p>
-        <Button asChild variant="outline">
-          <Link to="/courses">Browse Courses</Link>
-        </Button>
-      </div>
+      <PublicLayout navVariant="minimal">
+        <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-4">
+          <Lock className="h-16 w-16 text-muted-foreground" />
+          <h1 className="text-2xl font-bold">Profile Not Available</h1>
+          <p className="text-muted-foreground max-w-sm">
+            This profile is private or does not exist.
+          </p>
+          <Button asChild variant="outline">
+            <Link to="/courses">Browse Courses</Link>
+          </Button>
+        </div>
+      </PublicLayout>
     );
   }
 
@@ -156,6 +161,7 @@ export function PublicProfilePage() {
   ];
 
   return (
+    <PublicLayout navVariant="minimal">
     <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
       {/* Hero card */}
       <Card className="p-6 flex items-center gap-6">
@@ -277,5 +283,6 @@ export function PublicProfilePage() {
         />
       )}
     </div>
+    </PublicLayout>
   );
 }

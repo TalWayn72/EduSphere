@@ -1,6 +1,7 @@
 import React from 'react';
 import { User, Award, BookOpen } from 'lucide-react';
 import { PageMeta, PersonSchema, BreadcrumbSchema } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 interface Instructor {
   id: string;
@@ -136,7 +137,7 @@ function InstructorCard({ instructor }: InstructorCardProps) {
 
 export function InstructorDirectoryPage() {
   return (
-    <>
+    <PublicLayout>
       <PageMeta
         title="Instructor Directory — Expert Educators on EduSphere"
         description="Meet EduSphere's world-class instructors: AI researchers, knowledge graph architects, L&D strategists, and corporate training leaders from Stanford, MIT, and Harvard."
@@ -204,7 +205,7 @@ export function InstructorDirectoryPage() {
           </div>
         </main>
       </div>
-    </>
+    </PublicLayout>
   );
 }
 

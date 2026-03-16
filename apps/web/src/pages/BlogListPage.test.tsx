@@ -4,6 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { BlogListPage } from './BlogListPage';
 
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 vi.mock('@/components/seo', () => ({
   PageMeta: vi.fn(() => null),
   BreadcrumbSchema: vi.fn(() => null),

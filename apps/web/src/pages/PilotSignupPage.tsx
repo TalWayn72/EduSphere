@@ -12,8 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Brain } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const REQUEST_PILOT_MUTATION = `
   mutation RequestPilot($input: PilotRequestInput!) {
@@ -53,13 +52,9 @@ export function PilotSignupPage() {
   };
 
   return (
-    <div data-testid="pilot-signup-page" className="min-h-screen bg-gradient-to-br from-indigo-900 to-slate-900">
-      <nav className="px-6 py-4 flex items-center gap-2">
-        <Brain className="h-7 w-7 text-indigo-300" aria-hidden="true" />
-        <Link to="/landing" className="text-xl font-bold text-white">EduSphere</Link>
-      </nav>
-
-      <div className="max-w-2xl mx-auto px-4 py-12">
+    <PublicLayout navVariant="minimal">
+      <div data-testid="pilot-signup-page" className="min-h-screen bg-gradient-to-br from-indigo-900 to-slate-900">
+        <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white">Start Your Free Pilot</h1>
           <p className="mt-3 text-indigo-100">90 days, full features, no credit card required.</p>
@@ -145,8 +140,9 @@ export function PilotSignupPage() {
               </div>
             </form>
           )}
+          </div>
         </div>
       </div>
-    </div>
+    </PublicLayout>
   );
 }

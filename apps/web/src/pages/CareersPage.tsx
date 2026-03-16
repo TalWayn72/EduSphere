@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
-import { Brain, Briefcase, MapPin, Clock, Laptop, DollarSign, BookOpen, TrendingUp } from 'lucide-react';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import { Briefcase, MapPin, Clock, Laptop, DollarSign, BookOpen, TrendingUp } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const positions = [
   { title: 'Senior Full-Stack Engineer', desc: 'Build scalable GraphQL Federation services and React interfaces for our knowledge graph platform.' },
@@ -20,18 +19,8 @@ const benefits = [
 
 export function CareersPage() {
   return (
-    <div data-testid="careers-page" className="min-h-screen bg-white">
+    <PublicLayout navVariant="minimal">
       <PageMeta title="Careers | EduSphere" description="Join the EduSphere team and help build the future of AI-powered education." />
-
-      {/* Nav */}
-      <nav className="border-b bg-white/80 backdrop-blur sticky top-0 z-50">
-        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 text-indigo-600 font-bold text-xl">
-            <Brain className="h-7 w-7" />
-            EduSphere
-          </Link>
-        </div>
-      </nav>
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white py-24 text-center">
@@ -92,8 +81,7 @@ export function CareersPage() {
         </div>
       </section>
 
-      <LandingFooter />
-    </div>
+    </PublicLayout>
   );
 }
 

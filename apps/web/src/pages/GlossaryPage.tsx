@@ -6,6 +6,7 @@ import { safeJsonLd } from '@/lib/safe-json-ld';
 import { GLOSSARY_TERMS } from '@/lib/aeo-data';
 import type { GlossaryTerm } from '@/lib/aeo-data';
 import { Input } from '@/components/ui/input';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -38,7 +39,7 @@ function GlossaryTermCard({ term }: { term: GlossaryTerm }) {
           {term.term}
         </h2>
         <span
-          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${CATEGORY_COLORS[term.category] ?? 'bg-gray-100 text-gray-700'}`}
+          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${CATEGORY_COLORS[term.category] ?? 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground'}`}
         >
           {term.category}
         </span>
@@ -114,6 +115,7 @@ export function GlossaryPage() {
       />
       <OrganizationSchema />
 
+      <PublicLayout navVariant="minimal">
       <div className="min-h-screen bg-gray-50 dark:bg-background">
         {/* Header */}
         <div className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-16">
@@ -128,7 +130,7 @@ export function GlossaryPage() {
             </p>
             <div className="relative max-w-xl mx-auto">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-muted-foreground"
                 aria-hidden="true"
               />
               <Input
@@ -136,7 +138,7 @@ export function GlossaryPage() {
                 placeholder="Search terms..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-white text-gray-900 border-0"
+                className="pl-10 bg-white dark:bg-background text-gray-900 dark:text-foreground border-0"
                 aria-label="Search glossary terms"
               />
             </div>
@@ -198,6 +200,7 @@ export function GlossaryPage() {
           )}
         </main>
       </div>
+      </PublicLayout>
     </>
   );
 }

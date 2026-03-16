@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, BarChart2, Tag } from 'lucide-react';
 import { PageMeta, CourseSchema, BreadcrumbSchema } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 interface FeaturedCourse {
   id: string;
@@ -96,7 +97,7 @@ function CourseCard({ course }: CourseCardProps) {
           {course.title}
         </h2>
         <span
-          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${LEVEL_COLORS[course.level] ?? 'bg-gray-100 text-gray-700'}`}
+          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${LEVEL_COLORS[course.level] ?? 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground'}`}
         >
           {course.level}
         </span>
@@ -154,6 +155,7 @@ export function CourseCatalogPage() {
         ]}
       />
 
+      <PublicLayout>
       <div className="min-h-screen bg-gray-50 dark:bg-background">
         {/* Header */}
         <div className="bg-indigo-700 text-white py-16">
@@ -207,6 +209,7 @@ export function CourseCatalogPage() {
           </div>
         </main>
       </div>
+      </PublicLayout>
     </>
   );
 }

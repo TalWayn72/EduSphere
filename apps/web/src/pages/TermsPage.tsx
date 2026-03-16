@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
-import { Brain } from 'lucide-react';
-import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageMeta } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const SECTIONS = [
   { id: 'acceptance', title: '1. Acceptance of Terms', body: 'By accessing or using EduSphere, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform. Continued use after changes constitutes acceptance of updated terms.' },
@@ -16,22 +14,13 @@ const SECTIONS = [
 
 export function TermsPage() {
   return (
-    <div data-testid="terms-page" className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+    <PublicLayout navVariant="minimal">
       <PageMeta
         title="Terms of Service | EduSphere"
         description="EduSphere Terms of Service — read our terms and conditions for using the AI-Native LMS platform."
       />
 
-      <nav className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 sticky top-0 z-30">
-        <div className="mx-auto max-w-5xl flex items-center gap-2 px-6 py-4">
-          <Link to="/" className="flex items-center gap-2 text-gray-900 dark:text-white hover:opacity-80 transition-opacity">
-            <Brain className="h-6 w-6 text-blue-600" aria-hidden="true" />
-            <span className="text-lg font-semibold">EduSphere</span>
-          </Link>
-        </div>
-      </nav>
-
-      <main className="flex-1 mx-auto max-w-3xl px-6 py-12">
+      <div className="mx-auto max-w-3xl px-6 py-12">
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Terms of Service</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -55,10 +44,8 @@ export function TermsPage() {
             </p>
           </section>
         </article>
-      </main>
-
-      <LandingFooter />
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
 

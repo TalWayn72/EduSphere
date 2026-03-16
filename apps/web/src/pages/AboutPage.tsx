@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Brain, Lightbulb, ShieldCheck, Accessibility, BookOpen } from 'lucide-react';
+import { Lightbulb, ShieldCheck, Accessibility, BookOpen } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const TEAM = [
   { name: 'Sarah Cohen', role: 'CEO', initials: 'SC' },
@@ -27,27 +26,14 @@ const VALUES = [
 
 export function AboutPage() {
   return (
-    <>
+    <PublicLayout navVariant="minimal">
       <PageMeta
         title="About EduSphere — AI-Native Learning Platform"
         description="Learn about EduSphere's mission to democratize education through AI and Knowledge Graphs."
         canonical="/about"
       />
 
-      {/* Nav */}
-      <nav aria-label="About page navigation" className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-gray-100 dark:border-slate-700 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2" aria-label="Back to home">
-            <Brain className="h-7 w-7 text-indigo-600" aria-hidden="true" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">EduSphere</span>
-          </Link>
-          <Link to="/" className="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-indigo-600 transition-colors">
-            &larr; Home
-          </Link>
-        </div>
-      </nav>
-
-      <main className="dark:bg-slate-900">
+      <div className="dark:bg-slate-900">
         {/* Hero */}
         <section aria-labelledby="about-heading" className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-900 dark:to-slate-800 py-20 text-center">
           <div className="max-w-3xl mx-auto px-4">
@@ -109,10 +95,8 @@ export function AboutPage() {
             </div>
           </div>
         </section>
-      </main>
-
-      <LandingFooter />
-    </>
+      </div>
+    </PublicLayout>
   );
 }
 

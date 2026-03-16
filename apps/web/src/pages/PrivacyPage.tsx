@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
-import { Brain } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const SECTIONS = [
   {
@@ -40,22 +38,13 @@ const SECTIONS = [
 
 export function PrivacyPage() {
   return (
-    <div data-testid="privacy-page" className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
+    <PublicLayout navVariant="minimal">
       <PageMeta
         title="Privacy Policy"
         description="EduSphere Privacy Policy — how we collect, use, and protect your data."
       />
 
-      <nav className="border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-800 dark:bg-gray-950">
-        <div className="mx-auto flex max-w-5xl items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-            <Brain className="h-6 w-6 text-indigo-600" aria-hidden="true" />
-            EduSphere
-          </Link>
-        </div>
-      </nav>
-
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
+      <div className="mx-auto w-full max-w-3xl px-6 py-12">
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <h1>Privacy Policy</h1>
           <p className="text-sm text-gray-500">Last Updated: March 2026</p>
@@ -72,10 +61,8 @@ export function PrivacyPage() {
             </section>
           ))}
         </article>
-      </main>
-
-      <LandingFooter />
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
 

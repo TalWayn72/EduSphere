@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '@/lib/blog-data';
 import { PageMeta, BreadcrumbSchema } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const BASE_URL = 'https://app.edusphere.dev';
 
@@ -15,7 +16,7 @@ function formatDate(iso: string): string {
 
 export function BlogListPage() {
   return (
-    <>
+    <PublicLayout navVariant="minimal">
       <PageMeta
         title="EduSphere Blog — AI Education Insights"
         description="Insights on AI-powered learning, knowledge graphs, e-learning standards, and compliance training automation from the EduSphere team."
@@ -79,7 +80,7 @@ export function BlogListPage() {
           </div>
         </main>
       </div>
-    </>
+    </PublicLayout>
   );
 }
 
