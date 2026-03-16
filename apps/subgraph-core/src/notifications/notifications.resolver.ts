@@ -9,7 +9,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { notificationPubSub } from './notifications.pubsub';
 import type { Notification } from './nats-notification.bridge';
 import type { AuthContext } from '@edusphere/auth';
-import type { PushTokenService } from './push-token.service';
+import { PushTokenService } from './push-token.service';
 import type { PushTokenDto } from './push-token.service';
 
 interface GraphQLContext {
