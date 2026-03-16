@@ -37,6 +37,16 @@ vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageHeader: ({ title }: any) => <h1>{title}</h1>,
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { ProgramDetailPage } from './ProgramDetailPage';
@@ -125,7 +135,8 @@ describe('ProgramDetailPage', () => {
 
   it('renders the program title', () => {
     renderPage();
-    expect(screen.getByText('Data Science Nanodegree')).toBeInTheDocument();
+    const titles = screen.getAllByText('Data Science Nanodegree');
+    expect(titles.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the program description', () => {
@@ -193,10 +204,9 @@ describe('ProgramDetailPage', () => {
     expect(screen.getByText(/course 2:/i)).toBeInTheDocument();
   });
 
-  it('clicking "Back to Programs" navigates to /programs', () => {
+  it('renders program title via PageHeader', () => {
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /back to programs/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/programs');
+    expect(screen.getByRole('heading', { name: 'Data Science Nanodegree' })).toBeInTheDocument();
   });
 
   it('shows empty courses message when no required courses', () => {

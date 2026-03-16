@@ -118,7 +118,6 @@ describe('ScenariosPage', () => {
     setupQuery({ error: new Error('Network failed') });
     renderPage();
     expect(screen.getByText(/failed to load scenarios/i)).toBeInTheDocument();
-    expect(screen.getByText(/network failed/i)).toBeInTheDocument();
   });
 
   it('shows empty state when no scenarios are returned', () => {

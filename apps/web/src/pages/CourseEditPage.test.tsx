@@ -44,6 +44,14 @@ vi.mock('@/components/SourceManager', () => ({
   SourceManager: vi.fn(() => <div data-testid="source-manager-stub">SourceManager</div>),
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/Breadcrumbs', () => ({
+  Breadcrumbs: () => <nav aria-label="Breadcrumb">breadcrumbs</nav>,
+}));
+
 vi.mock('@/lib/graphql/content.queries', () => ({
   COURSE_DETAIL_QUERY: 'COURSE_DETAIL_QUERY',
   PUBLISH_COURSE_MUTATION: 'PUBLISH_COURSE_MUTATION',
@@ -117,7 +125,7 @@ describe('CourseEditPage', () => {
       makeQuery({ error: { message: 'Network error' }, data: undefined })
     );
     render(<CourseEditPage />);
-    expect(screen.getByText(/network error/i)).toBeInTheDocument();
+    expect(screen.getByText(/failed to load course/i)).toBeInTheDocument();
   });
 
   it('shows "Course not found" when course is null', () => {

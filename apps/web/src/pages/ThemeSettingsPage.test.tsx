@@ -42,6 +42,14 @@ vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/Breadcrumbs', () => ({
+  Breadcrumbs: () => <nav aria-label="Breadcrumb">breadcrumbs</nav>,
+}));
+
 // ── Import after mocks ─────────────────────────────────────────────────────────
 
 import { ThemeSettingsPage } from './ThemeSettingsPage';

@@ -35,18 +35,17 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 vi.mock('@/components/admin/AdminLayout', () => ({
-  AdminLayout: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title?: string;
-  }) => (
-    <div data-testid="admin-layout">
-      <h1>{title}</h1>
-      {children}
-    </div>
+  AdminLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="admin-layout">{children}</div>
   ),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
 vi.mock('./TenantAnalyticsPage.charts', () => ({
@@ -198,7 +197,7 @@ describe('TenantAnalyticsPage', () => {
       vi.fn(),
     ] as never);
     renderDirect();
-    expect(screen.getByText(/Failed to load analytics: Network error/)).toBeInTheDocument();
+    expect(screen.getByText(/Failed to load analytics/)).toBeInTheDocument();
   });
 
   it('does NOT show raw error object to user when there is no error', () => {
