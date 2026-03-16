@@ -9,6 +9,7 @@ import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClipboardList } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { AssessmentRadarChart } from '@/components/assessment/RadarChart';
 import { ASSESSMENT_RESULT_QUERY } from '@/lib/graphql/assessment.queries';
 
@@ -72,6 +73,13 @@ export function AssessmentResultPage() {
   return (
     <Layout>
       <div className="container mx-auto p-6 space-y-6 max-w-3xl">
+        <Breadcrumbs
+          items={[
+            { label: 'Assessments', href: '/assessments' },
+            { label: 'Assessment', href: `/assessments/${campaignId}` },
+            { label: 'Results' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <ClipboardList className="h-8 w-8 text-primary" aria-hidden="true" />
           <h1 className="text-3xl font-bold">Assessment Results</h1>

@@ -2,7 +2,7 @@
  * ProctoringService — Remote Proctoring session lifecycle (PRD §7.2 G-4).
  * Memory safety: implements OnModuleDestroy + closes DB pool.
  */
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -51,7 +51,7 @@ export class ProctoringService implements OnModuleDestroy {
 
     if (!row) {
       this.logger.error({ assessmentId, tenantId, userId }, '[ProctoringService] startSession: insert failed');
-      throw new Error('Failed to create proctoring session');
+      throw new InternalServerErrorException('Failed to create proctoring session');
     }
 
     this.logger.log({ sessionId: row.id, assessmentId, tenantId, userId }, '[ProctoringService] session created');

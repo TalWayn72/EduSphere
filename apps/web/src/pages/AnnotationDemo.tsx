@@ -1,9 +1,10 @@
 import { AnnotationPanel } from '@/components/AnnotationPanel';
+import { PageShell } from '@/components/PageShell';
 
 export default function AnnotationDemo() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-7xl mx-auto">
+      <PageShell size="2xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
             Annotation System Demo
@@ -131,7 +132,7 @@ export default function AnnotationDemo() {
             </p>
           </div>
         </div>
-      </div>
+      </PageShell>
     </div>
   );
 }

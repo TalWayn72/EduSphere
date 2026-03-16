@@ -1,9 +1,29 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { UnauthorizedException, Logger } from '@nestjs/common';
+import { UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
+import type { ConceptRelationshipType } from '@edusphere/db';
 import { GraphService } from './graph.service';
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 import type { GraphQLContext } from '../auth/auth.middleware';
+
+const VALID_RELATIONSHIP_TYPES: ReadonlySet<string> = new Set<ConceptRelationshipType>([
+  'RELATED_TO',
+  'RELATES_TO',
+  'PREREQUISITE_OF',
+  'CONTRADICTS',
+  'DERIVED_FROM',
+  'PART_OF',
+  'AUTHORED_BY',
+]);
+
+function assertRelationshipType(value: string): ConceptRelationshipType {
+  if (!VALID_RELATIONSHIP_TYPES.has(value)) {
+    throw new BadRequestException(
+      `Invalid relationship type '${value}'. Must be one of: ${[...VALID_RELATIONSHIP_TYPES].join(', ')}`
+    );
+  }
+  return value as ConceptRelationshipType;
+}
 
 const tracer = trace.getTracer('subgraph-knowledge');
 
@@ -245,10 +265,11 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
+    const validatedType = assertRelationshipType(relationshipType);
     return this.graphService.linkConcepts(
       fromId,
       toId,
-      relationshipType,
+      validatedType,
       strength,
       description,
       tenantId,

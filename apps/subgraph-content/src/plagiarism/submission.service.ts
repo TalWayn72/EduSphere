@@ -6,6 +6,7 @@ import {
   Logger,
   NotFoundException,
   ForbiddenException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -72,7 +73,7 @@ export class SubmissionService implements OnModuleDestroy {
           submittedAt: new Date(),
         })
         .returning();
-      if (!row) throw new Error('Failed to insert text submission');
+      if (!row) throw new InternalServerErrorException('Failed to insert text submission');
       return row;
     });
 

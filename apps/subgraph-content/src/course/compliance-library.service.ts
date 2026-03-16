@@ -5,7 +5,7 @@
  * Template courses are identified by fixed UUIDs and the isTemplate flag.
  * Memory safety: OnModuleDestroy clears DB pool via closeAllPools.
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import { closeAllPools } from '@edusphere/db';
 
 export interface ComplianceCourse {
@@ -100,7 +100,7 @@ export class ComplianceLibraryService implements OnModuleDestroy {
   ): Promise<ComplianceCourse> {
     const template = COMPLIANCE_COURSES.find((c) => c.id === templateCourseId);
     if (!template) {
-      throw new Error(`Compliance template not found: ${templateCourseId}`);
+      throw new NotFoundException(`Compliance template not found: ${templateCourseId}`);
     }
 
     // Production: deep copy course + modules + lessons for the tenant

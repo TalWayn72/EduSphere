@@ -43,10 +43,12 @@ describe('TranscriptionWorker', () => {
       (fn as () => void)();
       return 0 as unknown as ReturnType<typeof setTimeout>;
     });
+    /* eslint-disable @typescript-eslint/no-explicit-any -- partial mocks in test */
     worker = new TranscriptionWorker(
       mockTranscriptionService as any,
       mockNatsService as any
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   });
 
   describe('onModuleInit', () => {

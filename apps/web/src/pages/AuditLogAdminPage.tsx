@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Download, FileText, FileJson } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
 
 // ─── GraphQL ─────────────────────────────────────────────────────────────────
 
@@ -85,7 +86,7 @@ export function AuditLogAdminPage() {
     setExportingFormat(null);
 
     if (result.error) {
-      toast.error(`Export failed: ${result.error.message}`);
+      toast.error('Export failed. Please try again.');
       return;
     }
 
@@ -113,7 +114,7 @@ export function AuditLogAdminPage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <PageShell size="sm" className="max-w-3xl">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Audit Log</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -205,7 +206,7 @@ export function AuditLogAdminPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

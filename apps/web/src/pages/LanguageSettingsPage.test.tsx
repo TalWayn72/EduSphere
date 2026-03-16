@@ -183,7 +183,7 @@ describe('LanguageSettingsPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() => {
-      expect(screen.getByText('Server error')).toBeInTheDocument();
+      expect(screen.getByText(/failed to save language settings/i)).toBeInTheDocument();
     });
   });
 

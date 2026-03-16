@@ -5,6 +5,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -96,10 +98,12 @@ export function PlatformUsageDashboardPage() {
   }
 
   return (
-    <AdminLayout
-      title="Platform Usage"
-      description="YAU utilization across all tenants"
-    >
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="Platform Usage"
+          description="YAU utilization across all tenants"
+        />
       <div data-testid="platform-usage-page">
         {/* Export button */}
         <div className="flex justify-end mb-4">
@@ -125,7 +129,7 @@ export function PlatformUsageDashboardPage() {
         {error && !fetching && (
           <Card>
             <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load platform data: {error.message}
+              Failed to load platform data. Please try again.
             </CardContent>
           </Card>
         )}
@@ -166,6 +170,7 @@ export function PlatformUsageDashboardPage() {
           </Table>
         )}
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

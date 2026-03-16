@@ -11,6 +11,7 @@ import {
   OnModuleDestroy,
   NotFoundException,
   ForbiddenException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -154,7 +155,7 @@ export class SubscriptionService implements OnModuleDestroy {
         .returning();
 
       if (!created) {
-        throw new Error(
+        throw new InternalServerErrorException(
           `[SubscriptionService] Failed to create pilot subscription for ${tenantId}`
         );
       }

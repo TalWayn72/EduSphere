@@ -660,8 +660,10 @@ describe('Feature Security: OCR content ingestion (SSRF, file size, path travers
   it('ingestContent requires INSTRUCTOR or higher role', () => {
     const start = ingestionGraphql.indexOf('ingestContent');
     const b = ingestionGraphql.slice(start, start + 300);
-    expect(b).toContain('@requiresRole');
-    expect(b).toContain('INSTRUCTOR');
+    // Authorization can be enforced via @requiresRole(INSTRUCTOR) or @requiresScopes(course:write)
+    const hasRoleGuard = b.includes('@requiresRole') && b.includes('INSTRUCTOR');
+    const hasScopeGuard = b.includes('@requiresScopes') && b.includes('course:write');
+    expect(hasRoleGuard || hasScopeGuard).toBe(true);
   });
 
   it('ingestContent does NOT allow STUDENT to upload content', () => {

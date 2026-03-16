@@ -11,9 +11,9 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseCourseButton } from '@/components/PurchaseCourseButton';
-
-const GRAPHQL_URL =
-  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
+import { PageShell } from '@/components/PageShell';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { GRAPHQL_URL, SEARCH_DEBOUNCE_MS } from '@/lib/constants';
 
 const COURSE_LISTINGS_QUERY = gql`
   query CourseListings($filters: CourseListingFiltersInput) {
@@ -114,7 +114,7 @@ export function MarketplacePage() {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedSearch(searchText), 300);
+    debounceRef.current = setTimeout(() => setDebouncedSearch(searchText), SEARCH_DEBOUNCE_MS);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [searchText]);
 
@@ -136,9 +136,7 @@ export function MarketplacePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <LoadingSpinner />
     );
   }
 
@@ -160,7 +158,7 @@ export function MarketplacePage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-6xl mx-auto">
+      <PageShell size="xl" className="p-6">
         <h1 className="text-3xl font-bold mb-2">Course Marketplace</h1>
         <p className="text-muted-foreground mb-6">
           Browse and purchase courses from expert instructors.
@@ -255,7 +253,7 @@ export function MarketplacePage() {
             })}
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

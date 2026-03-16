@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -23,6 +24,8 @@ import {
   REVOKE_SCIM_TOKEN_MUTATION,
 } from '@/lib/graphql/scim.queries';
 import { Shield, Copy, Plus, Trash2, AlertCircle, Loader2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
@@ -51,7 +54,7 @@ export function ScimSettingsPage() {
   const [expiresInDays, setExpiresInDays] = useState('');
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -69,7 +72,7 @@ export function ScimSettingsPage() {
 
   useEffect(() => {
     return () => {
-      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
     };
   }, []);
 
@@ -83,8 +86,8 @@ export function ScimSettingsPage() {
   const handleCopyEndpoint = async () => {
     await navigator.clipboard.writeText(scimBaseUrl);
     setCopied(true);
-    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
-    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
   };
 
   const handleGenerateToken = async () => {
@@ -109,7 +112,13 @@ export function ScimSettingsPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'SCIM' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Shield className="h-6 w-6 text-primary" />
           <div>
@@ -268,7 +277,7 @@ export function ScimSettingsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
       {showModal && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"

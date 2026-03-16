@@ -1,4 +1,12 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  UnauthorizedException,
+  NotFoundException,
+  ForbiddenException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -67,7 +75,7 @@ export class AnnotationService implements OnModuleDestroy {
 
   async findById(id: string, authContext?: AuthContext) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -98,7 +106,7 @@ export class AnnotationService implements OnModuleDestroy {
     authContext?: AuthContext
   ) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -156,7 +164,7 @@ export class AnnotationService implements OnModuleDestroy {
     authContext?: AuthContext
   ) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -208,7 +216,7 @@ export class AnnotationService implements OnModuleDestroy {
     authContext?: AuthContext
   ) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -230,7 +238,7 @@ export class AnnotationService implements OnModuleDestroy {
 
   async create(input: CreateAnnotationInput, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -254,7 +262,7 @@ export class AnnotationService implements OnModuleDestroy {
         .returning();
 
       if (!annotation) {
-        throw new Error('Failed to create annotation');
+        throw new InternalServerErrorException('Failed to create annotation');
       }
 
       this.logger.log(
@@ -270,7 +278,7 @@ export class AnnotationService implements OnModuleDestroy {
     authContext: AuthContext
   ) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -288,7 +296,7 @@ export class AnnotationService implements OnModuleDestroy {
         .limit(1);
 
       if (!existing) {
-        throw new Error('Annotation not found');
+        throw new NotFoundException('Annotation not found');
       }
 
       // Permission check: only owner or instructors can update
@@ -299,8 +307,8 @@ export class AnnotationService implements OnModuleDestroy {
       const isOwner = existing.user_id === authContext.userId;
 
       if (!isOwner && !isInstructor) {
-        throw new Error(
-          'Unauthorized: You can only update your own annotations'
+        throw new ForbiddenException(
+          'You can only update your own annotations'
         );
       }
 
@@ -325,7 +333,7 @@ export class AnnotationService implements OnModuleDestroy {
         .returning();
 
       if (!annotation) {
-        throw new Error('Failed to update annotation');
+        throw new InternalServerErrorException('Failed to update annotation');
       }
 
       this.logger.log(
@@ -341,13 +349,13 @@ export class AnnotationService implements OnModuleDestroy {
 
   async promote(id: string, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const userRole = authContext.roles[0] || 'STUDENT';
     const canPromote = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
     if (!canPromote) {
-      throw new Error('Unauthorized: only instructors can promote annotations');
+      throw new ForbiddenException('Only instructors can promote annotations');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -364,7 +372,7 @@ export class AnnotationService implements OnModuleDestroy {
         .limit(1);
 
       if (!existing) {
-        throw new Error('Annotation not found');
+        throw new NotFoundException('Annotation not found');
       }
 
       const [promoted] = await tx
@@ -374,7 +382,7 @@ export class AnnotationService implements OnModuleDestroy {
         .returning();
 
       if (!promoted) {
-        throw new Error('Failed to promote annotation');
+        throw new InternalServerErrorException('Failed to promote annotation');
       }
 
       this.logger.log(
@@ -386,13 +394,13 @@ export class AnnotationService implements OnModuleDestroy {
 
   async replyTo(parentId: string, content: string, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     // Load parent to inherit layer and assetId
     const parent = await this.findById(parentId, authContext);
     if (!parent) {
-      throw new Error('Parent annotation not found');
+      throw new NotFoundException('Parent annotation not found');
     }
 
     return this.create(
@@ -409,7 +417,7 @@ export class AnnotationService implements OnModuleDestroy {
 
   async delete(id: string, authContext: AuthContext): Promise<boolean> {
     if (!authContext || !authContext.tenantId) {
-      throw new Error('Authentication required');
+      throw new UnauthorizedException('Authentication required');
     }
 
     const tenantCtx = this.toTenantContext(authContext);
@@ -427,7 +435,7 @@ export class AnnotationService implements OnModuleDestroy {
         .limit(1);
 
       if (!existing) {
-        throw new Error('Annotation not found');
+        throw new NotFoundException('Annotation not found');
       }
 
       // Permission check: only owner or instructors can delete
@@ -438,8 +446,8 @@ export class AnnotationService implements OnModuleDestroy {
       const isOwner = existing.user_id === authContext.userId;
 
       if (!isOwner && !isInstructor) {
-        throw new Error(
-          'Unauthorized: You can only delete your own annotations'
+        throw new ForbiddenException(
+          'You can only delete your own annotations'
         );
       }
 

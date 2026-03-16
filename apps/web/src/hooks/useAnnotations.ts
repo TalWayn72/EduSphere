@@ -83,7 +83,10 @@ function normaliseAnnotation(
   const text = extractContentText(gql.content);
   const timestampStart = extractTimestamp(gql.spatialData);
 
-  const localLayer = gql.layer as unknown as AnnotationLayer;
+  // GraphQL codegen enum uses PascalCase keys (AiGenerated = 'AI_GENERATED')
+  // while the local enum uses SCREAMING_SNAKE (AI_GENERATED = 'AI_GENERATED').
+  // Runtime values are identical strings, so a direct string-value cast is safe.
+  const localLayer = (gql.layer as string) as AnnotationLayer;
 
   return {
     id: gql.id,

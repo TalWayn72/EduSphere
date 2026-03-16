@@ -4,6 +4,10 @@ import typescriptParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import noUnsanitizedPlugin from 'eslint-plugin-no-unsanitized';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const edusphereDesignSystem = require('@edusphere/eslint-config/eslint-plugin-edusphere-design-system');
 
 export default [
   js.configs.recommended,
@@ -112,6 +116,7 @@ export default [
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'no-unsanitized': noUnsanitizedPlugin,
+      'edusphere-design-system': edusphereDesignSystem,
     },
     settings: {
       react: {
@@ -133,6 +138,10 @@ export default [
       // XSS prevention — block unsanitized innerHTML / outerHTML writes
       'no-unsanitized/method': 'error',
       'no-unsanitized/property': 'error',
+      // EduSphere Design System rules
+      'edusphere-design-system/no-orphan-colors': 'warn',
+      'edusphere-design-system/require-page-header': 'warn',
+      'edusphere-design-system/require-page-shell': 'warn',
     },
   },
 ];

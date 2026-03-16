@@ -97,6 +97,7 @@ export class GroupChallengeLeaderboardService {
           await tx
             .update(challengeParticipants)
             .set({ rank: i + 1 })
+            // eslint-disable-next-line security/detect-object-injection -- numeric index from for-loop
             .where(eq(challengeParticipants.id, allParticipants[i].id));
         }
 

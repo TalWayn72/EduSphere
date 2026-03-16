@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { PageShell } from '@/components/PageShell';
 import {
   RadarChart,
   PolarGrid,
@@ -117,7 +118,7 @@ export default function AssessmentResultsDetailPage() {
   const raterTypes = campaign.raterGroups.map((g) => g.raterType);
 
   return (
-    <main className="p-6 max-w-4xl mx-auto space-y-8" aria-label="Assessment Results">
+    <PageShell size="md" spacing="relaxed" className="p-6" data-testid="assessment-results-shell">
       <header>
         <h1 className="text-2xl font-bold">{campaign.title}</h1>
         <Badge variant="secondary" className="mt-1">
@@ -180,7 +181,7 @@ export default function AssessmentResultsDetailPage() {
           </table>
         </div>
       </section>
-    </main>
+    </PageShell>
   );
 }
 

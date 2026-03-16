@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { BlockRenderer } from '@/components/portal-builder/blocks/BlockRenderer';
 import type { PortalBlock, BlockType } from '@/components/portal-builder/types';
 import { PUBLIC_PORTAL_QUERY } from '@/lib/graphql/portal.queries';
@@ -52,9 +53,7 @@ export function PortalPage() {
 
   if (fetching) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <LoadingSpinner containerHeight="min-h-screen" />
     );
   }
 

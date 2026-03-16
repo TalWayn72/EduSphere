@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle } from 'lucide-react';
 import { PublicLayout } from '@/components/PublicLayout';
+import { PageShell } from '@/components/PageShell';
 
 // Public accessibility statement page — no auth required.
 // Route: /accessibility
@@ -97,7 +98,7 @@ const KNOWN_LIMITATIONS: KnownLimitation[] = [
 export function AccessibilityStatementPage() {
   return (
     <PublicLayout navVariant="minimal">
-      <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
+      <PageShell size="sm" spacing="relaxed" className="max-w-3xl py-10">
         {/* Header */}
         <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -261,7 +262,7 @@ export function AccessibilityStatementPage() {
             Return to home
           </Link>
         </p>
-      </div>
+      </PageShell>
     </PublicLayout>
   );
 }

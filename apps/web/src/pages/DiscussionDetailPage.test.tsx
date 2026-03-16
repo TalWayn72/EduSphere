@@ -73,6 +73,14 @@ vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+}));
+
 import * as urql from 'urql';
 import { DiscussionDetailPage } from './DiscussionDetailPage';
 
@@ -98,15 +106,9 @@ describe('DiscussionDetailPage', () => {
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
-  it('renders Back to Discussions link', () => {
+  it('renders Discussion heading via PageHeader', () => {
     renderPage();
-    expect(screen.getByText('Back to Discussions')).toBeInTheDocument();
-  });
-
-  it('back link points to /discussions', () => {
-    renderPage();
-    const backLink = screen.getByText('Back to Discussions').closest('a');
-    expect(backLink).toHaveAttribute('href', '/discussions');
+    expect(screen.getByRole('heading', { name: 'Discussion' })).toBeInTheDocument();
   });
 
   it('renders message log region with aria-label', () => {

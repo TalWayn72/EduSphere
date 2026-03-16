@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   OnModuleDestroy,
@@ -212,7 +213,7 @@ export class VisualAnchorService implements OnModuleDestroy {
         .returning()
     );
 
-    if (!row) throw new Error('Insert failed');
+    if (!row) throw new InternalServerErrorException('Insert failed');
 
     await this.publishNats('EDUSPHERE.visual.anchor.created', {
       anchorId: row.id,

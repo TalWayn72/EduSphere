@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -83,7 +84,7 @@ export class ScormSessionService implements OnModuleDestroy {
       })
       .returning();
 
-    if (!created) throw new Error('Failed to create SCORM session');
+    if (!created) throw new InternalServerErrorException('Failed to create SCORM session');
     this.logger.log(`Created SCORM session: id=${created.id} userId=${userId}`);
     return mapSession(created);
   }

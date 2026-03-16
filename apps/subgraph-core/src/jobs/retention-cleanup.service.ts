@@ -110,6 +110,7 @@ export class RetentionCleanupService implements OnModuleDestroy {
       },
     };
 
+    // eslint-disable-next-line security/detect-object-injection -- entityType is validated against known tableMap keys
     const entry = tableMap[entityType];
     if (!entry) {
       this.logger.warn({ entityType }, 'No table mapped — skipping');

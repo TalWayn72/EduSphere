@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -83,7 +85,12 @@ export function GapAnalysisDashboardPage() {
   const isLoading = profilesFetching || gapFetching;
 
   return (
-    <AdminLayout title="Gap Analysis Dashboard" description="Knowledge gaps across your organisation">
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="Gap Analysis Dashboard"
+          description="Knowledge gaps across your organisation"
+        />
       <div data-testid="gap-analysis-page" className="space-y-6">
         {isLoading && (
           <div className="space-y-4" data-testid="gap-skeleton">
@@ -144,6 +151,7 @@ export function GapAnalysisDashboardPage() {
           </>
         )}
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

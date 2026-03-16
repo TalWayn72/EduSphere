@@ -310,7 +310,7 @@ describe('ContentViewer', () => {
   it('renders video title from useContentData hook', () => {
     renderCV();
     expect(
-      screen.getByText('Introduction to Talmudic Reasoning')
+      screen.getByRole('heading', { name: 'Introduction to Talmudic Reasoning' })
     ).toBeDefined();
   });
 

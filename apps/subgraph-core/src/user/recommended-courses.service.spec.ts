@@ -81,6 +81,7 @@ function mockParallelQueries(
     ];
     const mockTx = {
       execute: vi.fn().mockImplementation(() => {
+        // eslint-disable-next-line security/detect-object-injection -- numeric index in test mock
         const res = responses[callIdx] ?? { rows: [] };
         callIdx++;
         return Promise.resolve(res);

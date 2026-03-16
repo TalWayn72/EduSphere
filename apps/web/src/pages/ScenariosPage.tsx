@@ -101,7 +101,7 @@ export function ScenariosPage() {
         {/* Error state */}
         {result.error && (
           <p className="text-sm text-destructive">
-            Failed to load scenarios: {result.error.message}
+            Failed to load scenarios. Please try again.
           </p>
         )}
 

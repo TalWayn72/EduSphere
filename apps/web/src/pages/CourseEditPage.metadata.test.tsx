@@ -166,7 +166,7 @@ describe('CourseEditMetadata', () => {
 
     await waitFor(() => {
       expect(onSaved).toHaveBeenCalledWith(
-        expect.stringContaining('Unauthorized')
+        expect.stringContaining('Save failed')
       );
     });
   });

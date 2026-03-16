@@ -17,6 +17,7 @@ import {
   BadRequestException,
   NotFoundException,
   UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -132,7 +133,7 @@ export class PilotService implements OnModuleDestroy {
       .returning();
 
     if (!created) {
-      throw new Error('[PilotService] Failed to insert pilot_request row');
+      throw new InternalServerErrorException('[PilotService] Failed to insert pilot_request row');
     }
 
     this.publish(SUBJ_SUBMITTED, {
@@ -205,7 +206,7 @@ export class PilotService implements OnModuleDestroy {
       .returning();
 
     if (!newTenant) {
-      throw new Error('[PilotService] Failed to provision tenant');
+      throw new InternalServerErrorException('[PilotService] Failed to provision tenant');
     }
 
     // Find or fallback to first active plan for pilot
@@ -216,7 +217,7 @@ export class PilotService implements OnModuleDestroy {
       .limit(1);
 
     if (!pilotPlan) {
-      throw new Error('[PilotService] No active subscription plan found');
+      throw new InternalServerErrorException('[PilotService] No active subscription plan found');
     }
 
     const pilotEndsAt = new Date();

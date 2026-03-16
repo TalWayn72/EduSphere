@@ -16,6 +16,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { PublicLayout } from '@/components/PublicLayout';
+import { PageHeader } from '@/components/PageHeader';
 
 const SECTIONS = [
   {
@@ -107,6 +108,9 @@ export function CompliancePage() {
   return (
     <PublicLayout>
       <div className="min-h-screen bg-white dark:bg-background">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+          <PageHeader title="Compliance & Certifications" description="Industry standards, security certifications, and regulatory compliance." />
+        </div>
         {/* Navigation pills */}
       <nav className="sticky top-0 z-40 bg-white dark:bg-background border-b border-gray-200 dark:border-border py-3" aria-label="Compliance sections">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-2">

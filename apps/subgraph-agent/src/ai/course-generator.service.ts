@@ -5,7 +5,7 @@
  * Memory safety: implements OnModuleDestroy and closes the DB pool.
  */
 
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -80,7 +80,7 @@ export class CourseGeneratorService implements OnModuleDestroy {
       .returning();
 
     if (!execution) {
-      throw new Error('Failed to create execution record');
+      throw new InternalServerErrorException('Failed to create execution record');
     }
 
     const executionId = execution.id;

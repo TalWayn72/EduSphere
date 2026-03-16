@@ -7,6 +7,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageHeader } from '@/components/PageHeader';
 import { toast } from 'sonner';
 import { BlockPalette } from '@/components/portal-builder/BlockPalette';
 import { CanvasDropZone } from '@/components/portal-builder/CanvasDropZone';
@@ -123,8 +124,15 @@ export function PortalBuilderPage() {
   const isPublished = serverPortal?.published ?? false;
 
   return (
-    <AdminLayout title="Portal Builder">
-    <div className="flex flex-col h-screen">
+    <AdminLayout>
+    <PageHeader
+      title="Portal Builder"
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Portal Builder' },
+      ]}
+    />
+    <div className="flex flex-col h-screen mt-4">
       {/* Toolbar */}
       <header className="flex items-center gap-3 px-6 py-3 border-b bg-background shrink-0">
         <input

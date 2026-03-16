@@ -56,6 +56,7 @@ describe('NatsService', () => {
 
     it('does not throw when NATS is unreachable', async () => {
       const { connect } = await import('nats');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock cast in test
       (connect as any).mockRejectedValueOnce(new Error('connection refused'));
       await expect(service.onModuleInit()).resolves.toBeUndefined();
     });
@@ -70,6 +71,7 @@ describe('NatsService', () => {
       });
 
       const { connect } = await import('nats');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock cast in test
       const conn = await (connect as any).mock.results[0].value;
       const js = conn.jetstream();
       expect(js.publish).toHaveBeenCalledWith(
@@ -92,6 +94,7 @@ describe('NatsService', () => {
       await service.onModuleDestroy();
 
       const { connect } = await import('nats');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock cast in test
       const conn = await (connect as any).mock.results[0].value;
       expect(conn.drain).toHaveBeenCalled();
     });

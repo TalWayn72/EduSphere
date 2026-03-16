@@ -157,6 +157,7 @@ export class AuditLogService implements OnModuleDestroy {
     };
     const header = CSV_HEADERS.join(',');
     const rows = entries.map((e) =>
+      // eslint-disable-next-line security/detect-object-injection -- iterating known CSV_HEADERS keys
       CSV_HEADERS.map((k) => escape(e[k] ?? null)).join(',')
     );
     return [header, ...rows].join('\n');

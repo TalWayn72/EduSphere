@@ -9,6 +9,7 @@ import {
   CertificateCard,
   type Certificate,
 } from '@/components/certificates/CertificateCard';
+import { PageShell } from '@/components/PageShell';
 import {
   MY_CERTIFICATES_QUERY,
   CERTIFICATE_DOWNLOAD_URL_QUERY,
@@ -70,7 +71,7 @@ export function CertificatesPage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <PageShell size="md" className="p-6">
         <div>
           <h1 className="text-3xl font-bold" data-testid="page-heading">
             {t('certificates.title', 'Certificates')}
@@ -122,7 +123,7 @@ export function CertificatesPage() {
             ))}
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

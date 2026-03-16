@@ -50,6 +50,7 @@ vi.mock('@langchain/langgraph', () => {
 import { LangGraphService } from './langgraph.service';
 
 function getPrivate<T>(svc: LangGraphService, field: string): T {
+  // eslint-disable-next-line security/detect-object-injection -- test utility accessing private fields by known name
   return (svc as unknown as Record<string, T>)[field];
 }
 

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -26,6 +27,8 @@ import {
   Copy,
   CheckCircle2,
 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 
 const LTI_PLATFORMS_QUERY = `
   query LtiPlatforms {
@@ -90,7 +93,7 @@ export function LtiSettingsPage() {
     ok: boolean;
     message: string;
   } | null>(null);
-  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -106,7 +109,7 @@ export function LtiSettingsPage() {
 
   useEffect(() => {
     return () => {
-      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
     };
   }, []);
 
@@ -121,8 +124,8 @@ export function LtiSettingsPage() {
   const handleCopyUrl = () => {
     void navigator.clipboard.writeText(callbackUrl);
     setCopied(true);
-    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
-    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
   };
 
   const handleToggle = async (id: string, current: boolean) => {
@@ -148,17 +151,23 @@ export function LtiSettingsPage() {
           ? 'JWKS reachable (HTTP ' + res.status + ')'
           : 'JWKS unreachable: HTTP ' + res.status,
       });
-    } catch (err) {
+    } catch {
       setTestResult({
         ok: false,
-        message: 'Connection failed: ' + String(err),
+        message: 'Connection failed. Please check the URL and try again.',
       });
     }
   };
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'LTI' },
+          ]}
+        />
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">LTI 1.3 Platforms</h1>
@@ -251,7 +260,7 @@ export function LtiSettingsPage() {
         {error && (
           <div className="flex items-center gap-2 text-destructive">
             <AlertCircle className="h-4 w-4" />
-            <span>{error.message}</span>
+            <span>Failed to load LTI settings. Please try again.</span>
           </div>
         )}
 
@@ -337,7 +346,7 @@ export function LtiSettingsPage() {
             connect your LMS.
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

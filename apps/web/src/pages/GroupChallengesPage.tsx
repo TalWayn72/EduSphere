@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { ChallengeCard } from '@/components/challenge/ChallengeCard';
 import {
   ACTIVE_CHALLENGES_QUERY,
@@ -72,7 +73,7 @@ export function GroupChallengesPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <PageShell size="md" className="py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">Group Challenges</h1>
           <Link
@@ -173,7 +174,7 @@ export function GroupChallengesPage() {
             )}
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

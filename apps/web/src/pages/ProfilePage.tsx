@@ -13,6 +13,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -134,7 +135,7 @@ export function ProfilePage() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto space-y-6">
+      <PageShell size="sm">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
@@ -259,7 +260,7 @@ export function ProfilePage() {
         {userId && (
           <ProfileVisibilityCard userId={userId} preferences={preferences} />
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

@@ -17,6 +17,7 @@ import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 export function LandingPage() {
   return (
     <PublicLayout>
+      <h1 className="sr-only">EduSphere — AI-Powered Learning Platform</h1>
       <PageMeta
         title="AI-Powered Knowledge Graph Learning Platform"
         description="EduSphere: personalized AI tutoring (Chavruta), knowledge graphs, gamification, and enterprise LMS. Free for individuals, scalable to 100,000+ users."

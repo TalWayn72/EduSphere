@@ -73,7 +73,7 @@ const instructorAuth: AuthContext = {
   scopes: [],
   isSuperAdmin: false,
 };
-const orgAdminAuth: AuthContext = {
+const _orgAdminAuth: AuthContext = {
   userId: 'admin-1',
   email: 'a@e.com',
   username: 'admin',
@@ -100,7 +100,7 @@ const aiAnnotation = {
   id: 'ai-1', layer: 'AI_GENERATED', user_id: 'system',
   asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
 };
-const otherPersonal = {
+const _otherPersonal = {
   id: 'p-2', layer: 'PERSONAL', user_id: 'student-2',
   asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
 };

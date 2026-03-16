@@ -6,6 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -63,10 +65,13 @@ export function AuditLogPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <AdminLayout
-      title="Audit Log"
-      description="Track all administrative actions and platform events"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Audit Log"
+          description="Track all administrative actions and platform events"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Audit Log' }]}
+        />
       <div className="space-y-4">
         <Card>
           <CardHeader>
@@ -223,6 +228,7 @@ export function AuditLogPage() {
           </div>
         )}
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

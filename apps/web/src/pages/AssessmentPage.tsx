@@ -4,6 +4,8 @@
  */
 import { useParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { AssessmentForm } from '@/components/AssessmentForm';
 
 const DEMO_CRITERIA = [
@@ -17,7 +19,14 @@ export function AssessmentPage() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto mt-6">
+      <PageShell size="md">
+        <PageHeader
+          title="Assessment"
+          breadcrumbs={[
+            { label: 'Assessments', href: '/assessments' },
+            { label: 'Assessment' },
+          ]}
+        />
         <AssessmentForm
           campaignId={assessmentId}
           raterRole="PEER"
@@ -25,7 +34,7 @@ export function AssessmentPage() {
           proctoringEnabled={true}
           assessmentId={assessmentId}
         />
-      </div>
+      </PageShell>
     </Layout>
   );
 }

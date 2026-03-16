@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Button } from '@/components/ui/button';
 import { LESSON_QUERY } from '@/lib/graphql/lesson.queries';
 import { login } from '@/lib/auth';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 const AUTH_ERROR_PATTERNS = [
   'unauthorized',
@@ -69,9 +72,7 @@ export function LessonDetailPage() {
   if (!mounted || fetching) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
+        <LoadingSpinner />
       </Layout>
     );
   }
@@ -90,7 +91,7 @@ export function LessonDetailPage() {
     }
     return (
       <Layout>
-        <div className="p-6 text-red-600">שגיאה: {error.message}</div>
+        <div className="p-6 text-red-600">שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.</div>
       </Layout>
     );
   }
@@ -111,7 +112,15 @@ export function LessonDetailPage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto p-6">
+      <PageShell size="sm" className="max-w-3xl p-6">
+        <Breadcrumbs
+          className="mb-4"
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: 'Course', href: `/courses/${courseId}` },
+            { label: lesson.title },
+          ]}
+        />
         <div className="flex items-center gap-2 mb-6">
           <Button
             variant="ghost"
@@ -187,7 +196,7 @@ export function LessonDetailPage() {
             </Button>
           )}
         </div>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

@@ -29,8 +29,10 @@ export function encryptHrisCredentials(config: HrisConfig): HrisConfig {
   const encrypted = { ...config };
 
   for (const field of SECRET_FIELDS) {
+    // eslint-disable-next-line security/detect-object-injection -- field is from typed SECRET_FIELDS constant
     const value = encrypted[field];
     if (value) {
+      // eslint-disable-next-line security/detect-object-injection -- field is from typed SECRET_FIELDS constant
       encrypted[field] = encryptField(value, tenantKey);
     }
   }
@@ -51,9 +53,11 @@ export function decryptHrisCredentials(config: HrisConfig): HrisConfig {
   const decrypted = { ...config };
 
   for (const field of SECRET_FIELDS) {
+    // eslint-disable-next-line security/detect-object-injection -- field is from typed SECRET_FIELDS constant
     const value = decrypted[field];
     if (value && value.includes(':')) {
       try {
+        // eslint-disable-next-line security/detect-object-injection -- field is from typed SECRET_FIELDS constant
         decrypted[field] = decryptField(value, tenantKey);
       } catch {
         logger.error(

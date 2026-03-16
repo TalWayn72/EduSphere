@@ -24,12 +24,14 @@ vi.mock('urql', () => ({
 
 vi.mock('@/components/admin/AdminLayout', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  AdminLayout: ({ children, title }: any) => (
-    <div>
-      <h1>{title}</h1>
-      {children}
-    </div>
+  AdminLayout: ({ children }: any) => (
+    <div>{children}</div>
   ),
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageHeader: ({ title }: any) => <h1>{title}</h1>,
 }));
 
 vi.mock('@/hooks/useAuthRole', () => ({

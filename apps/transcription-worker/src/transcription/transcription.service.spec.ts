@@ -105,6 +105,7 @@ describe('TranscriptionService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     s3SendMock.mockResolvedValue({});
+    /* eslint-disable @typescript-eslint/no-explicit-any -- partial mocks in test */
     service = new TranscriptionService(
       mockWhisper as any,
       mockMinio as any,
@@ -114,6 +115,7 @@ describe('TranscriptionService', () => {
       mockHls as any,
       mockTranslation as any
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   });
 
   describe('transcribeFile', () => {

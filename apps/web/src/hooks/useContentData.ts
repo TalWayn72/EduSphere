@@ -3,10 +3,6 @@
  *
  * Falls back to mock video/transcript when the query errors or returns nothing
  * (e.g. gateway offline in local dev without VITE_DEV_MODE=true).
- *
- * TODO: Replace ContentQueryResult with the generated ContentItemQuery type
- * from @edusphere/graphql-types once the contentItem query in the supergraph
- * includes mediaAsset and transcript fields (tracked in OPEN_ISSUES.md).
  */
 import { useQuery } from 'urql';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';

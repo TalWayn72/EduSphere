@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -50,7 +51,7 @@ export function UserSearchPage() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
+      <PageShell size="sm" className="py-10">
         <div className="flex items-center gap-3">
           <Users className="h-7 w-7 text-primary" aria-hidden="true" />
           <h1 className="text-2xl font-bold">Find People</h1>
@@ -117,7 +118,7 @@ export function UserSearchPage() {
             ))}
           </ul>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

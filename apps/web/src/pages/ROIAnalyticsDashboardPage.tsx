@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuthRole } from '@/hooks/useAuthRole';
@@ -99,14 +101,19 @@ export function ROIAnalyticsDashboardPage() {
   }
 
   return (
-    <AdminLayout title="ROI Analytics" description="Return on investment from AI-powered learning">
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="ROI Analytics"
+          description="Return on investment from AI-powered learning"
+        />
       <div data-testid="roi-dashboard-page">
         {fetching && <LoadingSkeleton />}
 
         {error && !fetching && (
           <Card>
             <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load ROI data: {error.message}
+              Failed to load ROI data. Please try again.
             </CardContent>
           </Card>
         )}
@@ -155,6 +162,7 @@ export function ROIAnalyticsDashboardPage() {
           </>
         )}
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

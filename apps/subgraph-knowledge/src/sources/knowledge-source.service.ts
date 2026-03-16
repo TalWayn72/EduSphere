@@ -12,6 +12,8 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  InternalServerErrorException,
+  BadRequestException,
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
@@ -139,7 +141,7 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
       })
       .returning();
 
-    if (!source) throw new Error('Failed to create knowledge source');
+    if (!source) throw new InternalServerErrorException('Failed to create knowledge source');
 
     // 2. Fire-and-forget with 5-min timeout (per memory-safety rules)
     const processTask = this.processSource(source.id, input);
@@ -196,7 +198,7 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
         parsed = await this.parser.parseDocx(input.fileBuffer ?? input.origin);
       } else if (input.sourceType === 'FILE_PDF') {
         if (!input.fileBuffer)
-          throw new Error('FILE_PDF requires a file buffer');
+          throw new BadRequestException('FILE_PDF requires a file buffer');
         parsed = await this.parser.parsePdf(input.fileBuffer);
       } else if (input.sourceType === 'FILE_TXT') {
         const text = input.fileBuffer?.toString('utf-8') ?? '';

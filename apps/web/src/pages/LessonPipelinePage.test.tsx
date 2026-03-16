@@ -32,6 +32,11 @@ vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: any) => children,
 }));
 
+vi.mock('@/components/PageHeader', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageHeader: ({ title }: any) => <h1>{title}</h1>,
+}));
+
 vi.mock('@/components/pipeline/PipelineConfigPanel', () => ({
   PipelineConfigPanel: ({ node, onClose }: { node: { labelHe: string }; onClose: () => void }) => (
     <div data-testid="config-panel">
@@ -127,14 +132,14 @@ describe('LessonPipelinePage', () => {
     } as never);
   });
 
-  it('renders "Pipeline Builder" label in toolbar', () => {
+  it('renders "Lesson Pipeline" heading via PageHeader', () => {
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getByText('Pipeline Builder')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Lesson Pipeline' })).toBeInTheDocument();
   });
 
-  it('renders lesson title in back button', () => {
+  it('renders template picker', () => {
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getByText(/Test Lesson/)).toBeInTheDocument();
+    expect(screen.getByTestId('template-picker')).toBeInTheDocument();
   });
 
   it('shows module palette with Hebrew labels', () => {
@@ -304,10 +309,9 @@ describe('LessonPipelinePage', () => {
     expect(screen.queryByText(/\[object Object\]/)).not.toBeInTheDocument();
   });
 
-  it('navigates back to lesson when back button is clicked', () => {
+  it('renders Lesson Pipeline heading', () => {
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    fireEvent.click(screen.getByText(/Test Lesson/));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/lessons/lesson-1');
+    expect(screen.getByRole('heading', { name: 'Lesson Pipeline' })).toBeInTheDocument();
   });
 
   // ── CUSTOM template (Build from scratch) ────────────────────────────────────

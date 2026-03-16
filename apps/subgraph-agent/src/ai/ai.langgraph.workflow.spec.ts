@@ -30,10 +30,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // ---------------------------------------------------------------------------
 
 function readSrc(filename: string): string {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- test helper resolving known source files relative to __dirname
   return readFileSync(resolve(__dirname, filename), 'utf-8');
 }
 
 function srcExists(filename: string): boolean {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- test helper checking known source files relative to __dirname
   return existsSync(resolve(__dirname, filename));
 }
 

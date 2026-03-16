@@ -55,7 +55,8 @@ export function useSubmitAssignment(
           textContent,
         });
         if (result.error) {
-          setError(result.error.message);
+          console.error('[useSubmitAssignment] Submission failed:', result.error.message);
+          setError('Failed to submit assignment. Please try again.');
           return null;
         }
         return (
@@ -63,9 +64,8 @@ export function useSubmitAssignment(
             ?.submitTextAssignment ?? null
         );
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Submission failed';
-        setError(message);
+        console.error('[useSubmitAssignment] Unexpected error:', err);
+        setError('Failed to submit assignment. Please try again.');
         return null;
       } finally {
         setLoading(false);

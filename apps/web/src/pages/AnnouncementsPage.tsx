@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -110,11 +111,16 @@ export function AnnouncementsPage() {
   };
 
   return (
-    <AdminLayout
-      title="Announcements"
-      description="Manage platform-wide announcements"
-    >
-      <div className="space-y-6">
+    <AdminLayout>
+      <PageHeader
+        title="Announcements"
+        description="Manage platform-wide announcements"
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Announcements' },
+        ]}
+      />
+      <div className="space-y-6 mt-6">
         <div className="flex justify-end">
           <Button onClick={() => setShowForm((s) => !s)}>
             {showForm ? 'Cancel' : 'Create Announcement'}

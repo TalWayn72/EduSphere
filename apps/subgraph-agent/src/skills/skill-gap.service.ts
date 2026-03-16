@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
+  closeAllPools,
   skills,
   inArray,
   type DrizzleDB,
@@ -17,8 +18,12 @@ export interface SkillGapAnalysisResult {
 }
 
 @Injectable()
-export class SkillGapService {
+export class SkillGapService implements OnModuleDestroy {
   private readonly db: DrizzleDB = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async getSkillGapAnalysis(
     auth: AuthContext,

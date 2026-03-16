@@ -26,7 +26,9 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { AnalyticsCharts } from './CourseAnalyticsPage.charts';
+import { PageShell } from '@/components/PageShell';
 import { useAuthRole } from '@/hooks/useAuthRole';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { AtRiskLearnersTable } from '@/components/AtRiskLearnersTable';
 import type { AtRiskLearnerRow } from '@/components/AtRiskLearnersTable';
 
@@ -163,7 +165,14 @@ export function CourseAnalyticsPage() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto space-y-6 p-6">
+      <PageShell size="lg" className="p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: 'Course', href: `/courses/${courseId}` },
+            { label: 'Analytics' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -228,7 +237,7 @@ export function CourseAnalyticsPage() {
             />
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

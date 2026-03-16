@@ -25,6 +25,8 @@ export interface Annotation {
   createdAt: string;
   updatedAt: string;
   textRange?: TextRange;
+  /** Raw spatialData from GraphQL JSON scalar (document: {from,to}, video: {timestampStart}). */
+  spatialData?: Record<string, unknown>;
 }
 
 export interface AnnotationThread {

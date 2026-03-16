@@ -10,7 +10,7 @@ const mockInsert = vi.fn();
 const mockValues = vi.fn();
 const mockReturning = vi.fn();
 const mockUpdate = vi.fn();
-const mockSet = vi.fn();
+const _mockSet = vi.fn();
 const mockDelete = vi.fn();
 
 const mockTx = {

@@ -51,7 +51,7 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 // ─── Imports ──────────────────────────────────────────────────────────────────
-import { SearchPage } from './Search';
+import { SearchPage } from './search';
 import { useQuery, useMutation } from 'urql';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -395,7 +395,7 @@ describe('SearchPage', () => {
       ] as unknown as ReturnType<typeof useQuery>);
 
       // Dynamically import SearchPage after module reset so DEV_MODE=false
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -430,7 +430,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -466,7 +466,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -501,7 +501,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -530,7 +530,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -576,7 +576,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -616,7 +616,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -658,7 +658,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       // Render with a navigate-capturing wrapper
       const NavigateSpy = ({ to: _to }: { to: string }) => null;
@@ -709,7 +709,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       const { container } = render(
         <MemoryRouter initialEntries={['/search']}>
@@ -1061,7 +1061,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       const { container } = render(
         <MemoryRouter initialEntries={['/search']}>
@@ -1107,7 +1107,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -1151,7 +1151,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       render(
         <MemoryRouter initialEntries={['/search']}>
@@ -1195,7 +1195,7 @@ describe('SearchPage', () => {
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
 
-      const { SearchPage: SearchPageReal } = await import('./Search');
+      const { SearchPage: SearchPageReal } = await import('./search');
 
       const { container } = render(
         <MemoryRouter initialEntries={['/search']}>

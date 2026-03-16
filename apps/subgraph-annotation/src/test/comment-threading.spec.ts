@@ -56,7 +56,7 @@ const ownerAuth: AuthContext = {
   scopes: [],
   isSuperAdmin: false,
 };
-const instructorAuth: AuthContext = {
+const _instructorAuth: AuthContext = {
   userId: 'instr-1',
   email: 'i@e.com',
   username: 'instr',

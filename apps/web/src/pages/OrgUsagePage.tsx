@@ -6,6 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { UsageMeter } from '@/components/admin/UsageMeter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -73,7 +75,12 @@ export function OrgUsagePage() {
   const usage = data?.myTenantUsage;
 
   return (
-    <AdminLayout title="Usage & Seats" description="Your organization's yearly active user utilization">
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="Usage & Seats"
+          description="Your organization's yearly active user utilization"
+        />
       <div data-testid="org-usage-page">
         {/* Year selector */}
         <div className="flex items-center gap-3 mb-6">
@@ -140,6 +147,7 @@ export function OrgUsagePage() {
           </>
         )}
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

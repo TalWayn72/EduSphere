@@ -3,6 +3,7 @@ import {
   Logger,
   ConflictException,
   NotFoundException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -56,7 +57,7 @@ export class EnrollmentService implements OnModuleDestroy {
         .values({ userId: ctx.userId, courseId, status: 'ACTIVE' })
         .returning();
       this.logger.log(`User ${ctx.userId} enrolled in course ${courseId}`);
-      if (!enrollment) throw new Error('Enrollment failed');
+      if (!enrollment) throw new InternalServerErrorException('Enrollment failed');
       return this.mapEnrollment(enrollment);
     });
   }

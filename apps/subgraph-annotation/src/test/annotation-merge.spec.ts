@@ -63,7 +63,7 @@ const instructorAuth: AuthContext = {
   scopes: [],
   isSuperAdmin: false,
 };
-const otherStudentAuth: AuthContext = {
+const _otherStudentAuth: AuthContext = {
   userId: 'student-2',
   email: 's2@e.com',
   username: 'student2',

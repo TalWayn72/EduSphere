@@ -22,6 +22,7 @@ const LANGUAGE_INSTRUCTIONS: Readonly<Record<string, string>> = {
  * For unknown locales, the prompt is returned unchanged (safe fallback).
  */
 export function injectLocale(systemPrompt: string, locale: string): string {
+  // eslint-disable-next-line security/detect-object-injection -- locale is a language code string used as dictionary key
   const instruction = LANGUAGE_INSTRUCTIONS[locale];
   return instruction ? `${systemPrompt}\n\n${instruction}` : systemPrompt;
 }

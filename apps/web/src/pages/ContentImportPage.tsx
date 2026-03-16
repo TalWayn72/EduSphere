@@ -7,6 +7,7 @@ import { FolderUploadZone } from '@/components/content-import/FolderUploadZone';
 import { DriveImportCard } from '@/components/content-import/DriveImportCard';
 import { ImportProgressPanel } from '@/components/content-import/ImportProgressPanel';
 import { useContentImport } from '@/hooks/useContentImport';
+import { PageShell } from '@/components/PageShell';
 
 type ImportSource = 'youtube' | 'website' | 'folder' | 'drive' | null;
 
@@ -40,7 +41,7 @@ export function ContentImportPage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-3xl mx-auto">
+      <PageShell size="sm" className="max-w-3xl p-6" spacing="normal">
         <h1 className="text-3xl font-bold mb-2">Import Content</h1>
         <p className="text-muted-foreground mb-8">
           Bulk-import lessons from YouTube playlists, websites, or local files.
@@ -119,7 +120,7 @@ export function ContentImportPage() {
         ) : (
           <ImportProgressPanel job={importJob} onDone={() => navigate(`/courses/${courseId}`)} />
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

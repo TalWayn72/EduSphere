@@ -23,6 +23,8 @@ import {
   UPDATE_COURSE_COMPLIANCE_MUTATION,
 } from '@/lib/graphql/compliance.queries';
 import { ShieldCheck, Download, Loader2, AlertCircle } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
@@ -109,7 +111,13 @@ export function ComplianceReportsPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Compliance' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Compliance Training Reports</h1>
@@ -132,7 +140,7 @@ export function ComplianceReportsPage() {
             {error && (
               <div className="flex items-center gap-2 text-destructive">
                 <AlertCircle className="h-4 w-4" />
-                <span>{error.message}</span>
+                <span>Failed to load compliance data. Please try again.</span>
               </div>
             )}
             {!fetching && courses.length === 0 && (
@@ -275,7 +283,7 @@ export function ComplianceReportsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

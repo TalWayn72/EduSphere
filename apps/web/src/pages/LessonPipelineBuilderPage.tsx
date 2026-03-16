@@ -18,6 +18,8 @@ import {
   PUBLISH_LESSON_PLAN_MUTATION,
 } from '@/lib/graphql/lesson-plan.queries';
 import { toast } from 'sonner';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 
 type LessonStepType = 'VIDEO' | 'QUIZ' | 'DISCUSSION' | 'AI_CHAT' | 'SUMMARY';
 
@@ -164,7 +166,16 @@ export function LessonPipelineBuilderPage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto py-8 px-4">
+      <PageShell size="sm" className="max-w-3xl py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          className="mb-4"
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: 'Course', href: `/courses/${courseId}` },
+            { label: 'Pipeline Builder' },
+          ]}
+        />
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -268,7 +279,7 @@ export function LessonPipelineBuilderPage() {
             {publishing ? 'Publishing...' : 'Publish'}
           </Button>
         </div>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

@@ -13,6 +13,7 @@ export function OAuthCallbackPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
+      <h1 className="sr-only">Authentication</h1>
       <p className="text-muted-foreground">Connecting Google Drive...</p>
     </div>
   );

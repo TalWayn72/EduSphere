@@ -2,7 +2,7 @@
  * ChavrutaPartnerMatchService — GAP-3: Chavruta debate partner matching.
  * Finds enrolled peers in the same course and creates partner sessions.
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import {
   db,
   withTenantContext,
@@ -120,7 +120,7 @@ export class ChavrutaPartnerMatchService implements OnModuleDestroy {
           .returning();
         const session = rows[0];
         if (!session) {
-          throw new Error('[ChavrutaPartnerMatchService] Insert returned no rows');
+          throw new InternalServerErrorException('[ChavrutaPartnerMatchService] Insert returned no rows');
         }
         this.logger.log(
           { sessionId: session.id, initiatorId, partnerId },

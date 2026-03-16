@@ -6,12 +6,17 @@ import { PilotRequestsAdminPage } from './PilotRequestsAdminPage';
 
 // Mock AdminLayout to avoid ThemeProvider/AppSidebar dependency
 vi.mock('@/components/admin/AdminLayout', () => ({
-  AdminLayout: ({ children, title }: { children: React.ReactNode; title?: string }) => (
-    <div data-testid="admin-layout">
-      {title && <h1>{title}</h1>}
-      {children}
-    </div>
+  AdminLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="admin-layout">{children}</div>
   ),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
 // Mock useAuthRole to SUPER_ADMIN

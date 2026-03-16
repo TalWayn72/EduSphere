@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -21,6 +22,7 @@ import {
   CRM_SYNC_LOG_QUERY,
   DISCONNECT_CRM_MUTATION,
 } from '@/lib/graphql/crm.queries';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   Link,
   Copy,
@@ -29,6 +31,7 @@ import {
   Loader2,
   Unplug,
 } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
@@ -100,12 +103,18 @@ export function CrmSettingsPage() {
     await navigator.clipboard.writeText(webhookUrl);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
   };
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'CRM' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Link className="h-6 w-6 text-primary" />
           <div>
@@ -252,7 +261,7 @@ export function CrmSettingsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

@@ -5,6 +5,8 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -74,7 +76,12 @@ export function PartnerDashboardPage() {
   const newKey = regenResult.data?.regeneratePartnerApiKey?.apiKey as string | undefined;
 
   return (
-    <AdminLayout title="Partner Dashboard" description="Revenue analytics and API access for EduSphere Partners">
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="Partner Dashboard"
+          description="Revenue analytics and API access for EduSphere Partners"
+        />
       <div data-testid="partner-dashboard-page">
         {fetching && (
           <div className="space-y-4" data-testid="partner-skeleton" role="status" aria-label="Loading partner dashboard">
@@ -128,6 +135,7 @@ export function PartnerDashboardPage() {
           </>
         )}
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

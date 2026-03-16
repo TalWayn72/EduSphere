@@ -23,10 +23,10 @@ export function AdminLayout({
         <AdminSidebar />
         <div className="flex-1 min-w-0">
           {title && (
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold">{title}</h1>
+            <div className="mb-6" data-testid="admin-page-header">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
               {description && (
-                <p className="text-muted-foreground mt-1 text-sm">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {description}
                 </p>
               )}

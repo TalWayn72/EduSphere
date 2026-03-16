@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SIMULATED_SAVE_MS, TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { Label } from '@/components/ui/label';
 import {
   Card,
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { Building2, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
@@ -99,22 +101,28 @@ export function HrisConfigPage() {
 
   function handleTestConnection() {
     setTesting(true);
-    setTimeout(() => setTesting(false), 1500);
+    setTimeout(() => setTesting(false), SIMULATED_SAVE_MS);
   }
 
   function handleSave() {
     setSaving(true);
-    setTimeout(() => setSaving(false), 1000);
+    setTimeout(() => setSaving(false), SIMULATED_SAVE_MS);
   }
 
   function handleSyncNow() {
     setSyncing(true);
-    setTimeout(() => setSyncing(false), 2000);
+    setTimeout(() => setSyncing(false), TOAST_AUTO_DISMISS_MS);
   }
 
   return (
     <Layout>
       <div className="p-6 space-y-6" data-testid="hris-config-page">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'HRIS' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Building2 className="h-6 w-6 text-primary" />
           <div>

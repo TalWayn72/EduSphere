@@ -342,7 +342,7 @@ describe('AuditLogAdminPage', () => {
 
     await waitFor(() => {
       expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
-        expect.stringContaining('Insufficient permissions')
+        expect.stringContaining('Export failed')
       );
     });
   });

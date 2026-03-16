@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -82,8 +83,16 @@ export function AutoGradingResultsPage() {
   const overall = overallScore(results);
 
   return (
-    <AdminLayout title="AI Auto-Grading Results" description="Review AI-generated quiz grading">
-      <div data-testid="auto-grading-page" className="space-y-6">
+    <AdminLayout>
+      <PageHeader
+        title="Auto-Grading Results"
+        description="Review AI-generated quiz grading"
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Auto-Grading' },
+        ]}
+      />
+      <div data-testid="auto-grading-page" className="space-y-6 mt-6">
         {fetching && (
           <div className="space-y-4" data-testid="grading-skeleton">
             <Skeleton className="h-32 w-full rounded-lg" />

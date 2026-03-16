@@ -29,6 +29,15 @@ vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: any) => children,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/Breadcrumbs', () => ({
+  Breadcrumbs: () => <nav aria-label="Breadcrumb">breadcrumbs</nav>,
+}));
+
 vi.mock('@/lib/graphql/lesson.queries', () => ({
   LESSON_QUERY: 'LESSON_QUERY',
 }));
@@ -134,7 +143,6 @@ describe('LessonDetailPage', () => {
       </MemoryRouter>
     );
     expect(screen.getByText(/שגיאה/)).toBeInTheDocument();
-    expect(screen.getByText(/Network error/)).toBeInTheDocument();
   });
 
   it('shows "השיעור לא נמצא" when lesson is null', () => {

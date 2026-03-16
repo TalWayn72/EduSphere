@@ -88,7 +88,7 @@ describe('Session Recording — document snapshot persistence', () => {
     const doc = new Y.Doc();
     const text = doc.getText('content');
     text.insert(0, 'Session transcript content');
-    const snapshot = Buffer.from(Y.encodeStateAsUpdate(doc));
+    const _snapshot = Buffer.from(Y.encodeStateAsUpdate(doc));
 
     // Access private method via prototype to test store logic
     const storeData = {

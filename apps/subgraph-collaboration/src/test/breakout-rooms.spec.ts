@@ -75,7 +75,7 @@ const STUDENT_AUTH: AuthContext = {
   isSuperAdmin: false,
 };
 
-const MAIN_SESSION = {
+const _MAIN_SESSION = {
   id: 'main-session',
   tenant_id: 'tenant-1',
   course_id: 'course-1',
@@ -122,7 +122,7 @@ function setupSelectChain(result: unknown[]) {
   mockSelect.mockReturnValue({ from: mockFrom });
 }
 
-function setupInsertChain(result: unknown[]) {
+function _setupInsertChain(result: unknown[]) {
   mockReturning.mockResolvedValue(result);
   mockValues.mockReturnValue({ returning: mockReturning });
   mockInsert.mockReturnValue({ values: mockValues });

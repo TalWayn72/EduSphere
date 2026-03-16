@@ -8,10 +8,12 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useSearchParams } from 'react-router-dom';
+import { PageShell } from '@/components/PageShell';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GitPullRequest } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { MergeRequestCard } from '@/components/merge-queue/MergeRequestCard';
 import { RejectDialog } from '@/components/merge-queue/RejectDialog';
 import { StatsBar, ResolvedList } from '@/components/merge-queue/MergeQueueStats';
@@ -85,7 +87,13 @@ export function InstructorMergeQueuePage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <PageShell size="sm" className="max-w-3xl">
+        <Breadcrumbs
+          items={[
+            { label: 'Instructor', href: '/instructor' },
+            { label: 'Merge Queue' },
+          ]}
+        />
         <div>
           <div className="flex items-center gap-2 mb-1">
             <GitPullRequest className="h-5 w-5 text-indigo-600" />
@@ -144,7 +152,7 @@ export function InstructorMergeQueuePage() {
           onClose={() => setRejectTarget(null)}
           onConfirm={(reason) => rejectTarget && void handleReject(rejectTarget, reason)}
         />
-      </div>
+      </PageShell>
     </Layout>
   );
 }

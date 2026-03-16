@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Loader2, Plus, Users } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
 import {
   MY_CAMPAIGNS_QUERY,
   CREATE_CAMPAIGN_MUTATION,
@@ -122,7 +123,7 @@ export function AssessmentCampaignPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Users className="h-6 w-6 text-primary" />
@@ -217,7 +218,7 @@ export function AssessmentCampaignPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

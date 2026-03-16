@@ -46,6 +46,22 @@ function readSrc(filename: string): string {
   return readFileSync(p, 'utf-8');
 }
 
+/** Read events.ts barrel + all domain event files it re-exports */
+function readAllEventSources(): string {
+  const domainFiles = [
+    'events.ts',
+    'agent-events.ts',
+    'annotation-events.ts',
+    'content-events.ts',
+    'knowledge-events.ts',
+    'lesson-events.ts',
+    'social-events.ts',
+    'course-events.ts',
+    'gateway-events.ts',
+  ];
+  return domainFiles.map((f) => readSrc(f)).join('\n');
+}
+
 // ---------------------------------------------------------------------------
 // 1. Schema versioning — timestamp field is required on time-series events
 // ---------------------------------------------------------------------------
@@ -333,7 +349,7 @@ describe('ContentPayload: all event type values pass validation', () => {
 // ---------------------------------------------------------------------------
 
 describe('Event type definitions use readonly modifiers (immutability)', () => {
-  const src = readSrc('events.ts');
+  const src = readAllEventSources();
 
   it('AgentSessionPayload fields are readonly', () => {
     // Check that the interface uses "readonly" on its fields
@@ -389,7 +405,7 @@ describe('Event type definitions use readonly modifiers (immutability)', () => {
 // ---------------------------------------------------------------------------
 
 describe('NatsEvent discriminated union is defined and comprehensive', () => {
-  const src = readSrc('events.ts');
+  const src = readAllEventSources();
 
   it('NatsEvent type alias is exported', () => {
     expect(src).toMatch(/export\s+type\s+NatsEvent\s*=/);
@@ -531,22 +547,22 @@ describe('events.ts file exists and exports expected symbols', () => {
   });
 
   it('exports isAgentSessionEvent', () => {
-    const src = readSrc('events.ts');
+    const src = readAllEventSources();
     expect(src).toMatch(/export\s+function\s+isAgentSessionEvent/);
   });
 
   it('exports isAgentMessageEvent', () => {
-    const src = readSrc('events.ts');
+    const src = readAllEventSources();
     expect(src).toMatch(/export\s+function\s+isAgentMessageEvent/);
   });
 
   it('exports isAnnotationEvent', () => {
-    const src = readSrc('events.ts');
+    const src = readAllEventSources();
     expect(src).toMatch(/export\s+function\s+isAnnotationEvent/);
   });
 
   it('exports isContentEvent', () => {
-    const src = readSrc('events.ts');
+    const src = readAllEventSources();
     expect(src).toMatch(/export\s+function\s+isContentEvent/);
   });
 

@@ -413,6 +413,7 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
     const mockTranslation = {
       translateTranscript: vi.fn().mockResolvedValue(undefined),
     };
+    /* eslint-disable @typescript-eslint/no-explicit-any -- partial mocks in test */
     const service = new TranscriptionService(
       mockWhisper as any,
       mockMinio as any,
@@ -422,6 +423,7 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
       mockHls as any,
       mockTranslation as any
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     await service.transcribeFile({
       fileKey: 'tenant/course/id/video.mp4',

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class EmbeddingProviderService {
@@ -19,7 +19,7 @@ export class EmbeddingProviderService {
         }
       );
       if (!resp.ok) {
-        throw new Error(`Ollama error ${resp.status}`);
+        throw new BadRequestException(`Ollama error ${resp.status}`);
       }
       const json = (await resp.json()) as { embedding: number[] };
       return json.embedding;
@@ -39,7 +39,7 @@ export class EmbeddingProviderService {
         }),
       });
       if (!resp.ok) {
-        throw new Error(`OpenAI error ${resp.status}`);
+        throw new BadRequestException(`OpenAI error ${resp.status}`);
       }
       const json = (await resp.json()) as {
         data: Array<{ embedding: number[] }>;
@@ -47,7 +47,7 @@ export class EmbeddingProviderService {
       return json.data[0]!.embedding;
     }
 
-    throw new Error('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
+    throw new BadRequestException('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
   }
 
   hasProvider(): boolean {

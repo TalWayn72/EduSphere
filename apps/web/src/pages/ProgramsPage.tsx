@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import {
   Card,
   CardContent,
@@ -65,9 +66,7 @@ export function ProgramsPage(): React.ReactElement {
   if (programsResult.fetching) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
+        <LoadingSpinner />
       </Layout>
     );
   }
@@ -76,7 +75,7 @@ export function ProgramsPage(): React.ReactElement {
     return (
       <Layout>
         <div className="p-6 text-destructive">
-          Failed to load programs: {programsResult.error.message}
+          Failed to load programs. Please try again.
         </div>
       </Layout>
     );

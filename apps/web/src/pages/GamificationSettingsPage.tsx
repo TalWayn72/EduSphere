@@ -6,6 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -101,10 +103,13 @@ export function GamificationSettingsPage() {
   };
 
   return (
-    <AdminLayout
-      title="Gamification Settings"
-      description="Configure badges, points, and leaderboards"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Gamification Settings"
+          description="Configure badges, points, and leaderboards"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Gamification Settings' }]}
+        />
       <div className="space-y-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -240,6 +245,7 @@ export function GamificationSettingsPage() {
           </CardContent>
         </Card>
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

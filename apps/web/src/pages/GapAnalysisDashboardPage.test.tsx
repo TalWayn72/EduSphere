@@ -5,12 +5,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GapAnalysisDashboardPage } from './GapAnalysisDashboardPage';
 
 vi.mock('@/components/admin/AdminLayout', () => ({
-  AdminLayout: ({ children, title }: { children: React.ReactNode; title?: string }) => (
-    <div data-testid="admin-layout">
-      {title && <h1>{title}</h1>}
-      {children}
-    </div>
+  AdminLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="admin-layout">{children}</div>
   ),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
 vi.mock('@/hooks/useAuthRole', () => ({

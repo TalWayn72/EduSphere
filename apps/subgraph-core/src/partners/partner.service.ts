@@ -7,7 +7,7 @@
  *   - All DB queries bypass tenant context (partners are cross-tenant — SUPER_ADMIN gate)
  *   - Memory safety: OnModuleDestroy closes all DB pools
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
   createDatabaseConnection,
@@ -67,7 +67,7 @@ export class PartnerService implements OnModuleDestroy {
       .returning({ id: schema.partners.id });
 
     const row = rows[0];
-    if (!row) throw new Error('Failed to create partner application');
+    if (!row) throw new InternalServerErrorException('Failed to create partner application');
 
     this.logger.log(
       { partnerId: row.id, contactEmail: input.contactEmail },

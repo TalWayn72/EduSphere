@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   ForbiddenException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import { randomUUID, randomBytes } from 'crypto';
@@ -142,7 +143,7 @@ export class LiveSessionService implements OnModuleDestroy {
       })
       .returning();
 
-    if (!session) throw new Error('Failed to insert live session');
+    if (!session) throw new InternalServerErrorException('Failed to insert live session');
 
     await this.publishNatsEvent(NATS_SESSION_CREATED, {
       sessionId: session.id,

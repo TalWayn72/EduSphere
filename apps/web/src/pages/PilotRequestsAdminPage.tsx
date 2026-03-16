@@ -6,6 +6,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -88,14 +91,18 @@ export function PilotRequestsAdminPage() {
   const requests: PilotRequest[] = data?.allPilotRequests ?? [];
 
   return (
-    <AdminLayout title="Pilot Requests" description="Review and manage B2B pilot applications">
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Pilot Requests"
+          description="Review and manage B2B pilot applications"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Pilot Requests' }]}
+        />
       <div data-testid="pilot-requests-page">
         {fetching && (
-          <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
+          <LoadingSpinner containerHeight="py-16" />
         )}
-        {error && <p className="text-destructive text-sm py-4">{error.message}</p>}
+        {error && <p className="text-destructive text-sm py-4">Failed to load pilot requests. Please try again.</p>}
 
         {!fetching && requests.length === 0 && (
           <p className="text-muted-foreground text-sm py-8 text-center">No pilot requests yet.</p>
@@ -175,6 +182,7 @@ export function PilotRequestsAdminPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </PageShell>
     </AdminLayout>
   );
 }

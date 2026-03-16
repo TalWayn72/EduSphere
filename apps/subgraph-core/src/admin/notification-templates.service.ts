@@ -2,7 +2,7 @@
  * NotificationTemplatesService — CRUD for admin-configurable notification templates.
  * Templates are stored in DB; defaults are seeded once on first access.
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { db, notificationTemplates, closeAllPools } from '@edusphere/db';
 import { sql, eq, and } from 'drizzle-orm';
 
@@ -141,7 +141,7 @@ export class NotificationTemplatesService implements OnModuleDestroy {
         )
       )
       .returning();
-    if (!row) throw new Error(`Notification template ${id} not found`);
+    if (!row) throw new NotFoundException(`Notification template ${id} not found`);
     this.logger.log({ id, tenantId }, 'Notification template updated');
     return mapRow(row);
   }
@@ -158,10 +158,10 @@ export class NotificationTemplatesService implements OnModuleDestroy {
       )
       .limit(1);
     const templateKey = currentRow[0]?.key;
-    if (!templateKey) throw new Error(`Notification template ${id} not found`);
+    if (!templateKey) throw new NotFoundException(`Notification template ${id} not found`);
 
     const defaults = PLATFORM_DEFAULTS.find((d) => d.key === templateKey);
-    if (!defaults) throw new Error(`No defaults found for key ${templateKey}`);
+    if (!defaults) throw new NotFoundException(`No defaults found for key ${templateKey}`);
 
     const [row] = await db
       .update(notificationTemplates)
@@ -178,7 +178,7 @@ export class NotificationTemplatesService implements OnModuleDestroy {
         )
       )
       .returning();
-    if (!row) throw new Error(`Reset failed for template ${id}`);
+    if (!row) throw new InternalServerErrorException(`Reset failed for template ${id}`);
     this.logger.log({ id, tenantId, key: templateKey }, 'Notification template reset to defaults');
     return mapRow(row);
   }

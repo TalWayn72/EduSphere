@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
-
-const GRAPHQL_URL =
-  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
+import { GRAPHQL_URL } from '@/lib/constants';
 
 const IMPORT_YOUTUBE_MUTATION = gql`
   mutation ImportFromYoutube($input: YoutubeImportInput!) {

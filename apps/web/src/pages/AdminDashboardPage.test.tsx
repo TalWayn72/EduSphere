@@ -31,16 +31,23 @@ vi.mock('urql', () => ({
 vi.mock('@/components/admin/AdminLayout', () => ({
   AdminLayout: ({
     children,
-    title,
   }: {
     children: React.ReactNode;
-    title: string;
   }) => (
     <div data-testid="admin-layout">
-      <h1>{title}</h1>
       {children}
     </div>
   ),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageHeader: ({ title }: any) => <h1>{title}</h1>,
 }));
 
 // Mock AdminStatCards
@@ -122,7 +129,7 @@ describe('AdminDashboardPage', () => {
     ] as unknown as ReturnType<typeof useQuery>);
     renderPage();
     expect(
-      screen.getByText('Failed to load dashboard data: Network error')
+      screen.getByText('Failed to load dashboard data')
     ).toBeInTheDocument();
   });
 

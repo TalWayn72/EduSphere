@@ -20,6 +20,7 @@ describe('LocalInferenceService', () => {
     // Restore env after each test
     Object.assign(process.env, originalEnv);
     for (const key of Object.keys(process.env)) {
+      // eslint-disable-next-line security/detect-object-injection -- iterating process.env keys in test cleanup
       if (!(key in originalEnv)) delete process.env[key];
     }
   });

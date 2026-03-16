@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, Logger, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -88,7 +88,7 @@ export class PushTokenService implements OnModuleDestroy {
     });
 
     if (!row) {
-      throw new Error('Failed to register push token');
+      throw new InternalServerErrorException('Failed to register push token');
     }
 
     this.logger.log(
@@ -220,7 +220,7 @@ export class PushTokenService implements OnModuleDestroy {
     if ((platform === 'ios' || platform === 'android') && expoPushToken) {
       return expoPushToken;
     }
-    throw new Error(
+    throw new BadRequestException(
       `Missing token data for platform ${platform}: provide expoPushToken or webPushSubscription`
     );
   }

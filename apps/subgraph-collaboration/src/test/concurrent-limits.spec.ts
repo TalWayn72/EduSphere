@@ -6,8 +6,8 @@ import type { AuthContext } from '@edusphere/auth';
 const mockFrom = vi.fn();
 const mockSelect = vi.fn();
 const mockInsert = vi.fn();
-const mockValues = vi.fn();
-const mockReturning = vi.fn();
+const _mockValues = vi.fn();
+const _mockReturning = vi.fn();
 
 const mockTx = {
   select: mockSelect,

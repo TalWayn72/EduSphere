@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -60,7 +61,7 @@ export function SkillGapDashboard() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <PageShell size="md" className="p-6">
         {/* Back button + heading */}
         <div className="flex items-center gap-3">
           <Button
@@ -170,7 +171,7 @@ export function SkillGapDashboard() {
         {!isLoading && !error && !analysis && (
           <p className="text-muted-foreground">No gap analysis data available for this path.</p>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

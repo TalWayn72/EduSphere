@@ -35,6 +35,7 @@ import {
 } from './course-create.types';
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 import { getCurrentUser } from '@/lib/auth';
+import { PageShell } from '@/components/PageShell';
 
 // ── Zod schema for Step 1 fields ─────────────────────────────────────────────
 export const courseSchema = z.object({
@@ -157,11 +158,8 @@ export function CourseCreatePage() {
       : DRAFT_COURSE_ID;
     const { data, error } = await executeExportScorm({ courseId });
     if (error) {
-      const msg =
-        error.graphQLErrors?.[0]?.message ??
-        error.message ??
-        'Failed to export SCORM package';
-      toast.error(msg);
+      console.error('[CourseCreatePage] SCORM export failed:', error.message);
+      toast.error('Failed to export SCORM package. Please try again.');
       return;
     }
     if (data?.exportCourseAsScorm2004) {
@@ -267,7 +265,7 @@ export function CourseCreatePage() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto space-y-6">
+      <PageShell size="sm">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
@@ -432,7 +430,7 @@ export function CourseCreatePage() {
             </Button>
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

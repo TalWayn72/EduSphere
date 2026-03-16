@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, NotFoundException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -119,7 +119,7 @@ export class AgentService implements OnModuleDestroy {
     try {
       const execution = await this.findById(executionId);
       if (!execution) {
-        throw new Error('Execution not found');
+        throw new NotFoundException('Execution not found');
       }
 
       // Get agent definition
@@ -130,7 +130,7 @@ export class AgentService implements OnModuleDestroy {
         .limit(1);
 
       if (!agent) {
-        throw new Error('Agent definition not found');
+        throw new NotFoundException('Agent definition not found');
       }
 
       // Execute with AI service

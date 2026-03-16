@@ -206,6 +206,6 @@ describe('ComplianceReportsPage', () => {
   it('shows error message when query returns error', () => {
     setupUrql([], false, { message: 'Network error' });
     renderPage();
-    expect(screen.getByText('Network error')).toBeInTheDocument();
+    expect(screen.getByText(/failed to load compliance data/i)).toBeInTheDocument();
   });
 });

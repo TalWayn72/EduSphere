@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, Logger, NotFoundException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -156,7 +156,7 @@ export class UserService implements OnModuleDestroy {
         .set(updateData)
         .where(eq(schema.users.id, id))
         .returning();
-      if (!user) throw new Error('User not found');
+      if (!user) throw new NotFoundException('User not found');
       return this.mapUser(user);
     });
   }
@@ -293,7 +293,7 @@ export class UserService implements OnModuleDestroy {
         .set({ deleted_at: suspended ? new Date() : null, updated_at: new Date() })
         .where(eq(schema.users.id, userId))
         .returning();
-      if (!user) throw new Error('User not found');
+      if (!user) throw new NotFoundException('User not found');
       this.logger.log(
         { userId, suspended, tenantId: tenantCtx.tenantId },
         '[UserService] suspendUser applied'

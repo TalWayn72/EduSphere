@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { toast } from 'sonner';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -164,10 +166,13 @@ export function UserManagementPage() {
   const tenantId = getCurrentUser()?.tenantId ?? '';
 
   return (
-    <AdminLayout
-      title="User Management"
-      description="Manage users, roles, and access"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="User Management"
+          description="Manage users, roles, and access"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'User Management' }]}
+        />
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2 items-end">
           <div className="flex-1 min-w-48">
@@ -371,6 +376,7 @@ export function UserManagementPage() {
           refetch({ requestPolicy: 'network-only' });
         }}
       />
+      </PageShell>
     </AdminLayout>
   );
 }

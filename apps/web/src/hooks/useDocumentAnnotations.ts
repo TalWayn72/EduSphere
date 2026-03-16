@@ -52,22 +52,22 @@ function hasTextRange(
 ): ann is Annotation & { textRange: { from: number; to: number } } {
   if (ann.textRange != null) return true;
   // Backwards-compatibility: spatialData may arrive un-normalised in the JSON field.
-  const sd = (ann as unknown as Record<string, unknown>)['spatialData'] as
-    | Record<string, unknown>
-    | undefined;
+  const sd = ann.spatialData;
   return (
-    typeof sd?.['from'] === 'number' &&
-    typeof sd?.['to'] === 'number' &&
-    (sd['to'] as number) > (sd['from'] as number)
+    sd != null &&
+    typeof sd['from'] === 'number' &&
+    typeof sd['to'] === 'number' &&
+    sd['to'] > sd['from']
   );
 }
 
 function getTextRange(ann: Annotation): { from: number; to: number } {
   if (ann.textRange != null) return ann.textRange;
-  const sd = (ann as unknown as Record<string, unknown>)[
-    'spatialData'
-  ] as Record<string, unknown>;
-  return { from: sd['from'] as number, to: sd['to'] as number };
+  const sd = ann.spatialData;
+  if (!sd || typeof sd['from'] !== 'number' || typeof sd['to'] !== 'number') {
+    return { from: 0, to: 0 };
+  }
+  return { from: sd['from'], to: sd['to'] };
 }
 
 // ── Hook ─────────────────────────────────────────────────────────────────────

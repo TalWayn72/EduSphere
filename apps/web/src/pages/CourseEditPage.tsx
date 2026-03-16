@@ -8,11 +8,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getCurrentUser } from '@/lib/auth';
 import { ArrowLeft, Globe, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   COURSE_DETAIL_QUERY,
   PUBLISH_COURSE_MUTATION,
@@ -21,6 +23,7 @@ import {
 import { CourseEditMetadata } from './CourseEditPage.metadata';
 import { CourseEditModules } from './CourseEditPage.modules';
 import { SourceManager } from '@/components/SourceManager';
+import { PageShell } from '@/components/PageShell';
 
 const EDITOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
@@ -108,7 +111,7 @@ export function CourseEditPage() {
   const showToast = (msg: string) => {
     setToast(msg);
     if (toastRef.current) clearTimeout(toastRef.current);
-    toastRef.current = setTimeout(() => setToast(null), 3000);
+    toastRef.current = setTimeout(() => setToast(null), SAVED_CONFIRMATION_MS);
   };
 
   const course = data?.course;
@@ -153,7 +156,7 @@ export function CourseEditPage() {
     return (
       <Layout>
         <div className="p-6 text-destructive text-sm">
-          {error ? `Error: ${error.message}` : 'Course not found.'}
+          {error ? 'Failed to load course. Please try again.' : 'Course not found.'}
         </div>
       </Layout>
     );
@@ -171,7 +174,16 @@ export function CourseEditPage() {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: course.title, href: `/courses/${courseId}` },
+            { label: 'Edit' },
+          ]}
+        />
+
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -248,7 +260,7 @@ export function CourseEditPage() {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

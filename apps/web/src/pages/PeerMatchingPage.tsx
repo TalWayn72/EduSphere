@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { MatchCard } from '@/components/peer-matching/MatchCard';
 import {
   PEER_MATCHES_QUERY,
@@ -68,7 +69,7 @@ export function PeerMatchingPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <PageShell size="md" className="py-6">
         <h1 className="text-2xl font-bold text-foreground mb-6">Peer Matching</h1>
 
         {/* Suggested Matches */}
@@ -191,7 +192,7 @@ export function PeerMatchingPage() {
             </div>
           )}
         </section>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

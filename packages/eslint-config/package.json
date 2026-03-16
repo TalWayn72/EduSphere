@@ -6,7 +6,9 @@
   "files": [
     "index.js",
     "nestjs.js",
-    "react.js"
+    "react.js",
+    "eslint-plugin-edusphere-design-system.js",
+    "rules/"
   ],
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.19.1",
