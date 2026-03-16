@@ -11,10 +11,10 @@ import { Button } from '@/components/ui/button';
 export interface Certificate {
   id: string;
   courseId: string;
+  courseName: string;
   issuedAt: string;
   verificationCode: string;
   pdfUrl: string;
-  metadata: Record<string, unknown> | null;
 }
 
 interface CertificateCardProps {
@@ -35,9 +35,7 @@ function copyCode(code: string): void {
 }
 
 export function CertificateCard({ cert, onDownload }: CertificateCardProps) {
-  const courseName =
-    (cert.metadata?.['courseName'] as string | undefined) ??
-    'Course Certificate';
+  const courseName = cert.courseName || 'Course Certificate';
 
   return (
     <Card className="flex flex-col" data-testid="certificate-card">

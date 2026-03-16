@@ -7,19 +7,19 @@ import { CertificateCard, type Certificate } from './CertificateCard';
 const MOCK_CERT: Certificate = {
   id: 'cert-001',
   courseId: 'crs-abc',
+  courseName: 'Introduction to AI',
   issuedAt: '2026-01-15T12:00:00Z',
   verificationCode: 'VERIFY-ABC-123',
   pdfUrl: 'https://example.com/cert.pdf',
-  metadata: { courseName: 'Introduction to AI' },
 };
 
-const MOCK_CERT_NO_META: Certificate = {
+const MOCK_CERT_NO_NAME: Certificate = {
   id: 'cert-002',
   courseId: 'crs-def',
+  courseName: '',
   issuedAt: '2026-03-01T08:30:00Z',
   verificationCode: 'VERIFY-DEF-456',
   pdfUrl: 'https://example.com/cert2.pdf',
-  metadata: null,
 };
 
 function renderCard(
@@ -43,14 +43,8 @@ describe('CertificateCard', () => {
     expect(screen.getByText('Introduction to AI')).toBeInTheDocument();
   });
 
-  it('falls back to "Course Certificate" when metadata is null', () => {
-    renderCard(MOCK_CERT_NO_META);
-    expect(screen.getByText('Course Certificate')).toBeInTheDocument();
-  });
-
-  it('falls back to "Course Certificate" when courseName is missing', () => {
-    const cert: Certificate = { ...MOCK_CERT, metadata: { other: 'val' } };
-    renderCard(cert);
+  it('falls back to "Course Certificate" when courseName is empty', () => {
+    renderCard(MOCK_CERT_NO_NAME);
     expect(screen.getByText('Course Certificate')).toBeInTheDocument();
   });
 

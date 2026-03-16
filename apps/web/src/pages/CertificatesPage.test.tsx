@@ -36,18 +36,18 @@ const MOCK_CERTS = [
   {
     id: 'cert-1',
     courseId: 'course-abc',
+    courseName: 'Introduction to GraphQL',
     issuedAt: '2024-03-15T00:00:00Z',
     verificationCode: 'VERIFY-ABC-001',
     pdfUrl: '/certificates/internal/cert-1.pdf',
-    metadata: { courseName: 'Introduction to GraphQL' },
   },
   {
     id: 'cert-2',
     courseId: 'course-xyz',
+    courseName: 'Advanced TypeScript',
     issuedAt: '2024-06-01T00:00:00Z',
     verificationCode: 'VERIFY-XYZ-002',
     pdfUrl: '/certificates/internal/cert-2.pdf',
-    metadata: { courseName: 'Advanced TypeScript' },
   },
 ];
 
@@ -152,15 +152,15 @@ describe('CertificatesPage', () => {
 
   // ── 4. Certificate card with course name ─────────────────────────────────
 
-  it('renders certificate cards with course names from metadata', async () => {
+  it('renders certificate cards with course names', async () => {
     mockQueries({ data: { myCertificates: MOCK_CERTS } });
     await renderPage();
     expect(screen.getByText('Introduction to GraphQL')).toBeInTheDocument();
     expect(screen.getByText('Advanced TypeScript')).toBeInTheDocument();
   });
 
-  it('falls back to "Course Certificate" when metadata.courseName missing', async () => {
-    const certNoName = [{ ...MOCK_CERTS[0]!, metadata: null }];
+  it('falls back to "Course Certificate" when courseName is empty', async () => {
+    const certNoName = [{ ...MOCK_CERTS[0]!, courseName: '' }];
     mockQueries({ data: { myCertificates: certNoName } });
     await renderPage();
     expect(screen.getByText('Course Certificate')).toBeInTheDocument();
