@@ -4,10 +4,29 @@ extend type User @key(fields: "id") {
   isFollowedByMe: Boolean!
 }
 
+type SocialFeedItem {
+  id: ID!
+  actorId: ID!
+  verb: String!
+  objectType: String!
+  objectId: ID!
+  objectTitle: String!
+  createdAt: String!
+}
+
+type SocialRecommendation {
+  contentItemId: ID!
+  contentTitle: String!
+  followersCount: Int!
+  isMutualFollower: Boolean!
+}
+
 extend type Query {
   myFollowers(limit: Int): [ID!]! @authenticated
   myFollowing(limit: Int): [ID!]! @authenticated
   searchUsers(query: String!, limit: Int): [PublicProfile!]! @authenticated
+  socialFeed(limit: Int): [SocialFeedItem!]! @authenticated
+  socialRecommendations(limit: Int): [SocialRecommendation!]! @authenticated
 }
 
 extend type Mutation {
