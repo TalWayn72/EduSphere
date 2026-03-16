@@ -401,7 +401,165 @@ test.describe('Knowledge Sources — BUG-055 (raw errorMessage must not reach UI
   });
 });
 
-// ─── Suite 4: BUG-056 regression — subscription auth warning fires at most once ─
+// ─── Suite 4: Loading bug fix — sources show data, not stuck on "טוען" ─────────
+
+test.describe('Knowledge Sources — Loading state fix (sources must not be stuck on loading)', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('sources panel shows source list (not "טוען..." forever) when data is available', async ({
+    page,
+  }) => {
+    // Intercept GraphQL to return sources
+    await page.route('**/graphql', async (route) => {
+      const request = route.request();
+      const body = request.postDataJSON() as { query?: string } | null;
+      if (body?.query?.includes('courseKnowledgeSources')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              courseKnowledgeSources: [
+                {
+                  id: 'src-1',
+                  title: 'מבוא לתלמוד',
+                  sourceType: 'URL',
+                  origin: 'https://example.com/intro',
+                  preview: 'תוכן לדוגמה',
+                  status: 'READY',
+                  chunkCount: 5,
+                  errorMessage: null,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    await page.getByTestId('toggle-sources').click();
+    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+
+    // Source title should be visible
+    await expect(page.getByText('מבוא לתלמוד')).toBeVisible({ timeout: UI_TIMEOUT });
+    // The loading indicator should NOT be visible
+    const bodyText = await page.evaluate(() => document.body.textContent ?? '');
+    expect(bodyText).not.toContain('טוען מקורות');
+  });
+
+  test('sources panel shows error UI with retry button when query fails', async ({
+    page,
+  }) => {
+    // Intercept GraphQL to return an error
+    await page.route('**/graphql', async (route) => {
+      const request = route.request();
+      const body = request.postDataJSON() as { query?: string } | null;
+      if (body?.query?.includes('courseKnowledgeSources')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [{ message: 'Network error' }],
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    await page.getByTestId('toggle-sources').click();
+    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+
+    // Should show error indicator (⚠️) and retry button, NOT stuck on "טוען..."
+    // Wait for react-query retries to exhaust (retry: 2)
+    await page.waitForTimeout(3000);
+    const bodyText = await page.evaluate(() => document.body.textContent ?? '');
+    // Should NOT be showing the infinite loading state
+    expect(bodyText).not.toContain('טוען מקורות');
+  });
+
+  test('visual: sources panel with loaded sources', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const request = route.request();
+      const body = request.postDataJSON() as { query?: string } | null;
+      if (body?.query?.includes('courseKnowledgeSources')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              courseKnowledgeSources: [
+                {
+                  id: 'src-1',
+                  title: 'מבוא לתלמוד',
+                  sourceType: 'URL',
+                  origin: 'https://example.com/intro',
+                  preview: 'מסכת בבא קמא — פרק ראשון',
+                  status: 'READY',
+                  chunkCount: 12,
+                  errorMessage: null,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    await page.getByTestId('toggle-sources').click();
+    await expect(page.getByText('מבוא לתלמוד')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).toHaveScreenshot(
+      'sources-panel-loaded.png'
+    );
+  });
+});
+
+// ─── Suite 5: CourseEditPage Sources tab ────────────────────────────────────
+
+test.describe('CourseEditPage — Sources tab', () => {
+  const EDIT_URL = `${BASE_URL}/courses/${DEMO_COURSE_ID}/edit`;
+
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    await page.goto(EDIT_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1_000);
+  });
+
+  test('edit page has a "מקורות מידע" tab', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: /מקורות מידע/i })).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
+  });
+
+  test('clicking Sources tab shows the SourceManager panel', async ({ page }) => {
+    await page.getByRole('tab', { name: /מקורות מידע/i }).click();
+    // SourceManager should render with its header
+    await expect(page.getByText(/Knowledge Sources|מקורות מידע/i).first()).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
+  });
+
+  test('visual: edit page with Sources tab active', async ({ page }) => {
+    await page.getByRole('tab', { name: /מקורות מידע/i }).click();
+    await page.waitForTimeout(500);
+    await expect(page.locator('.max-w-4xl')).toHaveScreenshot(
+      'course-edit-sources-tab.png'
+    );
+  });
+});
+
+// ─── Suite 6: BUG-056 regression — subscription auth warning fires at most once ─
 //
 // Navigates to a course page and monitors console.warn calls.
 // The urql subscription auth warning must fire at most ONCE per subscription

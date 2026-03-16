@@ -20,6 +20,7 @@ import {
 } from '@/lib/graphql/content.queries';
 import { CourseEditMetadata } from './CourseEditPage.metadata';
 import { CourseEditModules } from './CourseEditPage.modules';
+import { SourceManager } from '@/components/SourceManager';
 
 const EDITOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
@@ -213,6 +214,7 @@ export function CourseEditPage() {
           <TabsList>
             <TabsTrigger value="info">Basic Info</TabsTrigger>
             <TabsTrigger value="modules">Modules &amp; Content</TabsTrigger>
+            <TabsTrigger value="sources">מקורות מידע</TabsTrigger>
           </TabsList>
 
           <TabsContent value="info" className="mt-4">
@@ -238,6 +240,12 @@ export function CourseEditPage() {
               onRefetch={() => refetch({ requestPolicy: 'network-only' })}
               onToast={showToast}
             />
+          </TabsContent>
+
+          <TabsContent value="sources" className="mt-4">
+            <div className="h-[500px] border rounded-xl overflow-hidden">
+              <SourceManager courseId={courseId} />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

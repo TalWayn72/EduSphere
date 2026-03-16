@@ -671,7 +671,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
     };
   }, []);
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isError, error: queryError, refetch } = useQuery({
     queryKey: ['course-sources', courseId],
     queryFn: IS_DEV_MODE
       ? devQueryFn
@@ -691,6 +691,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
           );
           return hasProcessing ? 3000 : false;
         },
+    retry: 2,
   });
 
   const deleteSource = useMutation({
@@ -726,7 +727,9 @@ export function SourceManager({ courseId }: { courseId: string }) {
           <p className="text-xs text-gray-500">
             {data
               ? t('sources.count', { count: data.length })
-              : t('sources.loading')}
+              : isError
+                ? t('sources.errorGeneric')
+                : t('sources.loading')}
           </p>
         </div>
         <button
@@ -754,7 +757,22 @@ export function SourceManager({ courseId }: { courseId: string }) {
           </div>
         )}
 
-        {!isLoading && data?.length === 0 && (
+        {!isLoading && isError && (
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <span className="text-4xl mb-3">⚠️</span>
+            <p className="text-sm font-medium text-red-600">
+              {t(getSourceErrorKey(queryError))}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="mt-3 px-4 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              {t('sources.retry', 'נסה שוב')}
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !isError && data?.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <span className="text-5xl mb-3">📚</span>
             <p className="text-sm font-medium text-gray-700">

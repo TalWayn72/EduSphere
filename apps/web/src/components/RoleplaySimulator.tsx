@@ -230,7 +230,7 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
             isSending ? 'Waiting for response...' : 'Type your response...'
           }
           disabled={isSending || !sessionId}
-          className="flex-1 bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 bg-gray-800 text-white placeholder-gray-400 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
         <Button
           onClick={() => void handleSend()}

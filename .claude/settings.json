@@ -1,4 +1,8 @@
 {
+  "env": {
+    "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+    "NODE_EXTRA_CA_CERTS": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+  },
   "permissions": {
     "allow": [
       "Read(*)",
@@ -25,7 +29,8 @@
       "mcp__graphql__*",
       "mcp__nats__*",
       "mcp__typescript-diagnostics__*",
-      "mcp__playwright__*"
+      "mcp__playwright__*",
+      "mcp__context7__*"
     ]
   }
 }

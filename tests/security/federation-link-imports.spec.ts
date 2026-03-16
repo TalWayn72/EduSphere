@@ -220,3 +220,56 @@ describe('Federation @link Import Integrity (BUG-065 regression guard)', () => {
     expect(imports).not.toContain('@requiresRole');
   });
 });
+
+// ─── Supergraph Completeness (BUG-065 regression guard) ──────────────────────
+
+describe('Supergraph subgraph completeness (BUG-065 regression guard)', () => {
+  const SUPERGRAPH_PATH = resolve(ROOT, 'apps/gateway/supergraph.graphql');
+  const REQUIRED_SUBGRAPHS = ['AGENT', 'ANNOTATION', 'COLLABORATION', 'CONTENT', 'CORE', 'KNOWLEDGE'] as const;
+
+  let supergraphContent: string;
+
+  beforeAll(() => {
+    expect(existsSync(SUPERGRAPH_PATH)).toBe(true);
+    supergraphContent = readFileSync(SUPERGRAPH_PATH, 'utf-8');
+  });
+
+  it('join__Graph enum contains all 6 required subgraphs', () => {
+    // Extract the join__Graph enum block
+    const enumMatch = supergraphContent.match(
+      /enum\s+join__Graph\s*\{([^}]*)\}/
+    );
+    expect(enumMatch).not.toBeNull();
+
+    const enumBody = enumMatch![1];
+    const missing: string[] = [];
+
+    for (const subgraph of REQUIRED_SUBGRAPHS) {
+      if (!enumBody.includes(subgraph)) {
+        missing.push(subgraph);
+      }
+    }
+
+    if (missing.length > 0) {
+      throw new Error(
+        `BUG-065 REGRESSION DETECTED — supergraph.graphql join__Graph enum is missing subgraphs:\n` +
+        missing.map((s) => `  - ${s}`).join('\n') +
+        `\n\nAll 6 subgraphs must be present: ${REQUIRED_SUBGRAPHS.join(', ')}.\n` +
+        `Run: pnpm --filter @edusphere/gateway compose`
+      );
+    }
+
+    expect(missing).toHaveLength(0);
+  });
+
+  it('updateUserPreferences mutation exists with @join__field(graph: CORE)', () => {
+    // Verify the mutation is present and routed to the CORE subgraph
+    expect(supergraphContent).toContain('updateUserPreferences');
+
+    const updatePrefMatch = supergraphContent.match(
+      /updateUserPreferences[^)]*\)[^@]*@join__field\(graph:\s*CORE\)/
+    );
+
+    expect(updatePrefMatch).not.toBeNull();
+  });
+});

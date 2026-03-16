@@ -29,6 +29,8 @@ services:
       - "4004:4004" # Collaboration Subgraph (future)
       - "4005:4005" # Agent Subgraph (future)
       - "4006:4006" # Knowledge Subgraph (future)
+      # Web Frontend
+      - "5173:5173" # React App (Vite preview)
       # Infrastructure
       - "5432:5432" # PostgreSQL
       - "6379:6379" # Redis
@@ -76,6 +78,9 @@ services:
       # subgraph-content: rebuilt dist with MinIO full-URL fix (endpoint: `http://${host}:${port}`)
       # MINIO_ENDPOINT in supervisord.conf must be just the hostname (e.g. "localhost"), not a full URL.
       - ./apps/subgraph-content/dist:/app/apps/subgraph-content/dist:ro
+      # web frontend: mount built dist so container always serves latest UI
+      # Rebuild locally with: pnpm --filter @edusphere/web build
+      - ./apps/web/dist:/app/apps/web/dist:ro
       # gateway supergraph: keeps the federation schema in sync after subgraph additions
       # without requiring an image rebuild (gateway polls every 10 s via pollingInterval)
       - ./apps/gateway/supergraph.graphql:/app/apps/gateway/supergraph.graphql:ro

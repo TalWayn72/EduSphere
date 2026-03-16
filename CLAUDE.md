@@ -379,6 +379,53 @@ Fix any errors before moving to next file. Do not batch lint at the end.
 
 ---
 
+## Skills Integration
+
+### Overview
+
+Skills are markdown-based expertise guides that auto-load when Claude detects relevant context (file paths, keywords, patterns). 8 custom EduSphere skills + ~200 external skills are installed in `~/.agents/skills/`.
+
+### EduSphere Custom Skills (Auto-Loaded)
+
+| Skill | Auto-Triggers On | Content |
+|-------|-------------------|---------|
+| `graphql-federation-edusphere` | `.graphql` files, `apps/gateway/`, resolver files | Federation v2.7, 6-subgraph map, entity resolution, SDL-first workflow |
+| `apache-age-knowledge-graph` | `packages/db/src/graph/`, `apps/subgraph-knowledge/` | Cypher queries, 5-node ontology, executeCypher(), RLS in graph |
+| `pgvector-hybrid-rag` | embeddings schema, `apps/subgraph-knowledge/` | HNSW indexes, 768-dim embeddings, HybridRAG fusion, RRF reranking |
+| `langgraph-agent-workflows` | `apps/subgraph-agent/`, AI agent code | StateGraph, assess-quiz-explain-debate, Vercel AI SDK v6, gVisor |
+| `drizzle-orm-edusphere` | `packages/db/`, schema/migration files | pgTable.withRLS(), withTenantContext(), SI-1/SI-3/SI-8 compliance |
+| `nats-jetstream-patterns` | `packages/nats-client/`, NATS imports | 23 event subjects, stream retention, KV stores, SI-7 TLS |
+| `session-completion-gate` | task completion, before git push | 10-check gate, 5-user auth, Docker health, failure protocol |
+| `discovery-wave-automator` | bug fixes, test failures | 3-wave search, 7-dir checklist, Discovery List, pattern-class search |
+
+### Skills per Wave (Mandatory Loading)
+
+Skills are loaded per Enterprise Execution Protocol wave:
+
+- **Wave 1 (Product/Arch/UX):** `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere`, `accessibility-compliance`, `wcag-audit-patterns`, `writing-plans`, `brainstorming`
+- **Wave 2 (FE/BE/DB/Security/QA):** `nestjs-best-practices`, `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `langgraph-agent-workflows`, `nats-jetstream-patterns`, `react-state-management`, `e2e-testing-patterns`, `auth-implementation-patterns`, `secrets-management`, `sast-configuration`, `test-driven-development`
+- **Wave 3 (Docs/DevOps):** `changelog-automation`, `deployment-pipeline-design`, `distributed-tracing`, `turborepo-caching`, `github-actions-templates`
+
+### Bug Fix Protocol Skills
+
+Load at the START of every bug investigation:
+1. `systematic-debugging` — root cause investigation framework
+2. `discovery-wave-automator` — 3-wave search automation
+3. Domain skill based on bug location (e.g., `drizzle-orm-edusphere` for DB bugs, `graphql-federation-edusphere` for schema bugs)
+
+### Session Completion Skills
+
+Load `session-completion-gate` skill before declaring ANY task complete. It automates all 10 checks from the Session Completion Gate.
+
+### Skill Trigger Rules
+
+- Skills auto-load based on `description` field in SKILL.md frontmatter
+- Custom EduSphere skills (`*-edusphere`) take precedence for overlapping domains
+- Multiple matching skills load additively (not exclusively)
+- Skills location: `~/.agents/skills/<skill-name>/SKILL.md`
+
+---
+
 ## Commands Reference
 
 ### Development

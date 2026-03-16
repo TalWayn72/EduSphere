@@ -95,15 +95,17 @@
 
   
 enum join__Graph {
-  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql") 
-  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql") 
-  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql") 
-  CONTENT @join__graph(name: "content", url: "http://localhost:4002/graphql") 
+  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql")
+  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql")
+  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql")
+  CONTENT @join__graph(name: "content", url: "http://localhost:4002/graphql")
+  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql")
+  KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql")
 }
 
-scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: CONTENT) 
+scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)
 
-scalar DateTime @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT) 
+scalar DateTime @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)
 
 type AgentMessage @join__type(graph: AGENT, key: "id")  {
   id: ID!
@@ -129,8 +131,16 @@ type AgentSession @join__type(graph: AGENT, key: "id")  {
 """
 External entity stubs
 """
-type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  {
+type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: CORE, key: "id")  {
   id: ID!
+  email: String! @join__field(graph: CORE)
+  firstName: String! @join__field(graph: CORE)
+  lastName: String! @join__field(graph: CORE)
+  role: UserRole! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  preferences: UserPreferences! @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+  updatedAt: DateTime! @join__field(graph: CORE)
 }
 
 type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  {
@@ -150,7 +160,7 @@ type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATI
   updatedAt: String! @join__field(graph: CONTENT) 
 }
 
-type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  {
+type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
   agentSession(id: ID!) : AgentSession @join__field(graph: AGENT) 
   myAgentSessions: [AgentSession!]! @join__field(graph: AGENT) 
   agentTemplates: [AgentTemplate!]! @join__field(graph: AGENT) 
@@ -307,9 +317,14 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Query recent xAPI statements stored in the self-hosted LRS.
   """
   xapiStatements(limit: Int, since: String) : [XapiStatementResult!]! @join__field(graph: CONTENT)  @authenticated
+  me: User @join__field(graph: CORE)  @authenticated
+  user(id: ID!): User @join__field(graph: CORE)  @authenticated
+  users(limit: Int = 10, offset: Int = 0): [User!]! @join__field(graph: CORE)  @authenticated
+  courseKnowledgeSources(courseId: ID!): [KnowledgeSource!]! @join__field(graph: KNOWLEDGE)  @authenticated
+  knowledgeSource(id: ID!): KnowledgeSource @join__field(graph: KNOWLEDGE)  @authenticated
 }
 
-type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  {
+type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
   startAgentSession(templateType: TemplateType!, context: JSON!) : AgentSession! @join__field(graph: AGENT)  @authenticated
   sendMessage(sessionId: ID!, content: String!) : AgentMessage! @join__field(graph: AGENT)  @authenticated
   endSession(sessionId: ID!) : Boolean! @join__field(graph: AGENT)  @authenticated
@@ -515,6 +530,15 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Revoke an existing xAPI token.
   """
   revokeXapiToken(tokenId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!): User! @join__field(graph: CORE)  @authenticated
+  updateProfileVisibility(isPublic: Boolean!): UserPreferences! @join__field(graph: CORE)  @authenticated
+  createUser(input: CreateUserInput!): User! @join__field(graph: CORE)  @authenticated
+  updateUser(id: ID!, input: UpdateUserInput!): User! @join__field(graph: CORE)  @authenticated
+  addUrlSource(input: AddUrlSourceInput!): KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated
+  addTextSource(input: AddTextSourceInput!): KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated
+  addYoutubeSource(input: AddYoutubeSourceInput!): KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated
+  addFileSource(input: AddFileSourceInput!): KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated
+  deleteKnowledgeSource(id: ID!): Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
 }
 
 type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  {
@@ -532,6 +556,64 @@ type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @jo
   pollUpdated(pollId: ID!) : PollResults! @join__field(graph: CONTENT)  @authenticated
   anchorDeleted(mediaAssetId: ID!) : ID! @join__field(graph: CONTENT)  @authenticated
   anchorCreated(mediaAssetId: ID!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated
+}
+
+type KnowledgeSource @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  courseId: ID!
+  tenantId: ID!
+  title: String!
+  sourceType: SourceType!
+  origin: String
+  rawContent: String
+  preview: String
+  status: SourceStatus!
+  chunkCount: Int!
+  errorMessage: String
+  metadata: JSON
+  createdAt: String!
+}
+
+enum SourceType @join__type(graph: KNOWLEDGE)  {
+  FILE_DOCX @join__enumValue(graph: KNOWLEDGE)
+  FILE_PDF @join__enumValue(graph: KNOWLEDGE)
+  FILE_TXT @join__enumValue(graph: KNOWLEDGE)
+  URL @join__enumValue(graph: KNOWLEDGE)
+  YOUTUBE @join__enumValue(graph: KNOWLEDGE)
+  TEXT @join__enumValue(graph: KNOWLEDGE)
+}
+
+enum SourceStatus @join__type(graph: KNOWLEDGE)  {
+  PENDING @join__enumValue(graph: KNOWLEDGE)
+  PROCESSING @join__enumValue(graph: KNOWLEDGE)
+  READY @join__enumValue(graph: KNOWLEDGE)
+  FAILED @join__enumValue(graph: KNOWLEDGE)
+}
+
+input AddUrlSourceInput @join__type(graph: KNOWLEDGE)  {
+  courseId: ID!
+  title: String!
+  url: String!
+}
+
+input AddTextSourceInput @join__type(graph: KNOWLEDGE)  {
+  courseId: ID!
+  title: String!
+  text: String!
+}
+
+input AddYoutubeSourceInput @join__type(graph: KNOWLEDGE)  {
+  courseId: ID!
+  title: String!
+  url: String!
+}
+
+input AddFileSourceInput @join__type(graph: KNOWLEDGE)  {
+  courseId: ID!
+  title: String!
+  fileName: String!
+  contentBase64: String!
+  mimeType: String!
 }
 
 type AgentExecution @join__type(graph: AGENT, key: "id")  {
@@ -2157,5 +2239,42 @@ input UpdateVisualAnchorInput @join__type(graph: CONTENT)  {
   posXEnd: Float
   posYEnd: Float
   documentOrder: Int
+}
+
+enum UserRole @join__type(graph: CORE)  {
+  SUPER_ADMIN @join__enumValue(graph: CORE)
+  ORG_ADMIN @join__enumValue(graph: CORE)
+  INSTRUCTOR @join__enumValue(graph: CORE)
+  STUDENT @join__enumValue(graph: CORE)
+  RESEARCHER @join__enumValue(graph: CORE)
+}
+
+type UserPreferences @join__type(graph: CORE)  {
+  locale: String!
+  theme: String!
+  emailNotifications: Boolean!
+  pushNotifications: Boolean!
+  isPublicProfile: Boolean!
+}
+
+input UpdateUserPreferencesInput @join__type(graph: CORE)  {
+  locale: String
+  theme: String
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+}
+
+input CreateUserInput @join__type(graph: CORE)  {
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+  tenantId: ID!
+}
+
+input UpdateUserInput @join__type(graph: CORE)  {
+  firstName: String
+  lastName: String
+  role: UserRole
 }
     
