@@ -27,31 +27,31 @@ function GlossaryTermCard({ term }: { term: GlossaryTerm }) {
   return (
     <article
       id={term.term.toLowerCase().replace(/\s+/g, '-')}
-      className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-lg p-5"
+      className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-5"
       itemScope
       itemType="https://schema.org/DefinedTerm"
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <h2
-          className="text-lg font-bold text-gray-900 dark:text-foreground"
+          className="text-lg font-bold text-gray-900 dark:text-white"
           itemProp="name"
         >
           {term.term}
         </h2>
         <span
-          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${CATEGORY_COLORS[term.category] ?? 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground'}`}
+          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${CATEGORY_COLORS[term.category] ?? 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'}`}
         >
           {term.category}
         </span>
       </div>
       <p
-        className="text-gray-600 dark:text-muted-foreground text-sm leading-relaxed"
+        className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed"
         itemProp="description"
       >
         {term.shortDef}
       </p>
       {expanded && (
-        <p className="mt-3 text-gray-500 dark:text-muted-foreground text-sm leading-relaxed border-t border-gray-100 dark:border-border pt-3">
+        <p className="mt-3 text-gray-500 dark:text-slate-400 text-sm leading-relaxed border-t border-gray-100 dark:border-slate-700 pt-3">
           {term.fullDef}
         </p>
       )}
@@ -116,7 +116,7 @@ export function GlossaryPage() {
       <OrganizationSchema />
 
       <PublicLayout navVariant="minimal">
-      <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
         <div className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -130,7 +130,7 @@ export function GlossaryPage() {
             </p>
             <div className="relative max-w-xl mx-auto">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-muted-foreground"
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-slate-400"
                 aria-hidden="true"
               />
               <Input
@@ -138,7 +138,7 @@ export function GlossaryPage() {
                 placeholder="Search terms..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-white dark:bg-background text-gray-900 dark:text-foreground border-0"
+                className="pl-10 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border-0"
                 aria-label="Search glossary terms"
               />
             </div>
@@ -153,7 +153,7 @@ export function GlossaryPage() {
               className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
                 activeLetter === null
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-card text-gray-600 dark:text-muted-foreground hover:bg-indigo-50 dark:hover:bg-accent border border-gray-200 dark:border-border'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
               }`}
               aria-pressed={activeLetter === null}
             >
@@ -171,7 +171,7 @@ export function GlossaryPage() {
                   className={`w-8 h-8 rounded text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
                     activeLetter === letter
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-white dark:bg-card text-gray-600 dark:text-muted-foreground hover:bg-indigo-50 dark:hover:bg-accent border border-gray-200 dark:border-border'
+                      : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
                   }`}
                   aria-pressed={activeLetter === letter}
                 >
@@ -182,13 +182,13 @@ export function GlossaryPage() {
           </nav>
 
           {/* Term count */}
-          <p className="text-sm text-gray-500 dark:text-muted-foreground mb-6">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
             Showing {filtered.length} of {GLOSSARY_TERMS.length} terms
           </p>
 
           {/* Terms Grid */}
           {filtered.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-muted-foreground">
+            <div className="text-center py-12 text-gray-500 dark:text-slate-400">
               <p>No terms found matching &ldquo;{search}&rdquo;.</p>
             </div>
           ) : (

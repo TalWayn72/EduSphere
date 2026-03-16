@@ -31,13 +31,13 @@ export function PricingPage() {
 
   return (
     <PublicLayout>
-    <div data-testid="pricing-page" className="min-h-screen bg-slate-50 dark:bg-background">
+    <div data-testid="pricing-page" className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Hero */}
-      <div className="bg-white dark:bg-card py-14 text-center px-4">
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-foreground tracking-tight">
+      <div className="bg-white dark:bg-slate-800 py-14 text-center px-4">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Pricing &amp; Plans
         </h1>
-        <p className="mt-4 text-lg text-slate-500 dark:text-muted-foreground max-w-xl mx-auto">
+        <p className="mt-4 text-lg text-slate-500 dark:text-slate-300 max-w-xl mx-auto">
           Transparent YAU-based pricing. No per-module fees. No surprise overages.
         </p>
         <Link
@@ -55,21 +55,21 @@ export function PricingPage() {
       {/* FAQ */}
       <section
         data-testid="pricing-faq"
-        className="bg-white dark:bg-card py-20"
+        className="bg-white dark:bg-slate-800 py-20"
         aria-label="Frequently asked questions"
       >
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-foreground mb-8 text-center">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
             {FAQ_ITEMS.map((item, i) => (
               <div
                 key={i}
-                className="bg-slate-50 dark:bg-muted border border-slate-200 dark:border-border rounded-xl overflow-hidden"
+                className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
               >
                 <button
-                  className="w-full text-left px-5 py-4 font-semibold text-slate-800 dark:text-foreground text-sm flex justify-between items-center hover:bg-slate-100 dark:hover:bg-accent transition-colors"
+                  className="w-full text-left px-5 py-4 font-semibold text-slate-800 dark:text-white text-sm flex justify-between items-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   aria-expanded={openFaq === i}
                 >
@@ -79,7 +79,7 @@ export function PricingPage() {
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-5 pb-4 text-sm text-slate-500 dark:text-muted-foreground">{item.a}</div>
+                  <div className="px-5 pb-4 text-sm text-slate-500 dark:text-slate-300">{item.a}</div>
                 )}
               </div>
             ))}

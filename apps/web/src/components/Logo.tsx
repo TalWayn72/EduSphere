@@ -34,7 +34,7 @@ export function Logo({
         aria-hidden="true"
       />
       {showText && (
-        <span className={`${text} font-bold text-gray-900 dark:text-foreground`}>
+        <span className={`${text} font-bold text-gray-900 dark:text-white`}>
           EduSphere
         </span>
       )}

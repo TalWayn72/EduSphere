@@ -186,14 +186,14 @@ export function FeaturesPage() {
       <SoftwareApplicationSchema />
 
       <PublicLayout>
-      <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
-        <div className="bg-white dark:bg-card border-b border-gray-100 dark:border-border py-16">
+        <div className="bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-foreground mb-4">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
               Everything You Need to Learn Smarter
             </h1>
-            <p className="text-lg text-gray-500 dark:text-muted-foreground max-w-2xl mx-auto mb-8">
+            <p className="text-lg text-gray-500 dark:text-slate-300 max-w-2xl mx-auto mb-8">
               EduSphere combines AI tutoring, knowledge graphs, gamification, and enterprise LMS
               features into a single platform built for 100,000+ concurrent users.
             </p>
@@ -234,18 +234,18 @@ export function FeaturesPage() {
                   </div>
                   <h2
                     id={`feature-title-${feature.id}`}
-                    className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-foreground mb-4"
+                    className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4"
                   >
                     {feature.title}
                   </h2>
-                  <p className="text-gray-600 dark:text-muted-foreground leading-relaxed mb-6">
+                  <p className="text-gray-600 dark:text-slate-300 leading-relaxed mb-6">
                     {feature.description}
                   </p>
                   <ul className="space-y-2">
                     {feature.benefits.map((b) => (
                       <li
                         key={b}
-                        className="flex items-start gap-2 text-sm text-gray-700 dark:text-foreground"
+                        className="flex items-start gap-2 text-sm text-gray-700 dark:text-white"
                       >
                         <Check
                           className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0"
@@ -259,8 +259,8 @@ export function FeaturesPage() {
 
                 {/* How it Works */}
                 {feature.howItWorks.length > 0 && (
-                  <div className="flex-1 bg-white dark:bg-card rounded-2xl border border-gray-200 dark:border-border p-6">
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wide mb-4">
+                  <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-4">
                       How it works
                     </h3>
                     <ol className="space-y-4">
@@ -270,10 +270,10 @@ export function FeaturesPage() {
                             {s.step}
                           </div>
                           <div>
-                            <div className="font-medium text-gray-900 dark:text-foreground text-sm">
+                            <div className="font-medium text-gray-900 dark:text-white text-sm">
                               {s.title}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-muted-foreground">
+                            <div className="text-sm text-gray-500 dark:text-slate-400">
                               {s.desc}
                             </div>
                           </div>

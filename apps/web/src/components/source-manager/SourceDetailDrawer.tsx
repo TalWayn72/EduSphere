@@ -60,7 +60,7 @@ export function SourceDetailDrawer({
           ? t('sources.loading')
           : (data?.rawContent ?? t('sources.noContent'))}
       </div>
-      <div className="px-4 py-2 border-t text-xs text-gray-400 dark:text-muted-foreground">
+      <div className="px-4 py-2 border-t text-xs text-gray-400 dark:text-slate-400">
         {data &&
           t('sources.chunkFooter', {
             count: data.chunkCount,

@@ -70,7 +70,7 @@ function InstructorCard({ instructor }: InstructorCardProps) {
   return (
     <article
       id={instructor.id}
-      className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl p-6 flex flex-col gap-4"
+      className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 flex flex-col gap-4"
       aria-label={`Instructor: ${instructor.name}`}
     >
       <div className="flex items-start gap-4">
@@ -81,25 +81,25 @@ function InstructorCard({ instructor }: InstructorCardProps) {
           <User className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-foreground">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
             {instructor.name}
           </h2>
           <p className="text-indigo-600 dark:text-indigo-400 text-sm font-medium">
             {instructor.jobTitle}
           </p>
-          <p className="text-gray-500 dark:text-muted-foreground text-xs mt-0.5 flex items-center gap-1">
+          <p className="text-gray-500 dark:text-slate-400 text-xs mt-0.5 flex items-center gap-1">
             <Award className="h-3 w-3" aria-hidden="true" />
             {instructor.credential}
           </p>
         </div>
       </div>
 
-      <p className="text-gray-600 dark:text-muted-foreground text-sm leading-relaxed">
+      <p className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed">
         {instructor.bio}
       </p>
 
       <div>
-        <p className="text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wide mb-2">
+        <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-2">
           Areas of Expertise
         </p>
         <ul
@@ -118,8 +118,8 @@ function InstructorCard({ instructor }: InstructorCardProps) {
         </ul>
       </div>
 
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100 dark:border-border">
-        <span className="text-sm text-gray-500 dark:text-muted-foreground flex items-center gap-1">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100 dark:border-slate-700">
+        <span className="text-sm text-gray-500 dark:text-slate-400 flex items-center gap-1">
           <BookOpen className="h-4 w-4" aria-hidden="true" />
           {instructor.courses} courses
         </span>
@@ -160,7 +160,7 @@ export function InstructorDirectoryPage() {
         ]}
       />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
         <div className="bg-indigo-700 text-white py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -189,10 +189,10 @@ export function InstructorDirectoryPage() {
 
           {/* CTA */}
           <div className="mt-12 p-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl text-center">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-foreground mb-2">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Want to become an EduSphere instructor?
             </h2>
-            <p className="text-gray-600 dark:text-muted-foreground mb-6">
+            <p className="text-gray-600 dark:text-slate-300 mb-6">
               Share your expertise with thousands of learners worldwide.
             </p>
             <a

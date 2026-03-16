@@ -107,18 +107,18 @@ const SECTIONS = [
 export function CompliancePage() {
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-white dark:bg-background">
+      <div>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
           <PageHeader title="Compliance & Certifications" description="Industry standards, security certifications, and regulatory compliance." />
         </div>
         {/* Navigation pills */}
-      <nav className="sticky top-0 z-40 bg-white dark:bg-background border-b border-gray-200 dark:border-border py-3" aria-label="Compliance sections">
+      <nav className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 py-3" aria-label="Compliance sections">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-2">
           {SECTIONS.map((s) => (
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-muted text-slate-700 dark:text-muted-foreground hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+              className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
             >
               {s.title.split(' ')[0]}
             </a>
@@ -144,11 +144,11 @@ export function CompliancePage() {
                 <div>
                   <h2
                     id={`${section.id}-heading`}
-                    className="text-2xl font-bold text-gray-900 dark:text-foreground"
+                    className="text-2xl font-bold text-gray-900 dark:text-white"
                   >
                     {section.title}
                   </h2>
-                  <p className="mt-2 text-gray-600 dark:text-muted-foreground leading-relaxed">
+                  <p className="mt-2 text-gray-600 dark:text-slate-300 leading-relaxed">
                     {section.description}
                   </p>
                 </div>
@@ -157,7 +157,7 @@ export function CompliancePage() {
                 {section.items.map((item) => (
                   <li
                     key={item}
-                    className="flex items-start gap-2 text-gray-700 dark:text-foreground"
+                    className="flex items-start gap-2 text-gray-700 dark:text-white"
                   >
                     <ShieldCheck
                       className="h-4 w-4 text-green-500 mt-1 flex-shrink-0"
@@ -172,11 +172,11 @@ export function CompliancePage() {
         })}
 
         {/* CTA */}
-        <div className="text-center py-12 border-t border-gray-200 dark:border-border">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-4">
+        <div className="text-center py-12 border-t border-gray-200 dark:border-slate-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Ready to learn more?
           </h2>
-          <p className="text-gray-600 dark:text-muted-foreground mb-6">
+          <p className="text-gray-600 dark:text-slate-300 mb-6">
             Contact our team for a detailed security review or to request our SOC
             2 report.
           </p>
@@ -189,7 +189,7 @@ export function CompliancePage() {
             </Link>
             <Link
               to="/pilot"
-              className="px-6 py-3 border border-gray-300 dark:border-border text-gray-700 dark:text-foreground rounded-lg hover:bg-gray-50 dark:hover:bg-accent transition-colors font-medium"
+              className="px-6 py-3 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors font-medium"
             >
               Start Free Pilot
             </Link>
