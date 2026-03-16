@@ -20,6 +20,7 @@ import { OnboardingModule } from './onboarding/onboarding.module';
 import { BillingModule } from './billing/billing.module.js';
 import { HrisModule } from './integrations/hris/hris.module.js';
 import { PartnerModule } from './partners/partner.module.js';
+import { ChallengesModule } from './challenges/challenges.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { PartnerModule } from './partners/partner.module.js';
     BillingModule,
     HrisModule,
     PartnerModule,
+    ChallengesModule,
   ],
 })
 export class AppModule {}

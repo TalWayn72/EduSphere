@@ -7,6 +7,8 @@ import { PublicProfileService } from './public-profile.service';
 import { ActivityFeedService } from './activity-feed.service';
 import { InProgressCoursesService } from './in-progress-courses.service';
 import { RecommendedCoursesService } from './recommended-courses.service';
+import { CompetencyGoalResolver } from './competency-goal.resolver';
+import { CompetencyGoalService } from './competency-goal.service';
 
 @Module({
   providers: [
@@ -18,6 +20,8 @@ import { RecommendedCoursesService } from './recommended-courses.service';
     ActivityFeedService,
     InProgressCoursesService,
     RecommendedCoursesService,
+    CompetencyGoalResolver,
+    CompetencyGoalService,
   ],
   exports: [
     UserService,
