@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Manifest of all EduSphere tables containing Personally Identifiable Information (PII). Used by GDPR Art.20 export attestation and Art.17 erasure verification.",
+  "version": "1.0.0",
+  "tables": [
+    {
+      "name": "users",
+      "schemaFile": "core.ts",
+      "piiColumns": ["email", "first_name", "last_name", "display_name", "avatar_url"],
+      "note": "Primary definition in core.ts; also re-exported from users.ts (base subset)"
+    },
+    {
+      "name": "users_base",
+      "schemaFile": "users.ts",
+      "piiColumns": ["email", "first_name", "last_name"],
+      "note": "Base users table definition — same DB table as 'users' in core.ts"
+    },
+    {
+      "name": "annotations",
+      "schemaFile": "annotations.ts",
+      "piiColumns": ["text", "highlighted_text"],
+      "note": "User-authored personal notes and highlights"
+    },
+    {
+      "name": "agent_sessions",
+      "schemaFile": "agentSessions.ts",
+      "piiColumns": ["metadata"],
+      "note": "Session metadata may contain user-provided context"
+    },
+    {
+      "name": "agent_messages",
+      "schemaFile": "agentMessages.ts",
+      "piiColumns": ["content"],
+      "note": "Free-text conversation content with AI agents"
+    },
+    {
+      "name": "user_progress",
+      "schemaFile": "userProgress.ts",
+      "piiColumns": ["last_accessed_at", "completed_at"],
+      "note": "Behavioral data — learning activity timestamps"
+    },
+    {
+      "name": "user_courses",
+      "schemaFile": "userCourses.ts",
+      "piiColumns": ["enrolled_at", "completed_at"],
+      "note": "Enrollment records linked to user identity"
+    },
+    {
+      "name": "user_consents",
+      "schemaFile": "consent.ts",
+      "piiColumns": ["ip_address", "user_agent"],
+      "note": "Consent records include IP and browser fingerprint"
+    },
+    {
+      "name": "discussions",
+      "schemaFile": "discussions.ts",
+      "piiColumns": ["content", "title"],
+      "note": "User-authored discussion posts"
+    },
+    {
+      "name": "quiz_results",
+      "schemaFile": "quiz-results.ts",
+      "piiColumns": ["answers", "item_results", "score"],
+      "note": "Assessment answers and scores linked to user"
+    },
+    {
+      "name": "text_submissions",
+      "schemaFile": "submissions.ts",
+      "piiColumns": ["text_content"],
+      "note": "Free-text assignment submissions"
+    },
+    {
+      "name": "peer_review_assignments",
+      "schemaFile": "peer-review.ts",
+      "piiColumns": ["submission_text", "feedback"],
+      "note": "Peer review text authored by learners"
+    },
+    {
+      "name": "push_notification_tokens",
+      "schemaFile": "push-notification-tokens.ts",
+      "piiColumns": ["token", "expo_push_token", "web_push_subscription"],
+      "note": "Device push tokens are device-level PII"
+    },
+    {
+      "name": "saved_searches",
+      "schemaFile": "saved-searches.ts",
+      "piiColumns": ["query", "filters"],
+      "note": "Search queries may reveal personal interests"
+    },
+    {
+      "name": "certificates",
+      "schemaFile": "certificates.ts",
+      "piiColumns": ["pdf_url", "metadata"],
+      "note": "Certificate PDFs contain user name"
+    },
+    {
+      "name": "onboarding_state",
+      "schemaFile": "onboarding.ts",
+      "piiColumns": ["data"],
+      "note": "Onboarding wizard data may contain user preferences"
+    },
+    {
+      "name": "audit_log",
+      "schemaFile": "auditLog.ts",
+      "piiColumns": ["ip_address", "user_agent", "metadata"],
+      "note": "Audit trail — IP addresses and browser fingerprints"
+    }
+  ]
+}
