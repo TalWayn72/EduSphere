@@ -25,17 +25,19 @@ const InvestorDeckPage = lazy(() =>
   import('@/pages/InvestorDeckPage').then((m) => ({ default: m.InvestorDeckPage }))
 );
 
+const INSTRUCTOR_ROLES = { requiredRoles: ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'] };
+
 /**
  * Instructor, partner, and internal routes.
  */
 export const instructorRoutes: RouteObject[] = [
   // Instructor Analytics Dashboard
-  { path: '/instructor/analytics', element: guarded(<InstructorAnalyticsDashboard />) },
+  { path: '/instructor/analytics', element: guarded(<InstructorAnalyticsDashboard />, INSTRUCTOR_ROLES) },
   // Instructor annotation merge queue
-  { path: '/instructor/merge-queue', element: guarded(<InstructorMergeQueuePage />) },
-  { path: '/instructor/earnings', element: guarded(<InstructorEarningsPage />) },
+  { path: '/instructor/merge-queue', element: guarded(<InstructorMergeQueuePage />, INSTRUCTOR_ROLES) },
+  { path: '/instructor/earnings', element: guarded(<InstructorEarningsPage />, INSTRUCTOR_ROLES) },
   // Partner revenue + API key dashboard
-  { path: '/partner/dashboard', element: guarded(<PartnerDashboardPage />) },
+  { path: '/partner/dashboard', element: guarded(<PartnerDashboardPage />, INSTRUCTOR_ROLES) },
   // Internal investor deck — SUPER_ADMIN only
-  { path: '/internal/investor-deck', element: guarded(<InvestorDeckPage />) },
+  { path: '/internal/investor-deck', element: guarded(<InvestorDeckPage />, { requiredRoles: ['SUPER_ADMIN'] }) },
 ];

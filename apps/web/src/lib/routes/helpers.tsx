@@ -10,11 +10,16 @@ export function PageLoader() {
 
 // ── Wrap element in ErrorBoundary + ProtectedRoute + Suspense ─────────────────
 // Each route gets its own ErrorBoundary so a crash in one page won't kill the shell.
-export function guarded(element: React.ReactNode) {
+export function guarded(
+  element: React.ReactNode,
+  options?: { requiredRoles?: string[] }
+) {
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
-        <ProtectedRoute>{element}</ProtectedRoute>
+        <ProtectedRoute requiredRoles={options?.requiredRoles}>
+          {element}
+        </ProtectedRoute>
       </Suspense>
     </ErrorBoundary>
   );
