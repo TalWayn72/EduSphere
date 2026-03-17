@@ -30,6 +30,26 @@
 | BUG-071 | AI Course consent error | ✅ Fixed | `fed522a` |
 | BUG-072 | APQ gateway error cascade | ✅ Fixed | `390a623` |
 | BUG-073 | Media upload failure | ✅ Fixed | `256655c` |
+| ARCH-6 | CRDT compaction no automated trigger | ✅ Fixed | `cf60f20` |
+| ARCH-5 | Connection budget undocumented | ✅ Fixed | `c5edcb4` |
+| ARCH-4 | Content subgraph 38 domains (ADR) | ✅ Documented | `26d01d0` |
+| ARCH-1 | PostgreSQL extraction plan | ✅ Documented | `c5edcb4` |
+| DB-7 | withReadReplica creates new Drizzle per call | ✅ Fixed | `a8672f9` |
+| BE-10 | No circuit breaker for external deps | ✅ Fixed | `3e88fae` |
+| QA-6 | No E2E for cross-role mutation auth | ✅ Fixed | `c649df4` |
+| DOC-9 | No operational runbooks | ✅ Fixed | `3e2b019` |
+| OPS-5 | Base images use floating tags | ✅ Fixed | `d64ea70` |
+| QA-1 | 504 waitForTimeout calls in E2E | ✅ Fixed | `0f26985` |
+| FE-2 | No token expiry reaction | ✅ Fixed | (Wave 3 commit) |
+| FE-4/UX-3 | Sidebar 19 items no role grouping | ✅ Fixed | (Wave 3 commit) |
+| FE-6 | guarded() no client-side role check | ✅ Fixed | (Wave 4 commit) |
+| FE-5 | No shared useFileUpload hook | ✅ Fixed | `d44f376` |
+| ARCH-8 | HybridRAG fusion weights hardcoded | ✅ Fixed | `7ef3bc0` |
+| DB-6 | Concept embeddings orphaned on delete | ✅ Fixed | `49a7d13` |
+| BE-6 | Relay cursor uses offset encoding | ✅ Fixed | (keyset pagination) |
+| ORCH-4 | Discovery wave checklist incomplete | ✅ Fixed | `b360fcc` |
+| DOC-2 | CHANGELOG missing 20+ versions | ✅ Fixed | (Wave 6 commit) |
+| DOC-4 | docs/INDEX.md frozen at Session 27 | ✅ Fixed | (Wave 6 commit) |
 
 ---
 
