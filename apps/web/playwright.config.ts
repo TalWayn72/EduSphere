@@ -86,8 +86,11 @@ export default defineConfig({
   /* Fail build in CI if test.only() was accidentally committed */
   forbidOnly: !!process.env.CI,
 
-  /* Skip snapshot comparisons in CI — no baseline images committed to repo */
-  ignoreSnapshots: !!process.env.CI,
+  /* Enable snapshot comparisons everywhere (including CI) */
+  ignoreSnapshots: false,
+
+  /* In CI, fail on missing/mismatched snapshots instead of updating them */
+  updateSnapshots: process.env.CI ? 'none' : 'missing',
 
   /**
    * Retry flaky tests.
