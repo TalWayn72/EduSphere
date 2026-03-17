@@ -33,14 +33,17 @@
 Grep for the exact broken pattern (string, function, API call) across entire codebase.
 
 ### Wave 2 — Similarity Search (NEVER SKIP)
-Check ALL 7 directories for variations of the same anti-pattern:
+Check ALL 10 directories for variations of the same anti-pattern:
 - [ ] `apps/web/src/pages/`
 - [ ] `apps/web/src/hooks/`
 - [ ] `apps/web/src/components/`
 - [ ] `apps/mobile/src/`
-- [ ] ALL 6 backend subgraphs (`apps/subgraph-*/`)
-- [ ] All resolver files
+- [ ] ALL 6 backend subgraphs (`apps/subgraph-*/src/`)
+- [ ] All resolver files across all subgraphs
 - [ ] Mobile equivalent of affected web component
+- [ ] `packages/*/src/` — shared packages (db, auth, nats-client, graphql-shared)
+- [ ] `infrastructure/` + `docker-compose*.yml` — if infrastructure/config bug
+- [ ] `.env*` files + `apps/*/src/config/` — if env-var or config-related bug
 
 ### Wave 3 — Pattern Class
 Search all usages of the same API or pattern class. Examples:
