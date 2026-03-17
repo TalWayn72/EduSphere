@@ -13,3 +13,5 @@ export {
   authMiddleware,
   type GraphQLContext,
 } from './middleware.js';
+
+export { TracingInterceptor } from './tracing.interceptor.js';
