@@ -99,6 +99,9 @@ export {
   withReadReplica,
   createReadConnection,
   createWriteConnection,
+  getReadDb,
+  getWriteDb,
+  closeReadReplica,
 } from './helpers/readReplica.js';
 
 // Export PII encryption helpers (SI-3: AES-256-GCM field encryption)
