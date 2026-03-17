@@ -143,6 +143,7 @@ UsersP0039217.claudeprojectsEduSpherescripts*.txt
 .claude/worktrees/
 
 # Test result artifacts
+test-results/
 apps/*/test-results/
 
 # Temporary test files
