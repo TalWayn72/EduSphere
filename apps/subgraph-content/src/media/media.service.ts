@@ -13,7 +13,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
-import { connect, StringCodec } from 'nats';
+import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { and, eq, isNotNull } from 'drizzle-orm';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
@@ -59,6 +59,7 @@ export class MediaService implements OnModuleDestroy {
   private readonly bucket: string;
   private readonly db = createDatabaseConnection();
   private readonly sc = StringCodec();
+  private natsConn: NatsConnection | null = null;
 
   constructor() {
     this.bucket = minioConfig.bucket;
@@ -83,7 +84,18 @@ export class MediaService implements OnModuleDestroy {
   }
 
   async onModuleDestroy(): Promise<void> {
+    if (this.natsConn) {
+      await this.natsConn.drain().catch(() => undefined);
+      this.natsConn = null;
+    }
     await closeAllPools();
+  }
+
+  private async getNatsConnection(): Promise<NatsConnection> {
+    if (!this.natsConn || this.natsConn.isClosed()) {
+      this.natsConn = await connect(buildNatsOptions());
+    }
+    return this.natsConn;
   }
 
   async getPresignedUploadUrl(
@@ -397,9 +409,9 @@ export class MediaService implements OnModuleDestroy {
     contentType: string;
   }): Promise<void> {
     // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
-    let nc;
+    // Uses persistent NATS connection (cleaned up in onModuleDestroy).
     try {
-      nc = await connect(buildNatsOptions());
+      const nc = await this.getNatsConnection();
       nc.publish(
         'EDUSPHERE.media.uploaded',
         this.sc.encode(JSON.stringify(payload))
@@ -414,8 +426,8 @@ export class MediaService implements OnModuleDestroy {
         'Failed to publish EDUSPHERE.media.uploaded to NATS',
         err
       );
-    } finally {
-      if (nc) await nc.close().catch(() => undefined);
+      // Reset connection on error so next call retries
+      this.natsConn = null;
     }
   }
 

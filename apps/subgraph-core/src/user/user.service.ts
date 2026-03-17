@@ -3,6 +3,7 @@ import {
   createDatabaseConnection,
   schema,
   eq,
+  sql,
   withTenantContext,
   closeAllPools,
 } from '@edusphere/db';
@@ -316,14 +317,17 @@ export class UserService implements OnModuleDestroy {
             .limit(opts.limit)
             .offset(opts.offset)
         : tx.select().from(schema.users).limit(opts.limit).offset(opts.offset));
-      const countRows = await tx
-        .select({ id: schema.users.id })
+      const countQuery = tx
+        .select({ total: sql<number>`cast(count(*) as integer)` })
         .from(schema.users);
+      const [countResult] = opts.role
+        ? await countQuery.where(eq(schema.users.role, opts.role as UserRole))
+        : await countQuery;
       return {
         users: rows
           .map((u) => this.mapUser(u))
           .filter((u): u is NonNullable<MappedUser> => u !== null),
-        total: countRows.length,
+        total: countResult?.total ?? 0,
       };
     });
   }

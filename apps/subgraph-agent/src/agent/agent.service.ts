@@ -133,11 +133,21 @@ export class AgentService implements OnModuleDestroy {
         throw new NotFoundException('Agent definition not found');
       }
 
-      // Execute with AI service
-      const result = await this.aiService.execute(
-        agent,
-        execution!.input as Record<string, unknown>
+      // Execute with AI service (Memory Safety: Promise.race with 5-min timeout)
+      const EXECUTION_TIMEOUT_MS = 300_000;
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Execution timed out after 5 minutes')),
+          EXECUTION_TIMEOUT_MS
+        )
       );
+      const result = await Promise.race([
+        this.aiService.execute(
+          agent,
+          execution!.input as Record<string, unknown>
+        ),
+        timeoutPromise,
+      ]);
 
       // Update with result
       await this.db
