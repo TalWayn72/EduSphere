@@ -37,3 +37,6 @@ dist-ssr
 test-results/
 playwright-report/
 visual-qa-results/
+
+# Storybook build output
+storybook-static/
