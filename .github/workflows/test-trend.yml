@@ -1,0 +1,62 @@
+name: Test Trend Dashboard
+
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  aggregate-results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run tests with JSON reporter
+        run: |
+          pnpm turbo test -- --reporter=json --outputFile=test-results.json 2>/dev/null || true
+        continue-on-error: true
+
+      - name: Compute flakiness score
+        run: |
+          node -e "
+            const fs = require('fs');
+            const results = [];
+            const files = fs.readdirSync('.', { recursive: true })
+              .filter(f => f.endsWith('test-results.json'));
+            for (const f of files) {
+              try {
+                const data = JSON.parse(fs.readFileSync(f, 'utf8'));
+                if (data.testResults) results.push(...data.testResults);
+              } catch {}
+            }
+            const total = results.length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            const flakeRate = total > 0 ? (failed / total * 100).toFixed(1) : '0.0';
+            console.log('Total test files:', total);
+            console.log('Failed:', failed);
+            console.log('Flake rate:', flakeRate + '%');
+            if (parseFloat(flakeRate) > 5.0) {
+              console.log('ERROR: Flake rate exceeds 5% threshold');
+              process.exit(1);
+            }
+          "
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.sha }}
+          path: '**/test-results.json'
+          retention-days: 90
