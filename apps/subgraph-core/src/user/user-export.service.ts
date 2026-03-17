@@ -8,7 +8,10 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
-import piiManifest from '@edusphere/db/config/pii-bearing-tables.json';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const piiManifest = require('@edusphere/db/config/pii-bearing-tables.json') as {
+  tables: Array<{ name: string; schemaFile: string; piiColumns: string[]; note?: string }>;
+};
 
 /**
  * GDPR Art.20 — Right to Data Portability.
