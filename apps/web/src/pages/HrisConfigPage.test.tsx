@@ -27,6 +27,15 @@ vi.mock('@/hooks/useAuthRole', () => ({
   useAuthRole: vi.fn(() => 'ORG_ADMIN'),
 }));
 
+vi.mock('@/lib/constants', () => ({
+  SIMULATED_SAVE_MS: 1500,
+  TOAST_AUTO_DISMISS_MS: 2000,
+}));
+
+vi.mock('@/components/Breadcrumbs', () => ({
+  Breadcrumbs: () => <nav data-testid="breadcrumbs" />,
+}));
+
 // UI component mocks — return simple stubs for shadcn components
 vi.mock('@/components/ui/select', () => ({
   Select: ({ children, onValueChange: _onValueChange, value }: React.PropsWithChildren<{ onValueChange?: (v: string) => void; value?: string }>) => (
@@ -68,13 +77,17 @@ vi.mock('@/components/ui/label', () => ({
   ),
 }));
 
-vi.mock('lucide-react', () => ({
-  Building2: () => <span data-testid="icon-building" />,
-  CheckCircle: () => <span />,
-  XCircle: () => <span />,
-  Clock: () => <span />,
-  Loader2: () => <span />,
-}));
+vi.mock('lucide-react', () =>
+  new Proxy({} as Record<string, unknown>, {
+    get: (_, name) => {
+      if (name === '__esModule') return true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return function MockIcon(props: any) {
+        return <span data-testid={`icon-${String(name)}`} {...props} />;
+      };
+    },
+  })
+);
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
 

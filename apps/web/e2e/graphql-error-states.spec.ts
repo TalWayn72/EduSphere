@@ -26,7 +26,7 @@ import { routeGraphQL } from './graphql-mock.helpers';
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // Raw technical error strings that must NEVER be visible to users
@@ -89,7 +89,7 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
     await generateBtn.click();
 
     // Wait for the mutation response
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: raw technical error must NOT appear
     await assertNoRawErrors(page);
@@ -122,7 +122,7 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
     await page.getByTestId('launch-ai-builder-btn').click();
     await page.getByRole('dialog').locator('textarea').first().fill('Test course');
     await page.getByRole('dialog').getByRole('button', { name: /generate/i }).click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw service message must NOT be shown directly
     await expect(page.getByText('Service temporarily unavailable')).not.toBeVisible({ timeout: 3_000 });
@@ -156,7 +156,7 @@ test.describe('graphql-error-states — T-02: AI Course Builder network failure'
     await page.getByTestId('launch-ai-builder-btn').click();
     await page.getByRole('dialog').locator('textarea').first().fill('Introduction to Python');
     await page.getByRole('dialog').getByRole('button', { name: /generate/i }).click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: raw network error terms must NOT appear
     await assertNoRawErrors(page);
@@ -211,7 +211,7 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
     const submitBtn = page.getByRole('button', { name: /save quiz|create quiz|submit/i }).last();
     if (await submitBtn.isVisible()) {
       await submitBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // REGRESSION GUARD: raw DB error must NOT be visible
@@ -257,7 +257,7 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
     const submitBtn = page.getByRole('button', { name: /save quiz|save|submit/i }).last();
     if (await submitBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
       await submitBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       if (mutationIntercepted) {
         // Friendly toast message should appear
@@ -312,13 +312,13 @@ test.describe('graphql-error-states — T-04: Pipeline Builder publish error', (
     const addVideoBtn = page.getByRole('button', { name: 'Video' });
     await addVideoBtn.waitFor({ timeout: 5_000 });
     await addVideoBtn.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click Publish
     const publishBtn = page.getByRole('button', { name: /publish/i });
     await publishBtn.waitFor({ timeout: 5_000 });
     await publishBtn.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: raw transition error must NOT be visible to user
     await expect(
@@ -382,7 +382,7 @@ test.describe('graphql-error-states — T-05: Course Create submit error', () =>
     for (let i = 0; i < 3; i++) {
       if (await nextBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
       }
     }
 
@@ -390,7 +390,7 @@ test.describe('graphql-error-states — T-05: Course Create submit error', () =>
     const submitBtn = page.getByRole('button', { name: /save draft|save as draft|publish/i }).first();
     if (await submitBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await submitBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // REGRESSION GUARD: raw DB constraint error must NOT appear in toast or anywhere
       await expect(page.getByText(RAW_ERROR_MSG)).not.toBeVisible({ timeout: 3_000 });

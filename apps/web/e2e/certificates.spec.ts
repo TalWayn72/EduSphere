@@ -55,7 +55,7 @@ test.describe('CertificatesPage — DEV_MODE guard', () => {
     });
     await login(page);
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('renders certificates heading', async ({ page }) => {
@@ -115,7 +115,7 @@ test.describe('CertificatesPage — Live backend', () => {
 
   test('certificates page loads for authenticated student', async ({ page }) => {
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /certificates/i })
@@ -128,7 +128,7 @@ test.describe('CertificatesPage — Live backend', () => {
 
   test('certificate list or empty state is visible', async ({ page }) => {
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const hasCerts = await page.locator('[data-testid="certificate-card"]').count();
     const hasEmpty = await page

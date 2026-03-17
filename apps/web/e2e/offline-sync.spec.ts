@@ -29,7 +29,7 @@ test.describe('Offline Sync — Online Flush', () => {
     await loginInDevMode(page);
     // Navigate to dashboard so the Layout (with OfflineBanner) is mounted
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   // ── Test 1: OfflineBanner appears when offline ──────────────────────────────

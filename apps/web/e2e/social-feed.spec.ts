@@ -17,7 +17,7 @@ test.describe('Social Feed — DEV_MODE guard', () => {
 
   test('social feed page renders heading', async ({ page }) => {
     await page.goto(`${BASE_URL}/social`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Social Feed/i })
@@ -26,7 +26,7 @@ test.describe('Social Feed — DEV_MODE guard', () => {
 
   test('empty state shows when no follows', async ({ page }) => {
     await page.goto(`${BASE_URL}/social`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Either a real feed OR the empty-state prompt is visible
     const hasFeed = await page.locator('[data-testid="feed-item"]').count();
@@ -36,7 +36,7 @@ test.describe('Social Feed — DEV_MODE guard', () => {
 
   test('people search page renders', async ({ page }) => {
     await page.goto(`${BASE_URL}/people`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByPlaceholder(/Search people/i)
@@ -52,7 +52,7 @@ test.describe('Social Feed — DEV_MODE guard', () => {
 
   test('no [object Object] in social feed DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/social`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
@@ -69,7 +69,7 @@ test.describe('Social Feed — Live backend', () => {
 
   test('social feed page renders heading with screenshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/social`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Social Feed/i })
@@ -81,7 +81,7 @@ test.describe('Social Feed — Live backend', () => {
 
   test('people search page renders with screenshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/people`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByPlaceholder(/Search people/i)
@@ -95,11 +95,11 @@ test.describe('Social Feed — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/people`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.getByPlaceholder(/Search people/i);
     await searchInput.fill('student');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const hasResults = await page.locator('[data-testid="user-card"]').count();
     const hasEmpty = await page

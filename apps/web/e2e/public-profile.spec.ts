@@ -26,13 +26,13 @@ async function gotoPublicProfile(
   userId = 'demo-user'
 ) {
   await page.goto(`/u/${userId}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 async function gotoProfileSettings(page: Parameters<typeof login>[0]) {
   await login(page);
   await page.goto('/profile');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ---------------------------------------------------------------------------
@@ -265,7 +265,7 @@ test.describe('Public Profile', () => {
 
       const initialChecked = await toggle.getAttribute('aria-checked');
       await toggle.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // The aria-checked value should have flipped
       const newChecked = await toggle.getAttribute('aria-checked');

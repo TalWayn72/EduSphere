@@ -171,7 +171,7 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
   });
 
   test('catalog page does not expose DB connection strings or API keys in body', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const bodyHtml = await page.locator('html').innerHTML();
     expect(bodyHtml).not.toMatch(/DATABASE_URL|postgres:\/\/|postgresql:\/\//i);
     expect(bodyHtml).not.toMatch(/api[_-]?key\s*[:=]\s*['"][^'"]{8,}['"]/i);
@@ -198,7 +198,7 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
   // ─── Visual regression ───────────────────────────────────────────────────────
 
   test('visual snapshot — catalog page', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('catalog-page.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,
@@ -319,7 +319,7 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
   });
 
   test('instructors page does not expose auth tokens or internal user IDs', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const bodyHtml = await page.locator('html').innerHTML();
     expect(bodyHtml).not.toMatch(/bearer\s+[a-zA-Z0-9._-]{20,}/i);
     expect(bodyHtml).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
@@ -342,7 +342,7 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
   // ─── Visual regression ───────────────────────────────────────────────────────
 
   test('visual snapshot — instructors page', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('instructors-page.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,

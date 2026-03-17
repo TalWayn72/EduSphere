@@ -27,7 +27,7 @@ const MOCK_ADMIN_OVERVIEW = {
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Admin Dashboard ──────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ test.describe('admin-mutations — Admin Dashboard', () => {
     await loginAndNavigate(page, '/admin');
 
     // Should render admin layout header
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // No raw error strings visible
     const rawErrors = ['Cannot return null', 'graphQLErrors', 'CombinedError', 'INTERNAL_SERVER_ERROR'];
@@ -71,7 +71,7 @@ test.describe('admin-mutations — Admin Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Stat cards should render some numeric values
     // AdminStatCards component renders total users, courses, etc.
@@ -110,7 +110,7 @@ test.describe('admin-mutations — Admin Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw "Unauthorized" or GraphQL error codes must NOT appear as visible text
     await expect(page.getByText('UNAUTHENTICATED')).not.toBeVisible({ timeout: 3_000 });
@@ -142,7 +142,7 @@ test.describe('admin-mutations — User Management', () => {
     });
 
     await loginAndNavigate(page, '/admin/users');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // User list should render
     await expect(page.getByText(/alice@example|Alice Smith/i)).toBeVisible({ timeout: 10_000 }).catch(() => {});
@@ -164,7 +164,7 @@ test.describe('admin-mutations — User Management', () => {
     });
 
     await loginAndNavigate(page, '/admin/users');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw DB error must NOT be visible
     await expect(page.getByText('relation "users" does not exist')).not.toBeVisible({ timeout: 3_000 });
@@ -195,7 +195,7 @@ test.describe('admin-mutations — Announcements', () => {
     });
 
     await loginAndNavigate(page, '/admin/announcements');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('admin-announcements-loaded.png', {
       maxDiffPixelRatio: 0.05,
@@ -221,13 +221,13 @@ test.describe('admin-mutations — Announcements', () => {
     });
 
     await loginAndNavigate(page, '/admin/announcements');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for a Create/Add announcement form or button
     const createBtn = page.getByRole('button', { name: /create|add|new announcement/i }).first();
     if (await createBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await createBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Fill in title
       const titleInput = page.getByRole('textbox', { name: /title/i }).first();
@@ -239,7 +239,7 @@ test.describe('admin-mutations — Announcements', () => {
       const submitBtn = page.getByRole('button', { name: /save|submit|create/i }).last();
       if (await submitBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
         await submitBtn.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
       }
 
       if (mutationCalled) {
@@ -268,7 +268,7 @@ test.describe('admin-mutations — Announcements', () => {
     });
 
     await loginAndNavigate(page, '/admin/announcements');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page.getByRole('button', { name: /create|add|new announcement/i }).first();
     if (await createBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
@@ -282,7 +282,7 @@ test.describe('admin-mutations — Announcements', () => {
       const submitBtn = page.getByRole('button', { name: /save|submit|create/i }).last();
       if (await submitBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
         await submitBtn.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Raw constraint error must NOT be visible
         await expect(
@@ -315,7 +315,7 @@ test.describe('admin-mutations — At-Risk Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/admin/at-risk');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // No raw errors
     await expect(page.getByText('CombinedError')).not.toBeVisible({ timeout: 2_000 });

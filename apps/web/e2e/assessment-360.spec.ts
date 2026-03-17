@@ -18,7 +18,7 @@ test.describe('360° Assessments — DEV_MODE guard', () => {
 
   test('assessments page renders heading', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Assessment/i })
@@ -34,14 +34,14 @@ test.describe('360° Assessments — DEV_MODE guard', () => {
 
   test('no [object Object] in assessments DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
   test('assessments page shows list or empty state', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const hasAssessments = await page
       .locator('[data-testid="assessment-card"]')
@@ -64,7 +64,7 @@ test.describe('360° Assessments — Live backend', () => {
 
   test('assessments page renders with screenshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Assessment/i })
@@ -77,7 +77,7 @@ test.describe('360° Assessments — Live backend', () => {
   test('assessments page renders correctly as instructor', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.instructor);
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Assessment/i })
@@ -161,7 +161,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page.locator(
       '[data-testid="create-assessment-btn"], button:has-text("Create"), button:has-text("New Assessment"), a:has-text("New")'
@@ -179,7 +179,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page.locator(
       '[data-testid="create-assessment-btn"], button:has-text("Create"), button:has-text("New")'
@@ -198,7 +198,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
 
   test('campaign title input — accepts text without crash', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const titleInput = page.locator(
       '[data-testid="assessment-title-input"], input[name="title"], input[placeholder*="title" i]'
@@ -216,7 +216,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for respondent-related UI
     const respondentArea = page.locator(
@@ -232,7 +232,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
 
   test('deadline setting — date picker does not crash', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const deadlineInput = page.locator(
       '[data-testid="deadline-input"], input[type="date"], input[name="deadline"], input[placeholder*="deadline" i]'
@@ -250,7 +250,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/assessments/a-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -269,7 +269,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     });
 
     await page.goto(`${BASE_URL}/assessments/a-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('PermissionDenied');
@@ -278,7 +278,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
 
   test('export button — does not crash when clicked', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments/a-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const exportBtn = page.locator(
       '[data-testid="export-results-btn"], button:has-text("Export"), button:has-text("Download")'
@@ -295,7 +295,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
 
   test('anonymity toggle — toggling does not crash the form', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const anonToggle = page.locator(
       '[data-testid="anonymous-toggle"], [role="switch"]:near(:text("Anonymous")), input[name="anonymous"]'
@@ -315,7 +315,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Raw enum values should be formatted as human-readable badges
@@ -346,7 +346,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     });
 
     await page.goto(`${BASE_URL}/assessments/a-empty`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -380,7 +380,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     });
 
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('onerror=');
@@ -390,7 +390,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const descInput = page.locator(
       '[data-testid="assessment-description"], textarea[name="description"], textarea[placeholder*="description" i]'
@@ -406,7 +406,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
 
   test('visual regression — assessments list page', async ({ page }) => {
     await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('assessments-list-mocked.png', {
       fullPage: false,

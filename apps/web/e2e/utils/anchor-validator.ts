@@ -59,7 +59,7 @@ export async function validateAnchorLinks(page: Page): Promise<BrokenAnchor[]> {
       // Navigate to the path
       try {
         const baseUrl = new URL(currentUrl).origin;
-        await page.goto(`${baseUrl}${path}`, { waitUntil: 'networkidle', timeout: 10000 });
+        await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded', timeout: 10000 });
         const exists = await page.evaluate(
           (id) => !!document.getElementById(id),
           anchor,
@@ -83,7 +83,7 @@ export async function validateAnchorLinks(page: Page): Promise<BrokenAnchor[]> {
 
   // Navigate back to original page
   try {
-    await page.goto(currentUrl, { waitUntil: 'networkidle', timeout: 10000 });
+    await page.goto(currentUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
   } catch {
     // Best effort return
   }

@@ -46,7 +46,7 @@ async function visitAndAudit(
   screenshotName: string
 ): Promise<void> {
   await page.goto(`${BASE_URL}${route}`, NAV_TIMEOUT);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // 1. No error boundary visible
   const errorBoundary = page.locator('[data-testid="error-boundary"]');

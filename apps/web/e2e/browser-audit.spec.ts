@@ -188,7 +188,7 @@ test('13 - Keycloak login flow as super admin', async ({ page }) => {
     await page
       .click('input[type="submit"]')
       .catch(() => page.click('button[type="submit"]').catch(() => {}));
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
     await page.waitForTimeout(3000);
     await page.screenshot({
       path: `${SCREENSHOTS}/13c-after-login.png`,

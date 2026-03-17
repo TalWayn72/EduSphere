@@ -167,7 +167,7 @@ test.describe('Features Page — AEO', () => {
   // ─── Visual regression ────────────────────────────────────────────────────
 
   test('visual snapshot — Features page above the fold', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('features-page.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,

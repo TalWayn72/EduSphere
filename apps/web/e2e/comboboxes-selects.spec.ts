@@ -49,7 +49,7 @@ test.describe('Content Viewer — Annotations | AI | Context tabs', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Wait for the tablist containing the three panel tabs
     await page.getByRole('tablist').waitFor({ state: 'visible', timeout: 10_000 });
   });
@@ -154,7 +154,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/annotations');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   // ── Tab bar ─────────────────────────────────────────────────────────────────
@@ -386,7 +386,7 @@ test.describe('Agents page — 5 agent template mode cards', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('all 5 agent mode cards are rendered', async ({ page }) => {
@@ -608,7 +608,7 @@ test.describe('Course wizard — Difficulty select/combobox', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/courses/new');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('difficulty combobox defaults to BEGINNER', async ({ page }) => {
@@ -710,7 +710,7 @@ test.describe('Settings page — Language combobox', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('language combobox is present and enabled on the settings page', async ({
@@ -815,7 +815,7 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.locator('video').waitFor({ state: 'visible', timeout: 10_000 });
 
     // Open the annotation form

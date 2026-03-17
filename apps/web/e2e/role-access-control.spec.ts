@@ -73,7 +73,7 @@ test.describe('Public routes — accessible without login', () => {
   for (const { path, expect: textPattern } of publicRoutes) {
     test(`public route ${path} loads without auth`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should NOT redirect to /login
       const url = page.url();
@@ -111,7 +111,7 @@ test.describe('Admin routes — authenticated access', () => {
   for (const { path, name, expect: textPattern } of adminRoutes) {
     test(`admin route ${path} renders admin content`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should not be redirected to /login
       expect(page.url()).not.toMatch(/\/login$/);
@@ -159,7 +159,7 @@ test.describe('Instructor routes — authenticated access', () => {
       page,
     }) => {
       await page.goto(`${BASE_URL}${path}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       expect(page.url()).not.toMatch(/\/login$/);
 
@@ -203,7 +203,7 @@ test.describe('Student routes — authenticated access', () => {
   for (const { path, name, expect: textPattern } of studentRoutes) {
     test(`student route ${path} renders student content`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       expect(page.url()).not.toMatch(/\/login$/);
 
@@ -233,7 +233,7 @@ test.describe('Sidebar navigation — authenticated user', () => {
 
   test('sidebar is visible on dashboard', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Sidebar or navigation region should exist
     const nav = page.locator(
@@ -245,7 +245,7 @@ test.describe('Sidebar navigation — authenticated user', () => {
 
   test('sidebar contains navigation links', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should have at least some navigation links
     const navLinks = page.locator('nav a, [role="navigation"] a');
@@ -260,7 +260,7 @@ test.describe('Sidebar navigation — authenticated user', () => {
 
   test('clicking sidebar links navigates correctly', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Find a link to /courses in the navigation
     const coursesLink = page.locator(
@@ -270,7 +270,7 @@ test.describe('Sidebar navigation — authenticated user', () => {
 
     if (coursesLinkCount > 0) {
       await coursesLink.first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       expect(page.url()).toContain('/courses');
     }
   });
@@ -295,7 +295,7 @@ test.describe('API authorization context', () => {
     });
 
     await page.goto(`${BASE_URL}/courses`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The courses page should trigger at least one GraphQL request
     // In DEV_MODE, the app may use mock data, so this is a soft check
@@ -317,7 +317,7 @@ test.describe('API authorization context', () => {
     });
 
     await page.goto(`${BASE_URL}/courses`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // If GraphQL requests were made, they should have proper content-type
     // In DEV_MODE with mocked data, no requests may be made — that is OK
@@ -368,7 +368,7 @@ test.describe('Direct URL access after login', () => {
 
   test('direct navigation to /admin works after login', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/admin');
     const body = page.locator('body');
@@ -379,7 +379,7 @@ test.describe('Direct URL access after login', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/settings`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/settings');
     const body = page.locator('body');
@@ -390,7 +390,7 @@ test.describe('Direct URL access after login', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/knowledge-graph`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/knowledge-graph');
     const body = page.locator('body');
@@ -405,7 +405,7 @@ test.describe('Direct URL access after login', () => {
 
     for (const route of routes) {
       await page.goto(`${BASE_URL}${route}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should still be authenticated — not redirected to /login
       expect(page.url()).not.toMatch(/\/login$/);
@@ -424,7 +424,7 @@ test.describe('UI element isolation', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/admin`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const undefinedCount = await page
       .locator('text=/^undefined$/i')
@@ -448,7 +448,7 @@ test.describe('UI element isolation', () => {
 
     for (const route of routes) {
       await page.goto(`${BASE_URL}${route}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const errorBoundary = page.locator('[data-testid="error-boundary"]');
       const count = await errorBoundary.count();
@@ -464,7 +464,7 @@ test.describe('UI element isolation', () => {
 
     for (const route of routes) {
       await page.goto(`${BASE_URL}${route}`, NAV_TIMEOUT);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const bodyText = await page.locator('body').innerText();
       const leaks = bodyText.match(

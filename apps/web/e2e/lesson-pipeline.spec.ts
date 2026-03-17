@@ -157,7 +157,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('Pipeline Builder — page structure', () => {
   test('page loads with palette and empty canvas', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('Pipeline Builder')).toBeVisible({ timeout: 10_000 });
     // Module palette should list all modules
@@ -170,7 +170,7 @@ test.describe('Pipeline Builder — page structure', () => {
 
   test('toolbar shows Save and Run Pipeline buttons', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('save-btn')).toBeVisible();
     await expect(page.getByTestId('run-btn')).toBeVisible();
@@ -179,7 +179,7 @@ test.describe('Pipeline Builder — page structure', () => {
 
   test('template picker is visible', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByTestId('template-picker')).toBeVisible();
   });
 });
@@ -187,7 +187,7 @@ test.describe('Pipeline Builder — page structure', () => {
 test.describe('Pipeline Builder — template and node configuration', () => {
   test('loading THEMATIC template populates the canvas', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     // After template load, "גרור מודולים לכאן" should disappear
@@ -198,7 +198,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 
   test('clicking a node opens the config panel', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Load template first
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
@@ -213,7 +213,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 
   test('INGESTION config panel shows asset picker with lesson assets', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     await page.waitForTimeout(300);
@@ -228,7 +228,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 
   test('config panel closes when close button is clicked', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     await page.waitForTimeout(300);
@@ -241,7 +241,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 
   test('node toggle enable/disable works', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     await page.waitForTimeout(300);
@@ -263,7 +263,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
 
   test('Save button becomes enabled after template is loaded', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Initially disabled (no changes)
     await expect(page.getByTestId('save-btn')).toBeDisabled();
@@ -277,7 +277,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
 
   test('Run Pipeline with empty canvas shows error', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Don't load a template — canvas is empty
     await page.getByTestId('run-btn').click();
@@ -293,7 +293,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
 
   test('Full E2E: load template → configure INGESTION → save → run → see results', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Step 1: Load THEMATIC template
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
@@ -341,7 +341,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
   test('cancel run button appears during RUNNING state', async ({ page }) => {
     // First trigger a run
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     await page.waitForTimeout(500);
@@ -355,7 +355,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
 test.describe('Pipeline Builder — navigation', () => {
   test('back button navigates to lesson page', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByText('שיעור בנהר שלום').click();
     await expect(page).toHaveURL(new RegExp(`/courses/${COURSE_ID}/lessons/${LESSON_ID}$`), { timeout: 5_000 });
@@ -363,7 +363,7 @@ test.describe('Pipeline Builder — navigation', () => {
 
   test('page title has no raw error strings', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const title = await page.title();
     expect(title).not.toContain('undefined');
@@ -374,7 +374,7 @@ test.describe('Pipeline Builder — navigation', () => {
 test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
   test('template picker has a CUSTOM option', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const picker = page.getByTestId('template-picker');
     await expect(picker).toBeVisible();
@@ -386,7 +386,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
   test('selecting CUSTOM shows empty canvas with custom mode message', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // First load THEMATIC so canvas is populated
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
@@ -409,7 +409,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
   test('CUSTOM mode: drag module from palette adds it to canvas', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Enter custom mode
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
@@ -434,7 +434,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
   test('CUSTOM mode: can switch back to template after custom build', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Enter custom mode
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
@@ -453,7 +453,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
   test('CUSTOM mode: no raw technical strings shown', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
     await page.waitForTimeout(400);
@@ -467,7 +467,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
   test('CUSTOM mode screenshot is clean', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
     await page.waitForTimeout(400);
@@ -481,7 +481,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 test.describe('Pipeline Builder — screenshot regression', () => {
   test('pipeline page renders clean without errors', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // No error banners should be visible on clean load
     await expect(page.getByTestId('pipeline-error')).not.toBeVisible();
@@ -493,7 +493,7 @@ test.describe('Pipeline Builder — screenshot regression', () => {
 
   test('pipeline with template loaded renders correctly', async ({ page }) => {
     await page.goto(PIPELINE_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     await page.waitForTimeout(500);

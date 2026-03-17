@@ -51,7 +51,7 @@ function exportSuccessResponse() {
 async function gotoAuditLog(page: Parameters<typeof login>[0]) {
   await login(page);
   await page.goto('/admin/audit-log');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Suite ───────────────────────────────────────────────────────────────────
@@ -185,7 +185,7 @@ test.describe('Audit Log Export', () => {
 
       // Re-navigate after setting up the route mock
       await page.goto('/admin/audit-log');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Capture window.open calls
       const openedUrls: string[] = [];

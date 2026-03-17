@@ -40,7 +40,7 @@ const MOCK_COURSE = {
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── T-06: Course Create Wizard ───────────────────────────────────────────────
@@ -101,7 +101,7 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     const nextBtn = page.getByRole('button', { name: /next/i }).first();
     await nextBtn.waitFor({ timeout: 5_000 });
     await nextBtn.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Step 1 content — modules section
     await expect(page.getByText(/module|add module/i).first()).toBeVisible({ timeout: 10_000 });
@@ -165,7 +165,7 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     for (let i = 0; i < 3; i++) {
       if (await nextBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
       }
     }
 
@@ -241,7 +241,7 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
     const enrollBtn = page.getByRole('button', { name: /enroll|start course/i }).first();
     if (await enrollBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await enrollBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       expect(enrollCalled).toBe(true);
     }
   });
@@ -274,7 +274,7 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
     const enrollBtn = page.getByRole('button', { name: /enroll|start course/i }).first();
     if (await enrollBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await enrollBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Raw DB error must NOT be visible
       await expect(
@@ -329,7 +329,7 @@ test.describe('course-creation-flow — T-08: Course fork flow', () => {
     const forkBtn = page.getByRole('button', { name: /fork/i }).first();
     if (await forkBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await forkBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       expect(forkCalled).toBe(true);
     }
   });

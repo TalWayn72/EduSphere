@@ -36,7 +36,7 @@ test.describe('Tenant Analytics — DEV_MODE tab UI', () => {
     await page.goto(`${BASE_URL}/admin/analytics`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.locator('[data-testid="period-tab-7d"]')
@@ -53,7 +53,7 @@ test.describe('Tenant Analytics — DEV_MODE tab UI', () => {
     await page.goto(`${BASE_URL}/admin/analytics`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const tab90d = page.locator('[data-testid="period-tab-90d"]');
     await tab90d.waitFor({ timeout: 8_000 });
@@ -75,7 +75,7 @@ test.describe('Tenant Analytics — Live backend', () => {
   }) => {
     await loginViaKeycloak(page, TEST_USERS.instructor);
     await page.goto(`${BASE_URL}/admin/analytics`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.locator('[data-testid="period-tab-7d"]')
@@ -96,7 +96,7 @@ test.describe('Tenant Analytics — Live backend', () => {
   test('student gets blocked from /admin/analytics', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/admin/analytics`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     const body = (await page.textContent('body')) ?? '';
@@ -115,13 +115,13 @@ test.describe('Tenant Analytics — Live backend', () => {
   test('analytics page screenshot — 30d view', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.instructor);
     await page.goto(`${BASE_URL}/admin/analytics`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Switch to 30d tab
     const tab30d = page.locator('[data-testid="period-tab-30d"]');
     await tab30d.waitFor({ timeout: 10_000 });
     await tab30d.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot(
       'admin-analytics-30d-chromium-win32.png',

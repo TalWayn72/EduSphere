@@ -99,7 +99,7 @@ test.describe('Push Notifications — DEV_MODE', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The page may or may not auto-trigger push registration depending on UX;
     // this test asserts that the interception infrastructure works (no crash).
@@ -111,7 +111,7 @@ test.describe('Push Notifications — DEV_MODE', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot(
       'push-notifications-enabled-chromium-win32.png',
@@ -125,7 +125,7 @@ test.describe('Push Notifications — DEV_MODE', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     // Regression: raw urql error messages must not reach the user
@@ -155,7 +155,7 @@ test.describe('Push Notifications — mutation routing', () => {
     });
 
     await page.goto(`${BASE_URL}/notifications`, {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
     });
 
     // Verify all captured requests are GraphQL documents (not raw REST calls)
@@ -185,7 +185,7 @@ test.describe('Push Notifications — error handling', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Must not show raw error strings or crash overlay
     const body = (await page.textContent('body')) ?? '';
@@ -228,7 +228,7 @@ test.describe('Push Notifications — error handling', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Internal error details must not leak to user
     const body = (await page.textContent('body')) ?? '';
@@ -241,7 +241,7 @@ test.describe('Push Notifications — error handling', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     // i18n keys follow dot-notation patterns like "notifications.title"
@@ -273,7 +273,7 @@ test.describe('Push Notifications — error handling', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Must not crash or show raw error
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -311,7 +311,7 @@ test.describe('Push Notifications — error handling', () => {
     await page.goto(`${BASE_URL}/notifications`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should render without crash — empty state is acceptable
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

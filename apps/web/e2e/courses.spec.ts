@@ -43,7 +43,7 @@ test.describe('Course List — page load and content', () => {
 
   test('each course card shows duration icon', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Clock icon is rendered when estimatedHours is present (mock data has estimatedHours)
     // Lucide renders SVG with class "lucide lucide-clock ..."
@@ -55,7 +55,7 @@ test.describe('Course List — page load and content', () => {
     page,
   }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click the first course card (not the "Open" ghost button — the card itself)
     const firstTitle = page.getByText('Introduction to Talmud Study').first();
@@ -70,7 +70,7 @@ test.describe('Course List — page load and content', () => {
     page,
   }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // In DEV_MODE user is SUPER_ADMIN, so Enroll buttons are hidden.
     // Skip if admin role is active (Enroll is student-only).
@@ -109,7 +109,7 @@ test.describe('Course List — offline/network error banner (BUG-039)', () => {
     await page.route('**/graphql', (route) => route.abort('failed'));
 
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Offline banner must appear
     const banner = page.getByTestId('offline-banner');
@@ -151,7 +151,7 @@ test.describe('Course List — offline/network error banner (BUG-039)', () => {
     });
 
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Confirm banner is visible
     const banner = page.getByTestId('offline-banner');
@@ -186,7 +186,7 @@ test.describe('Content Viewer — video player', () => {
 
   test('play/pause button toggles the video state', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const video = page.locator('video');
     await expect(video).toBeVisible({ timeout: 8_000 });
@@ -217,7 +217,7 @@ test.describe('Content Viewer — video player', () => {
     page,
   }) => {
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const video = page.locator('video');
     await expect(video).toBeVisible({ timeout: 8_000 });
@@ -254,7 +254,7 @@ test.describe('Content Viewer — video player', () => {
     page,
   }) => {
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // VideoProgressMarkers renders annotation dots inside the seek bar
     // The seek bar container has annotation marker elements with title attributes
@@ -274,7 +274,7 @@ test.describe('Content Viewer — video player', () => {
     page,
   }) => {
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
     // Click the annotation panel "Add" button (exact "Add" text).
@@ -304,7 +304,7 @@ test.describe('Content Viewer — video player', () => {
     page,
   }) => {
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
     // The LayerToggleBar renders buttons for PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED

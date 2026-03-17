@@ -115,7 +115,7 @@ test.describe('Agent Studio — page structure', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Workflow name input
     await expect(page.getByTestId('workflow-name-input')).toBeVisible({
@@ -137,7 +137,7 @@ test.describe('Agent Studio — page structure', () => {
 
   test('all 6 node types are visible in the palette', async ({ page }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const nodeTypes = ['start', 'assess', 'explain', 'quiz', 'debate', 'end'];
     for (const type of nodeTypes) {
@@ -151,7 +151,7 @@ test.describe('Agent Studio — page structure', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByText(/Drag nodes here to build your workflow/i)
@@ -162,7 +162,7 @@ test.describe('Agent Studio — page structure', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('save-workflow-btn')).toBeDisabled({
       timeout: 8_000,
@@ -176,7 +176,7 @@ test.describe('Agent Studio — page structure', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('properties-panel')).toContainText(
       'Select a node',
@@ -188,7 +188,7 @@ test.describe('Agent Studio — page structure', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[GraphQL]');
@@ -209,7 +209,7 @@ test.describe('Agent Studio — page structure', () => {
 test.describe('Agent Studio — node drop interactions', () => {
   test('dropping a node removes the empty-state message', async ({ page }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Confirm empty state is shown
     await expect(
@@ -229,7 +229,7 @@ test.describe('Agent Studio — node drop interactions', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await dropNodeOnCanvas(page, 'START');
 
@@ -245,7 +245,7 @@ test.describe('Agent Studio — node drop interactions', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await dropNodeOnCanvas(page, 'QUIZ');
 
@@ -259,7 +259,7 @@ test.describe('Agent Studio — node drop interactions', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await dropNodeOnCanvas(page, 'EXPLAIN');
 
@@ -285,7 +285,7 @@ test.describe('Agent Studio — node drop interactions', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await dropNodeOnCanvas(page, 'DEBATE');
 
@@ -316,7 +316,7 @@ test.describe('Agent Studio — save workflow mutation', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Drop a node so the save button becomes enabled
     await dropNodeOnCanvas(page, 'END');
@@ -342,7 +342,7 @@ test.describe('Agent Studio — save workflow mutation', () => {
 
   test('workflow name input is editable', async ({ page }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const nameInput = page.getByTestId('workflow-name-input');
     await nameInput.fill('');
@@ -357,7 +357,7 @@ test.describe('Agent Studio — visual regression @visual', () => {
 
   test('agent studio empty state renders correctly', async ({ page }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Ensure the page is stable before snapshotting
     await expect(page.getByTestId('node-palette')).toBeVisible();
@@ -374,7 +374,7 @@ test.describe('Agent Studio — visual regression @visual', () => {
     page,
   }) => {
     await page.goto('/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await dropNodeOnCanvas(page, 'ASSESS');
 

@@ -31,6 +31,16 @@ vi.mock('@/components/Layout', () => ({
   ),
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children, className }: { children: React.ReactNode; size?: string; spacing?: string; className?: string }) => (
+    <div data-testid="page-shell" className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 ${className ?? ''}`}>{children}</div>
+  ),
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: () => <div data-testid="page-header" />,
+}));
+
 vi.mock('@/components/AssessmentForm', () => ({
   AssessmentForm: (props: Record<string, unknown>) => (
     <div data-testid="assessment-form" data-campaign-id={props.campaignId} data-proctoring={String(props.proctoringEnabled)} data-rater-role={props.raterRole}>
@@ -107,10 +117,10 @@ describe('AssessmentPage', () => {
     expect(screen.getByTestId('assessment-form')).toHaveAttribute('data-rater-role', 'PEER');
   });
 
-  it('renders content within max-w-2xl container', () => {
+  it('renders content within max-w-4xl container (PageShell size="md")', () => {
     renderPage();
     const form = screen.getByTestId('assessment-form');
-    expect(form.parentElement?.className).toContain('max-w-2xl');
+    expect(form.parentElement?.className).toContain('max-w-4xl');
   });
 
   it('does not display raw technical error strings', () => {
@@ -144,10 +154,10 @@ describe('AssessmentPage', () => {
     expect(form.parentElement?.className).toContain('mx-auto');
   });
 
-  it('applies top margin to form container', () => {
+  it('applies spacing to form container', () => {
     renderPage();
     const form = screen.getByTestId('assessment-form');
-    expect(form.parentElement?.className).toContain('mt-6');
+    expect(form.parentElement?.className).toContain('space-y-6');
   });
 
   it('demo criteria include Communication, Teamwork, Problem Solving', () => {

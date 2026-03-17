@@ -22,7 +22,7 @@ test.describe('QuizBuilderPage — DEV_MODE guard', () => {
       `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/modules/00000000-0000-0000-0000-000000000002/quiz/new`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -36,7 +36,7 @@ test.describe('QuizBuilderPage — DEV_MODE guard', () => {
       `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/modules/00000000-0000-0000-0000-000000000002/quiz/new`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     // DEV_MODE is SUPER_ADMIN — should see quiz builder, not be redirected
@@ -52,7 +52,7 @@ test.describe('QuizBuilderPage — DEV_MODE guard', () => {
       `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/modules/00000000-0000-0000-0000-000000000002/quiz/new`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -65,7 +65,7 @@ test.describe('QuizBuilderPage — DEV_MODE guard', () => {
       `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/modules/00000000-0000-0000-0000-000000000002/quiz/new`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -83,7 +83,7 @@ test.describe('QuizBuilderPage — Live backend', () => {
       `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/modules/00000000-0000-0000-0000-000000000002/quiz/new`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /quiz builder/i })
@@ -99,7 +99,7 @@ test.describe('QuizBuilderPage — Live backend', () => {
       `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/modules/00000000-0000-0000-0000-000000000002/quiz/new`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Student should NOT see quiz builder
     await expect(
@@ -148,7 +148,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for add-question controls
     const addBtn = page.locator(
@@ -166,7 +166,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Try to find question type selector
     const typeSelector = page.locator(
@@ -190,7 +190,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const typeSelector = page.locator(
       '[data-testid="question-type-select"], select:near(:text("Type"))'
@@ -212,7 +212,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
 
   test('hotspot question type — no crash on selection', async ({ page }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const typeSelector = page.locator(
       '[data-testid="question-type-select"], select:near(:text("Type"))'
@@ -236,7 +236,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Find the title input and clear it
     const titleInput = page.locator(
@@ -263,7 +263,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const previewBtn = page.locator(
       '[data-testid="preview-quiz-btn"], button:has-text("Preview"), button[aria-label*="preview" i]'
@@ -284,7 +284,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const scoreInput = page.locator(
       '[data-testid="passing-score-input"], input[name="passingScore"], input[placeholder*="passing" i]'
@@ -304,7 +304,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const timeLimitInput = page.locator(
       '[data-testid="time-limit-input"], input[name="timeLimit"], input[placeholder*="time" i]'
@@ -322,7 +322,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     page,
   }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const shuffleToggle = page.locator(
       '[data-testid="shuffle-toggle"], input[name="shuffleQuestions"], [role="switch"]:near(:text("Shuffle"))'
@@ -364,7 +364,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     });
 
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should render without errors when questions are present
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -386,7 +386,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     });
 
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('DatabaseError');
@@ -422,7 +422,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     });
 
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -455,7 +455,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     });
 
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Try clicking delete if available
     const deleteBtn = page.locator(
@@ -472,7 +472,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
 
   test('visual regression — quiz builder page (mocked)', async ({ page }) => {
     await page.goto(QUIZ_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('quiz-builder-mocked.png', {
       fullPage: false,

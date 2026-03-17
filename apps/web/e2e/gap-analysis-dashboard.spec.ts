@@ -107,7 +107,7 @@ test.describe('Gap Analysis Dashboard — Data Loaded', () => {
     await page.goto(`${BASE_URL}/admin/gap-analysis`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('page loads with gap-analysis container', async ({ page }) => {
@@ -182,7 +182,7 @@ test.describe('Gap Analysis Dashboard — Empty State', () => {
     await page.goto(`${BASE_URL}/admin/gap-analysis`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('empty state is shown when no skill profiles exist', async ({ page }) => {

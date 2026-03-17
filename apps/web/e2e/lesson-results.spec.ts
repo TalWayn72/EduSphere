@@ -262,7 +262,7 @@ test.describe('Results Page — empty state', () => {
   test('shows empty state when no pipeline results', async ({ page }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('תוצאות Pipeline')).toBeVisible({ timeout: 10_000 });
     await expect(page.getByTestId('empty-results')).toBeVisible({ timeout: 5_000 });
@@ -273,7 +273,7 @@ test.describe('Results Page — empty state', () => {
   test('shows video URL quick-add panel in empty state', async ({ page }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('add-video-panel')).toBeVisible({ timeout: 5_000 });
     await expect(page.getByTestId('video-url-input')).toBeVisible();
@@ -285,7 +285,7 @@ test.describe('Results Page — empty state', () => {
   test('video URL validation: empty input shows error', async ({ page }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.waitForSelector('[data-testid="add-video-btn"]', { timeout: 10_000 });
     await page.click('[data-testid="add-video-btn"]');
@@ -296,7 +296,7 @@ test.describe('Results Page — empty state', () => {
   test('video URL: fill and submit navigates to pipeline page', async ({ page }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.waitForSelector('[data-testid="video-url-input"]', { timeout: 10_000 });
     await page.fill('[data-testid="video-url-input"]', 'https://www.youtube.com/watch?v=purim-2024');
@@ -313,7 +313,7 @@ test.describe('Results Page — RUNNING state', () => {
   test('shows RUNNING badge when pipeline is running', async ({ page }) => {
     await setupResultsMocks(page, 'running');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('run-status-badge')).toBeVisible({ timeout: 8_000 });
     await expect(page.getByTestId('run-status-badge')).toContainText(/מריץ/);
@@ -324,7 +324,7 @@ test.describe('Results Page — COMPLETED state with all outputs', () => {
   test.beforeEach(async ({ page }) => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('תוצאות Pipeline')).toBeVisible({ timeout: 10_000 });
   });
 
@@ -445,7 +445,7 @@ test.describe('Results Page — regression guards', () => {
   test('no raw technical strings shown to user in empty state', async ({ page }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="empty-results"]', { timeout: 10_000 });
 
     const pageText = await page.textContent('body');
@@ -458,7 +458,7 @@ test.describe('Results Page — regression guards', () => {
   test('no raw technical strings shown in completed state', async ({ page }) => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="result-asr"]', { timeout: 10_000 });
 
     const pageText = await page.textContent('body');
@@ -481,7 +481,7 @@ test.describe('Results Page — regression guards', () => {
 
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="result-asr"]', { timeout: 10_000 });
 
     // Main content errors (non-subscription) should not exist
@@ -493,7 +493,7 @@ test.describe('Results Page — screenshots', () => {
   test('empty state screenshot is clean', async ({ page }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="empty-results"]', { timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('lesson-results-empty.png', { maxDiffPixels: 400 });
@@ -502,7 +502,7 @@ test.describe('Results Page — screenshots', () => {
   test('completed results page screenshot', async ({ page }) => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="result-asr"]', { timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('lesson-results-completed.png', { maxDiffPixels: 400 });

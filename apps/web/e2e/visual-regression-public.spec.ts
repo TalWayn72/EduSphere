@@ -51,7 +51,7 @@ test.describe('Visual Regression — Public Pages Light Mode @visual', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — light mode screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveScreenshot(`${pg.name}-light.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,
@@ -87,7 +87,7 @@ test.describe('Visual Regression — Public Pages Mobile @visual', () => {
     test(`${pg.name} — mobile viewport screenshot`, async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 812 });
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveScreenshot(`${pg.name}-mobile.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,

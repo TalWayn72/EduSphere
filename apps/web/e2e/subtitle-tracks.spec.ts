@@ -66,7 +66,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.locator('[data-testid="subtitle-selector-btn"]')
@@ -88,7 +88,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Hover over video to show controls
     await page
@@ -114,7 +114,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')
@@ -137,7 +137,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')
@@ -172,7 +172,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')
@@ -204,7 +204,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')
@@ -221,7 +221,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toContain('[Network Error]');
@@ -247,7 +247,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')
@@ -270,7 +270,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')
@@ -296,7 +296,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('video, [data-testid="video-player"]')

@@ -122,7 +122,7 @@ test.describe('XapiSettingsPage — @visual', () => {
   test('visual regression — xapi-settings desktop', async ({ page }) => {
     await mockXapiGraphQL(page);
     await page.goto(XAPI_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('xapi-settings-desktop.png', {
       maxDiffPixels: 500,
       animations: 'disabled',

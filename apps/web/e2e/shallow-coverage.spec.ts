@@ -21,7 +21,7 @@ import { routeGraphQL } from './graphql-mock.helpers';
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 async function assertNoRawErrors(page: Page) {
@@ -65,7 +65,7 @@ test.describe('shallow-coverage — T-16: Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('dashboard-loaded.png', {
@@ -82,7 +82,7 @@ test.describe('shallow-coverage — T-16: Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('dashboard-empty.png', {
@@ -102,7 +102,7 @@ test.describe('shallow-coverage — T-16: Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('SET LOCAL app.current_tenant failed')).not.toBeVisible({ timeout: 3_000 });
 
@@ -139,7 +139,7 @@ test.describe('shallow-coverage — T-17: Profile Page', () => {
     });
 
     await loginAndNavigate(page, '/profile');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('profile-loaded.png', {
@@ -164,19 +164,19 @@ test.describe('shallow-coverage — T-17: Profile Page', () => {
     });
 
     await loginAndNavigate(page, '/profile');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for edit or save buttons
     const editBtn = page.getByRole('button', { name: /edit|update|save profile/i }).first();
     if (await editBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await editBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Try to save with the update mutation
       const saveBtn = page.getByRole('button', { name: /save|update/i }).last();
       if (await saveBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
         await saveBtn.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Raw duplicate email error must NOT be shown
         await expect(
@@ -212,7 +212,7 @@ test.describe('shallow-coverage — T-18: Course Discover', () => {
     });
 
     await loginAndNavigate(page, '/courses/discover');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('course-discover-loaded.png', {
@@ -229,14 +229,14 @@ test.describe('shallow-coverage — T-18: Course Discover', () => {
     });
 
     await loginAndNavigate(page, '/courses/discover');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Try to type in search if available
     const searchInput = page.getByRole('searchbox').or(page.getByRole('textbox')).first();
     if (await searchInput.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await searchInput.fill('machine learning');
       await page.keyboard.press('Enter');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await assertNoRawErrors(page);
@@ -252,7 +252,7 @@ test.describe('shallow-coverage — T-18: Course Discover', () => {
 test.describe('shallow-coverage — T-19: Settings Theme', () => {
   test('settings/theme page loads without raw errors', async ({ page }) => {
     await loginAndNavigate(page, '/settings/theme');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('settings-theme-loaded.png', {
@@ -271,14 +271,14 @@ test.describe('shallow-coverage — T-19: Settings Theme', () => {
     });
 
     await loginAndNavigate(page, '/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Select French from combobox
     await page.getByRole('combobox').first().click();
     const frenchOption = page.getByRole('option', { name: /Fran/i }).first();
     if (await frenchOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await frenchOption.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // Error toast must NOT appear
@@ -303,13 +303,13 @@ test.describe('shallow-coverage — T-19: Settings Theme', () => {
     });
 
     await loginAndNavigate(page, '/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     const englishOption = page.getByRole('option', { name: /English/i }).first();
     if (await englishOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await englishOption.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // Raw enum error must NOT be visible
@@ -353,7 +353,7 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
     });
 
     await loginAndNavigate(page, `/courses/${COURSE_ID}/lessons/${LESSON_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('lesson-detail-loaded.png', {
@@ -379,13 +379,13 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
     });
 
     await loginAndNavigate(page, `/courses/${COURSE_ID}/lessons/${LESSON_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Try to find and click a "Mark Complete" button
     const completeBtn = page.getByRole('button', { name: /complete|mark.*complete|finish/i }).first();
     if (await completeBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await completeBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Raw internal error must NOT be visible
       await expect(
@@ -407,7 +407,7 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
     });
 
     await loginAndNavigate(page, `/courses/${COURSE_ID}/lessons/${LESSON_ID}/pipeline`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('lesson-pipeline-loaded.png', {

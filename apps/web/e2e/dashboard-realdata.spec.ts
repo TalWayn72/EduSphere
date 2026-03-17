@@ -28,7 +28,7 @@ test.describe('Dashboard Real Data — DEV_MODE guard', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
 
@@ -41,7 +41,7 @@ test.describe('Dashboard Real Data — DEV_MODE guard', () => {
 
   test('no raw object serialization in the DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -83,7 +83,7 @@ test.describe('Dashboard Real Data — Live backend', () => {
 
   test('no mock sentinel strings visible in DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('Dr. Cohen');
@@ -94,7 +94,7 @@ test.describe('Dashboard Real Data — Live backend', () => {
 
   test('dashboard screenshot — live backend render', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('dashboard-realdata-chromium-win32.png', {
       maxDiffPixels: 200,
     });

@@ -109,7 +109,7 @@ test.describe('i18n Smoke Guard — English (en)', () => {
 
   for (const { path, name } of PAGES) {
     test(`no raw i18n keys on /${name} (en)`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
       // Give translations time to load (lazy-loaded chunks)
       await page.waitForTimeout(1_000);
 
@@ -147,7 +147,7 @@ test.describe('i18n Smoke Guard — Hebrew (he)', () => {
       .catch(() => {
         // URL may already be on target route
       });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Force Hebrew locale after login
     await page.evaluate(() => {
@@ -157,7 +157,7 @@ test.describe('i18n Smoke Guard — Hebrew (he)', () => {
 
   for (const { path, name } of PAGES) {
     test(`no raw i18n keys on /${name} (he)`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
       // Give translations time to load (lazy-loaded chunks)
       await page.waitForTimeout(1_000);
 
@@ -166,7 +166,7 @@ test.describe('i18n Smoke Guard — Hebrew (he)', () => {
   }
 
   test('document direction is RTL when Hebrew is active', async ({ page }) => {
-    await page.goto(`${BASE_URL}/settings`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1_000);
 
     const dir = await page.evaluate(() => document.documentElement.dir);

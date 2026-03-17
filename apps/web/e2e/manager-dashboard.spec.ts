@@ -17,7 +17,7 @@ test.describe('Manager Dashboard — DEV_MODE guard', () => {
 
   test('no MOCK_ sentinel strings in manager dashboard DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -39,7 +39,7 @@ test.describe('Manager Dashboard — Live backend', () => {
   test('org admin can access /manager', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.superAdmin);
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/Manager Dashboard/i)).toBeVisible();
     await expect(page).toHaveScreenshot('manager-dashboard-admin.png', {
@@ -50,7 +50,7 @@ test.describe('Manager Dashboard — Live backend', () => {
   test('student is redirected away from /manager', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should redirect to home, not see Manager Dashboard
     await expect(page.getByText(/Manager Dashboard/i)).not.toBeVisible();
@@ -81,7 +81,7 @@ test.describe('Manager Dashboard — error handling', () => {
     });
 
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('ERR_CONNECTION_REFUSED');
@@ -123,7 +123,7 @@ test.describe('Manager Dashboard — error handling', () => {
     });
 
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('PostgreSQL pool exhausted');
@@ -158,7 +158,7 @@ test.describe('Manager Dashboard — error handling', () => {
     });
 
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -173,7 +173,7 @@ test.describe('Manager Dashboard — error handling', () => {
 
   test('no raw i18n keys visible on manager dashboard', async ({ page }) => {
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     // Must not show untranslated keys like "manager.stats.title"
@@ -183,7 +183,7 @@ test.describe('Manager Dashboard — error handling', () => {
 
   test('manager dashboard visual regression — DEV_MODE', async ({ page }) => {
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('manager-dashboard-devmode.png', {
       fullPage: false,
@@ -196,7 +196,7 @@ test.describe('Manager Dashboard — error handling', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('[Network]');

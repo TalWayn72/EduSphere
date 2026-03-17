@@ -22,7 +22,7 @@ import { IS_DEV_MODE, RUN_WRITE_TESTS } from './env';
 async function gotoLti(page: Parameters<typeof login>[0]) {
   await login(page);
   await page.goto('/admin/lti');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ---------------------------------------------------------------------------

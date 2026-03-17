@@ -187,7 +187,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
         // Sidebar may render inside a complementary landmark — acceptable
       });
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -232,7 +232,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(600); // allow image to settle
 
@@ -268,7 +268,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await mockAnchors(page, [MOCK_ANCHOR_WITH_IMAGE]);
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -300,7 +300,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     // Pass isRTL signal via URL param (consumed by the learn route)
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1?lang=he`);
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(500);
 
@@ -316,7 +316,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await mockEmptyAnchors(page);
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -353,7 +353,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await mockInstructorAnchors(page);
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -395,7 +395,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await mockAnchors(page, [MOCK_ANCHOR_WITH_IMAGE]);
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(600); // allow bottom sheet snap animation to complete
 

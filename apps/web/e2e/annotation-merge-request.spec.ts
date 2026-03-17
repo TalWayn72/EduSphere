@@ -6,7 +6,7 @@ import { loginInDevMode } from './auth.helpers';
 test.describe('KnowledgeGraph — Personal Wiki View', () => {
   test.beforeEach(async ({ page }) => {
     await loginInDevMode(page);
-    await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'domcontentloaded' });
   });
 
   test('shows Global and My Wiki tabs', async ({ page }) => {
@@ -94,7 +94,7 @@ test.describe('InstructorMergeQueuePage', () => {
   test.beforeEach(async ({ page }) => {
     await loginInDevMode(page);
     await page.goto(`${BASE_URL}/instructor/merge-queue`, {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
     });
   });
 
@@ -159,7 +159,7 @@ test.describe('AnnotationPanel — Propose to Official', () => {
     await loginInDevMode(page);
     // Annotations panel is accessible via /learn/:lessonId (UnifiedLearningPage)
     // or /annotations. Use the annotations page for simplicity.
-    await page.goto(`${BASE_URL}/annotations`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/annotations`, { waitUntil: 'domcontentloaded' });
   });
 
   test('Propose to Official button is present for personal annotations', async ({

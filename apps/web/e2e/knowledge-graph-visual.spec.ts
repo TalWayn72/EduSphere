@@ -131,11 +131,11 @@ async function mockKnowledgeGraphQL(
   });
 }
 
-/** Login and navigate to path, wait for networkidle */
+/** Login and navigate to path, wait for domcontentloaded */
 async function gotoGraph(page: Page, path: string): Promise<void> {
   await login(page);
   await page.goto(path, { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Suite 1: Global graph view (/knowledge-graph) ───────────────────────────
@@ -371,7 +371,7 @@ test.describe('KnowledgeGraph — error state (GraphQL blocked)', () => {
     await page.route('**/graphql', (route: Route) => route.abort('failed'));
 
     await page.goto(GRAPH_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(1_000);
 

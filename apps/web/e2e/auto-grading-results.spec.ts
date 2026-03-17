@@ -92,7 +92,7 @@ test.describe('Auto-Grading Results — Data Loaded', () => {
     await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-e2e-001`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('page loads with auto-grading container', async ({ page }) => {
@@ -168,7 +168,7 @@ test.describe('Auto-Grading Results — Empty State', () => {
     await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-e2e-empty`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('empty state message is visible when no results', async ({ page }) => {

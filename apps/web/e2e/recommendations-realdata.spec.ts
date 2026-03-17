@@ -25,7 +25,7 @@ test.describe('Recommendations Real Data — DEV_MODE guard', () => {
 
   test('recommendations section is present on dashboard', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // data-testid="recommendations" is rendered by DashboardPage
     const section = page.locator('[data-testid="recommendations"]');
@@ -35,7 +35,7 @@ test.describe('Recommendations Real Data — DEV_MODE guard', () => {
 
   test('no [object Object] serialization in DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -43,7 +43,7 @@ test.describe('Recommendations Real Data — DEV_MODE guard', () => {
 
   test('no MOCK_ sentinel strings in dashboard DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -51,7 +51,7 @@ test.describe('Recommendations Real Data — DEV_MODE guard', () => {
 
   test('no N+1 query warning string visible in DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('N+1 query detected');
@@ -60,7 +60,7 @@ test.describe('Recommendations Real Data — DEV_MODE guard', () => {
 
   test('no empty stringified array visible in DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Stringified empty array leaked into the DOM is a bug
@@ -86,7 +86,7 @@ test.describe('Recommendations Real Data — Live backend', () => {
 
   test('recommendations section visible with real data', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const section = page.locator('[data-testid="recommendations"]');
     await section.waitFor({ timeout: 10_000 });
@@ -97,7 +97,7 @@ test.describe('Recommendations Real Data — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -107,7 +107,7 @@ test.describe('Recommendations Real Data — Live backend', () => {
 
   test('visual snapshot — recommendations section', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot(
       'recommendations-with-reason-chromium-win32.png',
       { maxDiffPixels: 200 }

@@ -146,7 +146,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('fork course button is visible on CourseDetailPage', async ({ page }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Fork button requires INSTRUCTOR / ORG_ADMIN / SUPER_ADMIN role.
     // In DEV_MODE the mock user is SUPER_ADMIN so the button should render.
@@ -166,7 +166,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('fork button has accessible label', async ({ page }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
     const isVisible = await forkBtn.isVisible();
@@ -187,7 +187,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('[BUG-048] successful fork navigates to forked course page', async ({ page }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
@@ -206,7 +206,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('[BUG-048] fork failure shows clean error banner (not raw error string)', async ({ page }) => {
     await mockForkFailure(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
@@ -221,7 +221,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('[BUG-048] fork error banner contains no raw SQL or internal error strings', async ({ page }) => {
     await mockForkFailure(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
@@ -243,7 +243,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('[BUG-048] fork error banner can be dismissed', async ({ page }) => {
     await mockForkFailure(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
@@ -267,7 +267,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
   test('CourseDetailPage loads without raw technical strings', async ({ page }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const pageText = await page.textContent('body');
     // These strings should NEVER appear on any rendered page
@@ -286,7 +286,7 @@ test.describe('Fork Course — Visual regression', () => {
     await login(page);
     await mockForkFailure(page);
     await page.goto(DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
     if (!(await forkBtn.isVisible())) {

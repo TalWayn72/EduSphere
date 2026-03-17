@@ -38,7 +38,7 @@ test.describe('At-Risk Dashboard — DEV_MODE guard', () => {
     await page.goto(`${BASE_URL}/admin/at-risk`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Either a learner table row, or the empty-state message must be present
     const emptyState = page.locator('[data-testid="empty-state"]');
@@ -61,7 +61,7 @@ test.describe('At-Risk Dashboard — DEV_MODE guard', () => {
     await page.goto(`${BASE_URL}/admin/at-risk`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -71,7 +71,7 @@ test.describe('At-Risk Dashboard — DEV_MODE guard', () => {
     await page.goto(`${BASE_URL}/admin/at-risk`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -96,7 +96,7 @@ test.describe('At-Risk Dashboard — Live backend', () => {
         : { email: 'org.admin@example.com', password: 'OrgAdmin123!' }
     );
     await page.goto(`${BASE_URL}/admin/at-risk`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page title is "At-Risk Learners" (from AdminLayout title prop)
     const body = await page.textContent('body');
@@ -106,7 +106,7 @@ test.describe('At-Risk Dashboard — Live backend', () => {
   test('student cannot access /admin/at-risk', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/admin/at-risk`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     const body = (await page.textContent('body')) ?? '';
@@ -133,7 +133,7 @@ test.describe('At-Risk Dashboard — Live backend', () => {
         : { email: 'org.admin@example.com', password: 'OrgAdmin123!' }
     );
     await page.goto(`${BASE_URL}/admin/at-risk`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot(
       'at-risk-dashboard-chromium-win32.png',
       { maxDiffPixels: 200 }

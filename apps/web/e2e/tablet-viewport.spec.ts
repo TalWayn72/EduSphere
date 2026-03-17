@@ -47,7 +47,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('courses — grid adapts to tablet width', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     // Main content area should be visible
     const main = page.locator('main').first();
@@ -56,7 +56,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('courses — visual regression', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-courses.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -67,7 +67,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('settings — form fields readable', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -75,7 +75,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('settings — visual regression', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-settings.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -86,7 +86,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('profile — card centered without overflow', async ({ page }) => {
     await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -94,7 +94,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('profile — visual regression', async ({ page }) => {
     await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-profile.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -105,7 +105,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('admin — sidebar visible without overflow', async ({ page }) => {
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     // At 768px the admin sidebar should be visible (not collapsed into hamburger)
     const main = page.locator('main').first();
@@ -114,7 +114,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('admin — visual regression', async ({ page }) => {
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-admin.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -125,7 +125,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('knowledge-graph — container fills viewport', async ({ page }) => {
     await page.goto('/knowledge-graph');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -133,7 +133,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('knowledge-graph — visual regression', async ({ page }) => {
     await page.goto('/knowledge-graph');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-knowledge-graph.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -144,7 +144,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('ai-tutor — chat panel properly sized', async ({ page }) => {
     await page.goto('/ai-tutor');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -152,7 +152,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('ai-tutor — visual regression', async ({ page }) => {
     await page.goto('/ai-tutor');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-ai-tutor.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -163,7 +163,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('assessments — cards layout without overflow', async ({ page }) => {
     await page.goto('/assessments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -171,7 +171,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('assessments — visual regression', async ({ page }) => {
     await page.goto('/assessments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-assessments.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -182,7 +182,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('discussions — thread list readable', async ({ page }) => {
     await page.goto('/discussions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -190,7 +190,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('discussions — visual regression', async ({ page }) => {
     await page.goto('/discussions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-discussions.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,
@@ -201,7 +201,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('discover — grid layout without overflow', async ({ page }) => {
     await page.goto('/discover');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoHorizontalOverflow(page);
     const main = page.locator('main').first();
     await expect(main).toBeVisible({ timeout: 10_000 });
@@ -209,7 +209,7 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   test('discover — visual regression', async ({ page }) => {
     await page.goto('/discover');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('tablet-discover.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,

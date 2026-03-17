@@ -406,7 +406,7 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
 
   test('reduced-motion screenshot baseline — above-fold (argos)', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await argosScreenshot(page, 'landing-page-reduced-motion', { fullPage: false });
   });
 });
@@ -584,7 +584,7 @@ test.describe('Landing Page — @visual', () => {
   test('visual regression — landing page with reduced-motion (Phase 39 baseline)', async ({ page }) => {
     // Explicit reduced-motion baseline — captures stable layout without any animation
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(300);
 
     await expect(page).toHaveScreenshot('landing-page-reduced-motion-desktop.png', {

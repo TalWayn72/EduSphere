@@ -75,11 +75,11 @@ function dynamicMasks(page: Page) {
  * In DEV_MODE all routes are accessible without authentication.
  *
  * Waits for: network idle → no loading spinners → first meaningful element rendered.
- * This prevents screenshot races where networkidle fires before React has painted content.
+ * This prevents screenshot races where domcontentloaded fires before React has painted content.
  */
 async function goTo(page: Page, path: string) {
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   // Suppress animated spinners before snapping
   await page.emulateMedia({ reducedMotion: 'reduce' });
   // Wait for React to finish rendering: the app root must have at least one child
@@ -187,7 +187,7 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
     const submitVisible = await submitBtn.isVisible().catch(() => false);
     if (submitVisible) {
       await submitBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page).toHaveScreenshot('quiz-result-view.png', {
@@ -303,7 +303,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     const cardVisible = await firstCard.isVisible().catch(() => false);
     if (cardVisible) {
       await firstCard.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       // Wait for the simulator overlay to appear and stabilise
       await page
         .locator('.fixed.inset-0')

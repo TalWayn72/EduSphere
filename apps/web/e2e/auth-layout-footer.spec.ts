@@ -43,7 +43,7 @@ test.describe('Authenticated Layout Footer — presence on auth pages', () => {
   for (const route of AUTH_ROUTES) {
     test(`${route.path} (${route.label}) has AuthFooter`, async ({ page }) => {
       await page.goto(route.path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const footer = page.getByTestId('auth-footer');
       await expect(footer).toBeVisible({ timeout: 10_000 });
@@ -56,7 +56,7 @@ test.describe('Authenticated Layout Footer — presence on auth pages', () => {
 test.describe('Authenticated Layout Footer — content verification', () => {
   test('Dashboard AuthFooter shows current year copyright', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const footer = page.getByTestId('auth-footer');
     await expect(footer).toBeVisible({ timeout: 10_000 });
@@ -69,7 +69,7 @@ test.describe('Authenticated Layout Footer — content verification', () => {
 
   test('AuthFooter has Privacy link', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const footer = page.getByTestId('auth-footer');
     const privacyLink = footer.getByRole('link', { name: /Privacy/i });
@@ -82,7 +82,7 @@ test.describe('Authenticated Layout Footer — content verification', () => {
 
   test('AuthFooter has Terms link', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const footer = page.getByTestId('auth-footer');
     const termsLink = footer.getByRole('link', { name: /Terms/i });
@@ -95,7 +95,7 @@ test.describe('Authenticated Layout Footer — content verification', () => {
 
   test('AuthFooter has Accessibility link', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const footer = page.getByTestId('auth-footer');
     const a11yLink = footer.getByRole('link', { name: /Accessibility/i });
@@ -108,7 +108,7 @@ test.describe('Authenticated Layout Footer — content verification', () => {
 
   test('AuthFooter nav has aria-label "Footer links"', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const footer = page.getByTestId('auth-footer');
     const footerNav = footer.locator('nav[aria-label="Footer links"]');

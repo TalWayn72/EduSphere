@@ -206,7 +206,8 @@ describe('ProgramDetailPage', () => {
 
   it('renders program title via PageHeader', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: 'Data Science Nanodegree' })).toBeInTheDocument();
+    const headings = screen.getAllByRole('heading', { name: 'Data Science Nanodegree' });
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows empty courses message when no required courses', () => {

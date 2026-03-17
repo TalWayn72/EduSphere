@@ -36,7 +36,7 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const heading = page.locator('[data-testid="builder-heading"]');
     await heading.waitFor({ timeout: 10_000 });
@@ -50,7 +50,7 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // All five step types are rendered as palette buttons
     await expect(
@@ -75,7 +75,7 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.locator('[data-testid="save-draft-btn"]')
@@ -87,7 +87,7 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.locator('[data-testid="publish-btn"]')
@@ -109,7 +109,7 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`,
       { waitUntil: 'domcontentloaded' }
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -126,7 +126,7 @@ test.describe('Lesson Pipeline Builder — Live backend', () => {
     await page.goto(
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Instructor should see the builder heading — not redirected
     const heading = page.locator('[data-testid="builder-heading"]');
@@ -139,7 +139,7 @@ test.describe('Lesson Pipeline Builder — Live backend', () => {
     await page.goto(
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     // Component navigates to /courses for non-instructor roles
@@ -159,7 +159,7 @@ test.describe('Lesson Pipeline Builder — Live backend', () => {
     await page.goto(
       `${BASE_URL}/courses/${PLACEHOLDER_COURSE_ID}/pipeline/builder`
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot(
       'lesson-pipeline-builder-chromium-win32.png',
       { maxDiffPixels: 200 }

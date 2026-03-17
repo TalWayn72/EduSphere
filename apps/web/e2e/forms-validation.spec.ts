@@ -34,7 +34,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/courses/new');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   // ── Title field ─────────────────────────────────────────────────────────────
@@ -321,7 +321,7 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/courses/new');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Fill step 1 and advance to step 2
     const titleInput = page
@@ -503,7 +503,7 @@ test.describe('Course Creation Wizard — Step 4 (Publish / Review)', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/courses/new');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate through steps 1 → 2 → 3 → 4
     const titleInput = page
@@ -562,7 +562,7 @@ test.describe('Search form — input behaviour and validation', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/search');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('search input is auto-focused on page load', async ({ page }) => {
@@ -706,7 +706,7 @@ test.describe('Annotation creation form — /learn/content-1', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Wait for video element to be present
     await page.locator('video').waitFor({ state: 'visible', timeout: 10_000 });
   });
@@ -904,7 +904,7 @@ test.describe('Settings page — Language selector form', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('settings page loads with the page heading', async ({ page }) => {

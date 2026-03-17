@@ -367,7 +367,7 @@ test.describe('SkillTree Security — UI security guards', () => {
     await page.goto(`${BASE_URL}/skill-tree`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('skill-tree-with-data.png', {
       fullPage: false,
@@ -395,7 +395,7 @@ test.describe('SkillTree Security — UI security guards', () => {
     await page.goto(`${BASE_URL}/skill-tree`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -453,7 +453,7 @@ test.describe('SkillTree Security — UI security guards', () => {
     await page.goto(`${BASE_URL}/skill-tree`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toMatch(/\bskillTree\.[a-z]+\.[a-z]+\b/);

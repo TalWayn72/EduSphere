@@ -73,7 +73,7 @@ test.describe('Agents — page load and template selector', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: 'AI Learning Agents' })
@@ -82,7 +82,7 @@ test.describe('Agents — page load and template selector', () => {
 
   test('template selector shows all 5 agent mode cards', async ({ page }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // AGENT_MODES: chavruta, quiz, summarize, research, explain
     // Use locator().filter() to avoid strict-mode collision with nav sidebar links
@@ -107,7 +107,7 @@ test.describe('Agents — page load and template selector', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Default activeMode is 'chavruta'
     // The chat header shows "Chavruta Debate"
@@ -126,7 +126,7 @@ test.describe('Agents — page load and template selector', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click the Quiz Master card
     const quizCard = page.locator('button').filter({ hasText: 'Quiz Master' });
@@ -153,7 +153,7 @@ test.describe('Agents — page load and template selector', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Chavruta prompts: 'Debate free will', 'Argue against Rambam', 'Challenge my thesis'
     // Scope to chips container (overflow-x-auto strip) to avoid collision with chat bubbles
@@ -177,7 +177,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     if (process.env.VITE_DEV_MODE !== 'false') {
       // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     } else {
       await loginViaKeycloak(page);
     }
@@ -187,7 +187,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const chatInput = page.locator('input[placeholder*="Ask the"]');
     await expect(chatInput).toBeVisible({ timeout: 5_000 });
@@ -205,7 +205,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const chatInput = page.locator('input[placeholder*="Ask the"]');
     await chatInput.fill('Debate free will');
@@ -235,7 +235,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Scope to chips bar to avoid strict-mode collision with chat bubble text
     const chip = page
@@ -252,7 +252,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Send a message first
     const chatInput = page.locator('input[placeholder*="Ask the"]');
@@ -282,7 +282,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const chatInput = page.locator('input[placeholder*="Ask the"]');
     await chatInput.fill('Challenge my thesis');
@@ -309,7 +309,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     page,
   }) => {
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Send a message in Chavruta mode
     const chatInput = page.locator('input[placeholder*="Ask the"]');

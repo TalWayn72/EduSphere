@@ -68,16 +68,16 @@ export class CourseDetailPage {
   /** Navigate to a specific course detail page. */
   async goto(courseId = 'mock-course-1'): Promise<void> {
     await this.page.goto(`/courses/${courseId}`);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /** Navigate to a course by clicking its card in CourseList. */
   async openFromCourseList(courseTitle: string): Promise<void> {
     await this.page.goto('/courses');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
     await this.page.getByText(courseTitle, { exact: false }).first().click();
     await this.page.waitForURL(/\/courses\/[^/]+$/, { timeout: 10_000 });
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /** Assert the course detail page has loaded (no spinner, has title). */

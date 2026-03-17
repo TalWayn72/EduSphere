@@ -43,7 +43,7 @@ test.describe('Performance Smoke — LCP', () => {
       });
 
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Give the observer time to fire
       await page.waitForTimeout(1000);
@@ -95,7 +95,7 @@ test.describe('Performance Smoke — No Console Errors', () => {
       });
 
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Allow a brief settling period for lazy-loaded components
       await page.waitForTimeout(500);
@@ -126,7 +126,7 @@ test.describe('Performance Smoke — Navigation Speed', () => {
       const start = Date.now();
 
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const elapsed = Date.now() - start;
 

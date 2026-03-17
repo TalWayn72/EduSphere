@@ -112,7 +112,7 @@ test.describe('Instructor Merge Queue — Pending Proposals', () => {
     await mockMergeQueueWithData(page);
     await login(page);
     await page.goto(QUEUE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('page heading says "Annotation Proposals"', async ({ page }) => {
@@ -204,7 +204,7 @@ test.describe('Instructor Merge Queue — Empty State', () => {
     await mockMergeQueueEmpty(page);
     await login(page);
     await page.goto(QUEUE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('empty state message "No pending proposals" is visible', async ({ page }) => {

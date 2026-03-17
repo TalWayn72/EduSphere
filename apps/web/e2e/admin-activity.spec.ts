@@ -87,11 +87,11 @@ async function mockAdminGraphQL(
   });
 }
 
-/** Navigate to admin, login first, wait for networkidle */
+/** Navigate to admin, login first, wait for domcontentloaded */
 async function gotoAdmin(page: Page): Promise<void> {
   await login(page);
   await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Suite 1: Activity feed — loading skeleton ────────────────────────────────
@@ -318,7 +318,7 @@ test.describe('AdminActivityFeed — full admin page', () => {
     await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await login(page);
     await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('admin-page-full-dark.png', {

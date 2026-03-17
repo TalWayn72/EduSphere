@@ -80,7 +80,7 @@ test.describe('Partner Dashboard — Revenue Data', () => {
     await mockPartnerWithData(page);
     await login(page);
     await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('page loads with partner dashboard container', async ({ page }) => {
@@ -150,7 +150,7 @@ test.describe('Partner Dashboard — API Key Regeneration', () => {
     await mockPartnerWithData(page);
     await login(page);
     await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('regenerate button shows confirmation dialog', async ({ page }) => {
@@ -206,7 +206,7 @@ test.describe('Partner Dashboard — Empty State', () => {
     await mockPartnerEmpty(page);
     await login(page);
     await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('empty state shows "No partner account found"', async ({ page }) => {

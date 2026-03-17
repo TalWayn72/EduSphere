@@ -38,7 +38,7 @@ export class LoginPage {
   /** Navigate to the login page. */
   async goto(): Promise<void> {
     await this.page.goto('/login');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**

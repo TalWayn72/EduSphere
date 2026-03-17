@@ -22,7 +22,7 @@ async function login(page: any) {
     await devBtn.click();
     // SmartRoot redirects to /dashboard; /learn/ is also acceptable
     await page.waitForURL(/\/(learn|dashboard)\//, { timeout: 15_000 }).catch(async () => {
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     return;
   }
@@ -48,7 +48,7 @@ async function login(page: any) {
 test('M-01 mobile hamburger menu visible', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.screenshot({
     path: `${SHOTS}/m01-dashboard.png`,
     fullPage: false,
@@ -62,7 +62,7 @@ test('M-01 mobile hamburger menu visible', async ({ page }) => {
 test('M-02 mobile hamburger opens nav', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   const hamburger = page
     .locator('button[aria-label*="menu"], button[aria-label*="Menu"]')
     .first();
@@ -83,7 +83,7 @@ test('M-02 mobile hamburger opens nav', async ({ page }) => {
 test('M-03 mobile courses page', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/courses`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.screenshot({ path: `${SHOTS}/m03-courses.png`, fullPage: true });
   const h1 = await page
     .locator('h1')
@@ -96,7 +96,7 @@ test('M-03 mobile courses page', async ({ page }) => {
 test('M-04 mobile agents page', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/agents`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.screenshot({ path: `${SHOTS}/m04-agents.png`, fullPage: true });
   const h1 = await page
     .locator('h1')
@@ -111,7 +111,7 @@ test('M-04 mobile agents page', async ({ page }) => {
 test('M-05 touch scroll works on dashboard', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Simulate touch scroll by using mouse wheel (Playwright maps to touch on mobile)
   const initialScrollY = await page.evaluate(() => window.scrollY);
@@ -127,7 +127,7 @@ test('M-05 touch scroll works on dashboard', async ({ page }) => {
 test('M-06 responsive layout — cards stack vertically on mobile', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Find card-like containers (typical grid/flex items)
   const cards = page.locator(
@@ -154,7 +154,7 @@ test('M-06 responsive layout — cards stack vertically on mobile', async ({ pag
 test('M-07 bottom nav or hamburger is visible on mobile', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Either a bottom nav bar or a hamburger menu should be visible
   const bottomNav = page.locator(
@@ -173,7 +173,7 @@ test('M-07 bottom nav or hamburger is visible on mobile', async ({ page }) => {
 test('M-08 search on mobile — search input is accessible', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/search`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Search input should be usable on mobile
   const searchInput = page.locator(
@@ -197,7 +197,7 @@ test('M-08 search on mobile — search input is accessible', async ({ page }) =>
 test('M-09 settings page on mobile', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/settings`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await page.screenshot({ path: `${SHOTS}/m09-settings.png`, fullPage: true });
 
@@ -222,7 +222,7 @@ test('M-09 settings page on mobile', async ({ page }) => {
 test('M-10 profile page on mobile', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/profile`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await page.screenshot({ path: `${SHOTS}/m10-profile.png`, fullPage: true });
 
@@ -238,7 +238,7 @@ test('M-10 profile page on mobile', async ({ page }) => {
 test('M-11 courses grid becomes list on mobile', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/courses`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await page.screenshot({ path: `${SHOTS}/m11-courses-list.png`, fullPage: true });
 
@@ -278,7 +278,7 @@ test('M-12 zoom/pinch is not disabled via viewport meta', async ({ page }) => {
 test('M-13 swipe navigation — no horizontal scroll on dashboard', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // On mobile, the page should not have unintended horizontal scroll
   const hasHorizontalScroll = await page.evaluate(() => {
@@ -291,7 +291,7 @@ test('M-13 swipe navigation — no horizontal scroll on dashboard', async ({ pag
 test('M-14 hamburger menu close after link click', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   const hamburger = page
     .locator('button[aria-label*="menu" i], button[aria-label*="Menu"]')
@@ -320,7 +320,7 @@ test('M-14 hamburger menu close after link click', async ({ page }) => {
 test('M-15 mobile viewport — no overlapping elements', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Check that heading and main content don't overlap with nav
   const main = page.locator('main, [data-testid="layout-main"]').first();
@@ -341,7 +341,7 @@ test('M-16 visual regression — mobile dashboard', async ({ page }) => {
   await login(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(400);
 
   await expect(page).toHaveScreenshot('mobile-dashboard.png', {
@@ -354,7 +354,7 @@ test('M-16 visual regression — mobile dashboard', async ({ page }) => {
 test('M-17 mobile — text is readable (minimum font size)', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Check that body text has a reasonable minimum font size (>= 12px)
   const tooSmallTexts = await page.evaluate(() => {
@@ -378,7 +378,7 @@ test('M-17 mobile — text is readable (minimum font size)', async ({ page }) =>
 test('M-18 mobile — focus is visible on interactive elements', async ({ page }) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Tab through first few interactive elements and verify focus is shown
   await page.keyboard.press('Tab');
@@ -394,7 +394,7 @@ test('M-19 mobile — landscape orientation does not break layout', async ({ pag
   await page.setViewportSize({ width: 844, height: 390 });
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await page.screenshot({ path: `${SHOTS}/m19-landscape.png`, fullPage: false });
 
@@ -412,7 +412,7 @@ test('M-20 visual regression — mobile courses page', async ({ page }) => {
   await login(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${BASE_URL}/courses`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(400);
 
   await expect(page).toHaveScreenshot('mobile-courses.png', {

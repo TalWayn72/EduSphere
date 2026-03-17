@@ -108,7 +108,7 @@ test.describe('Search — keyboard shortcut', () => {
   }) => {
     // Start on a page with the Layout (which registers the keyboard handler)
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('header', { timeout: 5_000 });
 
     const searchPage = new SearchPage(page);
@@ -120,11 +120,11 @@ test.describe('Search — keyboard shortcut', () => {
 
   test('Escape key on search page navigates back', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate to search
     await page.goto('/search');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Press Escape — onKeyDown handler calls navigate(-1)
     const searchInput = page.locator(

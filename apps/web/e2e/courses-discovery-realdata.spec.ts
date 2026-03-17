@@ -27,7 +27,7 @@ test.describe('Courses Discovery Real Data — DEV_MODE guard', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/explore`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Phase 36 regression: these strings must NEVER appear as hardcoded fallbacks
@@ -85,7 +85,7 @@ test.describe('Courses Discovery Real Data — Live backend', () => {
 
   test('no mock sentinel strings in live-backend render', async ({ page }) => {
     await page.goto(`${BASE_URL}/explore`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_COURSES');
@@ -95,7 +95,7 @@ test.describe('Courses Discovery Real Data — Live backend', () => {
 
   test('visual snapshot — courses discovery page', async ({ page }) => {
     await page.goto(`${BASE_URL}/explore`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot(
       'courses-discovery-realdata-chromium-win32.png',
       { maxDiffPixels: 200 }

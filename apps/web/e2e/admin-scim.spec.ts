@@ -22,7 +22,7 @@ import { RUN_WRITE_TESTS } from './env';
 async function gotoScim(page: Parameters<typeof login>[0]) {
   await login(page);
   await page.goto('/admin/scim');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ---------------------------------------------------------------------------

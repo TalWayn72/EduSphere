@@ -36,7 +36,7 @@ test.describe('CheckoutPage', () => {
   }) => {
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     // In test env, VITE_STRIPE_PUBLISHABLE_KEY is not set → Payment Unavailable shown
@@ -47,7 +47,7 @@ test.describe('CheckoutPage', () => {
   });
 
   test('shows No Payment Session without secret param', async ({ page }) => {
-    await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'domcontentloaded' });
 
     await expect(
       page.getByText('No Payment Session')
@@ -58,7 +58,7 @@ test.describe('CheckoutPage', () => {
     const secret = 'pi_3abc_secret_xyz';
     await page.goto(
       `${BASE_URL}/checkout?secret=${secret}&session=pi_abc&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const bodyText = await page.evaluate(() => document.body.textContent);
@@ -68,7 +68,7 @@ test.describe('CheckoutPage', () => {
   test('no raw error strings or stack traces visible to user', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'domcontentloaded' });
     const bodyText = await page.evaluate(() => document.body.textContent ?? '');
     expect(bodyText).not.toMatch(/TypeError|Error:/);
     expect(bodyText).not.toMatch(/at\s+\w+\s*\(/);
@@ -77,7 +77,7 @@ test.describe('CheckoutPage', () => {
   test('visual regression — Payment Unavailable state', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
     await expect(page).toHaveScreenshot('checkout-unavailable.png', {
       fullPage: false,
@@ -85,7 +85,7 @@ test.describe('CheckoutPage', () => {
   });
 
   test('visual regression — No Payment Session state', async ({ page }) => {
-    await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveScreenshot('checkout-no-session.png', {
       fullPage: false,
     });
@@ -100,7 +100,7 @@ test.describe('PurchaseCourseButton → /checkout navigation', () => {
   test('navigates to /checkout with secret + session + course params after purchase mutation', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
 
     let checkoutUrl: string | null = null;
     page.on('framenavigated', (frame) => {
@@ -124,7 +124,7 @@ test.describe('PurchaseCourseButton → /checkout navigation', () => {
     // Whether clicked or not: /checkout must be accessible
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test_mock&session=pi_mock&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     // Verify the page loaded (Payment Unavailable or Complete Purchase)
@@ -171,7 +171,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     // The page should render without crash — validation errors are UI-level
@@ -200,7 +200,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const couponInput = page.locator(
@@ -235,7 +235,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const body = await page.textContent('body');
@@ -265,7 +265,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?course=c-free`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     // Page should not crash for free course flow
@@ -297,7 +297,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const body = await page.textContent('body');
@@ -327,7 +327,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout/success?session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -359,7 +359,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const body = await page.textContent('body');
@@ -374,7 +374,7 @@ test.describe('CheckoutPage — extended coverage', () => {
   }) => {
     await page.goto(
       `${BASE_URL}/checkout?secret=&session=&course=`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -387,7 +387,7 @@ test.describe('CheckoutPage — extended coverage', () => {
   test('checkout page — no XSS via query parameters', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/checkout?secret=<script>alert(1)</script>&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const body = await page.textContent('body');
@@ -398,10 +398,10 @@ test.describe('CheckoutPage — extended coverage', () => {
   test('checkout — back button or cancel returns to previous page', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const cancelBtn = page.locator(
@@ -443,7 +443,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     const submitBtn = page.locator(
@@ -468,7 +468,7 @@ test.describe('CheckoutPage — extended coverage', () => {
   }) => {
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
 
     // Main landmark should exist
@@ -494,7 +494,7 @@ test.describe('CheckoutPage — extended coverage', () => {
 
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
-      { waitUntil: 'networkidle' }
+      { waitUntil: 'domcontentloaded' }
     );
     await expect(page).toHaveScreenshot('checkout-with-course.png', {
       fullPage: false,

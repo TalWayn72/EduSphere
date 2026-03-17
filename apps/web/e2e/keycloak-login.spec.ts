@@ -103,7 +103,7 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
     });
 
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Allow StrictMode double-effect to fire
     await page.waitForTimeout(1_000);
@@ -131,7 +131,7 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
     });
 
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1_000);
 
     const devModeFallback = warnings.find((w) =>
@@ -158,7 +158,7 @@ test.describe('Keycloak — login page', () => {
 
   test('shows EduSphere branding and Sign In button', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: 'Welcome to EduSphere' })
@@ -170,7 +170,7 @@ test.describe('Keycloak — login page', () => {
 
   test('Sign In button redirects to Keycloak', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('button', { name: /Sign In with Keycloak/i }).click();
 
@@ -202,7 +202,7 @@ test.describe('Keycloak — full login flow', () => {
 
     // Keycloak redirects back with the PKCE code. Wait for the router to
     // navigate away from the callback URL (# fragment) to the actual route.
-    // We do NOT use networkidle here because ContentViewer opens a persistent
+    // We do NOT use domcontentloaded here because ContentViewer opens a persistent
     // WebSocket subscription that never settles.
     await page.waitForURL(/localhost/, { timeout: 20_000 });
     // Wait for the router to render (URL changes from /#code=... to /learn/... or /login)
@@ -227,7 +227,7 @@ test.describe('Keycloak — full login flow', () => {
 
   test('invalid credentials show Keycloak error message', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('button', { name: /Sign In with Keycloak/i }).click();
     await page.waitForURL(/localhost:8080\/realms\/edusphere/, {

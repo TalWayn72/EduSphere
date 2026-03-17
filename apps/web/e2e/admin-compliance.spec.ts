@@ -22,7 +22,7 @@ import { IS_DEV_MODE, RUN_WRITE_TESTS } from './env';
 async function gotoCompliance(page: Parameters<typeof login>[0]) {
   await login(page);
   await page.goto('/admin/compliance');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ---------------------------------------------------------------------------
@@ -177,7 +177,7 @@ test.describe('Compliance Training Reports', () => {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await page.goto('/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should redirect to /dashboard or show a 403/not-found
     const finalUrl = page.url();

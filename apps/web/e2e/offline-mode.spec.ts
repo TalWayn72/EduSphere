@@ -14,7 +14,7 @@ test.describe('Offline mode', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('OfflineBanner appears when browser goes offline', async ({
@@ -238,7 +238,7 @@ test.describe('Offline mode', () => {
   }) => {
     // First, load the app online so localStorage/sessionStorage are populated
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify the layout rendered successfully online
     await expect(page.locator('[data-testid="layout-main"]')).toBeVisible();

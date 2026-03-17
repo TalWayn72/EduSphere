@@ -70,12 +70,12 @@ async function setupDelayedGraphQL(page: Page, delayMs = GRAPHQL_DELAY_MS) {
 
 /**
  * Login in dev mode, then navigate to the given path.
- * Does NOT call waitForLoadState('networkidle') — the caller needs to
+ * Does NOT call waitForLoadState('domcontentloaded') — the caller needs to
  * assert loading state BEFORE network settles.
  */
 async function loginThenGoto(page: Page, path: string) {
   await loginInDevMode(page);
-  // Navigate but don't wait for networkidle — we want to catch loading state
+  // Navigate but don't wait for domcontentloaded — we want to catch loading state
   await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
 }
 
@@ -139,7 +139,7 @@ test.describe('loading-states — T-01: Dashboard', () => {
     await loginThenGoto(page, '/dashboard');
 
     // Wait for delay to complete and content to render
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
 
     // Page body should have meaningful content (not just spinners)
@@ -165,7 +165,7 @@ test.describe('loading-states — T-02: Courses', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/courses');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -189,7 +189,7 @@ test.describe('loading-states — T-03: Settings', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/settings');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -213,7 +213,7 @@ test.describe('loading-states — T-04: Knowledge Graph', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/knowledge-graph');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -237,7 +237,7 @@ test.describe('loading-states — T-05: Agents', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/agents');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -261,7 +261,7 @@ test.describe('loading-states — T-06: Profile', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/profile');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -285,7 +285,7 @@ test.describe('loading-states — T-07: Assessments', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/assessments');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -309,7 +309,7 @@ test.describe('loading-states — T-08: Discussions', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/discussions');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -333,7 +333,7 @@ test.describe('loading-states — T-09: Admin Dashboard', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/admin');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });
@@ -357,7 +357,7 @@ test.describe('loading-states — T-10: Discover', () => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/discover');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertLoadingGone(page);
     await expect(page.locator('body')).not.toBeEmpty();
   });

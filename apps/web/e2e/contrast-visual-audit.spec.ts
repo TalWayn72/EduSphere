@@ -44,7 +44,7 @@ async function auditContrast(
   url: string
 ): Promise<Result[]> {
   await page.goto(url);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2aa'])
     .withRules(['color-contrast'])
@@ -58,7 +58,7 @@ async function auditContrastDarkMode(
   url: string
 ): Promise<Result[]> {
   await page.goto(url);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await setDarkMode(page, true);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2aa'])
@@ -107,7 +107,7 @@ test.describe('Contrast Audit — Landing Page @a11y', () => {
 
   test('landing page hero section passes color-contrast', async ({ page }) => {
     await page.goto('/landing');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify the primary CTA button is visible before auditing
     const ctaLink = page.getByRole('link', { name: /Start 90-Day Pilot/i });
@@ -130,7 +130,7 @@ test.describe('Contrast Audit — Landing Page @a11y', () => {
     page,
   }) => {
     await page.goto('/landing');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Scroll through the page to trigger lazy-loaded sections
     await page.evaluate(async () => {
@@ -146,7 +146,7 @@ test.describe('Contrast Audit — Landing Page @a11y', () => {
       window.scrollTo(0, 0);
     });
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
@@ -170,7 +170,7 @@ test.describe('Contrast Audit — Landing Page (Dark Mode) @a11y', () => {
 
   test('landing page hero passes color-contrast in dark mode', async ({ page }) => {
     await page.goto('/landing');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await setDarkMode(page, true);
 
     const ctaLink = page.getByRole('link', { name: /Start 90-Day Pilot/i });
@@ -190,7 +190,7 @@ test.describe('Contrast Audit — Landing Page (Dark Mode) @a11y', () => {
 
   test('landing page — full scroll audit passes color-contrast in dark mode', async ({ page }) => {
     await page.goto('/landing');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await setDarkMode(page, true);
 
     await page.evaluate(async () => {
@@ -204,7 +204,7 @@ test.describe('Contrast Audit — Landing Page (Dark Mode) @a11y', () => {
       window.scrollTo(0, 0);
     });
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
@@ -374,7 +374,7 @@ test.describe('Contrast Visual Regression @a11y', () => {
 
   test('landing page screenshot matches baseline', async ({ page }) => {
     await page.goto('/landing');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('contrast-landing.png', {
       maxDiffPixels: 200,
@@ -384,7 +384,7 @@ test.describe('Contrast Visual Regression @a11y', () => {
 
   test('login page screenshot matches baseline', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('contrast-login.png', {
       maxDiffPixels: 200,
@@ -394,7 +394,7 @@ test.describe('Contrast Visual Regression @a11y', () => {
 
   test('dashboard screenshot matches baseline', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('contrast-dashboard.png', {
       maxDiffPixels: 200,
@@ -404,7 +404,7 @@ test.describe('Contrast Visual Regression @a11y', () => {
 
   test('landing page screenshot matches baseline (dark mode)', async ({ page }) => {
     await page.goto('/landing');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await setDarkMode(page, true);
 
     await expect(page).toHaveScreenshot('contrast-landing-dark.png', {
@@ -415,7 +415,7 @@ test.describe('Contrast Visual Regression @a11y', () => {
 
   test('login page screenshot matches baseline (dark mode)', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await setDarkMode(page, true);
 
     await expect(page).toHaveScreenshot('contrast-login-dark.png', {
@@ -426,7 +426,7 @@ test.describe('Contrast Visual Regression @a11y', () => {
 
   test('dashboard screenshot matches baseline (dark mode)', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await setDarkMode(page, true);
 
     await expect(page).toHaveScreenshot('contrast-dashboard-dark.png', {

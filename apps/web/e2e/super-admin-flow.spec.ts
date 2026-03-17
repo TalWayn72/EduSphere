@@ -79,7 +79,7 @@ test('Super Admin Full Login Flow', async ({ page }) => {
       await page
         .click('#kc-login, input[type="submit"], button[type="submit"]')
         .catch(() => {});
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(4000);
 
       console.log('After Keycloak submit URL:', page.url());
@@ -105,7 +105,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('admin dashboard renders without crash overlay', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -114,7 +114,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('admin dashboard shows navigation or admin content', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     const isAdmin = url.includes('/admin') || url.includes('/dashboard');
@@ -141,7 +141,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Super admin should see org/tenant references or admin controls
@@ -167,7 +167,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin/users`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -193,7 +193,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin/settings`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -235,7 +235,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin/audit`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -271,7 +271,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin/users`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toMatch(/TypeError|Error:/);
@@ -303,7 +303,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin/organizations`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -312,7 +312,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('no MOCK_ sentinel strings in admin pages', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -320,7 +320,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('no [object Object] serialization in admin DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -328,7 +328,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('admin sidebar navigation links are present', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Admin should have navigation elements
     const nav = page.locator('nav, [role="navigation"], [data-testid="admin-sidebar"]');
@@ -346,7 +346,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
 
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('INTERNAL_SERVER_ERROR');
@@ -355,7 +355,7 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('admin page does not leak tenant IDs in visible DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // UUID pattern should not be raw-rendered in visible text (data attrs are fine)
@@ -369,11 +369,11 @@ test.describe('Super Admin — DEV_MODE guard', () => {
 
   test('super admin can navigate to dashboard from admin', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate to dashboard
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     expect(url).toContain('/dashboard');
@@ -391,7 +391,7 @@ test.describe('Super Admin — Live backend', () => {
   test('super admin sees admin dashboard after login', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.superAdmin);
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -406,7 +406,7 @@ test.describe('Super Admin — Live backend', () => {
   test('non-admin user cannot access admin routes', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Student should be redirected away from admin or see access denied
     const url = page.url();

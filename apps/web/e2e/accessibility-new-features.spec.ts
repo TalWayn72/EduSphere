@@ -39,7 +39,7 @@ const WCAG_TAGS = [
  */
 async function auditPage(page: Page, url: string) {
   await page.goto(url);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   const results = await new AxeBuilder({ page })
     .withTags([...WCAG_TAGS])
     .analyze();
@@ -157,7 +157,7 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     page,
   }) => {
     await page.goto('/quiz/quiz-mc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -169,7 +169,7 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     page,
   }) => {
     await page.goto('/quiz/quiz-mc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const noOutline = await checkFocusVisible(page, 8);
     expect(
       noOutline,
@@ -181,7 +181,7 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     page,
   }) => {
     await page.goto('/quiz/quiz-mc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Tab into the question area
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
@@ -201,7 +201,7 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     page,
   }) => {
     await page.goto('/quiz/quiz-mc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const prevBtn = page.locator('button', { hasText: /previous/i });
     const nextBtn = page.locator('button', { hasText: /next|submit/i });
     const prevVisible = await prevBtn.isVisible().catch(() => false);
@@ -229,13 +229,13 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     page,
   }) => {
     await page.goto('/quiz/quiz-mc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Attempt to reach the result view
     const submitBtn = page.locator('button', { hasText: /submit quiz/i });
     const submitVisible = await submitBtn.isVisible().catch(() => false);
     if (submitVisible) {
       await submitBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
@@ -261,7 +261,7 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/scenarios');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -273,7 +273,7 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/scenarios');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const noOutline = await checkFocusVisible(page, 8);
     expect(
       noOutline,
@@ -285,7 +285,7 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/scenarios');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const btn = page.locator('button', { hasText: /create scenario/i });
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
@@ -300,7 +300,7 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/scenarios');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Tab into scenario grid
     let focusedCard = false;
     for (let i = 0; i < 15; i++) {
@@ -328,7 +328,7 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
 
   test('roleplay simulator has no WCAG violations', async ({ page }) => {
     await page.goto('/scenarios');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Open first scenario to enter simulator
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
     const cardVisible = await firstCard.isVisible().catch(() => false);
@@ -360,7 +360,7 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
     page,
   }) => {
     await page.goto('/document/doc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -372,7 +372,7 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
     page,
   }) => {
     await page.goto('/document/doc-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Page should have exactly one h1
     const h1Count = await page.locator('h1').count();
     // h1 may be 0 when document is not found — that is acceptable
@@ -386,7 +386,7 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
     page,
   }) => {
     await page.goto('/document/does-not-exist');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Error messages should have role="alert" or aria-live for SR announcement
     const alertEl = page.locator('[role="alert"], [aria-live]').first();
     const alertVisible = await alertEl.isVisible().catch(() => false);
@@ -421,7 +421,7 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/lti');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -433,7 +433,7 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/lti');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Open registration form
     const registerBtn = page.locator('button', {
       hasText: /register platform/i,
@@ -457,7 +457,7 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/lti');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const noOutline = await checkFocusVisible(page, 8);
     expect(
       noOutline,
@@ -476,7 +476,7 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/scim');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const btn = page.locator('button', { hasText: /generate token/i });
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
@@ -496,7 +496,7 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/scim');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const btn = page.locator('button', { hasText: /generate token/i });
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
@@ -520,7 +520,7 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/scim');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -539,7 +539,7 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
 
   test('compliance reports page — checkboxes are labeled', async ({ page }) => {
     await page.goto('/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
       .analyze();
@@ -553,7 +553,7 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const dateInput = page.locator('input[type="date"]');
     const dateVisible = await dateInput.isVisible().catch(() => false);
     if (dateVisible) {
@@ -583,7 +583,7 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -615,7 +615,7 @@ test.describe('Accessibility — Public Profile Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/u/user-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -627,7 +627,7 @@ test.describe('Accessibility — Public Profile Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/u/user-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const shareBtn = page.locator('button', { hasText: /share|copy/i });
     const btnVisible = await shareBtn.isVisible().catch(() => false);
     if (btnVisible) {
@@ -640,7 +640,7 @@ test.describe('Accessibility — Public Profile Page @a11y-new', () => {
 
   test('public profile page — avatar image has alt text', async ({ page }) => {
     await page.goto('/u/user-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const avatarImg = page.locator('.rounded-full img, [class*="Avatar"] img');
     const imgVisible = await avatarImg.isVisible().catch(() => false);
     if (imgVisible) {
@@ -663,7 +663,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
 
   test('dashboard — LeaderboardWidget has no violations', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const widget = page.locator('.card', { hasText: /leaderboard/i }).first();
     const visible = await widget.isVisible().catch(() => false);
     if (visible) {
@@ -682,7 +682,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
     page,
   }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const widget = page.locator('.card', { hasText: 'Daily Learning' }).first();
     const visible = await widget.isVisible().catch(() => false);
     if (visible) {
@@ -699,7 +699,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
 
   test('dashboard — SkillGapWidget has no violations', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
       .analyze();
@@ -713,7 +713,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
     page,
   }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const btn = page.locator('button', { hasText: /new profile/i });
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
@@ -738,7 +738,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
     page,
   }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -750,7 +750,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
     page,
   }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const noOutline = await checkFocusVisible(page, 10);
     expect(
       noOutline,
@@ -775,7 +775,7 @@ test.describe('Accessibility — Course Analytics Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/courses/course-1/analytics');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Check that any table elements use proper th elements with scope
     const tables = page.locator('table');
     const tableCount = await tables.count();
@@ -808,7 +808,7 @@ test.describe('Accessibility — Course Analytics Page @a11y-new', () => {
     page,
   }) => {
     await page.goto('/courses/course-1/analytics');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
@@ -925,7 +925,7 @@ test.describe('WCAG 2.2 SC 2.5.8 — Target Size (new pages) @a11y-new', () => {
       page,
     }) => {
       await page.goto(url);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       const violations = await checkTargetSizes(page);
       expect(
         violations,
@@ -953,7 +953,7 @@ test.describe('WCAG 2.2 SC 2.4.11 — Focus Appearance (new pages) @a11y-new', (
       page,
     }) => {
       await page.goto(url);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       const noOutline = await checkFocusVisible(page, 8);
       expect(
         noOutline,

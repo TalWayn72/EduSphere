@@ -46,7 +46,7 @@ const FORBIDDEN_STRINGS = [
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(`${BASE_URL}${path}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /** Assert none of the forbidden technical strings are visible on the page */
@@ -398,7 +398,7 @@ test.describe('error-boundary — T-08: Recovery after error', () => {
 
     // Navigate to a different page
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should render without crash — body should have meaningful content
     await expect(page.locator('body')).not.toBeEmpty();
@@ -432,7 +432,7 @@ test.describe('error-boundary — T-08: Recovery after error', () => {
 
     // Navigate away and back to trigger new requests (which now succeed)
     await page.goto(`${BASE_URL}/dashboard`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await assertNoTechnicalStrings(page);
   });

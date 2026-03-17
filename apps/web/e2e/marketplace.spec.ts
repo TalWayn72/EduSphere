@@ -18,7 +18,7 @@ test.describe('Marketplace Page — DEV_MODE guard', () => {
 
   test('marketplace page renders without crash overlay', async ({ page }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -27,7 +27,7 @@ test.describe('Marketplace Page — DEV_MODE guard', () => {
 
   test('no MOCK_ sentinel strings in marketplace DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -37,9 +37,9 @@ test.describe('Marketplace Page — DEV_MODE guard', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
-    // Loading spinners should NOT be visible after networkidle
+    // Loading spinners should NOT be visible after domcontentloaded
     const loadingSpinners = await page.locator('[aria-label="loading"]').count();
     expect(loadingSpinners).toBe(0);
   });
@@ -58,7 +58,7 @@ test.describe('Marketplace Page — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Mounted guard fix: query should execute, not remain paused
     const content = await page.content();
@@ -78,7 +78,7 @@ test.describe('Marketplace Page — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const hasCourses = await page
       .locator('[data-testid="course-card"], [data-testid="listing-card"]')
@@ -172,7 +172,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -183,7 +183,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
 
   test('filter — search input filters without crash', async ({ page }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator(
       '[data-testid="marketplace-search"], input[type="search"], input[placeholder*="search" i], input[placeholder*="filter" i]'
@@ -202,7 +202,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const categoryLink = page.locator(
       '[data-testid="category-link"], a:has-text("Engineering"), button:has-text("Engineering"), [role="tab"]:has-text("Engineering")'
@@ -221,7 +221,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Raw JSON field names should not be visible
@@ -232,7 +232,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
 
   test('free courses — shows "Free" label or $0 badge', async ({ page }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should render free course without error
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -246,7 +246,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Should not show raw JSON for instructor
@@ -272,7 +272,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     });
 
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -285,7 +285,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const courseCard = page.locator(
       '[data-testid="course-card"], [data-testid="listing-card"]'
@@ -312,7 +312,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     });
 
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('ConnectionPoolError');
@@ -349,7 +349,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     });
 
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('<script>');
@@ -357,7 +357,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
 
   test('visual regression — marketplace with mocked courses', async ({ page }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('marketplace-mocked-courses.png', {
       fullPage: false,

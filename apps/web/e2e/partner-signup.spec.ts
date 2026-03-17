@@ -243,7 +243,7 @@ test.describe('Partner Signup — Form Fields', () => {
   });
 
   test('visual screenshot — partner signup form (idle)', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('partner-signup-form-idle.png', {
       fullPage: false,
       animations: 'disabled',

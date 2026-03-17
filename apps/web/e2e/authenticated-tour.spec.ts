@@ -12,7 +12,7 @@ async function loginAsSuperAdmin(page: any) {
   if (process.env.VITE_DEV_MODE !== 'false') {
     // DEV_MODE: auto-authenticated — navigate directly, no Keycloak login needed
     await page.goto(`${BASE_URL}/`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     return;
   }
   await page.goto(`${BASE_URL}/login`);
@@ -65,7 +65,7 @@ test('SA-01 Content Viewer (Default landing)', async ({ page }) => {
 test('SA-02 Dashboard', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(3000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-02-dashboard.png`,
@@ -79,7 +79,7 @@ test('SA-02 Dashboard', async ({ page }) => {
 test('SA-03 Courses List', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/courses`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-03-courses.png`,
@@ -93,7 +93,7 @@ test('SA-03 Courses List', async ({ page }) => {
 test('SA-04 Course Create (Admin feature)', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/courses/new`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-04-course-create.png`,
@@ -107,7 +107,7 @@ test('SA-04 Course Create (Admin feature)', async ({ page }) => {
 test('SA-05 Knowledge Graph', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/graph`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(4000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-05-knowledge-graph.png`,
@@ -121,7 +121,7 @@ test('SA-05 Knowledge Graph', async ({ page }) => {
 test('SA-06 Annotations', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/annotations`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-06-annotations.png`,
@@ -135,7 +135,7 @@ test('SA-06 Annotations', async ({ page }) => {
 test('SA-07 Agents', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/agents`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-07-agents.png`,
@@ -149,7 +149,7 @@ test('SA-07 Agents', async ({ page }) => {
 test('SA-08 Collaboration', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/collaboration`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-08-collaboration.png`,
@@ -163,7 +163,7 @@ test('SA-08 Collaboration', async ({ page }) => {
 test('SA-09 Search', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/search`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-09-search.png`,
@@ -177,7 +177,7 @@ test('SA-09 Search', async ({ page }) => {
 test('SA-10 Profile', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/profile`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-10-profile.png`,
@@ -191,7 +191,7 @@ test('SA-10 Profile', async ({ page }) => {
 test('SA-11 User Menu - Check admin options', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/dashboard`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
 
   // Click on user avatar/menu

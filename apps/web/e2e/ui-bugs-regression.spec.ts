@@ -41,7 +41,7 @@ test.describe('BUG-001: sidebar nav shows translated labels, not raw i18n keys',
   test('raw key names must never appear in the sidebar text', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
@@ -69,7 +69,7 @@ test.describe('BUG-001: sidebar nav shows translated labels, not raw i18n keys',
   test('human-readable English labels appear in the sidebar', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
@@ -93,7 +93,7 @@ test.describe('BUG-001: sidebar nav shows translated labels, not raw i18n keys',
   test('sidebar nav items are visually rendered as links (not plain text)', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // At least one nav <a> or nav button must be present inside the sidebar
     const navLinks = page.locator('[data-testid="app-sidebar"] a, [data-testid="app-sidebar"] nav button');
@@ -108,7 +108,7 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
   test('logo image OR fallback element is visible', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const logoImg = page.locator('[data-testid="sidebar-logo-icon"]');
     const logoFallback = page.locator('[data-testid="sidebar-logo-fallback"]');
@@ -126,7 +126,7 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
   test('if logo img is visible it must not be a broken image (naturalWidth > 0)', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const logoImg = page.locator('[data-testid="sidebar-logo-icon"]');
     const imgVisible = await logoImg.isVisible().catch(() => false);
@@ -150,7 +150,7 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
 
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // After onerror fires the fallback should be visible
     const logoFallback = page.locator('[data-testid="sidebar-logo-fallback"]');
@@ -174,7 +174,7 @@ test.describe('BUG-003: main content layout does not overlap sidebar', () => {
   test('main content left edge is at or after sidebar right edge', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     const mainContent = page.locator('[data-testid="layout-main"]');
@@ -195,7 +195,7 @@ test.describe('BUG-003: main content layout does not overlap sidebar', () => {
   test('main content does not overlap sidebar on courses page', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     const mainContent = page.locator('[data-testid="layout-main"]');
@@ -240,7 +240,7 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
 
     await login(page);
     await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Give React time to process the error response
     await page.waitForTimeout(500);
 
@@ -268,7 +268,7 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
 
     await login(page);
     await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
     // If an error state is rendered, it must use friendly i18n text
@@ -306,7 +306,7 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
 
     await login(page);
     await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
     expect(bodyText).not.toContain('[object Object]');
@@ -336,7 +336,7 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
 
     await login(page);
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
     expect(bodyText, 'Raw "Internal server error" must not appear in DOM').not.toContain(
@@ -365,7 +365,7 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
 
     await login(page);
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const errorMsg = page.locator('[data-testid="error-message"]');
     const visible = await errorMsg.isVisible().catch(() => false);
@@ -398,7 +398,7 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
 
     await login(page);
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
     expect(bodyText).not.toContain('[object Object]');
@@ -411,7 +411,7 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
   test('locale stored in localStorage survives a page reload', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Directly set the locale in localStorage (simulates what setLocale() does)
     await page.evaluate(() => {
@@ -420,7 +420,7 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
 
     // Reload and verify localStorage still has the value (not wiped by GlobalLocaleSync)
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const storedLocale = await page.evaluate(() => localStorage.getItem('edusphere_locale'));
     expect(storedLocale, 'edusphere_locale in localStorage must survive a page reload').toBe('he');
@@ -452,7 +452,7 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
 
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Despite the DB call failing, localStorage must still hold 'he'
     const storedLocale = await page.evaluate(() => localStorage.getItem('edusphere_locale'));
@@ -470,7 +470,7 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
 
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
@@ -503,7 +503,7 @@ test.describe('Cross-bug smoke: all routes are clean of raw error strings', () =
     test(`${route} — no raw error strings in DOM`, async ({ page }) => {
       await login(page);
       await page.goto(`${BASE_URL}${route}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const content = await page.content();
 
@@ -531,7 +531,7 @@ test.describe('UI Bugs Regression — Live backend', () => {
   test('BUG-001 live: student sidebar shows translated nav labels', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
@@ -555,7 +555,7 @@ test.describe('UI Bugs Regression — Live backend', () => {
   test('BUG-003 live: main content does not overlap sidebar (student)', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     const mainContent = page.locator('[data-testid="layout-main"]');

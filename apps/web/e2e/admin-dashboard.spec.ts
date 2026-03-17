@@ -27,7 +27,7 @@ import { IS_DEV_MODE, RUN_WRITE_TESTS } from './env';
 async function gotoAdmin(page: Parameters<typeof login>[0]) {
   await login(page);
   await page.goto('/admin');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 async function gotoAdminRoute(
@@ -36,7 +36,7 @@ async function gotoAdminRoute(
 ) {
   await login(page);
   await page.goto(route);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ test.describe('Admin Dashboard — overview stat cards', () => {
     await gotoAdmin(page);
 
     // AdminStatCards renders six cards. In DEV_MODE the mock adminOverview
-    // resolver returns data immediately after networkidle.
+    // resolver returns data immediately after domcontentloaded.
     const body = (await page.locator('body').textContent()) ?? '';
 
     const hasStatCards =
@@ -438,7 +438,7 @@ test.describe('Admin area — non-admin redirect', () => {
     const page = await ctx.newPage();
 
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const finalUrl = page.url();
     const body = (await page.locator('body').textContent()) ?? '';
@@ -471,7 +471,7 @@ test.describe('Admin Dashboard — write operations', () => {
     const auditLink = page.getByRole('link', { name: /Audit Log/i });
     const href = await auditLink.first().getAttribute('href');
     await page.goto(href ?? '/admin/audit');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Audit Log/i })
@@ -485,7 +485,7 @@ test.describe('Admin Dashboard — write operations', () => {
 
     // Navigate directly — quick-link cards are under the fixed AppSidebar overlay.
     await page.goto('/admin/users');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     expect(url).toMatch(/\/admin\/users/);

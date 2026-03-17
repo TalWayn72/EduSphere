@@ -80,7 +80,7 @@ test.describe('Visual Regression Auth — Light Mode @visual', () => {
   for (const pg of AUTH_PAGES) {
     test(`${pg.name} — light mode screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveScreenshot(`auth-${pg.name}-light.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,

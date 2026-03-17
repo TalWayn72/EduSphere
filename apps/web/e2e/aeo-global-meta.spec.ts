@@ -191,7 +191,7 @@ test.describe('Global AEO — Meta Tags & Structured Data', () => {
 
   test('visual snapshot — Landing page with AEO schemas', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('landing-with-aeo.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,

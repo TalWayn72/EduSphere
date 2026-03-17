@@ -136,7 +136,7 @@ test.describe('Health Check — App Bootstrap', () => {
     page.on('pageerror', (err) => errors.push(`[PAGE ERROR] ${err.message}`));
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500); // Allow late async errors to surface
 
     expect(
@@ -150,7 +150,7 @@ test.describe('Health Check — App Bootstrap', () => {
     page.on('pageerror', (err) => pageErrors.push(err.message));
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(
       pageErrors,
@@ -210,7 +210,7 @@ test.describe('Health Check — Zero Network Errors on Load', () => {
     const networkErrors = attachNetworkMonitor(page);
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Filter out expected GraphQL 400s (no backend in DEV_MODE = normal)
     const unexpectedErrors = networkErrors.filter(
@@ -245,7 +245,7 @@ test.describe('Health Check — Zero Network Errors on Load', () => {
     page.on('pageerror', (err) => pageErrors.push(err.message));
 
     await page.goto('/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(
       pageErrors,

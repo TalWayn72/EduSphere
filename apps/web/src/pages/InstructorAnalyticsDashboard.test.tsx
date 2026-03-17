@@ -51,6 +51,15 @@ vi.mock('@/components/Layout', () => ({
     React.createElement('div', { 'data-testid': 'layout' }, children),
 }));
 
+vi.mock('@/components/Breadcrumbs', () => ({
+  Breadcrumbs: () => React.createElement('nav', { 'data-testid': 'breadcrumbs' }),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    React.createElement('div', { 'data-testid': 'page-shell', className }, children),
+}));
+
 vi.mock('@/components/analytics/DropOffFunnelChart', () => ({
   DropOffFunnelChart: ({ data }: { data: { moduleName: string; dropOffRate: number }[] }) =>
     React.createElement(
@@ -76,13 +85,16 @@ vi.mock('@/components/ui/card', () => ({
     React.createElement('h3', {}, children),
 }));
 
-vi.mock('lucide-react', () => ({
-  AlertCircle: () => React.createElement('span', { 'data-testid': 'alert-circle' }),
-  Users: () => React.createElement('span', { 'data-testid': 'users-icon' }),
-  TrendingUp: () => React.createElement('span', { 'data-testid': 'trending-icon' }),
-  Star: () => React.createElement('span', { 'data-testid': 'star-icon' }),
-  Activity: () => React.createElement('span', { 'data-testid': 'activity-icon' }),
-}));
+vi.mock('lucide-react', () =>
+  new Proxy({} as Record<string, unknown>, {
+    get: (_, name) => {
+      if (name === '__esModule') return true;
+      return function MockIcon(props: Record<string, unknown>) {
+        return React.createElement('span', { 'data-testid': `icon-${String(name)}`, ...props });
+      };
+    },
+  })
+);
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
 

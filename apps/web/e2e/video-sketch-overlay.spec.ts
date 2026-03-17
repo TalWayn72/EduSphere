@@ -138,7 +138,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('VideoSketchOverlay — integration with UnifiedLearningPage', () => {
   test('learning page loads cleanly at /learn/content-1', async ({ page }) => {
     await page.goto(LEARNING_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The page must render the video/transcript panel and tab bar
     // (the learning page itself must not crash)
@@ -151,7 +151,7 @@ test.describe('VideoSketchOverlay — integration with UnifiedLearningPage', () 
     page,
   }) => {
     await page.goto(LEARNING_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[GraphQL]');
@@ -161,7 +161,7 @@ test.describe('VideoSketchOverlay — integration with UnifiedLearningPage', () 
 
   test('learning page toolbar tab bar is present', async ({ page }) => {
     await page.goto(LEARNING_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The tab bar must be present (annotations/AI/context)
     await expect(page.getByRole('tablist')).toBeVisible({ timeout: 10_000 });
@@ -189,7 +189,7 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
    */
   async function injectSyntheticOverlay(page: Page): Promise<void> {
     await page.goto(LEARNING_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Inject a container with the same testid structure as VideoSketchOverlay
     await page.evaluate(() => {
@@ -426,7 +426,7 @@ test.describe('VideoSketchOverlay — visual regression @visual', () => {
 
   async function injectOverlayForScreenshot(page: Page): Promise<void> {
     await page.goto(LEARNING_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.evaluate(() => {
       const container = document.createElement('div');
       container.id = 'e2e-sketch-overlay';

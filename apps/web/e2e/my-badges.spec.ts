@@ -114,7 +114,7 @@ async function gotoMyBadges(
 
   await login(page);
   await page.goto('/my-badges');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Suite ───────────────────────────────────────────────────────────────────
@@ -185,7 +185,7 @@ test.describe('My Open Badges', () => {
   test('Layout navigation contains a link to /my-badges', async ({ page }) => {
     await login(page);
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for a nav link that navigates to the my-badges route
     const badgesLink = page.locator('a[href="/my-badges"]');
@@ -447,7 +447,7 @@ test.describe('My Open Badges', () => {
     await login(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/my-badges');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
     await expect(page).toHaveScreenshot('badges-grid-mixed.png', {
@@ -470,7 +470,7 @@ test.describe('My Open Badges', () => {
     await login(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/my-badges');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
     await expect(page).toHaveScreenshot('badges-empty-state.png', {

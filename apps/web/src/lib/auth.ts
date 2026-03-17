@@ -61,6 +61,11 @@ let devToken = 'dev-token-mock-jwt';
 // or if setupTokenRefresh() is called more than once (e.g. hot-reload).
 let _tokenRefreshInterval: ReturnType<typeof setInterval> | null = null;
 
+// BUG-068: Maximum time (ms) to wait for keycloak.init() before giving up.
+// If the token exchange hangs (e.g. Keycloak server unreachable during code
+// exchange after login redirect), the app must not stay on the spinner forever.
+const KEYCLOAK_INIT_TIMEOUT_MS = 10_000;
+
 export function initKeycloak(): Promise<boolean> {
   // Development mode - skip Keycloak
   if (DEV_MODE) {
@@ -83,7 +88,7 @@ export function initKeycloak(): Promise<boolean> {
     return initPromise;
   }
 
-  initPromise = keycloak!
+  const kcInitPromise = keycloak!
     .init({
       onLoad: 'check-sso',
       // BUG-01 fix: silentCheckSsoRedirectUri was removed because it causes
@@ -117,6 +122,21 @@ export function initKeycloak(): Promise<boolean> {
       console.error('Keycloak initialization failed:', error);
       throw error;
     });
+
+  // BUG-068: Race the init against a timeout so the app never stays on the
+  // "Initializing authentication..." spinner forever.  If the Keycloak token
+  // exchange hangs (e.g. server unreachable after login redirect), we fall
+  // back to unauthenticated state after KEYCLOAK_INIT_TIMEOUT_MS.
+  const timeoutPromise = new Promise<boolean>((resolve) => {
+    setTimeout(() => {
+      console.error(
+        `[Auth] Keycloak init timed out after ${KEYCLOAK_INIT_TIMEOUT_MS}ms — continuing unauthenticated.`
+      );
+      resolve(false);
+    }, KEYCLOAK_INIT_TIMEOUT_MS);
+  });
+
+  initPromise = Promise.race([kcInitPromise, timeoutPromise]);
 
   return initPromise;
 }

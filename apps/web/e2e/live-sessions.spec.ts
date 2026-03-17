@@ -46,7 +46,7 @@ async function gotoContentViewer(
 ) {
   await login(page);
   await page.goto(`/learn/${contentId}`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ---------------------------------------------------------------------------
@@ -222,7 +222,7 @@ test.describe('Live Sessions', () => {
     }) => {
       await login(page);
       await page.goto('/courses');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Try to find any "Schedule" button on the page
       const scheduleBtn = page.getByRole('button', {
@@ -458,7 +458,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
   test('navigating to /sessions does NOT return 404', async ({ page }) => {
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify the page rendered something (not a redirect to 404 or blank)
     expect(page.url()).toContain('/sessions');
@@ -471,7 +471,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
   test('sessions list page renders without crashing', async ({ page }) => {
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // At minimum the layout (sidebar + topbar) should be present
     const layoutEl = page.locator('[data-testid="layout-main"]');
@@ -491,7 +491,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
 
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: "Failed to load sessions" MUST NOT be visible
     const errorEl = page.locator('[data-testid="sessions-error"]');
@@ -516,7 +516,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
 
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1_000);
 
     // Error UI MUST appear — but must NOT expose raw technical strings
@@ -531,7 +531,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
   test('Upcoming tab is active by default on /sessions', async ({ page }) => {
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
     if (await upcomingTab.count() > 0) {
@@ -545,7 +545,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
 
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(500);
 
@@ -622,7 +622,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await mockLiveSessionsWithData(page);
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: error state MUST NOT appear — the old bug caused
     // ctx.req.user?.tenant_id to be undefined, making the resolver fail
@@ -654,7 +654,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await mockLiveSessionsWithData(page);
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify status badges rendered
     const bodyText = (await page.locator('body').textContent()) ?? '';
@@ -694,7 +694,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
 
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1_000);
 
     const bodyText = (await page.locator('body').textContent()) ?? '';
@@ -750,7 +750,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
 
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1_000);
 
     const bodyText = (await page.locator('body').textContent()) ?? '';
@@ -769,7 +769,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await mockLiveSessionsWithData(page);
     await login(page);
     await page.goto('/sessions');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(500);
 
@@ -797,7 +797,7 @@ test.describe('LiveSessionDetailPage — /sessions/:id route', () => {
   }) => {
     await login(page);
     await page.goto('/sessions/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should not 404
     expect(page.url()).toContain('/sessions/');
@@ -811,7 +811,7 @@ test.describe('LiveSessionDetailPage — /sessions/:id route', () => {
   }) => {
     await login(page);
     await page.goto('/sessions/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('live-session-detail-page.png', {

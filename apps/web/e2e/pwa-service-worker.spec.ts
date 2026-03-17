@@ -116,7 +116,7 @@ test.describe('Service Worker Registration', () => {
   test('service worker registers on page load', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Check if a service worker is registered
     const swRegistered = await page.evaluate(async () => {
@@ -158,7 +158,7 @@ test.describe('Offline Behavior', () => {
   test('app shell loads initially with network', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // App shell should be visible
     const body = page.locator('body');
@@ -176,7 +176,7 @@ test.describe('Offline Behavior', () => {
   }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Simulate going offline by aborting all subsequent requests
     await page.route('**/*', (route) => route.abort());
@@ -204,7 +204,7 @@ test.describe('Offline Behavior', () => {
   }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Block only GraphQL requests to simulate API unreachability
     await page.route('**/graphql', (route) => route.abort());
@@ -234,7 +234,7 @@ test.describe('Offline Behavior', () => {
   }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Simulate offline by going into browser offline mode
     await page.context().setOffline(true);
@@ -266,7 +266,7 @@ test.describe('Offline Behavior', () => {
   }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Go offline
     await page.context().setOffline(true);
@@ -278,7 +278,7 @@ test.describe('Offline Behavior', () => {
 
     // Navigate to verify the app works again
     await page.goto(`${BASE_URL}/dashboard`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -329,7 +329,7 @@ test.describe('PWA Install Criteria', () => {
     });
 
     await page.goto(`${BASE_URL}/login`, NAV_TIMEOUT);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Vite hashed assets should have long cache headers
     // In dev mode, cache-control may be empty or no-cache — that is acceptable

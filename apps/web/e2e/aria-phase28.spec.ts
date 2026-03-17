@@ -25,7 +25,7 @@ test.describe('ARIA Phase 28 — LiveSessionsPage', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/sessions`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('tabs container has role="tablist"', async ({ page }) => {
@@ -138,7 +138,7 @@ test.describe('ARIA Phase 28 — AdminActivityFeed', () => {
     await login(page);
     // AdminActivityFeed is on the dashboard or admin pages
     await page.goto(`${BASE_URL}/dashboard`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('AdminActivityFeed live region has role="log" or aria-live', async ({
@@ -163,7 +163,7 @@ test.describe('ARIA Phase 28 — AdminActivityFeed', () => {
     } else {
       // Feed not present on this page — check admin route
       await page.goto(`${BASE_URL}/admin`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       const adminFeedEl = page
         .locator('[data-testid="admin-activity-feed"]')
         .or(page.locator('[role="log"]'));
@@ -340,7 +340,7 @@ test.describe('ARIA Phase 28 — OfflineBanner', () => {
     // OfflineBanner is in the authenticated Layout — login required
     await loginInDevMode(page);
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('OfflineBanner has role="status" when visible', async ({
@@ -415,7 +415,7 @@ test.describe('ARIA Phase 28 — Cross-cutting', () => {
   }) => {
     await login(page);
     await page.goto(`${BASE_URL}/sessions`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Check all visible buttons have accessible names
     const buttons = page.locator('button:not([hidden]):not([disabled])');

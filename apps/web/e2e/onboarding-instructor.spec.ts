@@ -19,7 +19,7 @@ test.describe('Instructor Onboarding — DEV_MODE guard', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -30,7 +30,7 @@ test.describe('Instructor Onboarding — DEV_MODE guard', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -50,7 +50,7 @@ test.describe('Instructor Onboarding — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should not show raw MOCK_ strings
     const content = await page.content();
@@ -65,7 +65,7 @@ test.describe('Instructor Onboarding — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -81,7 +81,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
 
   test('welcome screen displays instructor-specific greeting', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The page should render a heading
     const heading = page.getByRole('heading').first();
@@ -95,7 +95,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
 
   test('bio setup step allows text entry', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for bio/description textarea or input
     const bioField = page.locator(
@@ -116,7 +116,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
 
   test('first course creation wizard has required fields', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate to course creation step if multi-step
     for (let i = 0; i < 5; i++) {
@@ -147,7 +147,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
 
   test('content upload area is present in onboarding', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate through steps looking for an upload area
     for (let i = 0; i < 5; i++) {
@@ -175,7 +175,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
 
   test('dashboard redirect after completing onboarding', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Attempt to complete onboarding by clicking through all steps
     for (let i = 0; i < 10; i++) {
@@ -208,7 +208,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
   test('visual regression — instructor onboarding welcome', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
     await expect(page).toHaveScreenshot('onboarding-instructor-welcome.png', {

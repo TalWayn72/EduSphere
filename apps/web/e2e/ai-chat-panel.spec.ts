@@ -30,7 +30,7 @@ async function gotoPageWithPanel(page: Parameters<typeof login>[0]) {
   await login(page);
   // Navigate to dashboard — AIChatPanel is rendered on all authenticated pages
   await page.goto('/dashboard');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Suite ───────────────────────────────────────────────────────────────────

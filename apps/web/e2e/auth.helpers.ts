@@ -66,12 +66,12 @@ export async function loginInDevMode(page: Page): Promise<void> {
     .catch(() => {
       // URL never changed — app may already be on the target route
     });
-  // Always wait for networkidle so React Router client-side navigation
+  // Always wait for domcontentloaded so React Router client-side navigation
   // (e.g. / → /learn/content-1) completes before the caller does page.goto().
   // Without this, a competing React Router navigate() can race with the next
   // page.goto() call, causing "Target page, context or browser has been closed"
   // in mobile-chrome.
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Keycloak OIDC login ─────────────────────────────────────────────────────

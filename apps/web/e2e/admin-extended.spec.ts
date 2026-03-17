@@ -38,7 +38,7 @@ type PW = Parameters<typeof login>[0];
 async function gotoAdminRoute(page: PW, route: string): Promise<void> {
   await login(page);
   await page.goto(route);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /** Assert no fatal GraphQL or JS errors appear in the page body. */

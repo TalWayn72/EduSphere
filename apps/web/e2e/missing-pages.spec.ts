@@ -20,7 +20,7 @@ import { routeGraphQL } from './graphql-mock.helpers';
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 const NO_RAW_ERRORS = [
@@ -64,7 +64,7 @@ test.describe('missing-pages — T-11: Knowledge Graph', () => {
 
     await loginAndNavigate(page, '/graph');
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('knowledge-graph-loaded.png', {
@@ -76,7 +76,7 @@ test.describe('missing-pages — T-11: Knowledge Graph', () => {
     await routeGraphQL(page, () => null);
 
     await loginAndNavigate(page, '/knowledge-graph');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('knowledge-graph-alt-route.png', {
@@ -96,7 +96,7 @@ test.describe('missing-pages — T-11: Knowledge Graph', () => {
     });
 
     await loginAndNavigate(page, '/graph');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw AGE error must NOT be shown
     await expect(page.getByText('Apache AGE extension not loaded')).not.toBeVisible({ timeout: 3_000 });
@@ -151,7 +151,7 @@ test.describe('missing-pages — T-12: Search Page', () => {
 
     // Press Enter or click search button
     await page.keyboard.press('Enter');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await assertNoRawErrors(page);
 
@@ -177,7 +177,7 @@ test.describe('missing-pages — T-12: Search Page', () => {
     await searchInput.waitFor({ timeout: 10_000 });
     await searchInput.fill('machine learning');
     await page.keyboard.press('Enter');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw pgvector error must NOT be visible
     await expect(
@@ -219,7 +219,7 @@ test.describe('missing-pages — T-13: My Open Badges', () => {
     });
 
     await loginAndNavigate(page, '/my-badges');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('my-badges-loaded.png', {
@@ -236,7 +236,7 @@ test.describe('missing-pages — T-13: My Open Badges', () => {
     });
 
     await loginAndNavigate(page, '/my-badges');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('my-badges-empty.png', {
@@ -256,7 +256,7 @@ test.describe('missing-pages — T-13: My Open Badges', () => {
     });
 
     await loginAndNavigate(page, '/my-badges');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw verification hash error must NOT be visible
     await expect(
@@ -283,7 +283,7 @@ test.describe('missing-pages — T-14: Agents', () => {
     });
 
     await loginAndNavigate(page, '/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('agents-page-loaded.png', {
@@ -300,7 +300,7 @@ test.describe('missing-pages — T-14: Agents', () => {
     });
 
     await loginAndNavigate(page, '/agents/studio');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('agents-studio-loaded.png', {
@@ -320,7 +320,7 @@ test.describe('missing-pages — T-14: Agents', () => {
     });
 
     await loginAndNavigate(page, '/agents');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw gVisor error must NOT be visible
     await expect(
@@ -366,7 +366,7 @@ test.describe('missing-pages — T-15: Compliance Library', () => {
     });
 
     await loginAndNavigate(page, '/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('compliance-library-loaded.png', {
@@ -383,7 +383,7 @@ test.describe('missing-pages — T-15: Compliance Library', () => {
     });
 
     await loginAndNavigate(page, '/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByText(/GDPR|Data Protection|compliance/i).first()
@@ -404,7 +404,7 @@ test.describe('missing-pages — T-15: Compliance Library', () => {
     });
 
     await loginAndNavigate(page, '/admin/compliance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw license error must NOT be shown
     await expect(

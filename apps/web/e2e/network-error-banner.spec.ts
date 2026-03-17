@@ -89,7 +89,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('shows offline banner when GraphQL gateway is unreachable', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 });
   });
@@ -97,7 +97,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('offline banner has role="alert" for accessibility', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const banner = page.getByTestId('offline-banner');
     await expect(banner).toBeVisible({ timeout: 10_000 });
@@ -107,7 +107,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('offline banner contains retry button', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 });
     await expect(page.getByTestId('offline-banner-retry')).toBeVisible();
@@ -118,7 +118,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('[BUG-039] no raw "[Network]" string shown to user when offline', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Wait for the banner to appear to confirm error state was reached
     await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
 
@@ -131,7 +131,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('[BUG-039] no raw GraphQL error strings shown when offline', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
 
     const pageText = await page.textContent('body');
@@ -144,7 +144,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('[BUG-039] page shows mock fallback courses when offline (not blank)', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
 
     // CourseList renders MOCK_COURSES_FALLBACK when GraphQL errors — page must
@@ -160,13 +160,13 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
   test('retry button is clickable and does not crash the page', async ({ page }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="offline-banner-retry"]', { timeout: 10_000 });
 
     // Click retry — it calls reexecuteCourses({ requestPolicy: 'network-only' }).
     // With the gateway still blocked the banner should remain (not crash).
     await page.click('[data-testid="offline-banner-retry"]');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should not have crashed — a heading or content is still present
     const body = await page.textContent('body');
@@ -179,7 +179,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     // Phase 1: block GraphQL — banner appears
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
 
     // Phase 2: unblock GraphQL by routing to empty array response
@@ -188,7 +188,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
 
     // Phase 3: click retry — urql re-fetches with network-only, should succeed
     await page.click('[data-testid="offline-banner-retry"]');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Banner should be gone once the query succeeds
     const bannerVisible = await page.getByTestId('offline-banner').isVisible();
@@ -223,7 +223,7 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
 
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
 
     // The [Search] course search error log is acceptable — filter it out
@@ -241,7 +241,7 @@ test.describe('BUG-039 — Visual regression screenshots', () => {
     await setDevAuth(page);
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('bug039-offline-banner.png', {

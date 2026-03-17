@@ -18,7 +18,7 @@ test.describe('Discussions — DEV_MODE guard', () => {
 
   test('discussions page renders heading', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Discussions/i })
@@ -34,14 +34,14 @@ test.describe('Discussions — DEV_MODE guard', () => {
 
   test('no [object Object] in discussions DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
   test('discussions page shows threads list or empty state', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const hasThreads = await page.locator('[data-testid="discussion-thread"]').count();
     const hasEmpty = await page
@@ -62,7 +62,7 @@ test.describe('Discussions — Live backend', () => {
 
   test('discussions page renders with screenshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Discussions/i })
@@ -76,7 +76,7 @@ test.describe('Discussions — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify no unescaped script tags appear in visible text
     const body = await page.textContent('body');
@@ -180,7 +180,7 @@ test.describe('Discussions — thread and reply flows', () => {
 
   test('thread creation — new thread button does not crash', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const newThreadBtn = page.locator(
       '[data-testid="new-discussion-btn"], button:has-text("New Discussion"), button:has-text("Start"), button:has-text("New Thread")'
@@ -197,7 +197,7 @@ test.describe('Discussions — thread and reply flows', () => {
 
   test('thread creation form — title and body inputs work', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const titleInput = page.locator(
       '[data-testid="thread-title-input"], input[name="title"], input[placeholder*="title" i]'
@@ -220,7 +220,7 @@ test.describe('Discussions — thread and reply flows', () => {
 
   test('reply to thread — reply input is accessible', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions/thread-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const replyInput = page.locator(
       '[data-testid="reply-input"], textarea[name="reply"], textarea[placeholder*="reply" i], [contenteditable="true"]'
@@ -240,7 +240,7 @@ test.describe('Discussions — thread and reply flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/discussions/thread-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should render replies (nested or flat) without crash
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -255,7 +255,7 @@ test.describe('Discussions — thread and reply flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/discussions/thread-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const pinBtn = page.locator(
       '[data-testid="pin-discussion-btn"], button:has-text("Pin"), button[aria-label*="pin" i]'
@@ -297,7 +297,7 @@ test.describe('Discussions — thread and reply flows', () => {
     });
 
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should show empty state or create prompt — not a crash
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -311,7 +311,7 @@ test.describe('Discussions — thread and reply flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator(
       '[data-testid="discussion-search"], input[type="search"], input[placeholder*="search" i]'
@@ -338,7 +338,7 @@ test.describe('Discussions — thread and reply flows', () => {
     });
 
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('NatsError');
@@ -347,7 +347,7 @@ test.describe('Discussions — thread and reply flows', () => {
 
   test('visual regression — discussions list page (mocked)', async ({ page }) => {
     await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('discussions-list-mocked.png', {
       fullPage: false,

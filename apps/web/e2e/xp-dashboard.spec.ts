@@ -29,7 +29,7 @@ test.describe('XP Dashboard — DEV_MODE guard', () => {
 
   test('no MOCK_XP sentinel string in DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Phase 36 regression guard: MOCK_XP must never appear in the UI
@@ -39,7 +39,7 @@ test.describe('XP Dashboard — DEV_MODE guard', () => {
 
   test('xp-widget section is rendered', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const widget = page.locator('[data-testid="xp-widget"]');
     await widget.waitFor({ timeout: 10_000 });
@@ -48,7 +48,7 @@ test.describe('XP Dashboard — DEV_MODE guard', () => {
 
   test('xp-level-badge is rendered', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const badge = page.locator('[data-testid="xp-level-badge"]');
     await badge.waitFor({ timeout: 10_000 });
@@ -57,7 +57,7 @@ test.describe('XP Dashboard — DEV_MODE guard', () => {
 
   test('xp-level-badge contains "Lv." prefix', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const badge = page.locator('[data-testid="xp-level-badge"]');
     await badge.waitFor({ timeout: 10_000 });
@@ -67,7 +67,7 @@ test.describe('XP Dashboard — DEV_MODE guard', () => {
 
   test('no [object Object] serialization in dashboard DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -94,7 +94,7 @@ test.describe('XP Dashboard — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const badge = page.locator('[data-testid="xp-level-badge"]');
     await badge.waitFor({ timeout: 10_000 });
@@ -105,7 +105,7 @@ test.describe('XP Dashboard — Live backend', () => {
 
   test('xp widget shows numeric xp value', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const widget = page.locator('[data-testid="xp-widget"]');
     await widget.waitFor({ timeout: 10_000 });
@@ -116,7 +116,7 @@ test.describe('XP Dashboard — Live backend', () => {
 
   test('no mock sentinel strings in live-backend render', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_XP');
@@ -126,7 +126,7 @@ test.describe('XP Dashboard — Live backend', () => {
 
   test('visual snapshot — XP dashboard widgets', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('xp-dashboard-chromium-win32.png', {
       maxDiffPixels: 200,
     });

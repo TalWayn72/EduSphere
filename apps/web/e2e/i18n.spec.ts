@@ -32,7 +32,7 @@ test.describe('i18n — Settings page navigation', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveURL('/settings');
     // Layout wraps every page with a <header> (confirmed in smoke.spec.ts)
@@ -43,7 +43,7 @@ test.describe('i18n — Settings page navigation', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // SettingsPage: <h1>{t('title')}</h1>  en/settings.json → "Settings"
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible({
@@ -53,7 +53,7 @@ test.describe('i18n — Settings page navigation', () => {
 
   test('settings page shows the Language card title', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // CardTitle: t('language.title')  en → "Language"
     // .first() because the LanguageSelector label also reads "Language"
@@ -72,7 +72,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // LanguageSelector uses shadcn/ui <Select> which renders role="combobox"
     await expect(page.getByRole('combobox').first()).toBeVisible({
@@ -84,7 +84,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
 
@@ -97,7 +97,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
 
   test('dropdown shows English native name', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
 
     // LOCALE_LABELS['en'].native === 'English'
@@ -108,7 +108,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
 
   test('dropdown shows Español native name (es)', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
 
     // LOCALE_LABELS['es'].native === 'Español'
@@ -119,7 +119,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
 
   test('dropdown shows Français native name (fr)', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
 
     // LOCALE_LABELS['fr'].native === 'Français'
@@ -130,7 +130,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
 
   test('dropdown shows 中文 native name (zh-CN)', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
 
     // LOCALE_LABELS['zh-CN'].native === '中文'
@@ -149,7 +149,7 @@ test.describe('i18n — Language switching', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Confirm English is the active locale first
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible({
@@ -170,7 +170,7 @@ test.describe('i18n — Language switching', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // First switch to Spanish
     await page.getByRole('combobox').first().click();
@@ -187,7 +187,7 @@ test.describe('i18n — Language switching', () => {
       .click();
 
     // Allow locale JSON chunks to load (ViteLocaleBackend lazy-loads each locale)
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible({
       timeout: 15_000,
@@ -198,13 +198,13 @@ test.describe('i18n — Language switching', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /Espa/i }).first().click();
 
     // Allow Spanish locale JSON chunk to load (ViteLocaleBackend lazy-loads each locale)
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // es/settings.json: language.description → "Selecciona tu idioma preferido..."
     // Two elements may render the same description text (different font-size variants)
@@ -223,7 +223,7 @@ test.describe('i18n — Locale persistence in localStorage', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click selector and choose French
     await page.getByRole('combobox').first().click();
@@ -240,7 +240,7 @@ test.describe('i18n — Locale persistence in localStorage', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Choose Portuguese via the live selector
     await page.getByRole('combobox').first().click();
@@ -257,7 +257,7 @@ test.describe('i18n — Locale persistence in localStorage', () => {
 
     // Hard reload — app re-reads localStorage on bootstrap
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Key should survive the reload unchanged
     stored = await page.evaluate(() =>
@@ -270,7 +270,7 @@ test.describe('i18n — Locale persistence in localStorage', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Choose Russian — useUserPreferences.setLocale() calls localStorage.setItem
     // synchronously before awaiting updatePreferences() (GraphQL mutation)
@@ -290,7 +290,7 @@ test.describe('i18n — Locale persistence in localStorage', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Set Spanish first
     await page.getByRole('combobox').first().click();
@@ -321,7 +321,7 @@ test.describe('i18n — Hebrew RTL locale', () => {
 
   test('dropdown shows עברית native name (he)', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
 
     // LOCALE_LABELS['he'].native === 'עברית'
@@ -334,13 +334,13 @@ test.describe('i18n — Hebrew RTL locale', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
 
     // he/settings.json: title → "הגדרות"
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByRole('heading', { name: /הגדרות/ })).toBeVisible({
       timeout: 10_000,
     });
@@ -348,7 +348,7 @@ test.describe('i18n — Hebrew RTL locale', () => {
 
   test('selecting Hebrew sets document dir to rtl', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
@@ -360,7 +360,7 @@ test.describe('i18n — Hebrew RTL locale', () => {
 
   test('selecting Hebrew writes he to localStorage', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
@@ -375,7 +375,7 @@ test.describe('i18n — Hebrew RTL locale', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Switch to Hebrew first
     await page.getByRole('combobox').first().click();
@@ -389,7 +389,7 @@ test.describe('i18n — Hebrew RTL locale', () => {
       .getByRole('option', { name: /English/i })
       .first()
       .click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     dir = await page.evaluate(() => document.documentElement.dir);
     expect(dir).toBe('ltr');

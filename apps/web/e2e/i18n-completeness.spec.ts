@@ -147,7 +147,7 @@ for (const locale of LOCALES) {
         .catch(() => {
           // URL may already be on target route
         });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Re-set the locale after login (login may have overridden it)
       await page.evaluate(
@@ -161,7 +161,7 @@ for (const locale of LOCALES) {
     for (const { path, name } of PAGES) {
       test(`no raw i18n keys on ${name} (${locale})`, async ({ page }) => {
         await page.goto(`${BASE_URL}${path}`, {
-          waitUntil: 'networkidle',
+          waitUntil: 'domcontentloaded',
         });
         // Allow lazy-loaded translation chunks to resolve
         await page.waitForTimeout(1_000);

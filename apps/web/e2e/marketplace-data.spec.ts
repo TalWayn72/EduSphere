@@ -62,7 +62,7 @@ test.describe('MarketplacePage — DEV_MODE guard', () => {
     });
     await login(page);
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('displays real course title, not UUID truncation', async ({ page }) => {
@@ -120,7 +120,7 @@ test.describe('MarketplacePage — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Either courses are listed or an empty/loading state is visible
     const hasItems = await page.locator('[data-testid="course-listing-card"]').count();
@@ -135,7 +135,7 @@ test.describe('MarketplacePage — Live backend', () => {
 
   test('filter controls are accessible', async ({ page }) => {
     await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // At least a search input or a filter select should be visible
     const hasSearch = await page.getByPlaceholder(/search/i).count();

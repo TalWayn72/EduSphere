@@ -15,7 +15,7 @@ import { routeGraphQL } from './graphql-mock.helpers';
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
   await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 const MOCK_COURSES_WITH_ANALYTICS = [
@@ -67,7 +67,7 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     await loginAndNavigate(page, '/instructor/analytics');
 
     // Main heading should be visible
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // No raw errors
     await expect(page.getByText('CombinedError')).not.toBeVisible({ timeout: 2_000 });
@@ -89,7 +89,7 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/instructor/analytics');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // 142 enrollments or the course title should appear
     await expect(
@@ -111,7 +111,7 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/instructor/analytics');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for tabs: Overview, Learner Engagement, At-Risk, AI Usage
     const tabs = page.getByRole('tab');
@@ -121,7 +121,7 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
       const secondTab = tabs.nth(1);
       if (await secondTab.isVisible({ timeout: 2_000 }).catch(() => false)) {
         await secondTab.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
       }
     }
 
@@ -142,7 +142,7 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     });
 
     await loginAndNavigate(page, '/instructor/analytics');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw validation error must NOT be visible
     await expect(
@@ -170,11 +170,11 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     });
 
     await loginAndNavigate(page, '/instructor/earnings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should show earnings amounts (formatted from cents)
     // $1,250.00 total earned or similar formatted value
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('instructor-earnings-loaded.png', {
       maxDiffPixelRatio: 0.05,
@@ -193,7 +193,7 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     });
 
     await loginAndNavigate(page, '/instructor/earnings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw FORBIDDEN message must NOT be visible to user
     await expect(
@@ -220,12 +220,12 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     });
 
     await loginAndNavigate(page, '/instructor/earnings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const payoutBtn = page.getByRole('button', { name: /request payout|withdraw|payout/i }).first();
     if (await payoutBtn.isVisible({ timeout: 8_000 }).catch(() => false)) {
       await payoutBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       expect(payoutCalled).toBe(true);
     }
 
@@ -249,12 +249,12 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     });
 
     await loginAndNavigate(page, '/instructor/earnings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const payoutBtn = page.getByRole('button', { name: /request payout|withdraw|payout/i }).first();
     if (await payoutBtn.isVisible({ timeout: 8_000 }).catch(() => false)) {
       await payoutBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Raw Stripe/internal error must NOT be visible
       await expect(
@@ -276,7 +276,7 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     });
 
     await loginAndNavigate(page, '/instructor/earnings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should render at least one purchase row
     const rows = page.getByRole('row');
@@ -305,7 +305,7 @@ test.describe('instructor-pages — Merge Queue', () => {
     });
 
     await loginAndNavigate(page, '/instructor/merge-queue');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('CombinedError')).not.toBeVisible({ timeout: 2_000 });
 

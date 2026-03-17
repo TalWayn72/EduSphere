@@ -99,7 +99,7 @@ test.describe('Smoke Tests — Navigation', () => {
 
   test('sidebar nav links are present on dashboard', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // AppSidebar nav items: Home, My Courses, Knowledge Graph, AI Tutor, Live Sessions
     const nav = page.locator('nav#main-nav');
@@ -117,7 +117,7 @@ test.describe('Smoke Tests — Navigation', () => {
 
   test('search button in header navigates to /search', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The header search button (the styled outline button with "Search..." text)
     const headerSearchBtn = page.getByRole('button', { name: /Search\.\.\./i });

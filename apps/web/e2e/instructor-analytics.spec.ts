@@ -59,7 +59,7 @@ test.describe('InstructorAnalyticsDashboard — DEV_MODE guard', () => {
     await page.goto(`${BASE_URL}/instructor/analytics`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('renders Instructor Analytics heading', async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe('InstructorAnalyticsDashboard — Live backend', () => {
     await page.goto(`${BASE_URL}/instructor/analytics`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /instructor analytics/i })
@@ -178,7 +178,7 @@ test.describe('MyProgressPage — DEV_MODE guard', () => {
     });
     await login(page);
     await page.goto(`${BASE_URL}/my-progress`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('renders My Progress heading', async ({ page }) => {
@@ -230,7 +230,7 @@ test.describe('MyProgressPage — Live backend', () => {
 
   test('my progress page loads for authenticated student', async ({ page }) => {
     await page.goto(`${BASE_URL}/my-progress`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Either stats are displayed or the empty-state prompt is shown
     const hasHeading = await page

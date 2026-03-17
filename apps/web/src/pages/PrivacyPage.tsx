@@ -44,7 +44,7 @@ export function PrivacyPage() {
         description="EduSphere Privacy Policy — how we collect, use, and protect your data."
       />
 
-      <div className="mx-auto w-full max-w-3xl px-6 py-12">
+      <div data-testid="privacy-page" className="mx-auto w-full max-w-3xl px-6 py-12">
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <h1>Privacy Policy</h1>
           <p className="text-sm text-gray-500">Last Updated: March 2026</p>

@@ -64,7 +64,7 @@ async function loginViaKeycloak(
     '\\$&'
   );
   await page.waitForURL(new RegExp(appHostPattern), { timeout: 60_000 });
-  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
+  await page.waitForLoadState('domcontentloaded', { timeout: 30_000 }).catch(() => {});
   // Wait for app to finish loading (Loading spinner gone)
   await page.waitForFunction(
     () => !document.body.textContent?.includes('Loading'),
@@ -85,7 +85,7 @@ async function logoutViaUI(page: Page): Promise<void> {
 
   // Wait for redirect to landing page or login page
   await page.waitForURL(/\/(login)?$/, { timeout: 30_000 }).catch(() => {});
-  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+  await page.waitForLoadState('domcontentloaded', { timeout: 15_000 }).catch(() => {});
 }
 
 // ─── Group 1: Success toast (no error toast) ──────────────────────────────────
@@ -104,7 +104,7 @@ test.describe('language-save-regression — success toast guard', () => {
 
   test('selecting Hebrew shows success toast, NOT error toast', async ({ page }) => {
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // BUG-065 regression: verify the error toast string is NEVER shown
     const errorToastLocator = page.getByText(/שמירת העדפות שפה נכשלה|language.*error|failed to save/i);
@@ -113,7 +113,7 @@ test.describe('language-save-regression — success toast guard', () => {
     await page.getByRole('option', { name: /עברית/ }).first().click();
 
     // Allow mutation to complete
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: error toast must NOT appear
     await expect(errorToastLocator).not.toBeVisible({ timeout: 5_000 });
@@ -126,11 +126,11 @@ test.describe('language-save-regression — success toast guard', () => {
 
   test('BAD: error toast text is absent from the DOM after language save', async ({ page }) => {
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /Espa/i }).first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The specific error string from BUG-065 must never appear
     await expect(
@@ -140,11 +140,11 @@ test.describe('language-save-regression — success toast guard', () => {
 
   test('locale selector shows updated value immediately after save', async ({ page }) => {
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Combobox should now show Hebrew flag + native name
     await expect(page.getByRole('combobox').first()).toContainText('עברית');
@@ -166,10 +166,10 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
 
     // Step 2: Navigate to Settings and switch to Hebrew
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Confirm success toast appeared (not error)
     await expect(page.getByText(/העדפת השפה נשמרה/)).toBeVisible({ timeout: 10_000 });
@@ -189,7 +189,7 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
 
     // Step 6: Navigate to Settings — locale must still be Hebrew
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The heading must be in Hebrew, not English
     await expect(page.getByRole('heading', { name: /הגדרות/ })).toBeVisible({
@@ -212,7 +212,7 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
       localStorage.setItem('edusphere-sidebar-collapsed', 'true');
     });
 
-    await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
 
     // Login page greeting must be in Hebrew
     // he/auth.json: welcome = "ברוכים הבאים ל-EduSphere"
@@ -228,10 +228,10 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
 
     // Set locale to French
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /Fran/i }).first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     let stored = await page.evaluate(
       () => localStorage.getItem('edusphere_locale')
@@ -264,12 +264,12 @@ test.describe('language-save-regression — visual regression', () => {
 
   test('settings page in Hebrew matches visual snapshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/settings`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Switch to Hebrew
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Wait for Hebrew heading to confirm locale is active
     await page.getByRole('heading', { name: /הגדרות/ }).waitFor({ timeout: 10_000 });

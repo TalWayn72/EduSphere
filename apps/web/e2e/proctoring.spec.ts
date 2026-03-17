@@ -73,7 +73,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('proctoring start button visible when proctoring enabled', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The start button should be visible in the proctoring overlay
     await expect(
@@ -84,7 +84,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('clicking start button shows proctoring-active-badge', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
 
@@ -99,7 +99,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('stop button visible after session starts', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
 
@@ -111,7 +111,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('flag count badge appears after tab-switch event', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
 
@@ -132,7 +132,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('stop button ends session and hides active badge', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
     await expect(page.locator('[data-testid="proctoring-active-badge"]')).toBeVisible();
@@ -148,7 +148,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
     await page.route('**/graphql', (route) => route.fulfill({ json: { errors: [{ message: 'Internal server error' }] } }));
 
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toContain('[Network Error]');
@@ -162,7 +162,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('proctoring overlay — inactive state visual regression', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('proctoring-inactive.png');
   });
@@ -170,7 +170,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('proctoring overlay — active state visual regression', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
     await expect(page.locator('[data-testid="proctoring-active-badge"]')).toBeVisible();
@@ -181,7 +181,7 @@ test.describe('Remote Proctoring — Phase 33', () => {
   test('proctoring overlay — flagged state visual regression', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
     await page.evaluate(() => {

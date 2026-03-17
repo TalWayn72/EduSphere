@@ -18,7 +18,7 @@ test.describe('Peer Review — DEV_MODE guard', () => {
 
   test('peer review dashboard renders heading', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Peer Review/i })
@@ -34,14 +34,14 @@ test.describe('Peer Review — DEV_MODE guard', () => {
 
   test('no [object Object] in peer review DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
   test('peer review shows assignments or empty state', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const hasAssignments = await page.locator('[data-testid="peer-review-assignment"]').count();
     const hasEmpty = await page
@@ -62,7 +62,7 @@ test.describe('Peer Review — Live backend', () => {
 
   test('peer review dashboard renders with screenshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.getByRole('heading', { name: /Peer Review/i })
@@ -93,7 +93,7 @@ test.describe('Peer Review — Live backend', () => {
     });
 
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Raw exception class name must not be visible to the user
     const body = await page.textContent('body');
@@ -174,7 +174,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
 
   test('review assignment list — displays assignment cards', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -187,7 +187,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/peer-review/pr-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -202,7 +202,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/peer-review/pr-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const feedbackInput = page.locator(
       '[data-testid="feedback-input"], textarea[name="feedback"], textarea[placeholder*="feedback" i]'
@@ -226,7 +226,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
 
   test('scoring — score inputs accept numeric values', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review/pr-1`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const scoreInputs = page.locator(
       '[data-testid="score-input"], input[type="number"][name*="score"], input[name*="criteria"]'
@@ -245,7 +245,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // For anonymous reviews, real reviewer identity should not be visible
     const body = await page.textContent('body');
@@ -258,7 +258,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     // Raw ISO strings should not appear in the visible DOM
@@ -298,7 +298,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     });
 
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -317,7 +317,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     });
 
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('DrizzleORMError');
@@ -326,7 +326,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
 
   test('visual regression — peer review list page (mocked)', async ({ page }) => {
     await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('peer-review-list-mocked.png', {
       fullPage: false,

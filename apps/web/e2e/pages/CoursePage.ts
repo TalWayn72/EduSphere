@@ -85,13 +85,13 @@ export class CoursePage {
   /** Navigate to the course list. */
   async gotoCourseList(): Promise<void> {
     await this.page.goto('/courses');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /** Navigate to the content viewer for a given content ID. */
   async gotoContentViewer(contentId = 'content-1'): Promise<void> {
     await this.page.goto(`/learn/${contentId}`);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**

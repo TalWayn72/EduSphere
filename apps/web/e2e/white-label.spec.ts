@@ -18,7 +18,7 @@ import { test, expect } from '@playwright/test';
 test.describe('White-label runtime', () => {
   test('login page shows default EduSphere branding when no tenant slug', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Title must match the generic app name — not a broken/empty override
     await expect(page).toHaveTitle(/EduSphere|Login/i);
@@ -55,7 +55,7 @@ test.describe('White-label runtime', () => {
     });
 
     await page.goto('/login?tenant=demo');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The login page must render the mocked org name and tagline
     await expect(page.getByText('Acme Learning')).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('White-label runtime', () => {
     });
 
     await page.goto('/login?tenant=test');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // If the frontend sent a publicBranding query, verify it does NOT request
     // privileged fields that belong only to the authenticated myTenantBranding query
@@ -129,7 +129,7 @@ test.describe('White-label runtime', () => {
     });
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The page body must never expose raw GraphQL error text or stack traces to users
     const bodyText = await page.locator('body').textContent() ?? '';
@@ -174,7 +174,7 @@ test.describe('White-label runtime', () => {
     });
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // If the app reached an authenticated page, verify the style tag was injected
     // using id="tenant-custom-css" (set by useTenantBranding's injectCustomCss)
@@ -191,7 +191,7 @@ test.describe('White-label runtime', () => {
 
   test('login page visual snapshot', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('login-default-branding.png', { fullPage: false });
   });
 
@@ -218,7 +218,7 @@ test.describe('White-label runtime', () => {
     });
 
     await page.goto('/login?tenant=nonexistent-slug');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Must fall back to default branding, not crash
     const body = (await page.locator('body').textContent()) ?? '';
@@ -245,7 +245,7 @@ test.describe('White-label runtime', () => {
     });
 
     await page.goto('/login?tenant=demo');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should still render with default branding
     await expect(page).toHaveTitle(/EduSphere|Login/i);
@@ -256,7 +256,7 @@ test.describe('White-label runtime', () => {
 
   test('no raw i18n keys on branded login page', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.locator('body').textContent()) ?? '';
     expect(body).not.toMatch(/\bbranding\.[a-z]+\.[a-z]+\b/);
@@ -267,7 +267,7 @@ test.describe('White-label runtime', () => {
   test('XSS in tenant slug parameter does not execute', async ({ page }) => {
     // Navigate with a XSS attempt in the tenant param
     await page.goto('/login?tenant=<script>alert(1)</script>');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Ensure no alert dialog was triggered
     let alertFired = false;

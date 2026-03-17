@@ -22,7 +22,7 @@ import { login } from './auth.helpers';
 
 /** Wait for page to settle (no spinner, no navigation in progress). */
 async function settle(page: Page, ms = 500): Promise<void> {
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
   await page.waitForTimeout(ms);
 }
 

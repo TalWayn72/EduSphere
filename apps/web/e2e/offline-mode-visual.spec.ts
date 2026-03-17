@@ -34,7 +34,7 @@ test.beforeEach(async ({ page }) => {
 /** Navigate to home, wait for app shell to settle */
 async function gotoHome(page: Page): Promise<void> {
   await page.goto(HOME_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /** Simulate the browser going offline and dispatch the DOM event */

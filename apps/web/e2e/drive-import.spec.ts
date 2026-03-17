@@ -72,7 +72,7 @@ test.describe('Drive Import — ContentImportPage', () => {
 
   test('Google Drive option visible in ContentImportPage', async ({ page }) => {
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Page either loads with import options or redirects to login — body must be truthy
     const bodyText = await page.locator('body').textContent();
     expect(bodyText).toBeTruthy();
@@ -80,7 +80,7 @@ test.describe('Drive Import — ContentImportPage', () => {
 
   test('no raw error strings visible on import page load', async ({ page }) => {
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
     expect(body).not.toContain('[GraphQL]');
@@ -127,7 +127,7 @@ test.describe('Drive Import — @visual', () => {
     await page.goto(`${OAUTH_CALLBACK_URL}?code=visual-test`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('oauth-callback-page.png', {
       maxDiffPixels: 300,
       animations: 'disabled',
@@ -160,7 +160,7 @@ test.describe('Drive Import — error handling', () => {
     });
 
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('Google API quota exceeded');
@@ -179,7 +179,7 @@ test.describe('Drive Import — error handling', () => {
     });
 
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('ERR_CONNECTION_REFUSED');
@@ -219,7 +219,7 @@ test.describe('Drive Import — error handling', () => {
   test('no raw i18n keys on import page', async ({ page }) => {
     await mockImportGraphQL(page);
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toMatch(/\bimport\.[a-z]+\.[a-z]+\b/);

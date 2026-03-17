@@ -28,7 +28,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
   test('instructor can navigate to course creation page', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should see the course creation form OR be redirected to courses list
     const url = page.url();
@@ -38,7 +38,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
   test('sidebar nav items show translated text (not raw i18n keys)', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
@@ -64,7 +64,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
   test('logo is visible in sidebar (not broken)', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Either the logo image is rendered OR the CSS/text fallback is visible.
     // data-testid="sidebar-logo-icon" → the <img> element
@@ -87,7 +87,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
   test('main content does not overlap sidebar (layout offset correct)', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     const mainContent = page.locator('[data-testid="layout-main"]');
@@ -129,7 +129,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
 
     await login(page);
     await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
 
@@ -165,7 +165,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
 
     await login(page);
     await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
 
@@ -187,7 +187,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
   test('language settings page is accessible and has a language selector', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The settings page must load with at least one heading
     await expect(page.locator('h1')).toBeVisible();
@@ -217,7 +217,7 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
 
     for (const route of routes) {
       await page.goto(`${BASE_URL}${route}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const content = await page.content();
 
@@ -248,7 +248,7 @@ test.describe('Course Lifecycle — Live backend', () => {
   test('instructor can navigate to course creation page (Keycloak auth)', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.instructor);
     await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     expect(url).toMatch(/\/(courses|create|new)/);
@@ -257,7 +257,7 @@ test.describe('Course Lifecycle — Live backend', () => {
   test('student can view courses discovery page (Keycloak auth)', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.locator('h1')).toBeVisible();
     await expect(page).toHaveScreenshot('courses-discovery-student.png', {
@@ -268,7 +268,7 @@ test.describe('Course Lifecycle — Live backend', () => {
   test('student dashboard loads and shows sidebar with translated nav items', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();

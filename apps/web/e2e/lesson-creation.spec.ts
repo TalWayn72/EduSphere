@@ -33,7 +33,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     page,
   }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('יצירת שיעור חדש')).toBeVisible({
       timeout: 10_000,
@@ -42,7 +42,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('step 1 — progress bar shows first step active', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Step indicator: 3 bars, first is blue
     const bars = page.locator('.flex.gap-2.mb-8 > div');
@@ -54,7 +54,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('step 1 — title and type fields are present', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Title field
     await expect(page.locator('input[name="title"], input[placeholder*="שיעור"], input[placeholder*="title"]').first()).toBeVisible({ timeout: 8_000 });
@@ -62,7 +62,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('step 1 — can fill form and proceed to step 2', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Fill title
     const titleInput = page.locator('input').first();
@@ -81,7 +81,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('step 3 — template selection is visible', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate through steps
     const titleInput = page.locator('input').first();
@@ -103,7 +103,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     page,
   }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate to step 3
     const titleInput = page.locator('input').first();
@@ -124,7 +124,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     page,
   }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate through all 3 steps
     const titleInput = page.locator('input').first();
@@ -165,7 +165,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('step 3 — error element has accessible role=alert', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E');
@@ -186,7 +186,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('back button on step 3 returns to step 2', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate to step 3
     const titleInput = page.locator('input').first();
@@ -206,7 +206,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
   test('visual — step 3 template selection screenshot', async ({ page }) => {
     await page.goto(LESSON_NEW_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E ויזואלי');
@@ -289,7 +289,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
 
     await routeLessonQuery(page);
     await page.goto(LESSON_DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
     // Iron rule: React must NOT emit setState-during-render warning
@@ -306,7 +306,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
 
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
     expect(reactErrors).toHaveLength(0);
@@ -329,7 +329,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
     await page.waitForLoadState('domcontentloaded');
     // Immediately navigate to results page — reproduces the BUG-049 race condition
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // KEY ASSERTION: zero React setState-during-render errors
     expect(reactErrors).toHaveLength(0);
@@ -349,7 +349,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
     await page.goto(LESSON_DETAIL_URL);
     await page.goto(LESSON_RESULTS_URL);
     await page.goto(LESSON_DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(reactErrors).toHaveLength(0);
   });
@@ -357,7 +357,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
   test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({ page }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.textContent('body');
     expect(bodyText).not.toContain('Cannot update a component');
@@ -368,7 +368,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
   test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({ page }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
 
     await page.screenshot({
@@ -379,7 +379,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
   test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({ page }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
 
     await page.screenshot({
@@ -399,7 +399,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
 
     await routeLessonQuery(page);
     await page.goto(LESSON_DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
     // Iron rule: React must NOT emit setState-during-render warning
@@ -416,7 +416,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
 
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
     expect(reactErrors).toHaveLength(0);
@@ -439,7 +439,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
     await page.waitForLoadState('domcontentloaded');
     // Immediately navigate to results page — reproduces the BUG-049 race condition
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // KEY ASSERTION: zero React setState-during-render errors
     expect(reactErrors).toHaveLength(0);
@@ -459,7 +459,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
     await page.goto(LESSON_DETAIL_URL);
     await page.goto(LESSON_RESULTS_URL);
     await page.goto(LESSON_DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(reactErrors).toHaveLength(0);
   });
@@ -467,7 +467,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
   test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({ page }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.textContent('body');
     expect(bodyText).not.toContain('Cannot update a component');
@@ -484,7 +484,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
 
     await routeLessonQuery(page);
     await page.goto(`${BASE_URL}/courses/course-1/lessons/new`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Even unauthenticated, the wizard page should load (auth check is at mutation time)
     // The "יצירת שיעור חדש" heading or a redirect should be visible
@@ -496,7 +496,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
   test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({ page }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_DETAIL_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
 
     await page.screenshot({
@@ -507,7 +507,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
   test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({ page }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
 
     await page.screenshot({

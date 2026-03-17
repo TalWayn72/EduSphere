@@ -63,7 +63,7 @@ test.describe('Skill Paths — DEV_MODE guard', () => {
     });
     await login(page);
     await page.goto(`${BASE_URL}/skills`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('page body is visible (no crash)', async ({ page }) => {
@@ -126,7 +126,7 @@ test.describe('Skill Paths — page renders with data', () => {
     });
     await login(page);
     await page.goto(`${BASE_URL}/skills`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('renders Full Stack Developer path title when data present', async ({
@@ -162,7 +162,7 @@ test.describe('Skill Paths — Live backend', () => {
 
   test('skill paths page loads for authenticated user', async ({ page }) => {
     await page.goto(`${BASE_URL}/skills`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Route may be at /skills or redirect — just verify no crash
     await expect(page.locator('body')).toBeVisible();

@@ -140,7 +140,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
     });
 
     await page.goto('/learn/media-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Locate the asset uploader (instructor mode shows this component)
     const uploader = page.locator('[data-testid="asset-uploader"]');
@@ -197,7 +197,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
     });
 
     await page.goto('/learn/media-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Wait for the document viewer to render (instructor mode)
     const anchorEditor = page.locator('[data-testid="anchor-editor"]');
@@ -239,7 +239,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
     });
 
     await page.goto('/learn/media-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // InstructorAnchorPanel should be visible on the right side
     const anchorPanel = page.locator('[data-testid="instructor-anchor-panel"]');
@@ -278,7 +278,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
     });
 
     await page.goto('/learn/media-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const anchorPanel = page.locator('[data-testid="instructor-anchor-panel"]');
     await expect(anchorPanel).toBeVisible({ timeout: 10_000 });
@@ -328,7 +328,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
     });
 
     await page.goto('/learn/media-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify instructor panel is visible before toggle
     const anchorPanel = page.locator('[data-testid="instructor-anchor-panel"]');

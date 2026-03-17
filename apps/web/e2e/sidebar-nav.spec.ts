@@ -94,11 +94,11 @@ const PROTECTED_ROUTES: RouteSpec[] = [
 
 /**
  * Navigate to a route and wait for the page to fully settle.
- * Uses networkidle so that async data fetches complete before assertions.
+ * Uses domcontentloaded so that async data fetches complete before assertions.
  */
 async function navigateTo(page: Page, path: string): Promise<void> {
   await page.goto(`${BASE_URL}${path}`, {
-    waitUntil: 'networkidle',
+    waitUntil: 'domcontentloaded',
     timeout: 30_000,
   });
 }

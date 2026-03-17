@@ -63,7 +63,7 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
   test('authenticated user can reach /dashboard directly', async ({ page }) => {
     // ProtectedRoute passes in DEV_MODE because isAuthenticated() returns true
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Dashboard renders personalised welcome heading (data-testid="welcome-heading")
     // rather than a generic "Dashboard" title
     await expect(page.getByTestId('welcome-heading')).toBeVisible({
@@ -76,7 +76,7 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
   }) => {
     // DEV_USER: { firstName: 'Super', lastName: 'Admin', username: 'super.admin' }
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // UserMenu renders firstName (or username) in the trigger button
     const header = page.locator('header');
@@ -90,7 +90,7 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
   test('logout redirects to /login', async ({ page }) => {
     // Start authenticated
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Open UserMenu dropdown
     const userMenuBtn = page.getByRole('button', { name: /user menu/i });
@@ -108,7 +108,7 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
   test('after logout /dashboard redirects to /login', async ({ page }) => {
     // Navigate to dashboard first
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Trigger logout via UserMenu
     const userMenuBtn = page.getByRole('button', { name: /user menu/i });
@@ -143,7 +143,7 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
     );
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Simulate passage of time (Playwright time manipulation not needed;
     // just verify the page stays usable after a short idle period)

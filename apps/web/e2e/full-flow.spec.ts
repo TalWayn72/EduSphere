@@ -39,7 +39,7 @@ test('complete learning loop — student session from login to logout', async ({
 
   // ─── Step 2: Navigate to Dashboard ───────────────────────────────────────
   await page.goto('/dashboard');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   // DashboardPage renders a welcome heading (data-testid="welcome-heading")
   // not a static "Dashboard" text
   await expect(page.getByTestId('welcome-heading')).toBeVisible({
@@ -51,7 +51,7 @@ test('complete learning loop — student session from login to logout', async ({
 
   // ─── Step 3: Navigate to Course List ─────────────────────────────────────
   await page.goto('/courses');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await expect(page.getByRole('heading', { name: 'Courses' })).toBeVisible({
     timeout: 8_000,
   });
@@ -68,7 +68,7 @@ test('complete learning loop — student session from login to logout', async ({
 
   // ─── Step 4b: Navigate to Content Viewer directly ────────────────────────
   await page.goto('/learn/content-1');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Video element should be rendered
   const video = page.locator('video');
@@ -106,7 +106,7 @@ test('complete learning loop — student session from login to logout', async ({
 
   // ─── Step 7: Navigate to Search ──────────────────────────────────────────
   await page.goto('/search');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   const searchInput = page.locator(
     'input[placeholder*="Search"], input[type="search"]'
@@ -144,7 +144,7 @@ test('complete learning loop — student session from login to logout', async ({
 
   // ─── Step 9: Navigate to Agents — select Chavruta mode ───────────────────
   await page.goto('/agents');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await expect(
     page.getByRole('heading', { name: 'AI Learning Agents' })
   ).toBeVisible({ timeout: 8_000 });
@@ -196,7 +196,7 @@ test('navigation sidebar links are reachable from any page', async ({
   page,
 }) => {
   await page.goto('/dashboard');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Verify nav links in AppSidebar (actual labels from NAV_ITEMS in AppSidebar.tsx):
   //   home → "Home", myCourses → "My Courses", discover → "Discover",
@@ -210,7 +210,7 @@ test('navigation sidebar links are reachable from any page', async ({
 
 test('annotations page is reachable and shows layer tabs', async ({ page }) => {
   await page.goto('/annotations');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await expect(page.getByRole('heading', { name: 'Annotations' })).toBeVisible({
     timeout: 8_000,
@@ -222,7 +222,7 @@ test('annotations page is reachable and shows layer tabs', async ({ page }) => {
 
 test('knowledge graph page loads without crashing', async ({ page }) => {
   await page.goto('/graph');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   // The graph page may show a canvas or SVG — just verify no error boundary triggered
   await expect(page).toHaveURL(/\/graph/);
   // Ensure the Layout header is visible (page rendered without crash)
@@ -233,7 +233,7 @@ test('profile page is accessible and shows user information', async ({
   page,
 }) => {
   await page.goto('/profile');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // ProfilePage should render within the Layout
   await expect(page.locator('header')).toBeVisible({ timeout: 8_000 });

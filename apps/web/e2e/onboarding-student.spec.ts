@@ -17,7 +17,7 @@ test.describe('Student Onboarding — DEV_MODE guard', () => {
 
   test('/onboarding page renders without crash overlay', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -26,7 +26,7 @@ test.describe('Student Onboarding — DEV_MODE guard', () => {
 
   test('no MOCK_ sentinel strings in onboarding DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
@@ -34,7 +34,7 @@ test.describe('Student Onboarding — DEV_MODE guard', () => {
 
   test('no [object Object] serialization in onboarding DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
@@ -54,7 +54,7 @@ test.describe('Student Onboarding — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Banner may or may not be shown (student may have already completed onboarding)
     // — if shown, assert it has correct ARIA role
@@ -70,7 +70,7 @@ test.describe('Student Onboarding — Live backend', () => {
 
   test('/onboarding page renders step wizard for student', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should not show raw MOCK_ strings
     const content = await page.content();
@@ -91,7 +91,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('welcome screen displays greeting and get-started CTA', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Welcome heading or greeting should be visible
     const heading = page.getByRole('heading').first();
@@ -109,7 +109,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('profile setup step allows name and avatar entry', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for profile-related inputs (name, display name, avatar upload)
     const nameInput = page.locator(
@@ -130,7 +130,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('first course enrollment step shows available courses', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate through steps to reach course selection if multi-step
     const nextBtn = page.getByRole('button', { name: /next|continue/i }).first();
@@ -155,7 +155,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('skip option allows bypassing onboarding', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for a skip link/button
     const skipBtn = page
@@ -182,7 +182,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('progress indicator shows current step', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for step indicators (dots, numbers, progress bar)
     const stepIndicator = page
@@ -206,7 +206,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('language selection is available during onboarding', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for a language selector (combobox, select, or dedicated dropdown)
     const langSelector = page
@@ -228,7 +228,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('tutorial completion navigates to dashboard', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Try to complete the onboarding by clicking through all steps
     for (let i = 0; i < 10; i++) {
@@ -261,7 +261,7 @@ test.describe('Student Onboarding — Flow tests', () => {
   test('visual regression — onboarding welcome screen', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
     await expect(page).toHaveScreenshot('onboarding-student-welcome.png', {
@@ -280,7 +280,7 @@ test.describe('Student Onboarding — Flow tests', () => {
     });
 
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Filter out known benign errors (e.g., favicon, sourcemap)
     const realErrors = consoleErrors.filter(
@@ -294,7 +294,7 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('onboarding page is accessible — no missing alt or role', async ({ page }) => {
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // All images should have alt text
     const images = page.locator('img:not([alt])');

@@ -61,7 +61,7 @@ test.describe('Auto-Grading Results — /admin/auto-grading (INSTRUCTOR)', () =>
     await page.goto(`${BASE_URL}/admin/auto-grading`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   // ── Page structure ─────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ test.describe('Auto-Grading Results — /admin/auto-grading (INSTRUCTOR)', () =>
   // ── Visual screenshot ──────────────────────────────────────────────────────
 
   test('visual screenshot — auto-grading results page', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('auto-grading-results.png', {
       fullPage: false,
       animations: 'disabled',
@@ -194,7 +194,7 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
     await page.goto(`${BASE_URL}/admin/gap-analysis`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   // ── Page structure ─────────────────────────────────────────────────────────
@@ -336,7 +336,7 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
   // ── Visual screenshot ──────────────────────────────────────────────────────
 
   test('visual screenshot — gap analysis table', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('gap-analysis-table.png', {
       fullPage: false,
       animations: 'disabled',

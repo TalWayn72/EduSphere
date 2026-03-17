@@ -36,7 +36,7 @@ async function auditPage(
   url: string
 ): Promise<Result[]> {
   await page.goto(url);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   const results = await new AxeBuilder({ page })
     .withTags([...WCAG_TAGS])
     .analyze();
@@ -129,7 +129,7 @@ test.describe('WCAG 2.2 SC 2.5.8 - Target Size @a11y', () => {
       page,
     }) => {
       await page.goto(url);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       type ViolationEntry = {
         selector: string;
@@ -199,7 +199,7 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
     page,
   }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.keyboard.press('Tab');
 
     const focused = page.locator(':focus');
@@ -226,7 +226,7 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
     page,
   }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const maxTabs = 10;
     const noOutlineElements: string[] = [];
@@ -282,7 +282,7 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
 test.describe('ARIA Snapshot — Navigation landmarks', () => {
   test('AppSidebar navigation landmark is present on /dashboard', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The sidebar renders as a <nav> or <aside> with an aria-label containing
     // "navigation" (English) or "ניווט" (Hebrew when i18n is active).
@@ -304,7 +304,7 @@ test.describe('ARIA Snapshot — Navigation landmarks', () => {
 
   test('main content landmark is present on /courses', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const main = page.locator('main').first();
     if (await main.count() > 0) {
@@ -329,7 +329,7 @@ test.describe('WCAG 2.2 SC 2.4.12 - Focus Not Obscured @a11y', () => {
     page,
   }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const viewportHeight = page.viewportSize()?.height ?? 768;
     const maxTabs = 15;

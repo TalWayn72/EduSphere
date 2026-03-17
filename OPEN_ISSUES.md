@@ -1,6 +1,45 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 16 מרץ 2026 (All 64 Phases ✅ Complete — full project implementation done + BUG-067 WCAG contrast audit)
+**תאריך עדכון:** 16 מרץ 2026 (All 64 Phases ✅ Complete — BUG-065 recurrence fixed, BUG-068/069 E2E infra fixed)
+
+---
+
+## BUG-069 — E2E networkidle timeout (967 instances across 127 files)
+
+**סטטוס:** ✅ Fixed (2026-03-16)
+**חומרה:** 🟡 Medium (E2E infrastructure — adds 45-60 min to CI runs)
+**קבצים:** 127 E2E spec files in `apps/web/e2e/`
+
+### שורש הבעיה
+Vite HMR WebSocket (`ws://localhost:5176/__vite_hmr__`) stays permanently open during E2E tests. Playwright's `waitForLoadState('networkidle')` requires ALL network connections idle for 500ms — HMR WebSocket never idles → every call times out at 30s.
+
+### תיקון
+Global replacement: `networkidle` → `domcontentloaded` across all 127 E2E files (967 instances).
+
+### מניעת הישנות
+- Grep for `networkidle` in CI — should return 0 matches in `apps/web/e2e/`
+- New E2E specs should use `domcontentloaded` or element-specific waits
+
+---
+
+## BUG-068 — App stuck on "Loading" after Keycloak login redirect
+
+**סטטוס:** ✅ Fixed (2026-03-16)
+**חומרה:** 🔴 Critical (all E2E tests requiring real Keycloak login fail)
+**קבצים:** `apps/web/src/App.tsx`, `apps/web/src/lib/auth.ts`
+
+### שורש הבעיה
+After Keycloak login, browser redirects back with `?code=...&state=...` params. `keycloak.init()` processes the code but `history.replaceState()` to clean the URL doesn't trigger React Router re-render. The lazy-loaded route components get stuck in Suspense fallback ("Initializing authentication...").
+
+Additionally, if `keycloak.init()` hangs (server unreachable during token exchange), the app stays on the spinner forever with no timeout.
+
+### תיקון
+1. **`App.tsx`:** Detect Keycloak redirect params → after bootstrap, clean URL + force `router.navigate('/dashboard')` to re-sync React Router
+2. **`auth.ts`:** 10-second timeout on `keycloak.init()` via `Promise.race()` — falls back to unauthenticated state instead of infinite spinner
+
+### מניעת הישנות
+- Auth unit tests verify timeout behavior
+- SmartRoot + ProtectedRoute tests verify redirect flow
 
 ---
 

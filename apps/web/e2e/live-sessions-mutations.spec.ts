@@ -157,7 +157,7 @@ test.describe('Live Sessions Page — Structure', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/sessions');
     const body = (await page.locator('body').textContent()) ?? '';
@@ -167,7 +167,7 @@ test.describe('Live Sessions Page — Structure', () => {
 
   test('Upcoming tab is present and active by default', async ({ page }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
     if (await upcomingTab.count() > 0) {
@@ -178,7 +178,7 @@ test.describe('Live Sessions Page — Structure', () => {
 
   test('Past tab is present and has role="tab"', async ({ page }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const pastTab = page.locator('[data-testid="tab-past"]');
     if (await pastTab.count() > 0) {
@@ -191,7 +191,7 @@ test.describe('Live Sessions Page — Structure', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const pastTab = page.locator('[data-testid="tab-past"]');
     if (await pastTab.count() > 0) {
@@ -205,7 +205,7 @@ test.describe('Live Sessions Page — Structure', () => {
 
   test('tablist has role="tablist" and accessible label', async ({ page }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const tablist = page.locator('[role="tablist"]');
     if (await tablist.count() > 0) {
@@ -225,7 +225,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
 
   test('instructor sees "Create Session" button', async ({ page }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // DEV_MODE user is SUPER_ADMIN which maps to isInstructor=true
     const createBtn = page.locator('[data-testid="create-session-btn"]');
@@ -244,7 +244,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
   }) => {
     await mockGraphQL(page, [makeSession({ status: 'SCHEDULED' })]);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Wait for the session grid or empty state
     await page
@@ -271,7 +271,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
   }) => {
     await mockGraphQL(page, [makeSession({ status: 'LIVE' })]);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('[data-testid="sessions-grid"], [data-testid="sessions-empty"]')
@@ -292,7 +292,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
     await mockGraphQL(page, [makeSession({ status: 'ENDED' })]);
     // Ended sessions are in the "Past" tab
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Switch to Past tab
     const pastTab = page.locator('[data-testid="tab-past"]');
@@ -312,7 +312,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page
       .locator('[data-testid="create-session-btn"]')
@@ -333,7 +333,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
 
   test('Create Session modal can be cancelled', async ({ page }) => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page
       .locator('[data-testid="create-session-btn"]')
@@ -369,7 +369,7 @@ test.describe('Live Sessions — STUDENT View', () => {
   }) => {
     await mockGraphQL(page, [makeSession({ status: 'LIVE' })]);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('[data-testid="sessions-grid"], [data-testid="sessions-empty"]')
@@ -392,7 +392,7 @@ test.describe('Live Sessions — STUDENT View', () => {
   }) => {
     await mockGraphQL(page, [makeSession({ status: 'SCHEDULED' })]);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page
       .locator('[data-testid="sessions-grid"], [data-testid="sessions-empty"]')
@@ -428,7 +428,7 @@ test.describe('Live Sessions — Mutations (write)', () => {
     await login(page);
     await mockGraphQL(page, []);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page
       .locator('[data-testid="create-session-btn"]')
@@ -502,7 +502,7 @@ test.describe('Live Sessions — Error and Empty States', () => {
     });
 
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1_000);
 
     const body = (await page.locator('body').textContent()) ?? '';
@@ -526,7 +526,7 @@ test.describe('Live Sessions — Error and Empty States', () => {
   }) => {
     await mockGraphQL(page, []);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.waitForTimeout(800);
 
@@ -555,7 +555,7 @@ test.describe('Live Sessions — Visual Regression', () => {
   }) => {
     await login(page);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(500);
 
@@ -575,7 +575,7 @@ test.describe('Live Sessions — Visual Regression', () => {
       makeSession({ status: 'LIVE', meetingName: 'Visual Test Live Session' }),
     ]);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(500);
 
@@ -590,7 +590,7 @@ test.describe('Live Sessions — Visual Regression', () => {
     await login(page);
     await mockGraphQL(page, []);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(800);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 

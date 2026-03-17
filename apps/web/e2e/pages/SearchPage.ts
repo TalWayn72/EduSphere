@@ -55,7 +55,7 @@ export class SearchPage {
   async goto(query?: string): Promise<void> {
     const url = query ? `/search?q=${encodeURIComponent(query)}` : '/search';
     await this.page.goto(url);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
     await expect(this.searchInput).toBeVisible({ timeout: 8_000 });
   }
 

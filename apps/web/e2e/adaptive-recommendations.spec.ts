@@ -26,7 +26,7 @@ test.describe('Adaptive Recommendations — DEV_MODE', () => {
 
   test('no [object Object] serialization in dashboard DOM', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('[object Object]');
@@ -36,7 +36,7 @@ test.describe('Adaptive Recommendations — DEV_MODE', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('N+1 query detected');
@@ -52,7 +52,7 @@ test.describe('Adaptive Recommendations — DEV_MODE', () => {
 
   test('recommendations visual snapshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot(
       'recommendations-with-reason-chromium-win32.png',
@@ -74,7 +74,7 @@ test.describe('Adaptive Recommendations — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
 
@@ -88,7 +88,7 @@ test.describe('Adaptive Recommendations — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('[Network]');
@@ -99,7 +99,7 @@ test.describe('Adaptive Recommendations — Live backend', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot(
       'recommendations-with-reason-chromium-win32.png',

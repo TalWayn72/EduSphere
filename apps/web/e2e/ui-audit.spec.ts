@@ -202,7 +202,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
     });
 
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Filter out known acceptable errors (e.g. GraphQL backend not running)
     const criticalErrors = consoleErrors.filter(
@@ -219,7 +219,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
 
   test('no raw i18n keys on dashboard page', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toMatch(/\bcommon\.error\b/);
@@ -229,7 +229,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
 
   test('profile page renders without crash overlay', async ({ page }) => {
     await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -244,7 +244,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
 
   test('courses page renders without crash overlay', async ({ page }) => {
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -258,7 +258,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
     await page.goto(`${BASE_URL}/knowledge-graph`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -275,7 +275,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
     await page.goto(`${BASE_URL}/collaboration`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -299,7 +299,7 @@ test.describe('UI Audit — DEV_MODE pages', () => {
     });
 
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Log errors for debugging but don't fail on GraphQL backend down in DEV_MODE
     if (networkErrors.length > 0) {

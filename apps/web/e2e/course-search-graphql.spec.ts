@@ -129,7 +129,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
   test('search page loads with empty state and suggestion chips', async ({ page }) => {
     await mockGraphQLSearch(page, []);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Suggestion chips are always rendered when the input is empty
     await expect(page.getByRole('button', { name: 'Talmud' })).toBeVisible({ timeout: 8_000 });
@@ -139,7 +139,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
   test('typing a query triggers searchCourses and shows course results', async ({ page }) => {
     await mockGraphQLSearch(page, MOCK_SEARCH_COURSES);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Focus the search input and type a query long enough to trigger the call (>= 2 chars)
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
@@ -158,7 +158,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
   test('course results show title and description snippet', async ({ page }) => {
     await mockGraphQLSearch(page, MOCK_SEARCH_COURSES);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Talmud');
@@ -173,7 +173,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
   test('Rambam query returns philosophy course from GraphQL mock', async ({ page }) => {
     await mockGraphQLSearch(page, MOCK_SEARCH_COURSES_RAMBAM);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Rambam');
@@ -186,7 +186,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
   test('clicking a course result navigates to /courses/:id', async ({ page }) => {
     await mockGraphQLSearch(page, MOCK_SEARCH_COURSES);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Talmud');
@@ -217,7 +217,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
   test('empty searchCourses result shows suggestion chips (not raw error)', async ({ page }) => {
     await mockGraphQLSearch(page, []);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('xyzzy');
@@ -258,7 +258,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
     });
 
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Talmud');
@@ -287,7 +287,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
     });
 
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('T');
@@ -304,7 +304,7 @@ test.describe('Course Search — Visual regression', () => {
   test('search results screenshot — course cards render cleanly', async ({ page }) => {
     await mockGraphQLSearch(page, MOCK_SEARCH_COURSES);
     await page.goto(`${BASE_URL}/search`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.waitFor({ timeout: 8_000 });

@@ -18,7 +18,7 @@ test.use({
 test.describe('Visual Regression @visual', () => {
   test('login page renders correctly', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('login.png', {
       maxDiffPixels: 100,
       animations: 'disabled',
@@ -27,7 +27,7 @@ test.describe('Visual Regression @visual', () => {
 
   test('courses list page renders correctly', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('courses-list.png', {
       maxDiffPixels: 100,
       animations: 'disabled',
@@ -36,7 +36,7 @@ test.describe('Visual Regression @visual', () => {
 
   test('course viewer renders correctly', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('course-viewer.png', {
       maxDiffPixels: 150,
       animations: 'disabled',
@@ -49,7 +49,7 @@ test.describe('Visual Regression @visual', () => {
 
   test('knowledge graph renders correctly', async ({ page }) => {
     await page.goto('/graph');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('knowledge-graph.png', {
       maxDiffPixels: 200, // Graph layouts may vary slightly
       animations: 'disabled',
@@ -58,7 +58,7 @@ test.describe('Visual Regression @visual', () => {
 
   test('RTL layout (Hebrew) renders correctly', async ({ page }) => {
     await page.goto('/courses?lang=he');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('courses-rtl.png', {
       maxDiffPixels: 100,
       animations: 'disabled',
@@ -68,7 +68,7 @@ test.describe('Visual Regression @visual', () => {
   test('mobile layout renders correctly', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('courses-mobile.png', {
       maxDiffPixels: 100,
       animations: 'disabled',

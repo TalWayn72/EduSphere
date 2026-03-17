@@ -96,7 +96,7 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
   test.beforeEach(async ({ page }) => {
     // Start from dashboard so header is fully rendered before each test
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('header')).toBeVisible({ timeout: 10_000 });
   });
 
@@ -108,7 +108,7 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
   }) => {
     // Sidebar has no "Learn" tab — navigate directly to content viewer
     await page.goto('/learn/content-1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/learn/');
 
@@ -178,7 +178,7 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
   }) => {
     // Annotations is not in the AppSidebar main nav — navigate directly
     await page.goto('/annotations');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/annotations');
 
@@ -224,7 +224,7 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
   }) => {
     // Chavruta/Collaboration is not in the AppSidebar main nav — navigate directly
     await page.goto('/collaboration');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/collaboration');
 
@@ -243,7 +243,7 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
   }) => {
     // Start from a different page so the navigation action is meaningful
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // AppSidebar nav.json: home → "Home"
     const dashboardLink = page
@@ -325,7 +325,7 @@ test.describe('Nav Audit — all nav destinations are error-free', () => {
   for (const { label, path, expectedText, urlPattern } of NAV_ROUTES) {
     test(`${label} — page loads without crash or SQL`, async ({ page }) => {
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // URL should be at the expected route (or match the pattern)
       if (urlPattern) {
@@ -353,7 +353,7 @@ test.describe('Nav Audit — all nav destinations are error-free', () => {
 test.describe('Nav Audit — user menu', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('user avatar button is visible in the header', async ({ page }) => {
@@ -445,7 +445,7 @@ test.describe('Nav Audit — user menu', () => {
 test.describe('Nav Audit — search button', () => {
   test('Search button is visible in the header', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Layout renders a search button with text "Search..." (from nav.json search key)
     // It has a ⌘K kbd hint. getByRole('button') with the search text finds it.
@@ -455,7 +455,7 @@ test.describe('Nav Audit — search button', () => {
 
   test('clicking the Search button navigates to /search', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const searchBtn = page.getByRole('button', { name: /Search\.\.\./i });
     await searchBtn.click();
@@ -466,7 +466,7 @@ test.describe('Nav Audit — search button', () => {
 
   test('Ctrl+K keyboard shortcut navigates to /search', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Layout.tsx adds a window keydown listener for Ctrl+K → navigate('/search')
     await page.keyboard.press('Control+k');
@@ -479,7 +479,7 @@ test.describe('Nav Audit — search button', () => {
     page,
   }) => {
     await page.goto('/search');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Search page renders an input for the query (no explicit type attribute)
     await expect(
@@ -497,7 +497,7 @@ test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)
     // "New Course" is in the Dashboard instructor tools section and CourseList,
     // not in the AppSidebar nav — navigate to a page that has it
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // CourseList renders a "New Course" button for instructors/admins
     const newCourseLink = page.getByRole('button', { name: /New Course/i }).first();
@@ -507,7 +507,7 @@ test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)
     } else {
       // Fallback: verify the /courses/new route is accessible
       await page.goto('/courses/new');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       expect(page.url()).toContain('/courses/new');
       await assertNoCrash(page);
     }
@@ -516,7 +516,7 @@ test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)
   test('clicking New Course navigates to /courses/new', async ({ page }) => {
     // Navigate directly since New Course is not in the sidebar nav
     await page.goto('/courses/new');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     expect(page.url()).toContain('/courses/new');
 
@@ -531,7 +531,7 @@ test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)
 test.describe('Nav Audit — EduSphere logo', () => {
   test('EduSphere brand name is visible in the sidebar', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // AppSidebar renders: <span data-testid="sidebar-brand-name">EduSphere</span>
     // (It is a span, not a link — the sidebar icon/name area is not a nav link)
@@ -545,7 +545,7 @@ test.describe('Nav Audit — EduSphere logo', () => {
   }) => {
     // Navigate to root "/" directly — SmartRoot redirects authenticated users to /dashboard
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // "/" authenticated → redirects to /dashboard (SmartRoot behaviour)
     await page.waitForURL(/\/(learn|dashboard|courses)/, { timeout: 10_000 });
@@ -558,7 +558,7 @@ test.describe('Nav Audit — EduSphere logo', () => {
 test.describe('Nav Audit — language selector (Settings page)', () => {
   test('Settings page has a language selector combobox', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // LanguageSelector uses shadcn/ui <Select> — renders role="combobox"
     await expect(page.getByRole('combobox').first()).toBeVisible({
@@ -570,7 +570,7 @@ test.describe('Nav Audit — language selector (Settings page)', () => {
     page,
   }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
 
@@ -583,7 +583,7 @@ test.describe('Nav Audit — language selector (Settings page)', () => {
 
   test('language selector shows English option', async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
     await expect(
@@ -618,7 +618,7 @@ test.describe('Nav Audit — SQL-free page verification across all routes', () =
   for (const route of SWEEP_ROUTES) {
     test(`No SQL appears on ${route}`, async ({ page }) => {
       await page.goto(route);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(800); // allow async error states to settle
 
       await assertNoSqlOnPage(page);

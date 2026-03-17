@@ -57,7 +57,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
   test('Model3DViewer canvas element is rendered', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(
       page.locator('[data-testid="model3d-canvas"]')
@@ -85,7 +85,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
 
     await interceptGraphQL(page);
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toContain('TypeError');
@@ -101,7 +101,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
     await page.route('**/three**', (route) => route.abort());
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const unavailable = page.locator('[data-testid="model3d-unavailable"]');
     const canvas = page.locator('[data-testid="model3d-canvas"]');
@@ -122,7 +122,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
     });
 
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Trigger a model upload via UI (if upload button exists)
     const uploadBtn = page.locator('[data-testid="model3d-upload-btn"]');
@@ -140,7 +140,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
   test('model3d canvas initial state visual regression', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('model3d-initial.png');
   });
@@ -148,7 +148,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
   test('model3d error state visual regression', async ({ page }) => {
     await page.route('**/graphql', (route) => route.fulfill({ json: { errors: [{ message: 'Not found' }] } }));
     await page.goto(LESSON_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('model3d-error-state.png');
   });

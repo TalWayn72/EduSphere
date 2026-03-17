@@ -106,7 +106,7 @@ test.describe('Stripe Invoices — Invoice List', () => {
     await mockInvoicesWithData(page);
     await login(page);
     await page.goto(INVOICE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('page loads with stripe invoice container', async ({ page }) => {
@@ -181,7 +181,7 @@ test.describe('Stripe Invoices — Generate Invoice Dialog', () => {
     await mockInvoicesWithData(page);
     await login(page);
     await page.goto(INVOICE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('clicking Generate Invoice opens dialog', async ({ page }) => {
@@ -240,7 +240,7 @@ test.describe('Stripe Invoices — Empty State', () => {
     await mockInvoicesEmpty(page);
     await login(page);
     await page.goto(INVOICE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('empty state shows "No invoices found"', async ({ page }) => {

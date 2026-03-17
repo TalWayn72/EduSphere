@@ -171,7 +171,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
         // Acceptable: page may show loading or other state; capture regardless
       });
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -220,7 +220,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -242,7 +242,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
     await pastTab.waitFor({ timeout: 8_000 }).catch(() => {});
     await pastTab.click();
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -260,7 +260,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
     await loginAndGoto(page, SESSIONS_URL);
 
     // Wait for page to settle then open the Create Session modal
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page.getByTestId('create-session-btn');
     const hasTrigger = await createBtn
@@ -325,7 +325,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
     await mockEmptySessions(page);
     await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await loginAndGoto(page, SESSIONS_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
     await expect(page).toHaveScreenshot('live-sessions-empty-state-dark.png', {
@@ -346,7 +346,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
     await expect(page).toHaveScreenshot('live-sessions-upcoming-list-dark.png', {
@@ -370,7 +370,7 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -402,7 +402,7 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -431,7 +431,7 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 
@@ -460,7 +460,7 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
     }));
 
     await loginAndGoto(page, `${BASE_URL}/sessions/nonexistent-session`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(400);
 

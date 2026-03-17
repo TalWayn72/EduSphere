@@ -326,7 +326,7 @@ test.describe('Knowledge Graph — BUG-043: clean error banner (no raw error str
     await page.route('**/graphql', (route) => route.abort('failed'));
 
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // 1. Clean error banner must appear
     const banner = page.getByTestId('graph-error-banner');
