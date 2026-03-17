@@ -3,6 +3,7 @@
  */
 import { Module } from '@nestjs/common';
 import { YauCounterService } from './yau-counter.service.js';
+import { YauEnforcementService } from './yau-enforcement.service.js';
 import { SubscriptionService } from './subscription.service.js';
 import { PilotService } from './pilot.service.js';
 import { TenantUsageService } from './tenant-usage.service.js';
@@ -13,6 +14,7 @@ import { BillingQueryResolver, BillingMutationResolver } from './billing.resolve
 @Module({
   providers: [
     YauCounterService,
+    YauEnforcementService,
     SubscriptionService,
     PilotService,
     TenantUsageService,
@@ -21,6 +23,6 @@ import { BillingQueryResolver, BillingMutationResolver } from './billing.resolve
     BillingQueryResolver,
     BillingMutationResolver,
   ],
-  exports: [YauCounterService, SubscriptionService, StripeInvoiceService],
+  exports: [YauCounterService, YauEnforcementService, SubscriptionService, StripeInvoiceService],
 })
 export class BillingModule {}
