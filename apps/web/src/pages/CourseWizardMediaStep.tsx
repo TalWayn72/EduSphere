@@ -146,6 +146,8 @@ export function CourseWizardMediaStep({
       .toPromise();
 
     if (presignResult.error || !presignResult.data?.getPresignedUploadUrl) {
+      const reason = presignResult.error?.message ?? 'No presigned URL returned';
+      console.error('[CourseWizardMediaStep] presign failed:', reason);
       updateEntry(index, {
         state: 'error',
         error: t('wizard.failedUploadUrl'),
@@ -309,7 +311,18 @@ export function CourseWizardMediaStep({
               {entry.state === 'error' && (
                 <div className="flex items-center gap-2 text-destructive text-xs">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  {entry.error}
+                  <span className="flex-1">{entry.error}</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => {
+                      updateEntry(i, { state: 'idle', progress: 0, error: undefined });
+                    }}
+                  >
+                    {t('wizard.retryUpload')}
+                  </Button>
                 </div>
               )}
 

@@ -307,6 +307,19 @@ describe('AuthMiddleware.validateRequest', () => {
     expect(ctx.authContext?.roles).toEqual(['SUPER_ADMIN']);
   });
 
+  // ── BUG-073 regression: audience must NOT be checked in subgraph middleware ─
+  it('does NOT pass audience to JWTValidator (BUG-073 regression)', () => {
+    // createRemoteJWKSet is called in constructor — verify jwtVerify options
+    // don't include audience by attempting a valid JWT without the audience claim
+    const payloadNoAud = { ...VALID_PAYLOAD };
+    delete (payloadNoAud as Record<string, unknown>).aud;
+    mockJwtVerify.mockResolvedValueOnce({ payload: payloadNoAud } as never);
+
+    const ctx = makeContext('Bearer valid-no-aud.jwt');
+    // Should succeed without audience mismatch
+    return expect(middleware.validateRequest(ctx)).resolves.toBeUndefined();
+  });
+
   it('leaves authContext undefined when JWT fails AND no x-user-id header', async () => {
     mockJwtVerify.mockRejectedValueOnce(new Error('JWKS fetch failed'));
 

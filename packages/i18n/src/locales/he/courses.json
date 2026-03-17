@@ -100,6 +100,7 @@
     "uploadComplete": "ההעלאה הושלמה",
     "upload": "העלה",
     "failedUploadUrl": "כשל בקבלת כתובת להעלאה",
+    "retryUpload": "נסה שוב",
     "networkError": "שגיאת רשת בזמן ההעלאה",
     "failedConfirm": "אישור ההעלאה נכשל"
   },

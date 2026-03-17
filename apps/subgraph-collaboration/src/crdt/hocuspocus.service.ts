@@ -36,10 +36,11 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
 
   constructor() {
     this.db = createDatabaseConnection();
+    // BUG-073 fix: subgraphs skip audience validation — gateway already
+    // validates JWT. clientId default 'edusphere-app' mismatched 'edusphere-web'.
     this.jwtValidator = new JWTValidator(
       keycloakConfig.url,
-      keycloakConfig.realm,
-      keycloakConfig.clientId
+      keycloakConfig.realm
     );
   }
 

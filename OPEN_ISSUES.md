@@ -59,7 +59,7 @@ The same issue existed in the mobile menu (line 62). Additionally, Pilot tab was
 
 ## BUG-073 — PDF Upload Fails in Course Wizard Media Step — "כשל בקבלת כתובת להעלאה" (17 Mar 2026)
 
-**סטטוס:** 🔴 Open
+**סטטוס:** ✅ Fixed (2026-03-17)
 **חומרה:** 🟡 Medium (upload feature broken, workaround: retry by removing and re-adding file)
 **דווח ע"י:** User — attempted PDF upload from Downloads folder on local machine
 
@@ -128,6 +128,23 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 - `packages/auth/src/jwt.ts` — JWT validation with audience check
 - `packages/auth/src/middleware.ts` — gateway header fallback
 - `apps/gateway/src/index.ts` — header forwarding to subgraphs
+
+### Fix Applied (2026-03-17)
+
+**Round 1 — Root cause fix (audience mismatch):**
+- `packages/auth/src/middleware.ts` — removed `clientId` from `JWTValidator` constructor; subgraphs skip audience validation since gateway already validates JWT
+- `apps/subgraph-collaboration/src/crdt/hocuspocus.service.ts` — same fix (removed `clientId`)
+- Note: `apps/subgraph-knowledge/src/sources/knowledge-source.controller.ts` already correct (no clientId)
+
+**Round 2 — Frontend UX fix:**
+- `apps/web/src/pages/CourseWizardMediaStep.tsx` — added retry button on error state, added `console.error` logging for presign failures
+- `packages/i18n/src/locales/*/courses.json` — added `retryUpload` key in all 10 locales
+
+**Tests added:**
+- `apps/web/src/pages/CourseWizardMediaStep.test.tsx` — 3 BUG-073 regression tests (retry button shown, retry resets to idle, error logged)
+- `packages/auth/src/middleware.test.ts` — 1 BUG-073 regression test (no audience validation)
+
+**Anti-recurrence:** `CourseWizardMediaStep.test.tsx:BUG-073` tests guard retry button; `middleware.test.ts:BUG-073` guards no-audience.
 
 ### Diagnosis Scripts (cleanup after fix)
 

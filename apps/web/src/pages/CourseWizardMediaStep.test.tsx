@@ -18,6 +18,7 @@ vi.mock('react-i18next', () => ({
         'wizard.confirming': 'Confirming...',
         'wizard.uploadComplete': 'Upload complete',
         'wizard.failedUploadUrl': 'Failed to get upload URL',
+        'wizard.retryUpload': 'Retry',
         'wizard.networkError': 'Network error',
         'wizard.failedConfirm': 'Failed to confirm upload',
       };
@@ -182,6 +183,91 @@ describe('CourseWizardMediaStep', () => {
     });
     fireEvent.change(fileInput);
     expect(screen.getByText('lecture.mp4')).toBeInTheDocument();
+  });
+
+  // ── BUG-073 regression tests ──────────────────────────────────────────────
+  it('shows retry button when upload fails (BUG-073)', async () => {
+    const { urqlClient } = await import('@/lib/urql-client');
+    vi.mocked(urqlClient.query).mockReturnValue({
+      toPromise: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'JWT audience invalid' },
+      }),
+    } as never);
+
+    const { container } = renderStep();
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['%PDF-1.0'], 'test.pdf', { type: 'application/pdf' });
+    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    fireEvent.change(fileInput);
+
+    // Click Upload
+    const uploadBtn = screen.getByRole('button', { name: /^Upload$/i });
+    fireEvent.click(uploadBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to get upload URL')).toBeInTheDocument();
+    });
+
+    // BUG-073: Retry button must exist
+    const retryBtn = screen.getByRole('button', { name: /Retry/i });
+    expect(retryBtn).toBeInTheDocument();
+  });
+
+  it('retry button resets entry to idle state (BUG-073)', async () => {
+    const { urqlClient } = await import('@/lib/urql-client');
+    vi.mocked(urqlClient.query).mockReturnValue({
+      toPromise: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'Network error' },
+      }),
+    } as never);
+
+    const { container } = renderStep();
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['data'], 'doc.pdf', { type: 'application/pdf' });
+    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    fireEvent.change(fileInput);
+
+    fireEvent.click(screen.getByRole('button', { name: /^Upload$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to get upload URL')).toBeInTheDocument();
+    });
+
+    // Click Retry — should go back to idle with Upload button visible
+    fireEvent.click(screen.getByRole('button', { name: /Retry/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^Upload$/i })).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Failed to get upload URL')).not.toBeInTheDocument();
+  });
+
+  it('logs error to console.error when presign fails (BUG-073)', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { urqlClient } = await import('@/lib/urql-client');
+    vi.mocked(urqlClient.query).mockReturnValue({
+      toPromise: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'Audience mismatch' },
+      }),
+    } as never);
+
+    const { container } = renderStep();
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['x'], 'f.pdf', { type: 'application/pdf' });
+    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    fireEvent.change(fileInput);
+    fireEvent.click(screen.getByRole('button', { name: /^Upload$/i }));
+
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[CourseWizardMediaStep] presign failed:',
+        'Audience mismatch'
+      );
+    });
+    consoleSpy.mockRestore();
   });
 
   it('clears richDocSaved timer on unmount (no memory leak)', () => {

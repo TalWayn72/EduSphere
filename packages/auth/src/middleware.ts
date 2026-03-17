@@ -15,10 +15,12 @@ export class AuthMiddleware {
   private readonly jwtValidator: JWTValidator;
 
   constructor() {
+    // BUG-073 fix: subgraphs skip audience validation — the gateway already
+    // validates the JWT. Passing clientId caused permanent audience mismatch
+    // ('edusphere-app' default vs frontend's 'edusphere-web' aud claim).
     this.jwtValidator = new JWTValidator(
       keycloakConfig.url,
-      keycloakConfig.realm,
-      keycloakConfig.clientId
+      keycloakConfig.realm
     );
     this.logger.log(`JWT Validator initialized: ${keycloakConfig.issuer}`);
   }

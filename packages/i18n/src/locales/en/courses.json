@@ -100,6 +100,7 @@
     "uploadComplete": "Upload complete",
     "upload": "Upload",
     "failedUploadUrl": "Failed to get upload URL",
+    "retryUpload": "Retry",
     "networkError": "Network error during upload",
     "failedConfirm": "Failed to confirm upload"
   },
