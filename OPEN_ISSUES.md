@@ -1,6 +1,86 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 17 מרץ 2026 (BUG-072 — persistedExchange causes false "server unavailable" banner)
+**תאריך עדכון:** 17 מרץ 2026 (BUG-073 — PDF upload fails in course wizard media step)
+
+---
+
+## BUG-073 — PDF Upload Fails in Course Wizard Media Step — "כשל בקבלת כתובת להעלאה" (17 Mar 2026)
+
+**סטטוס:** 🔴 Open
+**חומרה:** 🟡 Medium (upload feature broken, workaround: retry by removing and re-adding file)
+**דווח ע"י:** User — attempted PDF upload from Downloads folder on local machine
+
+### תיאור הבעיה
+
+When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course creation wizard step 3 (מדיה), clicking "העלה" triggers `getPresignedUploadUrl` GraphQL query which fails. The UI shows red error: "כשל בקבלת כתובת להעלאה" (Failed to get upload URL).
+
+### שורש הבעיה — Multi-Factor
+
+**Backend: VERIFIED WORKING** — Direct test with valid JWT returns presigned URL correctly (tested via `scripts/test-presign.mjs`). MinIO healthy, all subgraphs running, gateway routing works.
+
+**1. Content Subgraph JWT Audience Mismatch (Architecture Risk)**
+- `packages/config/src/keycloak.ts:4` defaults `clientId` to `'edusphere-app'`
+- Frontend authenticates with `client_id=edusphere-web` → JWT `aud: "edusphere-web"`
+- `KEYCLOAK_CLIENT_ID` env var is empty in container → subgraph uses default `'edusphere-app'`
+- `packages/auth/src/jwt.ts:92` `jwtVerify()` **always fails** with audience mismatch for browser JWTs
+- Falls back to gateway-forwarded headers (`x-user-id`, `x-tenant-id`) at `packages/auth/src/middleware.ts:73-89`
+- **Risk:** If gateway header forwarding breaks for any reason, ALL authenticated queries to ALL subgraphs fail
+
+**2. No Retry Mechanism (UX Bug)**
+- `apps/web/src/pages/CourseWizardMediaStep.tsx:148-154` — on presign failure, state → `'error'`
+- No "retry" button exists — user must remove file (X) and re-add
+- Error message is generic `t('wizard.failedUploadUrl')` — actual `presignResult.error` is discarded
+- No `console.error` logging — impossible to diagnose from browser DevTools
+
+**3. Transient Error Vulnerability**
+- Steps 1-2 of wizard are purely client-side (no server calls)
+- If user spends extended time on steps 1-2, JWT may expire
+- Token refresh (60s interval, 70s buffer) should prevent this, but edge cases exist
+- Single network glitch = permanent failure (no retry path)
+
+### Discovery Waves
+
+**Wave 1 — Exact match:**
+- `apps/web/src/pages/CourseWizardMediaStep.tsx:124-154` — `uploadFile()` presign error handling
+
+**Wave 2 — Similar patterns (all presigned URL consumers):**
+
+| # | File | Same Issue |
+|---|------|------------|
+| 1 | `apps/web/src/pages/CourseWizardMediaStep.tsx` | No retry, generic error, no logging |
+| 2 | `apps/web/src/components/visual-anchoring/AssetUploader.tsx` | Same presigned URL pattern |
+| 3 | `apps/web/src/components/scorm/ScormImportDialog.tsx` | Same pattern (XHR-based) |
+| 4 | `apps/web/src/components/editor/RichDocumentEditor.tsx` | Same `PRESIGNED_UPLOAD_QUERY` |
+
+**Wave 3 — Class of bug:**
+- **Audience mismatch:** ALL 6 subgraphs use `keycloakConfig.clientId` default `'edusphere-app'` → JWT validation always fails, always relies on gateway fallback
+- **Generic upload errors:** All upload components swallow actual error details
+- **No retry pattern:** None of the upload components have retry functionality
+
+### Fix Recommendations
+
+| Priority | Fix | File(s) |
+|----------|-----|---------|
+| P0 | Set `KEYCLOAK_CLIENT_ID=edusphere-web` in container env OR remove audience validation for gateway-proxied subgraphs | `packages/config/src/keycloak.ts`, Docker env |
+| P1 | Add retry button: when `entry.state === 'error'`, render button that resets state to `'idle'` | `apps/web/src/pages/CourseWizardMediaStep.tsx` |
+| P1 | Log actual error: `console.error('[MediaUpload] presign failed:', presignResult.error)` | Same file |
+| P2 | Add token freshness check before upload: `if (!isAuthenticated()) { /* show re-login prompt */ }` | Same file |
+| P2 | Apply retry + logging pattern to all Wave 2 files | 4 files listed above |
+
+### קבצים מושפעים
+
+- `apps/web/src/pages/CourseWizardMediaStep.tsx` — upload flow, error handling
+- `apps/web/src/lib/urql-client.ts` — (already fixed by user) network error logging added
+- `packages/config/src/keycloak.ts` — audience mismatch source
+- `packages/auth/src/jwt.ts` — JWT validation with audience check
+- `packages/auth/src/middleware.ts` — gateway header fallback
+- `apps/gateway/src/index.ts` — header forwarding to subgraphs
+
+### Diagnosis Scripts (cleanup after fix)
+
+- `scripts/test-presign.mjs` — end-to-end presigned URL test
+- `scripts/decode-jwt.mjs` — JWT claim inspector
+- `scripts/reproduce-upload-bug.mjs` — Playwright reproduction (incomplete)
 
 ---
 
