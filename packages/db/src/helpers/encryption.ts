@@ -2,6 +2,7 @@
  * PII Encryption Helpers — AES-256-GCM
  * SI-3: All PII fields must be encrypted at rest using these helpers.
  * Key derivation: HMAC-SHA256(ENCRYPTION_MASTER_KEY, tenantId) → 32-byte tenant key
+ * SEC-4: Version prefix enables key rotation — format: `v<N>:<iv>:<tag>:<ciphertext>`
  */
 import {
   createCipheriv,
@@ -15,15 +16,25 @@ const IV_LENGTH = 12; // 96-bit IV for GCM
 const AUTH_TAG_LENGTH = 16;
 const KEY_LENGTH = 32;
 
+// SEC-4: Key version prefix. When ENCRYPTION_MASTER_KEY is rotated, bump this
+// to 'v2' and keep the old key available via ENCRYPTION_MASTER_KEY_V1 env var.
+const CURRENT_KEY_VERSION = 'v1';
+
 /**
  * Derive a tenant-specific 32-byte encryption key from the master key.
  * Uses HMAC-SHA256(masterKey, tenantId) for key separation between tenants.
  */
-export function deriveTenantKey(tenantId: string): Buffer {
-  const masterKey = process.env['ENCRYPTION_MASTER_KEY'];
+export function deriveTenantKey(tenantId: string, keyVersion?: string): Buffer {
+  const version = keyVersion ?? CURRENT_KEY_VERSION;
+  // Support key rotation: v1 uses ENCRYPTION_MASTER_KEY, v2 uses ENCRYPTION_MASTER_KEY_V2, etc.
+  const envVar =
+    version === CURRENT_KEY_VERSION
+      ? 'ENCRYPTION_MASTER_KEY'
+      : `ENCRYPTION_MASTER_KEY_${version.toUpperCase()}`;
+  const masterKey = process.env[envVar] ?? process.env['ENCRYPTION_MASTER_KEY'];
   if (!masterKey || masterKey.length < 32) {
     throw new Error(
-      'ENCRYPTION_MASTER_KEY must be set and at least 32 characters'
+      `${envVar} must be set and at least 32 characters`
     );
   }
   return createHmac('sha256', Buffer.from(masterKey, 'utf8'))
@@ -34,8 +45,7 @@ export function deriveTenantKey(tenantId: string): Buffer {
 
 /**
  * Encrypt a plaintext string using AES-256-GCM.
- * Output format: <iv_hex>:<authTag_hex>:<ciphertext_hex>
- * Returns null if input is null/undefined.
+ * Output format: v1:<iv_hex>:<authTag_hex>:<ciphertext_hex>
  */
 export function encryptField(value: string, tenantKey: Buffer): string {
   const iv = randomBytes(IV_LENGTH);
@@ -49,23 +59,33 @@ export function encryptField(value: string, tenantKey: Buffer): string {
   ]);
 
   const authTag = cipher.getAuthTag();
-  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`;
+  return `${CURRENT_KEY_VERSION}:${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`;
 }
 
 /**
  * Decrypt an AES-256-GCM encrypted field.
- * Input format: <iv_hex>:<authTag_hex>:<ciphertext_hex>
- * Returns null if input is null/undefined.
+ * Supports both versioned (v1:iv:tag:data) and legacy (iv:tag:data) formats.
  */
 export function decryptField(ciphertext: string, tenantKey: Buffer): string {
   const parts = ciphertext.split(':');
-  if (parts.length !== 3) {
+
+  let ivHex: string;
+  let authTagHex: string;
+  let encryptedHex: string;
+
+  if (parts.length === 4 && parts[0]!.startsWith('v')) {
+    // Versioned format: v1:<iv>:<tag>:<data>
+    // If key version differs from current, caller should provide the correct tenantKey
+    [, ivHex, authTagHex, encryptedHex] = parts as [string, string, string, string];
+  } else if (parts.length === 3) {
+    // Legacy format (pre-SEC-4): <iv>:<tag>:<data>
+    [ivHex, authTagHex, encryptedHex] = parts as [string, string, string];
+  } else {
     throw new Error(
-      'Invalid encrypted field format — expected iv:authTag:ciphertext'
+      'Invalid encrypted field format — expected [v<N>:]iv:authTag:ciphertext'
     );
   }
 
-  const [ivHex, authTagHex, encryptedHex] = parts as [string, string, string];
   const iv = Buffer.from(ivHex, 'hex');
   const authTag = Buffer.from(authTagHex, 'hex');
   const encryptedData = Buffer.from(encryptedHex, 'hex');
@@ -79,6 +99,33 @@ export function decryptField(ciphertext: string, tenantKey: Buffer): string {
     decipher.update(encryptedData),
     decipher.final(),
   ]).toString('utf8');
+}
+
+/**
+ * Extract key version from a ciphertext string.
+ * Returns 'v1' for versioned format, 'legacy' for unversioned.
+ */
+export function getKeyVersion(ciphertext: string): string {
+  const parts = ciphertext.split(':');
+  if (parts.length === 4 && parts[0]!.startsWith('v')) {
+    return parts[0]!;
+  }
+  return 'legacy';
+}
+
+/**
+ * Re-encrypt a ciphertext from one key version to the current version.
+ * Used during key rotation migrations.
+ */
+export function migrateEncryptedField(
+  ciphertext: string,
+  tenantId: string
+): string {
+  const version = getKeyVersion(ciphertext);
+  const oldKey = deriveTenantKey(tenantId, version === 'legacy' ? CURRENT_KEY_VERSION : version);
+  const plaintext = decryptField(ciphertext, oldKey);
+  const newKey = deriveTenantKey(tenantId);
+  return encryptField(plaintext, newKey);
 }
 
 /**

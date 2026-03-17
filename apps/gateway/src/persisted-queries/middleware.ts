@@ -4,7 +4,7 @@
  * and only allows pre-registered query hashes (APQ protocol).
  * OWASP API4 — prevents untrusted clients from sending arbitrary queries.
  */
-import { registerQuery, lookupQuery, isRegistered } from './registry.js';
+import { registerQuerySync, lookupQuerySync } from './registry.js';
 
 const PERSISTED_QUERIES_ONLY =
   process.env['PERSISTED_QUERIES_ONLY'] === 'true' ||
@@ -61,15 +61,16 @@ export function applyPersistedQueryMiddleware(
 
   // Client sends both hash and full query → register and proceed
   if (hash && query) {
-    registerQuery(hash, query);
+    registerQuerySync(hash, query);
     return null;
   }
 
   // Client sends only the hash (standard APQ flow)
   if (hash) {
-    if (isRegistered(hash)) {
+    const storedQuery = lookupQuerySync(hash);
+    if (storedQuery) {
       // Substitute stored query so Yoga sees a full document
-      body.query = lookupQuery(hash);
+      body.query = storedQuery;
       return null;
     }
     // Hash not in registry → APQ miss (client must retry with full query)
