@@ -1,8 +1,9 @@
 # syntax=docker/dockerfile:1
-ARG NODE_VERSION=20
-ARG PNPM_VERSION=10
+# Pinned 2026-03-17 — was node:20-alpine, pnpm@10
+ARG NODE_VERSION=20.19.0
+ARG PNPM_VERSION=10.6.5
 
-FROM node:${NODE_VERSION}-alpine AS builder
+FROM node:${NODE_VERSION}-alpine3.21 AS builder
 ARG PNPM_VERSION
 RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit
 WORKDIR /app
@@ -21,7 +22,8 @@ ARG VITE_APQ_ENABLED=false
 
 RUN pnpm --filter @edusphere/web build
 
-FROM nginx:alpine AS runner
+# Pinned 2026-03-17 — was nginx:alpine
+FROM nginx:1.27.4-alpine3.21 AS runner
 # Upgrade libpng to patch CVE-2026-25646 (heap buffer overflow, HIGH)
 RUN apk upgrade --no-cache libpng
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html

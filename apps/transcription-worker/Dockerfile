@@ -1,8 +1,9 @@
 # syntax=docker/dockerfile:1
-ARG NODE_VERSION=22
-ARG PNPM_VERSION=10
+# Pinned 2026-03-17 — was node:22-alpine, pnpm@10
+ARG NODE_VERSION=22.14.0
+ARG PNPM_VERSION=10.6.5
 
-FROM node:${NODE_VERSION}-alpine AS base
+FROM node:${NODE_VERSION}-alpine3.21 AS base
 ARG PNPM_VERSION
 RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit
 WORKDIR /app

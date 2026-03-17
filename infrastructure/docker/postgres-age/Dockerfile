@@ -2,7 +2,8 @@
 # Used in GitHub Actions workflows as the test database service.
 # NOTE: This is the CI variant — no corporate CA cert required.
 #       For production/local dev, use infrastructure/docker/Dockerfile.postgres.
-FROM postgres:18-alpine
+# Pinned 2026-03-17 — was postgres:18-alpine
+FROM postgres:18.3-alpine3.21
 
 LABEL maintainer="EduSphere Team"
 LABEL description="CI test image: PostgreSQL 18 + Apache AGE 1.7.0 + pgvector 0.8.1"

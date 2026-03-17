@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", ":dependencyDashboard"],
+  "extends": ["config:base", ":dependencyDashboard", ":pinDigestsDisabled"],
   "schedule": ["before 6am on monday"],
   "packageRules": [
     {
@@ -22,10 +22,28 @@
         "drizzle-orm"
       ],
       "stabilityDays": 7
+    },
+    {
+      "description": "Docker base images — auto-update patch/minor with 3-day stability window",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true,
+      "labels": ["dependencies", "docker"],
+      "stabilityDays": 3
+    },
+    {
+      "description": "Docker base images — major updates require manual review",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "docker", "major-update"]
     }
   ],
   "ignorePaths": ["**/node_modules/**", ".claude/**"],
   "pnpm": {
     "minimumReleaseAge": "3 days"
+  },
+  "dockerfile": {
+    "fileMatch": ["(^|/)Dockerfile[^/]*$", "(^|/)Dockerfile\\.[^/]*$"]
   }
 }

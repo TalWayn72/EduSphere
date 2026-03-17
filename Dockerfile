@@ -5,7 +5,8 @@
 # Last updated: February 2026
 # ═══════════════════════════════════════════════════════════════
 
-FROM ubuntu:22.04
+# Pinned 2026-03-17 — was ubuntu:22.04
+FROM ubuntu:22.04.5
 
 LABEL maintainer="EduSphere Team"
 LABEL description="EduSphere all-in-one: PG18 + AGE 1.7.0 + pgvector 0.8.1 + Keycloak + NATS + MinIO"
@@ -86,7 +87,8 @@ RUN cd /tmp && \
     tar -xJf "$NODEFILE" && \
     mv "${NODEFILE%.tar.xz}" /opt/nodejs && \
     rm -f "$NODEFILE" && \
-    npm install -g pnpm@latest && \
+    # Pinned 2026-03-17 — was pnpm@latest
+    npm install -g pnpm@10.6.5 && \
     npm cache clean --force
 
 # ═══════════════════════════════════════════════════════════════
@@ -128,7 +130,8 @@ RUN cd /opt && \
 # STAGE 6: Ollama (copied from official image — avoids corporate proxy failures)
 # ═══════════════════════════════════════════════════════════════
 
-COPY --from=ollama/ollama:latest /usr/bin/ollama /usr/local/bin/ollama
+# Pinned 2026-03-17 — was ollama/ollama:latest
+COPY --from=ollama/ollama:0.6.2 /usr/bin/ollama /usr/local/bin/ollama
 RUN mkdir -p /var/log/ollama
 
 # ═══════════════════════════════════════════════════════════════

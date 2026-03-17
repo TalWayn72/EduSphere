@@ -1,4 +1,5 @@
-FROM python:3.11-slim
+# Pinned 2026-03-17 — was python:3.11-slim
+FROM python:3.11.12-slim-bookworm
 
 WORKDIR /app
 

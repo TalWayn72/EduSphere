@@ -4,7 +4,8 @@
 # Build for GPU:  docker build --target cuda -t edusphere/whisper-server:cuda .
 
 # ── Stage: cpu-base ───────────────────────────────────────────────
-FROM python:3.11-slim AS cpu-base
+# Pinned 2026-03-17 — was python:3.11-slim
+FROM python:3.11.12-slim-bookworm AS cpu-base
 
 WORKDIR /app
 
@@ -37,6 +38,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 CMD ["python", "main.py"]
 
 # ── Stage: cuda (NVIDIA GPU) ──────────────────────────────────────
+# Pinned 2026-03-17 — was nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04 (already version-pinned)
 FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04 AS cuda
 
 WORKDIR /app
