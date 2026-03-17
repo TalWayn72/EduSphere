@@ -81,6 +81,13 @@ async function seed() {
           email: 'instructor@example.com',
           display_name: 'Demo Instructor',
           role: 'INSTRUCTOR',
+          preferences: {
+            locale: 'he',
+            theme: 'system',
+            emailNotifications: true,
+            pushNotifications: true,
+            isPublicProfile: false,
+          },
         },
         {
           id: '00000000-0000-0000-0000-000000000003',

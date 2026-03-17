@@ -138,6 +138,20 @@ export default defineConfig({
             id.includes('node_modules/dayjs')
           )
             return 'vendor-dates';
+          // Real-time collaboration: TipTap collab extensions + Yjs CRDT + Hocuspocus
+          // MUST be checked BEFORE general @tiptap/ rule so that
+          // @tiptap/extension-collaboration* lands in vendor-collab (not vendor-tiptap).
+          // This prevents vendor-tiptap → vendor-collab dependency, which caused
+          // "Cannot access 'Hn' before initialization" TDZ errors on every TipTap page.
+          if (
+            id.includes('node_modules/@tiptap/extension-collaboration') ||
+            id.includes('node_modules/@tiptap/y-tiptap') ||
+            id.includes('node_modules/yjs') ||
+            id.includes('node_modules/y-') ||
+            id.includes('node_modules/@hocuspocus/') ||
+            id.includes('node_modules/lib0/')
+          )
+            return 'vendor-collab';
           // Tiptap rich-text editor + ProseMirror + lowlight syntax highlight
           // (only loaded on RichDocumentPage / DocumentAnnotationPage)
           if (
@@ -148,14 +162,6 @@ export default defineConfig({
             id.includes('node_modules/fault/')
           )
             return 'vendor-tiptap';
-          // Real-time collaboration (Yjs CRDT + Hocuspocus)
-          if (
-            id.includes('node_modules/yjs') ||
-            id.includes('node_modules/y-') ||
-            id.includes('node_modules/@hocuspocus/') ||
-            id.includes('node_modules/lib0/')
-          )
-            return 'vendor-collab';
           // Charts (recharts + d3-*)
           if (
             id.includes('node_modules/recharts') ||
