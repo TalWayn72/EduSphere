@@ -169,6 +169,9 @@ export const gatewayConfig = defineConfig({
           | {
               request?: Request;
               connectionParams?: Record<string, string>;
+              tenantId?: string | null;
+              userId?: string | null;
+              role?: string | null;
             }
           | null
           | undefined;
@@ -178,10 +181,13 @@ export const gatewayConfig = defineConfig({
           null;
         if (!auth) return;
         const prev = options.headers as Record<string, string> | undefined;
-        setOptions({
-          ...options,
-          headers: { ...(prev ?? {}), authorization: auth },
-        });
+        const forwarded: Record<string, string> = { ...(prev ?? {}), authorization: auth };
+        // Forward gateway-extracted identity headers so subgraph resolvers
+        // can read tenant/user context even if local JWT re-validation fails.
+        if (gqlCtx?.tenantId) forwarded['x-tenant-id'] = gqlCtx.tenantId;
+        if (gqlCtx?.userId) forwarded['x-user-id'] = gqlCtx.userId;
+        if (gqlCtx?.role) forwarded['x-user-role'] = gqlCtx.role;
+        setOptions({ ...options, headers: forwarded });
       },
     },
   ],

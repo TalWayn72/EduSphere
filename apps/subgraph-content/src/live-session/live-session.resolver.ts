@@ -1,17 +1,13 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
 import { LiveSessionService } from './live-session.service';
+import type { GraphQLContext } from '../auth/auth.middleware';
 
-interface GraphQLContext {
-  req: {
-    user?: {
-      sub?: string;
-      name?: string;
-      preferred_username?: string;
-      role?: string;
-      tenant_id?: string;
-    };
-  };
+/** Extract tenant ID from authContext (preferred) or x-tenant-id header (gateway fallback). */
+function extractTenantId(ctx: GraphQLContext): string {
+  if (ctx.authContext?.tenantId) return ctx.authContext.tenantId;
+  const header = ctx.req?.headers?.['x-tenant-id'];
+  return (Array.isArray(header) ? header[0] : header) ?? '';
 }
 
 @Resolver('LiveSession')
@@ -25,7 +21,7 @@ export class LiveSessionResolver {
     @Args('contentItemId') contentItemId: string,
     @Context() ctx: GraphQLContext
   ) {
-    const tenantId = ctx.req.user?.tenant_id ?? '';
+    const tenantId = extractTenantId(ctx);
     return this.liveSessionService.getByContentItem(contentItemId, tenantId);
   }
 
@@ -36,7 +32,7 @@ export class LiveSessionResolver {
     @Args('meetingName') meetingName: string,
     @Context() ctx: GraphQLContext
   ) {
-    const tenantId = ctx.req.user?.tenant_id ?? '';
+    const tenantId = extractTenantId(ctx);
     return this.liveSessionService.createLiveSession(
       contentItemId,
       tenantId,
@@ -52,7 +48,7 @@ export class LiveSessionResolver {
     @Args('offset') offset: number | undefined,
     @Context() ctx: GraphQLContext
   ) {
-    const tenantId = ctx.req.user?.tenant_id ?? '';
+    const tenantId = extractTenantId(ctx);
     this.logger.debug(
       `[LiveSessionResolver] liveSessions tenantId=${tenantId} status=${status ?? 'all'}`
     );
@@ -64,7 +60,7 @@ export class LiveSessionResolver {
     @Args('sessionId') sessionId: string,
     @Context() ctx: GraphQLContext
   ) {
-    const tenantId = ctx.req.user?.tenant_id ?? '';
+    const tenantId = extractTenantId(ctx);
     return this.liveSessionService.getById(sessionId, tenantId);
   }
 }

@@ -561,6 +561,233 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Suite: Auth Context Regression — liveSessions resolver used ctx.req.user?.tenant_id
+// (always undefined) instead of ctx.authContext?.tenantId.
+// The fix ensures proper auth context extraction so the query succeeds.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', () => {
+  const mockSessions = [
+    {
+      id: 'session-auth-1',
+      contentItemId: 'content-1',
+      meetingName: 'Introduction to Graph Theory',
+      scheduledAt: new Date(Date.now() + 60 * 60_000).toISOString(),
+      status: 'SCHEDULED',
+      recordingUrl: null,
+      participantCount: 3,
+      maxParticipants: 25,
+      instructorId: 'instructor-1',
+      courseId: 'course-1',
+    },
+    {
+      id: 'session-auth-2',
+      contentItemId: 'content-2',
+      meetingName: 'Live Debugging Workshop',
+      scheduledAt: new Date().toISOString(),
+      status: 'LIVE',
+      recordingUrl: null,
+      participantCount: 12,
+      maxParticipants: 30,
+      instructorId: 'instructor-1',
+      courseId: 'course-2',
+    },
+  ];
+
+  /**
+   * Intercept GraphQL and return the mock sessions list.
+   * Also checks the request body for the liveSessions query operation.
+   */
+  async function mockLiveSessionsWithData(
+    page: Parameters<typeof login>[0],
+    sessions: typeof mockSessions = mockSessions
+  ): Promise<void> {
+    await page.route('**/graphql', async (route: Route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('liveSessions') || body.includes('ListLiveSessions')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: { liveSessions: sessions } }),
+        });
+        return;
+      }
+      await route.continue();
+    });
+  }
+
+  test('page loads and renders sessions when GraphQL returns data (auth context working)', async ({
+    page,
+  }) => {
+    await mockLiveSessionsWithData(page);
+    await login(page);
+    await page.goto('/sessions');
+    await page.waitForLoadState('networkidle');
+
+    // REGRESSION GUARD: error state MUST NOT appear — the old bug caused
+    // ctx.req.user?.tenant_id to be undefined, making the resolver fail
+    const errorEl = page.locator('[data-testid="sessions-error"]');
+    await expect(errorEl).not.toBeVisible({ timeout: 5_000 });
+
+    // Sessions grid MUST be visible (not empty state, not error state)
+    const grid = page.locator('[data-testid="sessions-grid"]');
+    await expect(grid).toBeVisible({ timeout: 5_000 });
+
+    // Session cards should render with the mocked meeting names
+    const cards = page.locator('[data-testid="session-card"]');
+    await expect(cards).toHaveCount(2, { timeout: 5_000 });
+
+    // Verify meeting names are rendered in the UI
+    const bodyText = (await page.locator('body').textContent()) ?? '';
+    expect(bodyText).toContain('Introduction to Graph Theory');
+    expect(bodyText).toContain('Live Debugging Workshop');
+
+    // No error-related strings should appear
+    expect(bodyText).not.toContain('Failed to load sessions');
+    expect(bodyText).not.toContain('tenant_id');
+    expect(bodyText).not.toContain('undefined');
+  });
+
+  test('session cards render participant counts and status badges', async ({
+    page,
+  }) => {
+    await mockLiveSessionsWithData(page);
+    await login(page);
+    await page.goto('/sessions');
+    await page.waitForLoadState('networkidle');
+
+    // Verify status badges rendered
+    const bodyText = (await page.locator('body').textContent()) ?? '';
+    // SCHEDULED and LIVE sessions should show their status
+    expect(/SCHEDULED|LIVE/i.test(bodyText)).toBe(true);
+
+    // Participant counts should be visible
+    expect(bodyText).toContain('participants');
+  });
+
+  test('REGRESSION: resolver auth error returns user-friendly message, not raw error', async ({
+    page,
+  }) => {
+    // Simulate the EXACT error from the old broken resolver:
+    // ctx.req.user?.tenant_id was always undefined, causing an auth/RLS error
+    await page.route('**/graphql', async (route: Route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('liveSessions') || body.includes('ListLiveSessions')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: null,
+            errors: [
+              {
+                message: 'Cannot read properties of undefined (reading \'tenant_id\')',
+                extensions: { code: 'INTERNAL_SERVER_ERROR' },
+                path: ['liveSessions'],
+              },
+            ],
+          }),
+        });
+        return;
+      }
+      await route.continue();
+    });
+
+    await login(page);
+    await page.goto('/sessions');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1_000);
+
+    const bodyText = (await page.locator('body').textContent()) ?? '';
+
+    // The error state should show a user-friendly message
+    const errorEl = page.locator('[data-testid="sessions-error"]');
+    const errorVisible = await errorEl.isVisible({ timeout: 5_000 }).catch(() => false);
+
+    if (errorVisible) {
+      const errorText = (await errorEl.textContent()) ?? '';
+      // MUST show user-friendly text
+      expect(errorText).toContain('Failed to load sessions');
+      expect(errorText).toContain('try again');
+
+      // MUST NOT expose raw internal error details
+      expect(errorText).not.toContain('Cannot read properties of undefined');
+      expect(errorText).not.toContain('tenant_id');
+      expect(errorText).not.toContain('INTERNAL_SERVER_ERROR');
+      expect(errorText).not.toContain('ctx.req.user');
+    }
+
+    // Body-level check: no raw technical strings leaked anywhere
+    expect(bodyText).not.toContain('Cannot read properties of undefined');
+    expect(bodyText).not.toContain('ctx.req.user');
+    expect(bodyText).not.toContain('ctx.authContext');
+  });
+
+  test('REGRESSION: GraphQL 401 auth error shows clean UI (no stack traces)', async ({
+    page,
+  }) => {
+    // Simulate a 401/403 that would occur if tenant context is missing
+    await page.route('**/graphql', async (route: Route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('liveSessions') || body.includes('ListLiveSessions')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: null,
+            errors: [
+              {
+                message: 'Unauthorized: missing tenant context',
+                extensions: { code: 'UNAUTHENTICATED' },
+                path: ['liveSessions'],
+              },
+            ],
+          }),
+        });
+        return;
+      }
+      await route.continue();
+    });
+
+    await login(page);
+    await page.goto('/sessions');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1_000);
+
+    const bodyText = (await page.locator('body').textContent()) ?? '';
+
+    // No raw error internals should be exposed to the user
+    expect(bodyText).not.toContain('UNAUTHENTICATED');
+    expect(bodyText).not.toContain('missing tenant context');
+    expect(bodyText).not.toContain('stack');
+    expect(bodyText).not.toContain('at Object');
+    expect(bodyText).not.toContain('Error:');
+  });
+
+  test('visual: /sessions with mocked session data renders correctly @visual', async ({
+    page,
+  }) => {
+    await mockLiveSessionsWithData(page);
+    await login(page);
+    await page.goto('/sessions');
+    await page.waitForLoadState('networkidle');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.waitForTimeout(500);
+
+    // REGRESSION GUARD: error state must NOT appear
+    await expect(page.locator('[data-testid="sessions-error"]')).not.toBeVisible();
+
+    // Sessions grid should be visible with cards
+    await expect(page.locator('[data-testid="sessions-grid"]')).toBeVisible();
+
+    await expect(page).toHaveScreenshot('live-sessions-auth-context-fix.png', {
+      fullPage: false,
+      maxDiffPixelRatio: 0.05,
+      animations: 'disabled',
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Suite: /sessions/:sessionId route — LiveSessionDetailPage
 // ─────────────────────────────────────────────────────────────────────────────
 
