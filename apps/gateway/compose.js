@@ -128,6 +128,53 @@ function normalizeCoreSdl(sdl) {
   return out;
 }
 
+/**
+ * Strip social types/queries from knowledge's SDL.
+ * Core subgraph owns socialFeed, socialRecommendations, SocialFeedItem,
+ * SocialRecommendation. Knowledge's baked image still reflects these from
+ * its .graphql files. Remove the conflicting definitions so composition
+ * succeeds without rebuilding the Docker image.
+ */
+function normalizeKnowledgeSdl(sdl) {
+  // Remove SocialFeedItem type block
+  let out = sdl.replace(
+    /"""[^"]*"""\s*type SocialFeedItem\s*\{[^}]*\}/gs,
+    ''
+  );
+  out = out.replace(/type SocialFeedItem\s*\{[^}]*\}/gs, '');
+  // Remove SocialRecommendation type block
+  out = out.replace(
+    /"""[^"]*"""\s*type SocialRecommendation\s*\{[^}]*\}/gs,
+    ''
+  );
+  out = out.replace(/type SocialRecommendation\s*\{[^}]*\}/gs, '');
+  // Remove SocialVerb enum block
+  out = out.replace(/"""[^"]*"""\s*enum SocialVerb\s*\{[^}]*\}/gs, '');
+  out = out.replace(/enum SocialVerb\s*\{[^}]*\}/gs, '');
+  // Remove socialFeed and socialRecommendations from extend type Query blocks
+  out = out.replace(/\s*socialFeed[^\n]*/g, '');
+  out = out.replace(/\s*socialRecommendations[^\n]*/g, '');
+  // Remove skillGapAnalysis from knowledge (owned by agent subgraph)
+  // Knowledge's baked image still reflects the old skillGapAnalysis query
+  out = out.replace(/\s*"""[^"]*"""\s*skillGapAnalysis[^\n]*/gs, '');
+  out = out.replace(/\s*skillGapAnalysis[^\n]*/g, '');
+  // Remove SkillGapReport type block (conflicts with agent's SkillGapAnalysis)
+  out = out.replace(
+    /"""[^"]*"""\s*type SkillGapReport\s*\{[^}]*\}/gs,
+    ''
+  );
+  out = out.replace(/type SkillGapReport\s*\{[^}]*\}/gs, '');
+  // Remove SkillGapItem type block (part of knowledge's skill gap feature)
+  out = out.replace(
+    /"""[^"]*"""\s*type SkillGapItem\s*\{[^}]*\}/gs,
+    ''
+  );
+  out = out.replace(/type SkillGapItem\s*\{[^}]*\}/gs, '');
+  // Remove empty extend type Query {} blocks left behind
+  out = out.replace(/extend\s+type\s+Query\s*\{\s*\}/g, '');
+  return out;
+}
+
 async function fetchSDL(name, url) {
   try {
     const res = await fetch(url, {
@@ -139,6 +186,7 @@ async function fetchSDL(name, url) {
     if (data.errors) throw new Error(data.errors[0].message);
     let sdl = normalizeRequiresScopes(data.data._service.sdl);
     if (name === 'core') sdl = normalizeCoreSdl(sdl);
+    if (name === 'knowledge') sdl = normalizeKnowledgeSdl(sdl);
     return sdl;
   } catch (err) {
     console.error(`  FAIL ${name}: ${err.message}`);

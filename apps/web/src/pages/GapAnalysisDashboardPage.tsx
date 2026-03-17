@@ -1,7 +1,7 @@
 /**
  * GapAnalysisDashboardPage — Knowledge gap analysis for ORG_ADMIN / SUPER_ADMIN.
  * Route: /admin/gap-analysis
- * Wired to skillGapAnalysis + skillProfiles queries from subgraph-knowledge.
+ * Wired to skillGapReport + skillProfiles queries from subgraph-knowledge.
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,7 @@ export function GapAnalysisDashboardPage() {
     pause: !mounted,
   });
 
-  const [gapResult] = useQuery<{ skillGapAnalysis: SkillGapReport }>({
+  const [gapResult] = useQuery<{ skillGapReport: SkillGapReport }>({
     query: SKILL_GAP_ANALYSIS_QUERY,
     variables: { roleId: selectedRoleId },
     pause: !mounted || !selectedRoleId,
@@ -79,7 +79,7 @@ export function GapAnalysisDashboardPage() {
 
   const { fetching: profilesFetching, error: profilesError } = profilesResult;
   const profiles = profilesResult.data?.skillProfiles ?? [];
-  const report = gapResult.data?.skillGapAnalysis;
+  const report = gapResult.data?.skillGapReport;
   const gapFetching = gapResult.fetching;
   const gapError = gapResult.error;
   const isLoading = profilesFetching || gapFetching;

@@ -46,7 +46,7 @@ const MOCK_REPORT = {
   ],
 };
 
-// Use call-count based approach: first call = skillProfiles, second call = skillGapAnalysis
+// Use call-count based approach: first call = skillProfiles, second call = skillGapReport
 let queryCallCount = 0;
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal();
@@ -58,7 +58,7 @@ vi.mock('urql', async (importOriginal) => {
       if (queryCallCount % 2 === 1) {
         return [{ fetching: false, data: { skillProfiles: MOCK_PROFILES } }, vi.fn()];
       }
-      return [{ fetching: false, data: { skillGapAnalysis: MOCK_REPORT } }, vi.fn()];
+      return [{ fetching: false, data: { skillGapReport: MOCK_REPORT } }, vi.fn()];
     }),
   };
 });

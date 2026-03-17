@@ -37,12 +37,12 @@ describe('SkillGapResolver', () => {
     );
   });
 
-  describe('skillGapAnalysis()', () => {
+  describe('skillGapReport()', () => {
     it('delegates to skillGapService.analyzeSkillGap', async () => {
       const mockResult = { gaps: [], masteredConcepts: [] };
       mockAnalyzeSkillGap.mockResolvedValue(mockResult);
 
-      const result = await resolver.skillGapAnalysis('role-1', makeCtx());
+      const result = await resolver.skillGapReport('role-1', makeCtx());
 
       expect(mockAnalyzeSkillGap).toHaveBeenCalledWith(
         'user-1',
@@ -58,13 +58,13 @@ describe('SkillGapResolver', () => {
         authContext: { userId: null, tenantId: 'tenant-1', roles: ['STUDENT'] },
       };
       await expect(
-        resolver.skillGapAnalysis('role-1', ctx as never)
+        resolver.skillGapReport('role-1', ctx as never)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when authContext missing', async () => {
       await expect(
-        resolver.skillGapAnalysis('role-1', {} as never)
+        resolver.skillGapReport('role-1', {} as never)
       ).rejects.toThrow(UnauthorizedException);
     });
   });

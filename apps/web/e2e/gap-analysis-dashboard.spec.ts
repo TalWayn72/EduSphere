@@ -78,8 +78,8 @@ function mockGapWithData(page: Page): Promise<void> {
     if (q.includes('skillProfiles') || op === 'SkillProfiles') {
       return JSON.stringify({ data: { skillProfiles: MOCK_PROFILES } });
     }
-    if (q.includes('skillGapAnalysis') || op === 'SkillGapAnalysis') {
-      return JSON.stringify({ data: { skillGapAnalysis: MOCK_GAP_REPORT } });
+    if (q.includes('skillGapReport') || op === 'SkillGapReport') {
+      return JSON.stringify({ data: { skillGapReport: MOCK_GAP_REPORT } });
     }
     return null;
   });
@@ -91,8 +91,8 @@ function mockGapEmpty(page: Page): Promise<void> {
     if (q.includes('skillProfiles') || op === 'SkillProfiles') {
       return JSON.stringify({ data: { skillProfiles: [] } });
     }
-    if (q.includes('skillGapAnalysis') || op === 'SkillGapAnalysis') {
-      return JSON.stringify({ data: { skillGapAnalysis: null } });
+    if (q.includes('skillGapReport') || op === 'SkillGapReport') {
+      return JSON.stringify({ data: { skillGapReport: null } });
     }
     return null;
   });

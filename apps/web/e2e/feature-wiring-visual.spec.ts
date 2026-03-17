@@ -70,7 +70,7 @@ function mockAllData(page: Page): Promise<void> {
     const q = (body.query as string | undefined) ?? '';
     if (q.includes('autoGradingResults')) return JSON.stringify({ data: { autoGradingResults: MOCK_GRADING } });
     if (q.includes('skillProfiles')) return JSON.stringify({ data: { skillProfiles: MOCK_PROFILES } });
-    if (q.includes('skillGapAnalysis')) return JSON.stringify({ data: { skillGapAnalysis: MOCK_GAP_REPORT } });
+    if (q.includes('skillGapReport')) return JSON.stringify({ data: { skillGapReport: MOCK_GAP_REPORT } });
     if (q.includes('pendingAnnotationProposals')) return JSON.stringify({ data: { pendingAnnotationProposals: MOCK_PROPOSALS } });
     if (q.includes('myPartnerDashboard')) return JSON.stringify({ data: { myPartnerDashboard: MOCK_PARTNER } });
     if (q.includes('invoices') && !q.includes('generate')) return JSON.stringify({ data: { invoices: MOCK_INVOICES } });
@@ -83,7 +83,7 @@ function mockAllEmpty(page: Page): Promise<void> {
     const q = (body.query as string | undefined) ?? '';
     if (q.includes('autoGradingResults')) return JSON.stringify({ data: { autoGradingResults: [] } });
     if (q.includes('skillProfiles')) return JSON.stringify({ data: { skillProfiles: [] } });
-    if (q.includes('skillGapAnalysis')) return JSON.stringify({ data: { skillGapAnalysis: null } });
+    if (q.includes('skillGapReport')) return JSON.stringify({ data: { skillGapReport: null } });
     if (q.includes('pendingAnnotationProposals')) return JSON.stringify({ data: { pendingAnnotationProposals: [] } });
     if (q.includes('myPartnerDashboard')) return JSON.stringify({ data: { myPartnerDashboard: null } });
     if (q.includes('invoices') && !q.includes('generate')) return JSON.stringify({ data: { invoices: [] } });

@@ -1,14 +1,14 @@
 import { gql } from 'urql';
 
 // ─── F-006: Skill Gap Analysis ────────────────────────────────────────────────
-// skillGapAnalysis, skillProfiles, createSkillProfile not yet in supergraph.
+// skillGapReport, skillProfiles, createSkillProfile not yet in supergraph.
 // Excluded from codegen until the supergraph is recomposed with the full
 // subgraph-knowledge SDL (which includes skill-gap.resolver.ts).
 // Used by: SkillGapWidget.tsx
 
 export const SKILL_GAP_ANALYSIS_QUERY = gql`
-  query SkillGapAnalysis($roleId: ID!) {
-    skillGapAnalysis(roleId: $roleId) {
+  query SkillGapReport($roleId: ID!) {
+    skillGapReport(roleId: $roleId) {
       roleId
       roleName
       totalRequired
