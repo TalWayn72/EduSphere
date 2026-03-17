@@ -5,13 +5,13 @@ import type { CourseDetailData, LessonSummary } from './types';
 
 export const MOCK_LESSONS_FALLBACK: LessonSummary[] = [
   {
-    id: 'lesson-demo-1',
+    id: 'ad0b6070-9b21-4601-8046-ff4292dc73b1',
     title: 'שיעור 1 — מבוא למשנה',
     type: 'THEMATIC',
     status: 'PUBLISHED',
   },
   {
-    id: 'lesson-demo-2',
+    id: 'b370a695-7f26-4512-8a3a-4232245bba55',
     title: 'שיעור 2 — מבנה הגמרא',
     type: 'SEQUENTIAL',
     status: 'READY',
@@ -26,29 +26,29 @@ export const MOCK_COURSE_FALLBACK: CourseDetailData = {
   thumbnailUrl: '📚',
   estimatedHours: 8,
   isPublished: true,
-  instructorId: 'instructor-demo',
+  instructorId: '00000000-0000-0000-0000-000000000001',
   modules: [
     {
-      id: 'mod-demo-1',
+      id: 'a0000000-0000-0000-0000-000000000001',
       title: 'Module 1: Foundations',
       orderIndex: 0,
       contentItems: [
         {
-          id: 'content-1',
+          id: 'b0000000-0000-0000-0000-000000000001',
           title: 'Introduction Video',
           contentType: 'VIDEO',
           duration: 600,
           orderIndex: 0,
         },
         {
-          id: 'content-2',
+          id: 'b0000000-0000-0000-0000-000000000002',
           title: 'Course Overview',
           contentType: 'PDF',
           duration: null,
           orderIndex: 1,
         },
         {
-          id: 'content-3',
+          id: 'b0000000-0000-0000-0000-000000000003',
           title: 'Foundations Quiz',
           contentType: 'QUIZ',
           duration: null,
@@ -57,12 +57,12 @@ export const MOCK_COURSE_FALLBACK: CourseDetailData = {
       ],
     },
     {
-      id: 'mod-demo-2',
+      id: 'a0000000-0000-0000-0000-000000000002',
       title: 'Module 2: Core Concepts',
       orderIndex: 1,
       contentItems: [
         {
-          id: 'content-4',
+          id: 'b0000000-0000-0000-0000-000000000004',
           title: 'Deep Dive Video',
           contentType: 'VIDEO',
           duration: 1200,
@@ -71,12 +71,12 @@ export const MOCK_COURSE_FALLBACK: CourseDetailData = {
       ],
     },
     {
-      id: 'mod-demo-3',
+      id: 'a0000000-0000-0000-0000-000000000003',
       title: 'Module 3: Advanced Topics',
       orderIndex: 2,
       contentItems: [
         {
-          id: 'content-5',
+          id: 'b0000000-0000-0000-0000-000000000005',
           title: 'Advanced Lecture',
           contentType: 'VIDEO',
           duration: 900,

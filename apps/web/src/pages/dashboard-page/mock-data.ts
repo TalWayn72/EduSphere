@@ -2,21 +2,21 @@ import type { MockCourse, MockActivity, MockMasteryItem } from './types';
 
 export const MOCK_IN_PROGRESS: MockCourse[] = [
   {
-    id: 'c-1',
+    id: 'cc000000-0000-0000-0000-000000000002',
     title: 'Introduction to Talmud Study',
     progress: 72,
     lastStudied: '2 hours ago',
     instructor: 'Dr. Cohen',
   },
   {
-    id: 'c-2',
+    id: '22222222-2222-2222-2222-222222222221',
     title: 'Advanced Chavruta Techniques',
     progress: 45,
     lastStudied: '1 day ago',
     instructor: 'Prof. Levi',
   },
   {
-    id: 'c-3',
+    id: 'ea2e14c1-424e-4bcd-a209-13fb0c7ce84c',
     title: 'Knowledge Graph Navigation',
     progress: 28,
     lastStudied: '3 days ago',
@@ -26,14 +26,14 @@ export const MOCK_IN_PROGRESS: MockCourse[] = [
 
 export const MOCK_RECOMMENDED: MockCourse[] = [
   {
-    id: 'c-4',
+    id: '72d6a4b2-3728-4ce0-b748-f03e90e39d19',
     title: 'Mishnah: Laws of Damages',
     progress: 0,
     lastStudied: 'Not started',
     instructor: 'Dr. Shapiro',
   },
   {
-    id: 'c-5',
+    id: '7d795770-c774-4faf-ab0c-332b8a7be8df',
     title: 'Biblical Hebrew Foundations',
     progress: 0,
     lastStudied: 'Not started',

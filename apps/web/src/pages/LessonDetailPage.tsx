@@ -9,6 +9,8 @@ import { login } from '@/lib/auth';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const AUTH_ERROR_PATTERNS = [
   'unauthorized',
   'authentication required',
@@ -63,16 +65,26 @@ export function LessonDetailPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
+  const isValidId = lessonId ? UUID_RE.test(lessonId) : false;
+
   const [{ data, fetching, error }] = useQuery<LessonData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
-    pause: !mounted || !lessonId,
+    pause: !mounted || !lessonId || !isValidId,
   });
 
   if (!mounted || fetching) {
     return (
       <Layout>
         <LoadingSpinner />
+      </Layout>
+    );
+  }
+
+  if (!isValidId) {
+    return (
+      <Layout>
+        <div className="p-6 text-muted-foreground">השיעור לא נמצא</div>
       </Layout>
     );
   }

@@ -8,7 +8,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...actual,
-    useParams: vi.fn(() => ({ courseId: 'course-1', lessonId: 'lesson-1' })),
+    useParams: vi.fn(() => ({ courseId: 'cc000000-0000-0000-0000-000000000002', lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1' })),
     useNavigate: vi.fn(() => mockNavigate),
   };
 });
@@ -53,6 +53,7 @@ vi.mock('@/lib/auth', () => ({
 
 import { LessonDetailPage } from './LessonDetailPage';
 import * as urql from 'urql';
+import * as rrdom from 'react-router-dom';
 
 const MOCK_LESSON = {
   id: 'lesson-1',
@@ -93,6 +94,7 @@ function makeQuery(overrides: Record<string, unknown> = {}) {
 describe('LessonDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(rrdom.useParams).mockReturnValue({ courseId: 'cc000000-0000-0000-0000-000000000002', lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1' });
     vi.mocked(urql.useQuery).mockReturnValue(makeQuery());
   });
 
@@ -242,7 +244,7 @@ describe('LessonDetailPage', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /פתח Pipeline/ }));
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/courses/course-1/lessons/lesson-1/pipeline'
+      '/courses/cc000000-0000-0000-0000-000000000002/lessons/ad0b6070-9b21-4601-8046-ff4292dc73b1/pipeline'
     );
   });
 
@@ -253,7 +255,19 @@ describe('LessonDetailPage', () => {
       </MemoryRouter>
     );
     fireEvent.click(screen.getByRole('button', { name: /חזרה לקורס/ }));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/cc000000-0000-0000-0000-000000000002');
+  });
+
+  // ── Invalid UUID guard ─────────────────────────────────────────────────────
+
+  it('shows "השיעור לא נמצא" for non-UUID lessonId (e.g. "lesson-demo-1")', () => {
+    vi.mocked(rrdom.useParams).mockReturnValue({ courseId: 'cc000000-0000-0000-0000-000000000002', lessonId: 'lesson-demo-1' });
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('השיעור לא נמצא')).toBeInTheDocument();
   });
 
   // ── Auth error handling ─────────────────────────────────────────────────────

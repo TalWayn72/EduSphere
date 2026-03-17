@@ -27,7 +27,7 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
   {
     id: 'pn-1',
     label: 'Free Will & Determinism',
-    courseId: 'course-1',
+    courseId: 'cc000000-0000-0000-0000-000000000002',
     courseName: 'Jewish Philosophy 101',
     contentTimestamp: 312,
     excerpt: 'Maimonides argues free will is essential to moral responsibility...',
@@ -36,7 +36,7 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
   {
     id: 'pn-2',
     label: 'Rambam on Providence',
-    courseId: 'course-1',
+    courseId: 'cc000000-0000-0000-0000-000000000002',
     courseName: 'Jewish Philosophy 101',
     contentTimestamp: 540,
     excerpt: 'Divine providence operates through intellect, not arbitrary will...',
@@ -45,7 +45,7 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
   {
     id: 'pn-3',
     label: 'Spinoza\'s Determinism',
-    courseId: 'course-2',
+    courseId: '22222222-2222-2222-2222-222222222221',
     courseName: 'Early Modern Philosophy',
     excerpt: 'Everything follows from God\'s nature with the same necessity...',
     createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
@@ -53,7 +53,7 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
   {
     id: 'pn-4',
     label: 'Kant — Autonomy & Duty',
-    courseId: 'course-2',
+    courseId: '22222222-2222-2222-2222-222222222221',
     courseName: 'Early Modern Philosophy',
     excerpt: 'Moral law is self-legislated; freedom is presupposed by rational action...',
     createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -61,7 +61,7 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
   {
     id: 'pn-5',
     label: 'Teshuvah & Change',
-    courseId: 'course-3',
+    courseId: 'ea2e14c1-424e-4bcd-a209-13fb0c7ce84c',
     courseName: 'Halakha and Ethics',
     contentTimestamp: 90,
     excerpt: 'Repentance presupposes genuine capacity for change — a form of freedom...',
@@ -70,7 +70,7 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
   {
     id: 'pn-6',
     label: 'Compatibilism',
-    courseId: 'course-2',
+    courseId: '22222222-2222-2222-2222-222222222221',
     courseName: 'Early Modern Philosophy',
     excerpt: 'Freedom and determinism can coexist if "free" means acting without coercion...',
     createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
