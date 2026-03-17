@@ -28,6 +28,8 @@ const JWKS_URL =
   process.env.KEYCLOAK_JWKS_URL ||
   'http://localhost:8080/realms/edusphere/protocol/openid-connect/certs';
 const KEYCLOAK_ISSUER = `${process.env.KEYCLOAK_URL || 'http://localhost:8080'}/realms/${process.env.KEYCLOAK_REALM || 'edusphere'}`;
+// SEC-3: JWT audience check — validates token was issued for our client
+const KEYCLOAK_AUDIENCE = process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web';
 
 const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
 
@@ -135,18 +137,24 @@ const gateway = createGatewayRuntime({
 
           // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
           // non-production environments. NEVER active when NODE_ENV=production.
+          // SEC-1: requires ALLOW_DEV_TOKEN=true. Grants STUDENT by default.
           if (
             process.env.NODE_ENV !== 'production' &&
+            process.env['ALLOW_DEV_TOKEN'] === 'true' &&
             token === 'dev-token-mock-jwt'
           ) {
+            const APP_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER']);
+            const devRole = process.env['DEV_TOKEN_ROLE'] ?? 'STUDENT';
             resolvedTenantId = '00000000-0000-0000-0000-000000000000';
             userId = '00000000-0000-0000-0000-000000000001';
-            role = 'SUPER_ADMIN';
+            role = APP_ROLES.has(devRole) ? devRole : 'STUDENT';
             isAuthenticated = true;
+            logger.warn({ role }, 'SEC-1: dev-token bypass active — for E2E tests only');
           } else {
             try {
               const { payload } = await jwtVerify(token, JWKS, {
                 issuer: KEYCLOAK_ISSUER,
+                audience: KEYCLOAK_AUDIENCE,
               });
               resolvedTenantId = (payload['tenant_id'] as string) ?? null;
               userId = payload.sub ?? null;

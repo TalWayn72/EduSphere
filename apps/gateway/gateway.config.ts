@@ -21,6 +21,8 @@ const KEYCLOAK_URL =
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'edusphere';
 const JWKS_URL = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`;
 const KEYCLOAK_ISSUER = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
+// SEC-3: JWT audience validation
+const KEYCLOAK_AUDIENCE = process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web';
 const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
 const DEV_TOKEN = 'dev-token-mock-jwt';
 
@@ -208,15 +210,19 @@ export const gatewayConfig = defineConfig({
 
         if (auth?.startsWith('Bearer ')) {
           const token = auth.slice(7);
-          // Dev bypass: accept mock token in non-production environments
-          if (token === DEV_TOKEN && !isProduction) {
+          // SEC-1: Dev bypass requires ALLOW_DEV_TOKEN=true. Grants STUDENT by default.
+          if (token === DEV_TOKEN && !isProduction && process.env['ALLOW_DEV_TOKEN'] === 'true') {
+            const APP_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER']);
+            const devRole = process.env['DEV_TOKEN_ROLE'] ?? 'STUDENT';
             userId = '00000000-0000-0000-0000-000000000001';
             resolvedTenantId = '00000000-0000-0000-0000-000000000000';
-            role = 'SUPER_ADMIN';
+            role = APP_ROLES.has(devRole) ? devRole : 'STUDENT';
           } else {
             try {
+              // SEC-3: JWT audience validation
               const { payload } = await jwtVerify(token, JWKS, {
                 issuer: KEYCLOAK_ISSUER,
+                audience: KEYCLOAK_AUDIENCE,
               });
               userId = (payload.sub as string) ?? null;
               resolvedTenantId =

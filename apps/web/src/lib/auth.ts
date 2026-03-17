@@ -17,7 +17,7 @@ export const DEV_MODE =
 const keycloakConfig = {
   url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
   realm: import.meta.env.VITE_KEYCLOAK_REALM || 'edusphere',
-  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'edusphere-app',
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'edusphere-web',
 };
 
 export const keycloak = DEV_MODE ? null : new Keycloak(keycloakConfig);

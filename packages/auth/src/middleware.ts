@@ -15,12 +15,13 @@ export class AuthMiddleware {
   private readonly jwtValidator: JWTValidator;
 
   constructor() {
-    // BUG-073 fix: subgraphs skip audience validation — the gateway already
-    // validates the JWT. Passing clientId caused permanent audience mismatch
-    // ('edusphere-app' default vs frontend's 'edusphere-web' aud claim).
+    // SEC-3: Subgraphs now validate JWT audience. The Keycloak Client-ID
+    // default was fixed from 'edusphere-app' to 'edusphere-web' (packages/config).
+    // BUG-073 root cause was the mismatch, not audience validation itself.
     this.jwtValidator = new JWTValidator(
       keycloakConfig.url,
-      keycloakConfig.realm
+      keycloakConfig.realm,
+      keycloakConfig.clientId
     );
     this.logger.log(`JWT Validator initialized: ${keycloakConfig.issuer}`);
   }
@@ -72,9 +73,27 @@ export class AuthMiddleware {
       // headers (x-user-id, x-tenant-id, x-user-role), use those to populate
       // authContext. This ensures auth works even when subgraph JWT validation
       // fails (e.g. Keycloak JWKS endpoint temporarily unreachable).
+      // SEC-1/BE-7: Header fallback NEVER grants SUPER_ADMIN — an attacker who
+      // can reach a subgraph directly could spoof x-user-role: SUPER_ADMIN.
+      // Only JWT-validated tokens may grant SUPER_ADMIN.
       const userId = this.extractHeader(context, 'x-user-id');
       const tenantId = this.extractHeader(context, 'x-tenant-id');
-      const role = this.extractHeader(context, 'x-user-role');
+      const rawRole = this.extractHeader(context, 'x-user-role');
+      // Strip SUPER_ADMIN from header fallback — must be proven via JWT
+      const ALLOWED_HEADER_ROLES = new Set([
+        'ORG_ADMIN',
+        'INSTRUCTOR',
+        'STUDENT',
+        'RESEARCHER',
+      ]);
+      const role =
+        rawRole && ALLOWED_HEADER_ROLES.has(rawRole) ? rawRole : undefined;
+      if (rawRole === 'SUPER_ADMIN') {
+        this.logger.error(
+          `[AuthMiddleware] SEC-1: SUPER_ADMIN role stripped from header fallback — userId=${userId}, tenantId=${tenantId}. ` +
+            'SUPER_ADMIN must be proven via JWT, not headers.'
+        );
+      }
       if (userId) {
         context.authContext = {
           userId,
@@ -83,10 +102,10 @@ export class AuthMiddleware {
           roles: role ? [role as AuthContext['roles'][number]] : [],
           scopes: [],
           tenantId: tenantId ?? undefined,
-          isSuperAdmin: role === 'SUPER_ADMIN',
+          isSuperAdmin: false, // NEVER grant isSuperAdmin via header fallback
         };
         this.logger.warn(
-          `[AuthMiddleware] Using gateway-forwarded headers fallback: userId=${userId}, tenantId=${tenantId}`
+          `[AuthMiddleware] Using gateway-forwarded headers fallback: userId=${userId}, tenantId=${tenantId}, role=${role ?? 'none'}`
         );
       }
     }

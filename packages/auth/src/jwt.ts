@@ -69,22 +69,25 @@ export class JWTValidator {
     // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
     // non-production environments so Playwright tests work without a live Keycloak.
     // NEVER active in production (NODE_ENV === 'production').
+    // SEC-1 hardening: requires ALLOW_DEV_TOKEN=true AND non-production env.
+    // Grants STUDENT role by default — SUPER_ADMIN requires DEV_TOKEN_ROLE=SUPER_ADMIN.
     if (
       process.env.NODE_ENV !== 'production' &&
+      process.env['ALLOW_DEV_TOKEN'] === 'true' &&
       token === 'dev-token-mock-jwt'
     ) {
+      const devRole = (process.env['DEV_TOKEN_ROLE'] as UserRole) ?? 'STUDENT';
+      const validRole = UserRole.safeParse(devRole).success ? devRole : 'STUDENT';
       return {
-        // ID matches the seeded super.admin@edusphere.dev row in the users table.
-        // Run `pnpm --filter @edusphere/db seed` to ensure this user exists.
         userId: '00000000-0000-0000-0000-000000000001',
         email: 'super.admin@edusphere.dev',
         username: 'super.admin',
         firstName: 'Super',
         lastName: 'Admin',
-        roles: ['SUPER_ADMIN'],
+        roles: [validRole as UserRole],
         scopes: [],
         tenantId: '00000000-0000-0000-0000-000000000000',
-        isSuperAdmin: true,
+        isSuperAdmin: validRole === 'SUPER_ADMIN',
       };
     }
 

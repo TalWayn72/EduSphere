@@ -1,7 +1,7 @@
 export const keycloakConfig = {
   url: process.env['KEYCLOAK_URL'] ?? 'http://localhost:8080',
   realm: process.env['KEYCLOAK_REALM'] ?? 'edusphere',
-  clientId: process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-app',
+  clientId: process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web',
   get jwksUrl(): string {
     return `${this.url}/realms/${this.realm}/protocol/openid-connect/certs`;
   },
