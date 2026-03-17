@@ -1,20 +1,25 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
+const mockGetCurrentUser = vi.fn(() => ({
+  id: 'u-1',
+  username: 'alice',
+  email: 'alice@example.com',
+  firstName: 'Alice',
+  lastName: 'Smith',
+  tenantId: 't-1',
+  role: 'STUDENT',
+  scopes: ['read'],
+}));
+
 vi.mock('@/lib/auth', () => ({
-  getCurrentUser: vi.fn(() => ({
-    id: 'u-1',
-    username: 'alice',
-    email: 'alice@example.com',
-    firstName: 'Alice',
-    lastName: 'Smith',
-    tenantId: 't-1',
-    role: 'STUDENT',
-    scopes: ['read'],
-  })),
+  getCurrentUser: (...args: unknown[]) => mockGetCurrentUser(...args),
   DEV_MODE: true,
   logout: vi.fn(),
 }));
@@ -65,10 +70,26 @@ const renderAt = (path = '/dashboard') =>
     </MemoryRouter>
   );
 
+/** Helper to set the mocked user role before rendering */
+const setRole = (role: string) => {
+  mockGetCurrentUser.mockReturnValue({
+    id: 'u-1',
+    username: 'alice',
+    email: 'alice@example.com',
+    firstName: 'Alice',
+    lastName: 'Smith',
+    tenantId: 't-1',
+    role,
+    scopes: ['read'],
+  });
+};
+
 describe('AppSidebar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    // Default: STUDENT role
+    setRole('STUDENT');
   });
 
   it('renders with data-testid="app-sidebar"', () => {
@@ -76,7 +97,7 @@ describe('AppSidebar', () => {
     expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
   });
 
-  it('renders all main nav items', () => {
+  it('renders learning group items for STUDENT', () => {
     renderAt();
     expect(screen.getByTestId('nav-item-home')).toBeInTheDocument();
     expect(screen.getByTestId('nav-item-myCourses')).toBeInTheDocument();
@@ -85,6 +106,86 @@ describe('AppSidebar', () => {
     expect(screen.getByTestId('nav-item-aiTutor')).toBeInTheDocument();
     expect(screen.getByTestId('nav-item-liveSessions')).toBeInTheDocument();
   });
+
+  it('renders social group items for STUDENT', () => {
+    renderAt();
+    expect(screen.getByTestId('nav-item-discussions')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-socialFeed')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-findPeople')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-groupChallenges')).toBeInTheDocument();
+  });
+
+  // ── Role-based group visibility ──────────────────────────────────────────
+
+  it('hides Teaching and Analytics groups for STUDENT role', () => {
+    renderAt();
+    expect(screen.queryByTestId('nav-group-teaching')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('nav-group-analytics')).not.toBeInTheDocument();
+  });
+
+  it('shows Teaching group for INSTRUCTOR role', () => {
+    setRole('INSTRUCTOR');
+    renderAt();
+    expect(screen.getByTestId('nav-group-teaching')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-quizBuilder')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-assessments')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-peerReview')).toBeInTheDocument();
+  });
+
+  it('shows Analytics group for INSTRUCTOR role', () => {
+    setRole('INSTRUCTOR');
+    renderAt();
+    expect(screen.getByTestId('nav-group-analytics')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-managerDashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-cohortInsights')).toBeInTheDocument();
+  });
+
+  it('shows Analytics group for RESEARCHER role', () => {
+    setRole('RESEARCHER');
+    renderAt();
+    expect(screen.getByTestId('nav-group-analytics')).toBeInTheDocument();
+    // Researcher should NOT see Teaching group
+    expect(screen.queryByTestId('nav-group-teaching')).not.toBeInTheDocument();
+  });
+
+  it('shows all groups for ORG_ADMIN role', () => {
+    setRole('ORG_ADMIN');
+    renderAt();
+    expect(screen.getByTestId('nav-group-learning')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-social')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-teaching')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-analytics')).toBeInTheDocument();
+  });
+
+  it('shows all groups for SUPER_ADMIN role', () => {
+    setRole('SUPER_ADMIN');
+    renderAt();
+    expect(screen.getByTestId('nav-group-learning')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-social')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-teaching')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-analytics')).toBeInTheDocument();
+  });
+
+  // ── Group headings ───────────────────────────────────────────────────────
+
+  it('renders group headings when expanded', () => {
+    setRole('SUPER_ADMIN');
+    renderAt();
+    expect(screen.getByTestId('nav-group-heading-learning')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-heading-social')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-heading-teaching')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-group-heading-analytics')).toBeInTheDocument();
+  });
+
+  it('hides group headings when collapsed', () => {
+    setRole('SUPER_ADMIN');
+    renderAt();
+    fireEvent.click(screen.getByTestId('sidebar-collapse-toggle'));
+    expect(screen.queryByTestId('nav-group-heading-learning')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('nav-group-heading-teaching')).not.toBeInTheDocument();
+  });
+
+  // ── Existing sidebar tests (updated) ────────────────────────────────────
 
   it('renders Settings nav item in bottom section', () => {
     renderAt();
@@ -131,11 +232,8 @@ describe('AppSidebar', () => {
 
   it('hides brand name after collapsing sidebar', () => {
     renderAt();
-    // Initially expanded — brand name visible
     expect(screen.getByTestId('sidebar-brand-name')).toBeInTheDocument();
-    // Click collapse
     fireEvent.click(screen.getByTestId('sidebar-collapse-toggle'));
-    // Brand name should be hidden
     expect(screen.queryByTestId('sidebar-brand-name')).not.toBeInTheDocument();
   });
 
@@ -148,7 +246,6 @@ describe('AppSidebar', () => {
   it('restores collapsed state from localStorage on mount', () => {
     localStorage.setItem('edusphere-sidebar-collapsed', 'true');
     renderAt();
-    // When collapsed, brand name is hidden
     expect(screen.queryByTestId('sidebar-brand-name')).not.toBeInTheDocument();
   });
 
@@ -160,7 +257,6 @@ describe('AppSidebar', () => {
 
   it('renders nav labels in English via i18n', () => {
     renderAt();
-    // Labels now come from useTranslation('nav') — verify English strings are shown
     expect(screen.getByTestId('nav-item-home')).toHaveTextContent('Home');
     expect(screen.getByTestId('nav-item-myCourses')).toHaveTextContent('My Courses');
     expect(screen.getByTestId('nav-item-discover')).toHaveTextContent('Discover');
@@ -193,7 +289,6 @@ describe('AppSidebar', () => {
     });
     renderAt();
     expect(screen.getByTestId('sidebar-brand-name')).toHaveTextContent('Acme Corp');
-    // Default 'EduSphere' must not appear in the brand name slot
     expect(screen.getByTestId('sidebar-brand-name')).not.toHaveTextContent('EduSphere');
   });
 
@@ -249,7 +344,6 @@ describe('AppSidebar', () => {
       'aria-label',
       'Switch to light mode'
     );
-    // In dark mode, clicking should switch to light
     fireEvent.click(screen.getByTestId('theme-toggle'));
     expect(mockSetThemeMode).toHaveBeenCalledWith('light');
   });

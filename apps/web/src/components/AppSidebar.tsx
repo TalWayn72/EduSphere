@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -33,9 +33,6 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
 import { getCurrentUser } from '@/lib/auth';
 
-const MANAGER_SIDEBAR_ROLES = new Set(['MANAGER', 'ORG_ADMIN', 'SUPER_ADMIN']);
-const QUIZ_BUILDER_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
-
 const SIDEBAR_KEY = 'edusphere-sidebar-collapsed';
 
 interface NavItem {
@@ -44,25 +41,58 @@ interface NavItem {
   labelKey: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
+interface NavGroup {
+  key: string;
+  headingKey: string;
+  items: NavItem[];
+  /** Roles that can see this group. If empty/undefined, visible to all. */
+  allowedRoles?: Set<string>;
+}
+
+/** Learning group — visible to all authenticated users */
+const LEARNING_ITEMS: NavItem[] = [
   { to: '/dashboard', icon: LayoutDashboard, labelKey: 'home' },
   { to: '/courses', icon: BookOpen, labelKey: 'myCourses' },
   { to: '/explore', icon: Compass, labelKey: 'discover' },
   { to: '/knowledge-graph', icon: Network, labelKey: 'knowledgeGraph' },
   { to: '/agents', icon: Bot, labelKey: 'aiTutor' },
   { to: '/sessions', icon: Video, labelKey: 'liveSessions' },
-  { to: '/gamification', icon: Trophy, labelKey: 'gamification' },
-  { to: '/certificates', icon: Award, labelKey: 'certificates' },
   { to: '/srs-review', icon: Brain, labelKey: 'srsReview' },
   { to: '/skills', icon: Target, labelKey: 'skillPaths' },
+  { to: '/gamification', icon: Trophy, labelKey: 'gamification' },
+  { to: '/certificates', icon: Award, labelKey: 'certificates' },
+];
+
+/** Social group — visible to all authenticated users */
+const SOCIAL_ITEMS: NavItem[] = [
   { to: '/discussions', icon: MessageSquare, labelKey: 'discussions' },
   { to: '/social', icon: Users, labelKey: 'socialFeed' },
   { to: '/people', icon: Search, labelKey: 'findPeople' },
-  { to: '/peer-review', icon: Star, labelKey: 'peerReview' },
-  { to: '/assessments', icon: ClipboardList, labelKey: 'assessments' },
   { to: '/challenges', icon: Swords, labelKey: 'groupChallenges' },
+];
+
+/** Teaching group — INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN */
+const TEACHING_ITEMS: NavItem[] = [
+  { to: '/quiz-builder', icon: FileQuestion, labelKey: 'quizBuilder' },
+  { to: '/assessments', icon: ClipboardList, labelKey: 'assessments' },
+  { to: '/peer-review', icon: Star, labelKey: 'peerReview' },
   { to: '/peer-matching', icon: UserCheck, labelKey: 'peerMatching' },
+];
+
+/** Analytics group — INSTRUCTOR, RESEARCHER, ORG_ADMIN, SUPER_ADMIN */
+const ANALYTICS_ITEMS: NavItem[] = [
+  { to: '/manager', icon: BarChart2, labelKey: 'managerDashboard' },
   { to: '/cohort-insights', icon: Lightbulb, labelKey: 'cohortInsights' },
+];
+
+const TEACHING_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
+const ANALYTICS_ROLES = new Set(['INSTRUCTOR', 'RESEARCHER', 'MANAGER', 'ORG_ADMIN', 'SUPER_ADMIN']);
+
+const NAV_GROUPS: NavGroup[] = [
+  { key: 'learning', headingKey: 'groupLearning', items: LEARNING_ITEMS },
+  { key: 'social', headingKey: 'groupSocial', items: SOCIAL_ITEMS },
+  { key: 'teaching', headingKey: 'groupTeaching', items: TEACHING_ITEMS, allowedRoles: TEACHING_ROLES },
+  { key: 'analytics', headingKey: 'groupAnalytics', items: ANALYTICS_ITEMS, allowedRoles: ANALYTICS_ROLES },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {
@@ -85,6 +115,16 @@ export function AppSidebar() {
   const location = useLocation();
   const { resolvedMode, setThemeMode } = useTheme();
   const user = getCurrentUser();
+  const userRole = user?.role ?? 'STUDENT';
+
+  /** Filter nav groups by the current user's role */
+  const visibleGroups = useMemo(
+    () =>
+      NAV_GROUPS.filter(
+        (group) => !group.allowedRoles || group.allowedRoles.has(userRole)
+      ),
+    [userRole]
+  );
 
   useEffect(() => {
     try {
@@ -144,68 +184,45 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Main nav */}
+      {/* Main nav — grouped by role */}
       <nav id="main-nav" className="flex-1 overflow-y-auto py-2" aria-label="Main navigation">
-        {NAV_ITEMS.map(({ to, icon: Icon, labelKey }) => {
-          const label = t(labelKey);
-          const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
-          return (
-            <NavLink
-              key={to}
-              to={to}
-              title={collapsed ? label : undefined}
-              data-testid={`nav-item-${labelKey}`}
-              className={[
-                'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
-                'transition-colors hover:bg-muted/60',
-                isActive
-                  ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
-                  : 'text-muted-foreground border-l-2 border-transparent',
-              ].join(' ')}
-            >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden />
-              {!collapsed && <span className="truncate">{label}</span>}
-            </NavLink>
-          );
-        })}
-
-        {/* Manager Dashboard — visible to MANAGER / ORG_ADMIN / SUPER_ADMIN */}
-        {user?.role && MANAGER_SIDEBAR_ROLES.has(user.role) && (
-          <NavLink
-            to="/manager"
-            title={collapsed ? 'Manager Dashboard' : undefined}
-            data-testid="nav-item-managerDashboard"
-            className={[
-              'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
-              'transition-colors hover:bg-muted/60',
-              location.pathname === '/manager'
-                ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
-                : 'text-muted-foreground border-l-2 border-transparent',
-            ].join(' ')}
-          >
-            <BarChart2 className="h-4 w-4 shrink-0" aria-hidden />
-            {!collapsed && <span className="truncate">Manager Dashboard</span>}
-          </NavLink>
-        )}
-
-        {/* Quiz Builder — visible to INSTRUCTOR / ORG_ADMIN / SUPER_ADMIN */}
-        {user?.role && QUIZ_BUILDER_ROLES.has(user.role) && (
-          <NavLink
-            to="/quiz-builder"
-            title={collapsed ? t('quizBuilder') : undefined}
-            data-testid="nav-item-quizBuilder"
-            className={[
-              'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
-              'transition-colors hover:bg-muted/60',
-              location.pathname === '/quiz-builder'
-                ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
-                : 'text-muted-foreground border-l-2 border-transparent',
-            ].join(' ')}
-          >
-            <FileQuestion className="h-4 w-4 shrink-0" aria-hidden />
-            {!collapsed && <span className="truncate">{t('quizBuilder')}</span>}
-          </NavLink>
-        )}
+        {visibleGroups.map((group, groupIdx) => (
+          <div key={group.key} data-testid={`nav-group-${group.key}`}>
+            {/* Group separator (not before first group) */}
+            {groupIdx > 0 && <hr className="border-border mx-4 my-2" />}
+            {/* Group heading — hidden when collapsed */}
+            {!collapsed && (
+              <p
+                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider px-5 pt-2 pb-1"
+                data-testid={`nav-group-heading-${group.key}`}
+              >
+                {t(group.headingKey)}
+              </p>
+            )}
+            {group.items.map(({ to, icon: Icon, labelKey }) => {
+              const label = t(labelKey);
+              const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+              return (
+                <NavLink
+                  key={to}
+                  to={to}
+                  title={collapsed ? label : undefined}
+                  data-testid={`nav-item-${labelKey}`}
+                  className={[
+                    'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
+                    'transition-colors hover:bg-muted/60',
+                    isActive
+                      ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
+                      : 'text-muted-foreground border-l-2 border-transparent',
+                  ].join(' ')}
+                >
+                  <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                  {!collapsed && <span className="truncate">{label}</span>}
+                </NavLink>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Divider */}

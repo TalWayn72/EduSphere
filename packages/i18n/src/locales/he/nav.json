@@ -42,5 +42,10 @@
   "assessments": "הערכות",
   "groupChallenges": "אתגרים קבוצתיים",
   "peerMatching": "התאמת עמיתים",
-  "cohortInsights": "תובנות קבוצה"
+  "cohortInsights": "תובנות קבוצה",
+  "managerDashboard": "לוח מנהל",
+  "groupLearning": "למידה",
+  "groupSocial": "חברתי",
+  "groupTeaching": "הוראה",
+  "groupAnalytics": "אנליטיקה"
 }

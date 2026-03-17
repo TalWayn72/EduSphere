@@ -34,5 +34,10 @@
   "gamification": "Gamification",
   "certificates": "Certificates",
   "srsReview": "SRS Review",
-  "quizBuilder": "Quiz Builder"
+  "quizBuilder": "Quiz Builder",
+  "managerDashboard": "Manager Dashboard",
+  "groupLearning": "Learning",
+  "groupSocial": "Social",
+  "groupTeaching": "Teaching",
+  "groupAnalytics": "Analytics"
 }

@@ -42,5 +42,10 @@
   "assessments": "Assessments",
   "groupChallenges": "Group Challenges",
   "peerMatching": "Peer Matching",
-  "cohortInsights": "Cohort Insights"
+  "cohortInsights": "Cohort Insights",
+  "managerDashboard": "Manager Dashboard",
+  "groupLearning": "Learning",
+  "groupSocial": "Social",
+  "groupTeaching": "Teaching",
+  "groupAnalytics": "Analytics"
 }
