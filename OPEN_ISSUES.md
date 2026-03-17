@@ -1,6 +1,59 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 17 מרץ 2026 (BUG-073 — PDF upload fails in course wizard media step)
+**תאריך עדכון:** 17 מרץ 2026 (BUG-070 — Landing page Compliance tab navigation broken)
+
+---
+
+## BUG-070 — Landing Page Compliance Tab Breaks Navigation (17 Mar 2026)
+
+**סטטוס:** ✅ Fixed
+**חומרה:** 🟡 Medium (navigation UX broken after clicking Compliance tab)
+**דווח ע"י:** User — clicking Compliance tab navigates away from landing page, breaking subsequent tab clicks
+
+### תיאור הבעיה
+
+On the landing page (`/landing`), the 4 nav tabs (Features, Pricing, Compliance, Pilot) should all use hash-based anchor scrolling to their respective sections. However, the Compliance tab used React Router `<Link to="/compliance">` which navigated to a separate `/compliance` page, while the other 3 tabs used `<a href="#section">` for in-page scrolling. After clicking Compliance, returning and clicking other tabs resulted in broken navigation.
+
+### שורש הבעיה
+
+**File:** `apps/web/src/components/PublicNav.tsx` (lines 30, 62)
+
+| Tab | Before (broken) | After (fixed) |
+|-----|-----------------|---------------|
+| Features | `<a href={anchor('#features')}>` | No change |
+| Pricing | `<a href={anchor('#pricing')}>` | No change |
+| **Compliance** | **`<Link to="/compliance">`** | **`<a href={anchor('#compliance')}>`** |
+| Pilot | `<a href={anchor('#pilot-cta')}>` | No change |
+
+The same issue existed in the mobile menu (line 62). Additionally, Pilot tab was missing from the mobile menu.
+
+### Discovery Waves
+
+**Wave 1 — Exact match:** `PublicNav.tsx` lines 30 and 62 — `<Link to="/compliance">` instead of `<a href={anchor('#compliance')}>`
+
+**Wave 2 — Similarity search:** Checked ALL files in `apps/web/src/pages/`, `apps/web/src/components/`, `apps/web/src/components/landing/`, `apps/mobile/src/`. No other components had the same anti-pattern.
+
+**Wave 3 — Class of bug (mixed Link/anchor):** Searched entire codebase for files mixing `<Link>` and `<a href="#` in same component. Only `PublicNav.tsx` (now fixed) and `AccessibilityStatementPage.tsx` (correct — intentional mix of external + internal links).
+
+### Fix Applied
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/PublicNav.tsx:30` | `<Link to="/compliance">` → `<a href={anchor('#compliance')}>` |
+| `apps/web/src/components/PublicNav.tsx:62` | Same fix in mobile menu + added missing Pilot tab |
+| `apps/web/src/test-utils/route-registry.ts:149` | `href: '/compliance'` → `href: '#compliance'` |
+
+### Tests Added
+
+| Test File | Coverage |
+|-----------|----------|
+| `apps/web/src/components/PublicNav.test.tsx` | BUG-070 regression: all 4 tabs use `<a>`, Compliance not `<Link>`, mobile has Pilot |
+| `apps/web/e2e/landing-tab-navigation.spec.ts` | **33 E2E tests:** all 24 permutations of 4 tabs, Compliance regression guard (5 tests), visual regression screenshots, URL integrity + rapid-click stress test |
+
+### Anti-recurrence
+
+- **Unit test:** `PublicNav.test.tsx:270-278` — "Compliance tab should NOT use React Router Link (regression guard)" explicitly asserts `href` is not `/compliance` and contains `#compliance`
+- **E2E test:** `landing-tab-navigation.spec.ts` — tests all 24 permutations to catch any tab that navigates away from `/landing`
 
 ---
 
