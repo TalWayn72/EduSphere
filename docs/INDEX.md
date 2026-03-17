@@ -1,7 +1,7 @@
 # EduSphere Documentation Index
 
-> Single-source navigation for all 120+ project documents.
-> Last updated: March 2026 (Session 27)
+> Single-source navigation for all 130+ project documents.
+> Last updated: March 2026 (Enterprise Audit Session)
 
 ---
 
@@ -42,6 +42,7 @@
 |------|---------|
 | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | System architecture overview, 6-subgraph federation |
 | [PGBOUNCER.md](architecture/PGBOUNCER.md) | PgBouncer architecture and connection pooling design |
+| [PHASE29-ARCHITECTURE-REVIEW.md](architecture/PHASE29-ARCHITECTURE-REVIEW.md) | Phase 29 architecture review findings |
 
 ---
 
@@ -50,7 +51,17 @@
 | File | Purpose |
 |------|---------|
 | [HECVAT_LITE.md](compliance/HECVAT_LITE.md) | Higher Education Community Vendor Assessment |
-| [VPAT_v2.5.md](compliance/VPAT_v2.5.md) | Voluntary Product Accessibility Template (WCAG 2.2) |
+| [VPAT_V2_5.md](compliance/VPAT_V2_5.md) | Voluntary Product Accessibility Template (WCAG 2.2) |
+| [ACCESSIBILITY-STATEMENT-HE.md](compliance/ACCESSIBILITY-STATEMENT-HE.md) | Hebrew accessibility statement |
+| [ASSET-INVENTORY.md](compliance/ASSET-INVENTORY.md) | IT asset inventory |
+| [BREACH-NOTIFICATION-PROCEDURE.md](compliance/BREACH-NOTIFICATION-PROCEDURE.md) | Data breach notification procedure |
+| [DPIA.md](compliance/DPIA.md) | Data Protection Impact Assessment |
+| [EU-AI-ACT-TECHNICAL-DOCUMENTATION.md](compliance/EU-AI-ACT-TECHNICAL-DOCUMENTATION.md) | EU AI Act compliance documentation |
+| [ISO-27001-ISMS-SCOPE.md](compliance/ISO-27001-ISMS-SCOPE.md) | ISO 27001 ISMS scope definition |
+| [ISO-27001-STATEMENT-OF-APPLICABILITY.md](compliance/ISO-27001-STATEMENT-OF-APPLICABILITY.md) | ISO 27001 Statement of Applicability |
+| [ROPA.md](compliance/ROPA.md) | Records of Processing Activities (GDPR Art.30) |
+| [SOC2-READINESS-CHECKLIST.md](compliance/SOC2-READINESS-CHECKLIST.md) | SOC 2 Type II readiness checklist |
+| [VENDOR-RISK-REGISTER.md](compliance/VENDOR-RISK-REGISTER.md) | Vendor risk assessment register |
 
 ---
 
@@ -93,8 +104,17 @@
 | [DOCKER_SETUP.md](development/DOCKER_SETUP.md) | Docker development environment |
 | [GITHUB_SETUP.md](development/GITHUB_SETUP.md) | GitHub Actions, CI/CD setup |
 | [CICD_FIX_PLAN.md](development/CICD_FIX_PLAN.md) | CI/CD pipeline fix and improvement plan |
-| [CODE_QUALITY_IMPROVEMENT_PLAN.md](development/CODE_QUALITY_IMPROVEMENT_PLAN.md) | Code quality improvement plan |
 | [DESIGN_SYSTEM.md](development/DESIGN_SYSTEM.md) | Indigo Design System tokens, ThemeProvider, MasteryBadge, AppSidebar |
+| [STORYBOOK.md](development/STORYBOOK.md) | Storybook component development guide |
+
+---
+
+## docs/design-system/ — Design System
+
+| File | Purpose |
+|------|---------|
+| [DESIGN_SYSTEM.md](design-system/DESIGN_SYSTEM.md) | Core design system documentation |
+| [PAGE_CHECKLIST.md](design-system/PAGE_CHECKLIST.md) | Page implementation design checklist |
 
 ---
 
@@ -124,6 +144,14 @@
 > - `plans/bugs/` — Bug fix documents (BUG-NNN-*)
 > - `plans/features/` — Feature implementation specs
 > - `plans/archive/` — Completed sprint plans (historical)
+
+### docs/plans/ — Active Plans
+
+| File | Purpose |
+|------|---------|
+| [MASTER_WORK_PLAN_110_ITEMS.md](plans/MASTER_WORK_PLAN_110_ITEMS.md) | Enterprise Audit: 110 recommendations in 8 waves |
+| [AGENT_ONBOARDING_AUDIT_2026-03-17.md](plans/AGENT_ONBOARDING_AUDIT_2026-03-17.md) | Agent onboarding audit protocol |
+| [CODE_QUALITY_PLAN.md](plans/CODE_QUALITY_PLAN.md) | Code quality improvement plan |
 
 ### docs/plans/archive/ — Completed Plan History
 
@@ -198,6 +226,7 @@
 | [MCP_TOOLS_SETUP.md](reference/MCP_TOOLS_SETUP.md) | MCP server configuration reference |
 | [OPEN_SOURCE_TECHNOLOGY_AUDIT.md](reference/OPEN_SOURCE_TECHNOLOGY_AUDIT.md) | Open source license audit |
 | [STACK_CAPABILITIES_UPGRADE_PLAN.md](reference/STACK_CAPABILITIES_UPGRADE_PLAN.md) | Tech stack upgrade roadmap |
+| [BUG_FIX_PROTOCOL.md](reference/BUG_FIX_PROTOCOL.md) | Bug Fix Protocol V3 — 9-stage process |
 
 ---
 
