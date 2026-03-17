@@ -53,11 +53,15 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/edusphere_test
 
-      - name: Start subgraphs in background
+      - name: Start all subgraphs in background
         run: |
           pnpm turbo dev --filter='@edusphere/subgraph-core' &
           pnpm turbo dev --filter='@edusphere/subgraph-content' &
-          sleep 25
+          pnpm turbo dev --filter='@edusphere/subgraph-annotation' &
+          pnpm turbo dev --filter='@edusphere/subgraph-collaboration' &
+          pnpm turbo dev --filter='@edusphere/subgraph-agent' &
+          pnpm turbo dev --filter='@edusphere/subgraph-knowledge' &
+          sleep 30
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/edusphere_test
           NATS_URL: nats://localhost:4222
@@ -85,13 +89,33 @@ jobs:
             -d '{"query":"{ __typename }"}' \
             -f -s -o /dev/null
 
-      - name: ZAP Baseline Scan
+      - name: ZAP Baseline — Gateway (4000)
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: 'http://localhost:4000/graphql'
           rules_file_name: '.zap/rules.tsv'
           cmd_options: '-a -j'
           fail_action: true
+          allow_issue_writing: false
+
+      - name: ZAP Baseline — Agent subgraph (4005)
+        if: always()
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:4005/graphql'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          fail_action: false
+          allow_issue_writing: false
+
+      - name: ZAP Baseline — Knowledge subgraph (4006)
+        if: always()
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:4006/graphql'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          fail_action: false
           allow_issue_writing: false
 
       - name: Upload ZAP Report
