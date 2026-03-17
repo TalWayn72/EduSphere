@@ -6,6 +6,126 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.65.0] — 2026-03-17 — Enterprise Audit: 110 Recommendations (Waves 1-5)
+
+### Security Hardening (Wave 1)
+- **SEC-1** Dev-token bypass requires `ALLOW_DEV_TOKEN=true`, defaults to STUDENT role
+- **SEC-3** JWT audience validation on all 6 subgraphs via `jose` jwtVerify
+- **BE-7** Auth header fallback hardened — no SUPER_ADMIN from headers
+- **SI-7** All 15 NATS services converted to `buildNatsOptions()` with TLS/auth
+- **SEC-4** PII key versioning (`v1:iv:tag:data` format) with backward compatibility
+- **SEC-8** APQ registry Redis-backed with bounded in-memory LRU fallback
+- **OPS-4** Alertmanager routes to Slack webhook (not `null`)
+- **SEC-5** Cypher injection guard with Semgrep rule + 30 tests
+
+### Data Integrity (Wave 2)
+- **DB-2** HNSW indexes on content/annotation/concept embeddings (`vector_cosine_ops`, m=16, ef=64)
+- **DB-3** `tenant_id` column on `agentSessions` with foreign key to tenants
+- **DB-4** `withTimezone: true` standardized across 29 schema files
+- **BE-2** `Promise.race` 5-min timeout on AgentService execution
+- **BE-3** `adminUsers` uses `COUNT(*)` instead of O(N) row fetch
+- **BE-5** MediaService persistent NATS connection with drain on destroy
+- **BE-4** Zod validation on `createCourse`, `createUser`, `updateUser` mutations
+- **BE-9** `resetUserPassword` wired to Keycloak Admin API (was stub)
+- **FE-1** Route-level `<ErrorBoundary>` in `guarded()` and `publicPage()`
+- **QA-4** Visual snapshot comparisons enabled in CI
+
+### Enterprise Product (Wave 3)
+- **#45** Keyset pagination (`createdAt, id` composite cursor) replacing offset encoding
+- **#41** Token expiry UX — `useTokenExpiryWatcher` + `SessionExpiryDialog` (no abrupt logout)
+- **#42** Sidebar role-based grouping — 4 groups (Learning, Social, Teaching, Analytics) with i18n
+- **#40** BETA badges on mock-data Dashboard cards (Study Time, Concepts, Activity)
+
+### Accessibility (Wave 4)
+- **FE-6** Client-side role guard in `guarded()` — `requiredRoles` on admin/instructor routes
+
+### CI/Testing (Wave 5)
+- **#60** Mounted guard applied to 8 sibling route pages preventing urql cache dispatch
+
+### Tests
+- 79 new Wave 1 security tests (JWT, NATS TLS, PII, APQ, Cypher injection)
+- 20 new Wave 2 data integrity regression tests
+- 30 AppSidebar role-group tests
+- 14 keyset pagination tests
+- 24 user.service tests (COUNT, Keycloak, pagination)
+
+---
+
+## [0.64.0] — 2026-03-13 — Phase 64: Compliance Library + All 64 Phases Complete
+
+### Added
+- **Compliance Library** — `ComplianceLibraryPage` with GDPR/SOC2/HIPAA/ISO27001 templates, real-time monitoring
+- **No-Code Portal Builder** — `PortalBuilderPage` with drag-and-drop blocks, preview, publish flow
+- **Open Badges 3.0** — W3C Verifiable Credentials, `BadgeIssuerService`, credential issuance + verification
+- **SCORM 2004 Export** — `ScormExportService` packaging course content into SCORM 2004 ZIP
+- **360° Multi-Rater Assessments** — `AssessmentCampaignPage`, self/peer/manager/360° review types
+- **Instructor Marketplace** — `InstructorPayoutService`, revenue sharing, Stripe Connect integration
+- **Lesson Pipeline Builder** — `PipelineBuilderPage` with drag-and-drop node graph, configurable stages
+
+### Security
+- All 64 phases marked ✅ complete — full platform implementation verified
+- 21 stub/mock features wired to real implementations
+
+### Tests
+- Web: 4,424+ tests (370 files) | Security: 1,370 | E2E: 134 specs
+- Total: ~8,000+ tests across all suites
+
+---
+
+## [0.58.0] — 2026-03-12 — Phases 55-58: Admin Wiring + HRIS + i18n + Pipeline Builder
+
+### Added
+- **Phase 55** — 27 admin/settings pages wired (removed `pause: true` stubs)
+- **Phase 56** — HRIS cron scheduler + Partner API middleware + AEO pre-render
+- **Phase 57** — i18n: 9 languages (he, en, ar, ru, es, fr, zh, pt, hi + bn, id)
+- **Phase 58** — Lesson Pipeline Builder + CourseGenerator DI fix
+
+---
+
+## [0.53.0] — 2026-03-11 — Phases 51-53: B2B GTM + Air-Gap + Partner Portal
+
+### Added
+- **Phase 51** — Pilot request flow, usage dashboards, pricing tiers, ROI calculator, AEO hooks
+- **Phase 52** — Air-gapped deployment mode, partner portal, HRIS SCIM integration, investor deck page
+- **Phase 53** — AI auto-grading, skill gap analysis, Stripe invoicing, partner tiers
+
+---
+
+## [0.50.0] — 2026-03-10 — Phase 50: WCAG 2.2 AA + Security Compliance
+
+### Added
+- Full WCAG 2.2 AA contrast audit — 56+ violations fixed across 16 files
+- Dark mode WCAG compliance with explicit slate colors
+- `PublicLayout` + `AuthFooter` standardized across all pages
+- Comprehensive code quality overhaul — split 15 large files
+
+### Security
+- 3 security gaps closed + 7 WCAG fixes + 91 E2E tests
+- Federation security hardening, container hardening
+
+---
+
+## [0.48.0] — 2026-03-10 — Phases 47-48: AI Chavruta + Session Closure
+
+### Added
+- **Phase 47** — AI Chavruta partner, mentor path, cohort insights, graph credentials
+- **Phase 48** — Session closure + P2 debt cleanup + security gate
+
+---
+
+## [0.46.0] — 2026-03-09 — Phases 45-46: Social Learning + Group Challenges
+
+### Added
+- **Phase 45** — Social learning experience (social feed, recommendations, follow system)
+- **Phase 46** — Group challenges + knowledge graph peer matching
+- Peer review, social feed items, social recommendations SDL + resolvers
+
+### Tests
+- Social learning security spec — social_feed_items tenant isolation
+- Layout mock + useMutation re-render guard tests
+
+---
+
 ## [0.44.0] — 2026-03-09
 
 ### Added
