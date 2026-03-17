@@ -1,5 +1,5 @@
-# Pinned 2026-03-17 — was ubuntu:22.04
-FROM ubuntu:22.04.5
+# Pinned 2026-03-17
+FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice \

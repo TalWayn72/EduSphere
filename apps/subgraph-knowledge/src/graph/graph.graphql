@@ -381,6 +381,32 @@ type UserMasteryTopic {
   level: MasteryLevel!
 }
 
+# ─── Social Recommendations (F-036) ──────────────────────────────────────
+type SocialRecommendation @authenticated {
+  contentItemId: ID!
+  contentTitle: String!
+  followersCount: Int!
+  isMutualFollower: Boolean!
+  lastActivity: String!
+  weight: Float!
+}
+
+type SocialFeedItem @authenticated {
+  userId: ID!
+  userDisplayName: String!
+  action: String!
+  contentItemId: ID!
+  contentTitle: String!
+  timestamp: String!
+}
+
+extend type Query {
+  """Social content recommendations based on collaborative filtering."""
+  socialRecommendations(limit: Int): [SocialRecommendation!]! @authenticated
+  """Social activity feed from followed users."""
+  socialFeed(limit: Int): [SocialFeedItem!]! @authenticated
+}
+
 extend type Query {
   """
   Return the current user's top mastered topics (for Dashboard mastery widget).

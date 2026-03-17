@@ -5,8 +5,8 @@
 # Last updated: February 2026
 # ═══════════════════════════════════════════════════════════════
 
-# Pinned 2026-03-17 — was ubuntu:22.04
-FROM ubuntu:22.04.5
+# Pinned 2026-03-17
+FROM ubuntu:22.04
 
 LABEL maintainer="EduSphere Team"
 LABEL description="EduSphere all-in-one: PG18 + AGE 1.7.0 + pgvector 0.8.1 + Keycloak + NATS + MinIO"

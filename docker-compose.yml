@@ -80,6 +80,12 @@ services:
       # subgraph-content: rebuilt dist with MinIO full-URL fix (endpoint: `http://${host}:${port}`)
       # MINIO_ENDPOINT in supervisord.conf must be just the hostname (e.g. "localhost"), not a full URL.
       - ./apps/subgraph-content/dist:/app/apps/subgraph-content/dist:ro
+      # nats-pubsub: new package from Phase 65 — NatsPubSub engine for GraphQL subscriptions
+      - ./packages/nats-pubsub:/app/packages/nats-pubsub:ro
+      # nats-client dist: Phase 65 adds LessonNEREntitiesPayload + gateway-events subjects
+      - ./packages/nats-client/dist:/app/packages/nats-client/dist:ro
+      # graphql-subscriptions: runtime dep for nats-pubsub PubSubEngine base class
+      - ./node_modules/graphql-subscriptions:/app/node_modules/graphql-subscriptions:ro
       # web frontend: mount built dist so container always serves latest UI
       # Rebuild locally with: pnpm --filter @edusphere/web build
       - ./apps/web/dist:/app/apps/web/dist:ro
