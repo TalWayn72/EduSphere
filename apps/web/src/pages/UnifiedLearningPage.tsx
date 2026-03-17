@@ -56,11 +56,16 @@ export function UnifiedLearningPage() {
   const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{ contentId: string }>();
   const [searchParams] = useSearchParams();
 
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (/learn/:contentId and /document/:contentId both render this component).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // ── Content item query (contentType + document content) ──
   const [itemResult] = useQuery<ContentItemResult>({
     query: CONTENT_ITEM_QUERY,
     variables: { id: contentId },
-    pause: !contentId,
+    pause: !mounted || !contentId,
   });
   const item = itemResult.data?.contentItem;
   const contentType = item?.contentType ?? '';
@@ -117,7 +122,7 @@ export function UnifiedLearningPage() {
   const [anchorsResult] = useQuery<VisualAnchorsResult>({
     query: GET_VISUAL_ANCHORS,
     variables: { mediaAssetId: contentId },
-    pause: !contentId,
+    pause: !mounted || !contentId,
   });
   const visualAnchors: VisualAnchor[] = anchorsResult.data?.getVisualAnchors ?? [];
   const anchorPositions = visualAnchors.map((a) => ({

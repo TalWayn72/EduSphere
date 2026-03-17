@@ -47,6 +47,11 @@ export function CollaborationSessionPage() {
   const [saved, setSaved] = useState(false);
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (/collaboration and /collaboration/session share the same parent path prefix).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     return () => {
       if (savedTimerRef.current) {
@@ -60,7 +65,7 @@ export function CollaborationSessionPage() {
   const [{ data: discussionData }] = useQuery({
     query: DISCUSSION_QUERY,
     variables: { id: discussionId },
-    pause: !discussionId,
+    pause: !mounted || !discussionId,
   });
 
   const [, executeJoin] = useMutation(JOIN_DISCUSSION_MUTATION);

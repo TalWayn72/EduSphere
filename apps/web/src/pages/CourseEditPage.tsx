@@ -62,13 +62,15 @@ export function CourseEditPage() {
   const [published, setPublished] = useState<boolean | null>(null);
   const toastRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // 'network-only' prevents urql from reading the cache synchronously during render,
-  // which would trigger setState on the still-unmounting CourseDetailPage and cause
-  // React's "Cannot update component while rendering different component" warning.
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (CourseDetailPage / CourseEditPage / CourseAnalyticsPage share /courses/:courseId).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [{ data, fetching, error }, refetch] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,
     variables: { id: courseId },
-    pause: !courseId,
+    pause: !mounted || !courseId,
     requestPolicy: 'network-only',
   });
 

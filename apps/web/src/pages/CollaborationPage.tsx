@@ -63,6 +63,11 @@ export function CollaborationPage() {
     undefined
   );
 
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (/collaboration and /collaboration/session share the same parent path prefix).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // Cleanup match timeouts on unmount
   useEffect(() => {
     return () => {
@@ -74,7 +79,7 @@ export function CollaborationPage() {
   const [{ data, fetching, error }, reexecute] = useQuery({
     query: MY_DISCUSSIONS_QUERY,
     variables: { limit: 20, offset: 0 },
-    pause: DEV_MODE,
+    pause: !mounted || DEV_MODE,
   });
 
   const [createResult, executeCreate] = useMutation(CREATE_DISCUSSION_MUTATION);

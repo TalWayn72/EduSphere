@@ -42,10 +42,15 @@ interface SelectionState {
 export function DocumentAnnotationPage() {
   const { contentId = '' } = useParams<{ contentId: string }>();
 
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (content viewer pages share CONTENT_ITEM_QUERY across sibling routes).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [result] = useQuery<ContentItemResult>({
     query: CONTENT_ITEM_QUERY,
     variables: { id: contentId },
-    pause: !contentId,
+    pause: !mounted || !contentId,
   });
 
   const {

@@ -187,11 +187,16 @@ export function LiveSessionDetailPage() {
   const [joined, setJoined] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (/sessions and /sessions/:sessionId share the same parent path prefix).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // Fetch session detail
   const [sessionResult] = useQuery({
     query: GET_LIVE_SESSION_QUERY,
     variables: { sessionId: sessionId ?? '' },
-    pause: !sessionId,
+    pause: !mounted || !sessionId,
   });
 
   const [joinResult, executeJoin] = useMutation(JOIN_LIVE_SESSION_MUTATION);

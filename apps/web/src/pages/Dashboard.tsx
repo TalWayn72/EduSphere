@@ -1,5 +1,5 @@
 import { useQuery } from 'urql';
-import { useDeferredValue } from 'react';
+import { useState, useEffect, useDeferredValue } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCurrentUser } from '@/lib/auth';
@@ -85,10 +85,17 @@ interface MyAnnotationsQueryResult {
 export function Dashboard() {
   const { t } = useTranslation(['dashboard', 'common']);
   const localUser = getCurrentUser();
-  const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY });
+
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (/dashboard and /dashboard/legacy share the same parent path prefix).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY, pause: !mounted });
   const [coursesResult] = useQuery<CoursesQueryResult>({
     query: COURSES_QUERY,
     variables: { limit: 100, offset: 0 },
+    pause: !mounted,
   });
 
   // MY_ANNOTATIONS_QUERY requires userId; pause until me resolves to avoid a
@@ -97,7 +104,7 @@ export function Dashboard() {
   const [annotationsResult] = useQuery<MyAnnotationsQueryResult>({
     query: MY_ANNOTATIONS_QUERY,
     variables: { userId: currentUserId, limit: 500, offset: 0 },
-    pause: !currentUserId,
+    pause: !mounted || !currentUserId,
   });
 
   // --- Derived real stats (fall back to MOCK_STATS when real data unavailable) ---

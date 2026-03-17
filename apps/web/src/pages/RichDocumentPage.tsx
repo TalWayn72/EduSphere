@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -52,10 +52,15 @@ export function RichDocumentPage() {
   const role = useAuthRole();
   const isInstructor = role === 'INSTRUCTOR' || role === 'ORG_ADMIN' || role === 'SUPER_ADMIN';
 
+  // Mounted guard: prevent urql cache dispatch during sibling route render
+  // (content viewer pages share CONTENT_ITEM_QUERY across sibling routes).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [result] = useQuery<ContentItemResult>({
     query: CONTENT_ITEM_QUERY,
     variables: { id: contentId },
-    pause: !contentId,
+    pause: !mounted || !contentId,
   });
 
   const {
