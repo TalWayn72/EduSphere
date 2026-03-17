@@ -26,7 +26,7 @@ import { AnnotationsPanel } from './AnnotationsPanel';
 import { AiChatPanel } from './AiChatPanel';
 
 export function ContentViewer() {
-  const { contentId = 'content-1' } = useParams<{ contentId: string }>();
+  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{ contentId: string }>();
 
   // ── Video state ──
   const [currentTime, setCurrentTime] = useState(0);

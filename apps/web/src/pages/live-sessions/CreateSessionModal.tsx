@@ -10,7 +10,7 @@ export interface CreateSessionModalProps {
 
 export function CreateSessionModal({ onClose, onCreate, loading }: CreateSessionModalProps) {
   const [name, setName] = useState('');
-  const [contentId] = useState('content-1');
+  const [contentId] = useState('b0000000-0000-0000-0000-000000000001');
   const [scheduledAt, setScheduledAt] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {

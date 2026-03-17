@@ -89,7 +89,7 @@ export default function AnnotationDemo() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg h-[800px] sticky top-8">
               <AnnotationPanel
-                contentId="content-1"
+                contentId="b0000000-0000-0000-0000-000000000001"
                 currentUserId="current-user"
                 currentUserRole="student"
                 contentTimestamp={undefined}

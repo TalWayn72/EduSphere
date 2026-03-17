@@ -53,7 +53,7 @@ interface VisualAnchorsResult {
 }
 
 export function UnifiedLearningPage() {
-  const { contentId = 'content-1' } = useParams<{ contentId: string }>();
+  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{ contentId: string }>();
   const [searchParams] = useSearchParams();
 
   // ── Content item query (contentType + document content) ──

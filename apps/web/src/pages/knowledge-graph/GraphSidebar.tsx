@@ -104,7 +104,7 @@ export const GraphSidebar = React.memo(function GraphSidebar({
               size="sm"
               variant="ghost"
               className="w-full text-xs h-7 justify-start"
-              onClick={() => navigate('/learn/content-1')}
+              onClick={() => navigate('/learn/b0000000-0000-0000-0000-000000000001')}
             >
               <BookOpen className="h-3 w-3 mr-1" />
               {t('seeInContent')}{' '}

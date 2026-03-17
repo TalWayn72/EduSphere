@@ -5,17 +5,17 @@ import { mockGraphData } from '@/lib/mock-graph-data';
 
 const MOCK_COURSES = [
   {
-    id: 'course-1',
+    id: 'cc000000-0000-0000-0000-000000000002',
     title: 'Introduction to Talmud Study',
     description: 'Fundamentals of Talmudic reasoning and argumentation',
   },
   {
-    id: 'course-2',
+    id: '22222222-2222-2222-2222-222222222221',
     title: 'Advanced Chavruta Techniques',
     description: 'Collaborative Talmud learning with AI assistance',
   },
   {
-    id: 'course-3',
+    id: 'ea2e14c1-424e-4bcd-a209-13fb0c7ce84c',
     title: 'Knowledge Graph Navigation',
     description: 'Explore interconnected concepts in Jewish texts',
   },
@@ -41,7 +41,7 @@ export function mockSearch(query: string): SearchResult[] {
       snippet: s.text,
       meta: formatTime(s.startTime),
       timestamp: s.startTime,
-      href: `/learn/content-1?t=${s.startTime}`,
+      href: `/learn/b0000000-0000-0000-0000-000000000001?t=${s.startTime}`,
     }));
 
   const annotationResults: SearchResult[] = getThreadedAnnotations()
@@ -56,7 +56,7 @@ export function mockSearch(query: string): SearchResult[] {
       timestamp: a.contentTimestamp,
       href:
         a.contentTimestamp !== undefined
-          ? `/learn/content-1?t=${a.contentTimestamp}`
+          ? `/learn/b0000000-0000-0000-0000-000000000001?t=${a.contentTimestamp}`
           : '/annotations',
     }));
 
