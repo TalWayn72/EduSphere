@@ -33,6 +33,9 @@ export const agent_definitions = pgTable('agent_definitions', {
     ],
   }).notNull(),
   config: jsonb('config').notNull().default({}),
+  rag_config: jsonb('rag_config')
+    .notNull()
+    .default({ vectorWeight: 0.5, graphWeight: 0.5 }),
   is_active: boolean('is_active').notNull().default(true),
   ...timestamps,
   ...softDelete,
@@ -65,3 +68,9 @@ export type AgentExecution = typeof agent_executions.$inferSelect;
 export type NewAgentExecution = typeof agent_executions.$inferInsert;
 export type AgentTemplate = AgentDefinition['template'];
 export type AgentExecutionStatus = AgentExecution['status'];
+
+/** Per-tenant HybridRAG fusion weight configuration. */
+export interface RagConfig {
+  vectorWeight: number;
+  graphWeight: number;
+}

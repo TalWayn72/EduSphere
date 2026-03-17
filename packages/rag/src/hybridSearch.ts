@@ -2,11 +2,18 @@ import { Pool } from 'pg';
 import { CachedEmbeddings } from './embeddings';
 import { SearchResult } from './vectorStore';
 
+/** Per-tenant HybridRAG fusion weight configuration (mirrored from agent_definitions.rag_config). */
+export interface RagConfig {
+  vectorWeight: number;
+  graphWeight: number;
+}
+
 export interface HybridSearchOptions {
   topK?: number;
   semanticWeight?: number; // 0-1, weight for vector similarity
   keywordWeight?: number; // 0-1, weight for text search
   rerankTopK?: number; // Number of results to rerank
+  ragConfig?: RagConfig; // Per-tenant vector/graph fusion weights
 }
 
 export interface HybridSearchResult extends SearchResult {
@@ -188,6 +195,11 @@ export class HybridSearchEngine {
     tenantId: string,
     options: HybridSearchOptions = {}
   ): Promise<HybridSearchResult[]> {
+    const ragConfig: RagConfig = options.ragConfig ?? {
+      vectorWeight: 0.5,
+      graphWeight: 0.5,
+    };
+
     // First, perform hybrid search
     const hybridResults = await this.search(query, tenantId, options);
 
@@ -198,8 +210,12 @@ export class HybridSearchEngine {
       tenantId
     );
 
-    // Combine and rerank
-    return this.mergeWithGraphResults(hybridResults, relatedConcepts);
+    // Combine and rerank using per-tenant fusion weights
+    return this.mergeWithGraphResults(
+      hybridResults,
+      relatedConcepts,
+      ragConfig
+    );
   }
 
   private async findRelatedConcepts(
@@ -216,20 +232,29 @@ export class HybridSearchEngine {
 
   private mergeWithGraphResults(
     hybridResults: HybridSearchResult[],
-    graphResults: HybridSearchResult[]
+    graphResults: HybridSearchResult[],
+    ragConfig: RagConfig = { vectorWeight: 0.5, graphWeight: 0.5 }
   ): HybridSearchResult[] {
-    // Merge and deduplicate results
+    // Merge and deduplicate results using per-tenant fusion weights.
+    // hybridResults carry the vector channel score; graphResults carry the
+    // graph channel score. The final combinedScore is a weighted sum.
     const resultsMap = new Map<string, HybridSearchResult>();
 
     for (const result of hybridResults) {
-      resultsMap.set(result.id, result);
+      resultsMap.set(result.id, {
+        ...result,
+        combinedScore: result.combinedScore * ragConfig.vectorWeight,
+      });
     }
 
     for (const result of graphResults) {
-      if (!resultsMap.has(result.id)) {
+      const existing = resultsMap.get(result.id);
+      if (existing) {
+        existing.combinedScore += result.combinedScore * ragConfig.graphWeight;
+      } else {
         resultsMap.set(result.id, {
           ...result,
-          combinedScore: result.combinedScore * 0.5,
+          combinedScore: result.combinedScore * ragConfig.graphWeight,
         });
       }
     }

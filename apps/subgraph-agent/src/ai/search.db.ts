@@ -18,6 +18,14 @@ import {
 } from '@edusphere/db';
 import type { KnowledgeSearchResult } from './tools/agent-tools';
 
+/** Per-tenant HybridRAG fusion weight configuration. */
+export interface RagConfig {
+  vectorWeight: number;
+  graphWeight: number;
+}
+
+const DEFAULT_RAG_CONFIG: RagConfig = { vectorWeight: 0.5, graphWeight: 0.5 };
+
 const logger = new Logger('SearchDb');
 
 // ── Embedding provider ────────────────────────────────────────────────────────
@@ -72,10 +80,11 @@ async function generateQueryEmbedding(text: string): Promise<number[] | null> {
 export async function searchKnowledgeGraph(
   query: string,
   tenantId: string,
-  limit: number = 5
+  limit: number = 5,
+  ragConfig: RagConfig = DEFAULT_RAG_CONFIG
 ): Promise<KnowledgeSearchResult[]> {
   logger.debug(
-    `searchKnowledgeGraph: query="${query}" tenant=${tenantId} limit=${limit}`
+    `searchKnowledgeGraph: query="${query}" tenant=${tenantId} limit=${limit} ragConfig=${JSON.stringify(ragConfig)}`
   );
 
   const db = createDatabaseConnection();
@@ -111,7 +120,7 @@ export async function searchKnowledgeGraph(
           id: row.segment_id,
           text: row.text.slice(0, 200),
           type: 'transcript_segment',
-          similarity: parseFloat(row.similarity),
+          similarity: parseFloat(row.similarity) * ragConfig.vectorWeight,
         });
       }
     } catch (err) {
