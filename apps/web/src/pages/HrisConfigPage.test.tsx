@@ -77,17 +77,16 @@ vi.mock('@/components/ui/label', () => ({
   ),
 }));
 
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return function MockIcon(props: any) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
-);
+vi.mock('lucide-react', () => ({
+  Building2: () => <span data-testid="icon-building" />,
+  CheckCircle: () => <span />,
+  XCircle: () => <span />,
+  Clock: () => <span />,
+  Loader2: () => <span />,
+  Home: () => <span data-testid="icon-home" />,
+  ChevronRight: () => <span />,
+  ArrowLeft: () => <span />,
+}));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
 

@@ -85,16 +85,16 @@ vi.mock('@/components/ui/card', () => ({
     React.createElement('h3', {}, children),
 }));
 
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return React.createElement('span', { 'data-testid': `icon-${String(name)}`, ...props });
-      };
-    },
-  })
-);
+vi.mock('lucide-react', () => ({
+  AlertCircle: () => React.createElement('span', { 'data-testid': 'alert-circle' }),
+  Users: () => React.createElement('span', { 'data-testid': 'users-icon' }),
+  TrendingUp: () => React.createElement('span', { 'data-testid': 'trending-icon' }),
+  Star: () => React.createElement('span', { 'data-testid': 'star-icon' }),
+  Activity: () => React.createElement('span', { 'data-testid': 'activity-icon' }),
+  Home: () => React.createElement('span', { 'data-testid': 'icon-home' }),
+  ChevronRight: () => React.createElement('span', {}),
+  ArrowLeft: () => React.createElement('span', {}),
+}));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
