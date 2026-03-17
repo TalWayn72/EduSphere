@@ -47,6 +47,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       });
 
       if (presignedResult.error || !presignedResult.data?.getPresignedUploadUrl) {
+        console.error('[AssetUploader] presign failed:', presignedResult.error?.message ?? 'No URL returned');
         setErrorMessage('Could not initiate upload. Please try again.');
         setStatus('error');
         return;
@@ -71,7 +72,8 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           setStatus('error');
           return;
         }
-      } catch {
+      } catch (err) {
+        console.error('[AssetUploader] upload network error:', err instanceof Error ? err.message : String(err));
         setErrorMessage('Upload failed. Check your connection and try again.');
         setStatus('error');
         return;
@@ -88,6 +90,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       });
 
       if (confirmResult.error || !confirmResult.data?.confirmVisualAssetUpload) {
+        console.error('[AssetUploader] confirm failed:', confirmResult.error?.message ?? 'No confirmation data');
         setErrorMessage('Upload confirmation failed. Please try again.');
         setStatus('error');
         return;

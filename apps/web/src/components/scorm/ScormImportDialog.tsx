@@ -112,7 +112,9 @@ export function ScormImportDialog({
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
       redirectTimerRef.current = setTimeout(() => onSuccess(courseId), 800);
     } catch (err) {
-      setErrorMsg(String(err));
+      const msg = err instanceof Error ? err.message : 'Import failed';
+      console.error('[ScormImportDialog] import failed:', msg);
+      setErrorMsg(msg);
       setState('error');
     }
   };
