@@ -10,6 +10,8 @@ import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 import { StorageWarningBanner } from '@/components/StorageWarningBanner';
 import { GlobalLocaleSync } from '@/components/GlobalLocaleSync';
+import { SessionExpiryDialog } from '@/components/SessionExpiryDialog';
+import { useTokenExpiryWatcher } from '@/hooks/useTokenExpiryWatcher';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { BrandingProvider } from '@/contexts/BrandingContext';
@@ -105,6 +107,10 @@ function App() {
     void bootstrap();
   }, []);
 
+  // FE-2: Watch JWT expiry — warn before expiry, show re-auth dialog on expire.
+  // The hook is safe to call before keycloakReady (it no-ops when not authenticated).
+  const { expired: sessionExpired, handleReLogin } = useTokenExpiryWatcher();
+
   if (!keycloakReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -129,6 +135,7 @@ function App() {
             <GlobalLocaleSync />
             <StorageWarningBanner />
             <Toaster />
+            <SessionExpiryDialog open={sessionExpired} onReLogin={handleReLogin} />
             <ErrorBoundary pageName="App">
               <RouterProvider router={router} />
             </ErrorBoundary>

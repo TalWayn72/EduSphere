@@ -238,6 +238,26 @@ export function clearTokenRefresh(): void {
   }
 }
 
+/**
+ * Returns the access token expiry timestamp (seconds since epoch), or null
+ * if unavailable (dev mode / not authenticated).
+ */
+export function getTokenExpiry(): number | null {
+  if (DEV_MODE || !keycloak?.tokenParsed) return null;
+  const exp = (keycloak.tokenParsed as Record<string, unknown>).exp;
+  return typeof exp === 'number' ? exp : null;
+}
+
+/**
+ * Attempts to refresh the Keycloak access token.
+ * Resolves `true` if the token was actually refreshed, `false` if still valid.
+ * Rejects on failure (e.g. refresh token expired).
+ */
+export function refreshToken(minValidity = 70): Promise<boolean> {
+  if (DEV_MODE || !keycloak) return Promise.resolve(false);
+  return keycloak.updateToken(minValidity);
+}
+
 function setupTokenRefresh(): void {
   if (DEV_MODE || !keycloak) return;
 
@@ -253,8 +273,10 @@ function setupTokenRefresh(): void {
         }
       })
       .catch(() => {
-        console.error('Failed to refresh token');
-        logout();
+        // FE-2: Do NOT call logout() here — the useTokenExpiryWatcher hook
+        // will detect the expired token and show a re-auth dialog instead
+        // of abruptly redirecting the user to the login page.
+        console.error('[Auth] Silent token refresh failed — session may expire soon.');
       });
   }, 60000);
 }
