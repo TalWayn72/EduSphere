@@ -206,6 +206,25 @@ export class EmbeddingStoreService implements OnModuleDestroy {
     });
   }
 
+  /**
+   * Cascade-delete all embedding rows for a given AGE concept vertex ID.
+   * Called when a concept is deleted from the knowledge graph to prevent
+   * orphaned embedding rows (no FK exists between concept_embeddings and AGE).
+   */
+  async deleteByConceptId(conceptId: string): Promise<number> {
+    const rows = await this.db
+      .delete(schema.concept_embeddings)
+      .where(eq(schema.concept_embeddings.concept_id, conceptId))
+      .returning({ id: schema.concept_embeddings.id });
+    if (rows.length > 0) {
+      this.logger.log(
+        { conceptId, deletedCount: rows.length },
+        'Cascade-deleted orphaned concept embeddings'
+      );
+    }
+    return rows.length;
+  }
+
   async delete(id: string): Promise<boolean> {
     const [c] = await this.db
       .delete(schema.content_embeddings)

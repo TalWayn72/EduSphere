@@ -142,6 +142,15 @@ export class EmbeddingService implements OnModuleDestroy {
 
   // -- Delete ----------------------------------------------------------------
 
+  /**
+   * Cascade-delete all embedding rows for a concept vertex.
+   * Delegates to EmbeddingStoreService; fallback uses direct DB query.
+   */
+  async deleteByConceptId(conceptId: string): Promise<number> {
+    if (this.store) return this.store.deleteByConceptId(conceptId);
+    return this.fallbackDeleteByConceptId(conceptId);
+  }
+
   async delete(id: string): Promise<boolean> {
     if (this.store) return this.store.delete(id);
     return this.fallbackDelete(id);
@@ -326,6 +335,19 @@ export class EmbeddingService implements OnModuleDestroy {
       type: 'transcript_segment',
       similarity: parseFloat(r.similarity),
     }));
+  }
+
+  private async fallbackDeleteByConceptId(conceptId: string): Promise<number> {
+    const rows = await this.db
+      .delete(schema.concept_embeddings)
+      .where(eq(schema.concept_embeddings.concept_id, conceptId))
+      .returning({ id: schema.concept_embeddings.id });
+    if (rows.length > 0) {
+      this.logger.log(
+        `Cascade-deleted ${rows.length} orphaned concept embedding(s) for concept ${conceptId}`
+      );
+    }
+    return rows.length;
   }
 
   private async fallbackDelete(id: string): Promise<boolean> {

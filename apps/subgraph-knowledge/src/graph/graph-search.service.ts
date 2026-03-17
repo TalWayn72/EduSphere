@@ -16,6 +16,14 @@ import {
   scoreConceptsByText,
 } from './graph-search-helpers';
 
+/** Per-tenant HybridRAG fusion weight configuration. */
+export interface RagConfig {
+  vectorWeight: number;
+  graphWeight: number;
+}
+
+const DEFAULT_RAG_CONFIG: RagConfig = { vectorWeight: 0.5, graphWeight: 0.5 };
+
 @Injectable()
 export class GraphSearchService {
   private readonly logger = new Logger(GraphSearchService.name);
@@ -30,7 +38,8 @@ export class GraphSearchService {
     limit: number,
     tenantId: string,
     userId: string,
-    role: string
+    role: string,
+    ragConfig: RagConfig = DEFAULT_RAG_CONFIG
   ): Promise<SemanticResult[]> {
     return withTenantContext(
       db,
@@ -112,7 +121,20 @@ export class GraphSearchService {
           tenantId,
           Math.max(1, Math.floor(limit / 4))
         );
-        return [...vectorResults, ...textResults, ...conceptResults]
+
+        // Apply per-tenant HybridRAG fusion weights.
+        // Vector/text results are scaled by vectorWeight, graph (concept)
+        // results are scaled by graphWeight.
+        const weightedVector = [...vectorResults, ...textResults].map((r) => ({
+          ...r,
+          similarity: r.similarity * ragConfig.vectorWeight,
+        }));
+        const weightedGraph = conceptResults.map((r) => ({
+          ...r,
+          similarity: r.similarity * ragConfig.graphWeight,
+        }));
+
+        return [...weightedVector, ...weightedGraph]
           .sort((a, b) => b.similarity - a.similarity)
           .slice(0, limit);
       }

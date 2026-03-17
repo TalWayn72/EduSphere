@@ -65,7 +65,7 @@ describe('GraphService extended', () => {
     vi.clearAllMocks();
     mc.linkConceptsAndFetch.mockResolvedValue({ from: null, to: null });
     svc = new GraphService(
-      new GraphConceptService(mc as any),
+      new GraphConceptService(mc as any, mc as any),
       new GraphConceptLinkService(mc as any),
       new GraphSearchService(mc as any, mc as any),
       new GraphPersonTermService(mc as any, mc as any),

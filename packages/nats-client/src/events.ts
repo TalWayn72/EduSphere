@@ -37,7 +37,7 @@ import type {
   TranscriptionPayload,
   ContentTranslationPayload,
 } from './content-events.js';
-import type { KnowledgeConceptPayload } from './knowledge-events.js';
+import type { KnowledgeConceptPayload, KnowledgeConceptDeletedPayload } from './knowledge-events.js';
 import type { LessonPayload, LessonPipelineModuleCompletedPayload } from './lesson-events.js';
 import type {
   SocialFeedItemPayload,
@@ -56,6 +56,7 @@ export type NatsEvent =
   | MediaPayload
   | TranscriptionPayload
   | KnowledgeConceptPayload
+  | KnowledgeConceptDeletedPayload
   | ContentTranslationPayload
   | GatewayPubSubPayload
   | UserFollowedPayload

@@ -1,12 +1,13 @@
 /**
  * Knowledge Graph Events
  *
- * Covers: concept extraction, concept persistence
+ * Covers: concept extraction, concept persistence, concept deletion
  */
 
 export type KnowledgeConceptEventType =
   | 'knowledge.concepts.extracted'
-  | 'knowledge.concepts.persisted';
+  | 'knowledge.concepts.persisted'
+  | 'knowledge.concept.deleted';
 
 export interface ExtractedConceptItem {
   readonly name: string;
@@ -20,7 +21,16 @@ export interface KnowledgeConceptPayload {
   readonly concepts: ExtractedConceptItem[];
 }
 
-// ─── Type Guard ──────────────────────────────────────────────────────────────
+/** Payload published on `knowledge.concept.deleted` after a concept vertex
+ *  and its associated embeddings have been removed. */
+export interface KnowledgeConceptDeletedPayload {
+  readonly type: 'knowledge.concept.deleted';
+  readonly conceptId: string;
+  readonly tenantId: string;
+  readonly embeddingsDeleted: number;
+}
+
+// ─── Type Guards ─────────────────────────────────────────────────────────────
 
 export function isKnowledgeConceptEvent(
   e: unknown
@@ -32,5 +42,17 @@ export function isKnowledgeConceptEvent(
     Array.isArray(obj['concepts']) &&
     (obj['type'] === 'knowledge.concepts.extracted' ||
       obj['type'] === 'knowledge.concepts.persisted')
+  );
+}
+
+export function isKnowledgeConceptDeletedEvent(
+  e: unknown
+): e is KnowledgeConceptDeletedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    obj['type'] === 'knowledge.concept.deleted' &&
+    typeof obj['conceptId'] === 'string' &&
+    typeof obj['tenantId'] === 'string'
   );
 }

@@ -7,6 +7,7 @@ import {
   isGatewayPubSubEvent,
   isTranscriptionEvent,
   isKnowledgeConceptEvent,
+  isKnowledgeConceptDeletedEvent,
 } from './events.js';
 import {
   EventValidationError,
@@ -336,6 +337,51 @@ describe('Type Guards', () => {
 
     it('returns false for null', () => {
       expect(isKnowledgeConceptEvent(null)).toBe(false);
+    });
+  });
+
+  describe('isKnowledgeConceptDeletedEvent', () => {
+    it('returns true for valid knowledge.concept.deleted event', () => {
+      expect(
+        isKnowledgeConceptDeletedEvent({
+          type: 'knowledge.concept.deleted',
+          conceptId: 'uuid-1',
+          tenantId: 'uuid-2',
+          embeddingsDeleted: 3,
+        })
+      ).toBe(true);
+    });
+
+    it('returns false when conceptId is missing', () => {
+      expect(
+        isKnowledgeConceptDeletedEvent({
+          type: 'knowledge.concept.deleted',
+          tenantId: 'uuid-2',
+        })
+      ).toBe(false);
+    });
+
+    it('returns false when tenantId is missing', () => {
+      expect(
+        isKnowledgeConceptDeletedEvent({
+          type: 'knowledge.concept.deleted',
+          conceptId: 'uuid-1',
+        })
+      ).toBe(false);
+    });
+
+    it('returns false for wrong type', () => {
+      expect(
+        isKnowledgeConceptDeletedEvent({
+          type: 'knowledge.concepts.extracted',
+          conceptId: 'uuid-1',
+          tenantId: 'uuid-2',
+        })
+      ).toBe(false);
+    });
+
+    it('returns false for null', () => {
+      expect(isKnowledgeConceptDeletedEvent(null)).toBe(false);
     });
   });
 });

@@ -295,6 +295,30 @@ describe('EmbeddingService', () => {
     });
   });
 
+  // ── deleteByConceptId ─────────────────────────────────────────────────────
+
+  describe('deleteByConceptId()', () => {
+    it('deletes concept embeddings by concept_id and returns count', async () => {
+      mockDelete.mockReturnValueOnce({
+        where: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([{ id: 'emb-3' }]),
+        }),
+      });
+      const count = await service.deleteByConceptId('conc-1');
+      expect(count).toBe(1);
+    });
+
+    it('returns 0 when no embeddings match', async () => {
+      mockDelete.mockReturnValueOnce({
+        where: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([]),
+        }),
+      });
+      const count = await service.deleteByConceptId('conc-missing');
+      expect(count).toBe(0);
+    });
+  });
+
   // ── delete ────────────────────────────────────────────────────────────────
 
   describe('delete()', () => {

@@ -8,6 +8,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { db, withTenantContext } from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
+import { EmbeddingService } from '../embedding/embedding.service';
 import { toUserRole, type GraphConceptNode } from './graph-types';
 import { DEFAULT_CONCEPT_LIMIT } from '../constants';
 
@@ -15,7 +16,10 @@ import { DEFAULT_CONCEPT_LIMIT } from '../constants';
 export class GraphConceptService {
   private readonly logger = new Logger(GraphConceptService.name);
 
-  constructor(private readonly cypher: CypherConceptService) {}
+  constructor(
+    private readonly cypher: CypherConceptService,
+    private readonly embeddingService: EmbeddingService
+  ) {}
 
   mapConcept(node: GraphConceptNode) {
     return {
@@ -139,7 +143,26 @@ export class GraphConceptService {
     return withTenantContext(
       db,
       { tenantId, userId, userRole: toUserRole(role) },
-      async () => this.cypher.deleteConcept(id, tenantId)
+      async () => {
+        const deleted = await this.cypher.deleteConcept(id, tenantId);
+        if (deleted) {
+          try {
+            const count = await this.embeddingService.deleteByConceptId(id);
+            if (count > 0) {
+              this.logger.log(
+                { conceptId: id, tenantId, embeddingsDeleted: count },
+                'Cascade-deleted orphaned concept embeddings'
+              );
+            }
+          } catch (err) {
+            this.logger.error(
+              { err, conceptId: id, tenantId },
+              'Failed to cascade-delete concept embeddings — orphans may remain'
+            );
+          }
+        }
+        return deleted;
+      }
     );
   }
 }

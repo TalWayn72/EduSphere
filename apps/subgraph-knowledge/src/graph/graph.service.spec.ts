@@ -89,7 +89,7 @@ describe('GraphService', () => {
       to: null,
     });
     service = new GraphService(
-      new GraphConceptService(mockCypherService as any),
+      new GraphConceptService(mockCypherService as any, mockEmbeddingService as any),
       new GraphConceptLinkService(mockCypherService as any),
       new GraphSearchService(
         mockCypherService as any,

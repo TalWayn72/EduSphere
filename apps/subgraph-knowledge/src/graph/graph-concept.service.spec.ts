@@ -29,8 +29,17 @@ vi.mock('./cypher-concept.service', () => ({
   },
 }));
 
+// ─── EmbeddingService mock ───────────────────────────────────────────────────
+const mockDeleteByConceptId = vi.fn();
+vi.mock('../embedding/embedding.service', () => ({
+  EmbeddingService: class {
+    deleteByConceptId = mockDeleteByConceptId;
+  },
+}));
+
 import { GraphConceptService } from './graph-concept.service.js';
 import { CypherConceptService } from './cypher-concept.service.js';
+import { EmbeddingService } from '../embedding/embedding.service.js';
 
 const sampleNode = {
   id: 'concept-1',
@@ -47,7 +56,10 @@ describe('GraphConceptService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new GraphConceptService(new CypherConceptService({} as never));
+    service = new GraphConceptService(
+      new CypherConceptService({} as never),
+      new EmbeddingService()
+    );
   });
 
   describe('findConceptById()', () => {
@@ -114,6 +126,42 @@ describe('GraphConceptService', () => {
   describe('deleteConcept()', () => {
     it('delegates to cypher.deleteConcept and returns result', async () => {
       mockDeleteConcept.mockResolvedValue(true);
+      mockDeleteByConceptId.mockResolvedValue(0);
+      const result = await service.deleteConcept(
+        'concept-1',
+        'tenant-1',
+        'user-1',
+        'ORG_ADMIN'
+      );
+      expect(result).toBe(true);
+    });
+
+    it('cascade-deletes concept embeddings when concept is deleted', async () => {
+      mockDeleteConcept.mockResolvedValue(true);
+      mockDeleteByConceptId.mockResolvedValue(2);
+      await service.deleteConcept(
+        'concept-1',
+        'tenant-1',
+        'user-1',
+        'ORG_ADMIN'
+      );
+      expect(mockDeleteByConceptId).toHaveBeenCalledWith('concept-1');
+    });
+
+    it('does not cascade-delete embeddings when concept deletion fails', async () => {
+      mockDeleteConcept.mockResolvedValue(false);
+      await service.deleteConcept(
+        'concept-1',
+        'tenant-1',
+        'user-1',
+        'ORG_ADMIN'
+      );
+      expect(mockDeleteByConceptId).not.toHaveBeenCalled();
+    });
+
+    it('still returns true if embedding cleanup fails', async () => {
+      mockDeleteConcept.mockResolvedValue(true);
+      mockDeleteByConceptId.mockRejectedValue(new Error('DB error'));
       const result = await service.deleteConcept(
         'concept-1',
         'tenant-1',

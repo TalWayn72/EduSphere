@@ -164,6 +164,28 @@ describe('EmbeddingStoreService', () => {
     });
   });
 
+  describe('deleteByConceptId()', () => {
+    it('deletes embedding rows matching the concept_id and returns count', async () => {
+      mockDelete.mockReturnValueOnce({
+        where: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([{ id: 'emb-3' }, { id: 'emb-4' }]),
+        }),
+      });
+      const count = await service.deleteByConceptId('conc-1');
+      expect(count).toBe(2);
+    });
+
+    it('returns 0 when no matching embeddings exist', async () => {
+      mockDelete.mockReturnValueOnce({
+        where: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([]),
+        }),
+      });
+      const count = await service.deleteByConceptId('conc-missing');
+      expect(count).toBe(0);
+    });
+  });
+
   describe('delete()', () => {
     it('returns true when deleted from content_embeddings', async () => {
       mockDeleteChain(true);
