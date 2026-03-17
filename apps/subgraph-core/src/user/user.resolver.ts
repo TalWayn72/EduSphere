@@ -7,7 +7,11 @@ import { PublicProfileService } from './public-profile.service';
 import { ActivityFeedService } from './activity-feed.service';
 import { InProgressCoursesService } from './in-progress-courses.service';
 import { RecommendedCoursesService } from './recommended-courses.service';
-import { UpdateUserPreferencesSchema } from './user.schemas';
+import {
+  CreateUserInputSchema,
+  UpdateUserInputSchema,
+  UpdateUserPreferencesSchema,
+} from './user.schemas';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -101,8 +105,12 @@ export class UserResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
+    const validated = CreateUserInputSchema.parse(input);
     return this.userService.create(
-      input as Parameters<UserService['create']>[0],
+      {
+        ...validated,
+        tenantId: validated.tenantId || context.authContext.tenantId || '',
+      },
       context.authContext
     );
   }
@@ -114,11 +122,8 @@ export class UserResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.userService.update(
-      id,
-      input as Parameters<UserService['update']>[1],
-      context.authContext
-    );
+    const validated = UpdateUserInputSchema.parse(input);
+    return this.userService.update(id, validated, context.authContext);
   }
 
   @Mutation('updateUserPreferences')

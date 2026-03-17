@@ -12,6 +12,10 @@ import { trace, SpanStatusCode } from '@opentelemetry/api';
 import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 import { CourseService } from './course.service';
+import {
+  CreateCourseInputSchema,
+  UpdateCourseInputSchema,
+} from './course.schemas';
 import { EnrollmentService } from './enrollment.service';
 import { AdminEnrollmentService } from './admin-enrollment.service';
 import { ComplianceLibraryService } from './compliance-library.service';
@@ -96,8 +100,9 @@ export class CourseResolver {
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
+    const validated = CreateCourseInputSchema.parse(input);
     return this.courseService.create({
-      ...(input as unknown as Parameters<CourseService['create']>[0]),
+      ...validated,
       tenantId: tenantCtx.tenantId,
       instructorId: tenantCtx.userId,
       creatorId: tenantCtx.userId,
@@ -111,10 +116,8 @@ export class CourseResolver {
     @Context() ctx: GqlContext
   ) {
     requireAuth(ctx);
-    return this.courseService.update(
-      id,
-      input as unknown as Parameters<CourseService['update']>[1]
-    );
+    const validated = UpdateCourseInputSchema.parse(input);
+    return this.courseService.update(id, validated);
   }
 
   @Mutation('publishCourse')
