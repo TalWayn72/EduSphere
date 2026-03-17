@@ -18,6 +18,7 @@ import {
   complexityLimitRule,
 } from './middleware/query-complexity.js';
 import { createNatsPubSub, shutdownNatsPubSub } from './nats-subscriptions.js';
+import { registerShutdownHandlers } from './graceful-shutdown.js';
 
 const logger = pino({
   transport: { target: 'pino-pretty' },
@@ -300,23 +301,11 @@ server.listen(port, () => {
   );
 });
 
-// ── Graceful shutdown ─────────────────────────────────────────────────────────
+// ── Graceful shutdown (WebSocket drain + NATS cleanup) ──────────────────────
 
-async function shutdown(signal: string): Promise<void> {
-  logger.info({ signal }, 'Received shutdown signal — draining connections');
-
-  server.close(() => {
-    logger.info('HTTP server closed');
-  });
-
-  stopRateLimitCleanup();
-  logger.info('Rate-limit cleanup stopped');
-
-  await shutdownNatsPubSub();
-  logger.info('NATS pub/sub drained');
-
-  process.exit(0);
-}
-
-process.on('SIGTERM', () => void shutdown('SIGTERM'));
-process.on('SIGINT', () => void shutdown('SIGINT'));
+registerShutdownHandlers({
+  server,
+  stopRateLimitCleanup,
+  shutdownNatsPubSub,
+  logger,
+});
