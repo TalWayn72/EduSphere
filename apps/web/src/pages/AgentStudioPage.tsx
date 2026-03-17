@@ -173,8 +173,17 @@ export function AgentStudioPage() {
         input: { name: workflowName, nodes, edges },
       });
       if (res.error) {
-        console.error('[AgentStudioPage] Save failed:', res.error.message);
-        setSaveStatus('error');
+        const consentErr = res.error.graphQLErrors?.find(
+          (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+        );
+        if (consentErr) {
+          console.error('[AgentStudioPage] Consent required for AI workflow save');
+          setSaveStatus('error');
+          // TODO: surface consent prompt via toast/modal
+        } else {
+          console.error('[AgentStudioPage] Save failed:', res.error.message);
+          setSaveStatus('error');
+        }
         setTimeout(() => setSaveStatus('idle'), TOAST_AUTO_DISMISS_MS);
         return;
       }

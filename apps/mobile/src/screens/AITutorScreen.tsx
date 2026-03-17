@@ -188,7 +188,22 @@ export default function AITutorScreen() {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
 
-    await sendMessage({ variables: { sessionId: effectiveSessionId, content: input } });
+    try {
+      await sendMessage({ variables: { sessionId: effectiveSessionId, content: input } });
+    } catch (error: unknown) {
+      const gqlError = error as { graphQLErrors?: Array<{ extensions?: { code?: string } }> };
+      const consentErr = gqlError?.graphQLErrors?.find(
+        (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+      );
+      if (consentErr) {
+        Alert.alert(
+          'Consent Required',
+          'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.'
+        );
+      } else {
+        Alert.alert('Error', 'Failed to send message. Please try again.');
+      }
+    }
   };
 
   if (sessionLoading) {

@@ -16,6 +16,7 @@ import {
   Platform,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useMutation } from '@apollo/client';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -62,6 +63,19 @@ export default function AIChatScreen({ route }: Props) {
       const aiMsg = result.data?.sendMessage as ChatMessage | undefined;
       if (aiMsg) {
         setMessages((prev) => [...prev, aiMsg]);
+      }
+    } catch (error: unknown) {
+      const gqlError = error as { graphQLErrors?: Array<{ extensions?: { code?: string } }> };
+      const consentErr = gqlError?.graphQLErrors?.find(
+        (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+      );
+      if (consentErr) {
+        Alert.alert(
+          'Consent Required',
+          'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.'
+        );
+      } else {
+        Alert.alert('Error', 'Failed to send message. Please try again.');
       }
     } finally {
       setIsTyping(false);

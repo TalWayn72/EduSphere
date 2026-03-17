@@ -521,4 +521,40 @@ test.describe('AI Course Builder — Error Handling', () => {
     // Error container uses bg-destructive/10 class — error text area is visible
     await expect(dialog.locator('.bg-destructive\\/10').first()).toBeVisible({ timeout: 10_000 });
   });
+
+  test('shows consent-specific error when CONSENT_REQUIRED is returned', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = await route.request().postDataJSON();
+      if (body?.query?.includes('GenerateCourseFromPrompt')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: null,
+            errors: [{
+              message: 'AI processing requires consent',
+              extensions: { code: 'CONSENT_REQUIRED', consentType: 'AI_PROCESSING' },
+            }],
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await login(page);
+    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-testid="launch-ai-builder-btn"]').click();
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
+
+    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('textbox').fill('Test topic to trigger consent error');
+    await clickDialogButton(page, 'Generate Course');
+
+    // Consent-specific error message should appear
+    await expect(dialog.getByText(/consent|privacy/i)).toBeVisible({ timeout: 10_000 });
+
+    // No raw GraphQL error strings shown to user
+    await assertNoRawErrors(page);
+  });
 });

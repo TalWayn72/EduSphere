@@ -1,8 +1,6 @@
 import { gql } from 'urql';
 
 // ─── F-AI Course Generator ─────────────────────────────────────────────────────
-// generateCourseFromPrompt not yet in supergraph.
-// Excluded from codegen until the supergraph is recomposed.
 // Used by: AiCourseCreatorModal.tsx
 
 export const GENERATE_COURSE_FROM_PROMPT_MUTATION = gql`

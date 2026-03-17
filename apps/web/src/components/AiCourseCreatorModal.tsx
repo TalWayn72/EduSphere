@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useSubscription } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -62,6 +63,8 @@ export function AiCourseCreatorModal({
   open,
   onClose,
 }: AiCourseCreatorModalProps) {
+  const { t } = useTranslation('courses');
+  const { t: tCommon } = useTranslation('common');
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
   const [level, setLevel] = useState('');
@@ -115,14 +118,14 @@ export function AiCourseCreatorModal({
       setPauseSubscription(true);
       setGenerating(false);
       setOutline({
-        title: exec.output.courseTitle ?? 'Untitled Course',
+        title: exec.output.courseTitle ?? t('aiCreator.untitledCourse'),
         description: exec.output.courseDescription ?? '',
         modules: exec.output.modules ?? [],
       });
     } else if (exec.status === 'FAILED') {
       setPauseSubscription(true);
       setGenerating(false);
-      setErrorMsg(exec.output?.error ?? 'Generation failed. Please try again.');
+      setErrorMsg(exec.output?.error ?? t('aiCreator.generationFailed'));
     }
   }, [subData]);
 
@@ -140,10 +143,18 @@ export function AiCourseCreatorModal({
     });
     if (error || !data) {
       setGenerating(false);
-      // Map all server/network errors to a user-friendly message.
-      // Never expose raw GraphQL messages (e.g. "Cannot return null for
-      // non-nullable field") — these are internal implementation details.
-      setErrorMsg('Failed to generate course outline. Please try again.');
+      // Check for CONSENT_REQUIRED from SI-10 LLM consent guard
+      const consentErr = error?.graphQLErrors?.find(
+        (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+      );
+      if (consentErr) {
+        setErrorMsg(t('aiCreator.consentRequired'));
+      } else {
+        // Map all other server/network errors to a user-friendly message.
+        // Never expose raw GraphQL messages (e.g. "Cannot return null for
+        // non-nullable field") — these are internal implementation details.
+        setErrorMsg(t('aiCreator.generateError'));
+      }
       return;
     }
     const { executionId: eid, status } = data.generateCourseFromPrompt;
@@ -152,7 +163,7 @@ export function AiCourseCreatorModal({
       const r = data.generateCourseFromPrompt;
       setGenerating(false);
       setOutline({
-        title: r.courseTitle ?? 'Untitled',
+        title: r.courseTitle ?? t('aiCreator.untitledCourse'),
         description: r.courseDescription ?? '',
         modules: r.modules,
       });
@@ -172,12 +183,12 @@ export function AiCourseCreatorModal({
       },
     });
     if (error || !data) {
-      setErrorMsg('Failed to create course draft. Please try again.');
+      setErrorMsg(t('aiCreator.createDraftError'));
       return;
     }
     onClose();
     navigate('/courses/' + data.createCourse.id, {
-      state: { message: '"' + data.createCourse.title + '" created as draft!' },
+      state: { message: t('aiCreator.createdAsDraft', { title: data.createCourse.title }) },
     });
   };
 
@@ -192,11 +203,10 @@ export function AiCourseCreatorModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            AI Course Creator
+            {t('aiCreator.title')}
           </DialogTitle>
           <DialogDescription>
-            Describe your course topic and let AI generate a full structured
-            outline.
+            {t('aiCreator.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -204,10 +214,10 @@ export function AiCourseCreatorModal({
           <div className="space-y-4 mt-2">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">
-                Course Topic / Description *
+                {t('aiCreator.topicLabel')}
               </label>
               <Textarea
-                placeholder="e.g. Introduction to Machine Learning for high school students"
+                placeholder={t('aiCreator.topicPlaceholder')}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="min-h-[100px]"
@@ -216,27 +226,27 @@ export function AiCourseCreatorModal({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Audience Level</label>
+                <label className="text-sm font-medium">{t('aiCreator.audienceLevel')}</label>
                 <select
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
                   disabled={generating}
                 >
-                  <option value="">Any level</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
+                  <option value="">{t('aiCreator.anyLevel')}</option>
+                  <option value="beginner">{t('aiCreator.beginner')}</option>
+                  <option value="intermediate">{t('aiCreator.intermediate')}</option>
+                  <option value="advanced">{t('aiCreator.advanced')}</option>
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Estimated Hours</label>
+                <label className="text-sm font-medium">{t('estimatedHours')}</label>
                 <input
                   type="number"
                   min={1}
                   max={200}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="e.g. 10"
+                  placeholder={t('aiCreator.estimatedHoursPlaceholder')}
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
                   disabled={generating}
@@ -251,8 +261,8 @@ export function AiCourseCreatorModal({
             )}
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={onClose} disabled={generating}>
-                <X className="h-4 w-4 mr-1.5" />
-                Cancel
+                <X className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" />
+                {tCommon('cancel')}
               </Button>
               <Button
                 onClick={handleGenerate}
@@ -260,13 +270,13 @@ export function AiCourseCreatorModal({
               >
                 {generating ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                    Generating...
+                    <Loader2 className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5 animate-spin" />
+                    {t('aiCreator.generating')}
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 mr-1.5" />
-                    Generate Course
+                    <Sparkles className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" />
+                    {t('aiCreator.generateCourse')}
                   </>
                 )}
               </Button>
@@ -286,7 +296,7 @@ export function AiCourseCreatorModal({
               {outline.modules.map((mod, idx) => (
                 <div key={idx} className="border rounded-lg p-3 space-y-2">
                   <p className="font-medium text-sm">
-                    Module {idx + 1}: {mod.title}
+                    {t('aiCreator.moduleNumber', { n: idx + 1, title: mod.title })}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {mod.description}
@@ -313,14 +323,14 @@ export function AiCourseCreatorModal({
             )}
             <div className="flex justify-end gap-3 pt-2 border-t">
               <Button variant="outline" onClick={() => setOutline(null)}>
-                Regenerate
+                {t('aiCreator.regenerate')}
               </Button>
               <Button variant="outline" onClick={onClose}>
-                Discard
+                {t('aiCreator.discard')}
               </Button>
               <Button onClick={handleCreateDraft}>
-                <CheckCircle2 className="h-4 w-4 mr-1.5" />
-                Create Draft Course
+                <CheckCircle2 className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" />
+                {t('aiCreator.createDraftCourse')}
               </Button>
             </div>
           </div>

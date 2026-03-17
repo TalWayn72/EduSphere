@@ -1,6 +1,88 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 16 מרץ 2026 (All 64 Phases ✅ Complete — BUG-065 recurrence fixed, BUG-068/069 E2E infra fixed)
+**תאריך עדכון:** 17 מרץ 2026 (BUG-071 — AI Course Creator generic error handling + Memory Safety)
+
+---
+
+## BUG-071 — AI Course Creator: Generic Error Handling + Memory Safety Violations
+
+**סטטוס:** ✅ Fixed (2026-03-17)
+**חומרה:** 🟡 Medium (UX degradation + Memory Safety violation — no data loss)
+
+### שורש הבעיה
+
+1. **Generic error swallowing**: `AiCourseCreatorModal` mapped ALL GraphQL errors (consent, network, DB, LLM) to a single "Failed to generate course outline" message. Users with missing AI consent (SI-10) saw a generic error instead of being directed to privacy settings.
+2. **Memory Safety violation**: `CourseGeneratorService.generateCourse()` used bare fire-and-forget without `Promise.race` timeout — violating CLAUDE.md Memory Safety rule.
+3. **Poor LLM error diagnostics**: When Ollama is unreachable, the workflow returned a generic "outline_generation failed" without actionable guidance.
+4. **Misleading code comment**: `agent-course-gen.queries.ts` said "not yet in supergraph" but the mutation IS in the supergraph since Phase 36.
+
+### Discovery Waves
+
+- **Wave 1 (exact match)**: `AiCourseCreatorModal.tsx` — original reporter
+- **Wave 2 (similarity — 7 CRITICAL)**: AI mutations missing `CONSENT_REQUIRED` check:
+  - `ChavrutaPartnerPage.tsx`, `AIChatPanel.tsx`, `useChavrutaDebate.ts`, `useAgentChat.ts`, `AgentStudioPage.tsx`, `AIChatScreen.tsx` (mobile), `AITutorScreen.tsx` (mobile)
+- **Wave 3 (class of bug)**: 45 total files with generic mutation error handling (38 non-AI = lower priority, tracked for future improvement)
+
+### Fix Rounds
+
+**Round 1 — Frontend consent differentiation**:
+- `AiCourseCreatorModal.tsx` — check `error.graphQLErrors` for `CONSENT_REQUIRED` code, show specific i18n message
+- 10 i18n locale files — added `aiCreator.consentRequired` key (en, he, es, fr, pt, ru, hi, id, bn, zh-CN)
+- `agent-course-gen.queries.ts` — removed misleading "not yet in supergraph" comment
+
+**Round 2 — Critical AI mutations (7 files)**:
+- `ChavrutaPartnerPage.tsx`, `AIChatPanel.tsx`, `useChavrutaDebate.ts`, `useAgentChat.ts` — web consent checks
+- `AIChatScreen.tsx`, `AITutorScreen.tsx` — mobile Alert.alert for consent errors
+- `AgentStudioPage.tsx` — agent studio consent check
+
+**Round 3 — Backend fixes**:
+- `course-generator.service.ts` — `Promise.race` with 5-min timeout + `markFailed` on timeout/error
+- `course-generator.workflow.ts` — detect ECONNREFUSED/fetch-failed → actionable LLM error message
+
+### Tests Added
+
+- `AiCourseCreatorModal.test.tsx` — 2 new tests: consent error display + generic error differentiation (12/12 pass)
+- `ai-course-builder.spec.ts` — 1 new E2E test: consent error scenario with GraphQL interception
+- `course-generator.service.spec.ts` — 5/5 existing tests pass (timeout change is backwards-compatible)
+
+### Anti-Recurrence
+
+- Unit test `AiCourseCreatorModal.test.tsx:10-11` guards consent vs generic error differentiation
+- E2E test `ai-course-builder.spec.ts` (Suite 6) verifies consent error UI with mock GraphQL interception
+- Pattern: all future AI mutation handlers MUST check `graphQLErrors[].extensions.code === 'CONSENT_REQUIRED'`
+
+---
+
+## BUG-070 — 9 Pre-Existing Test Failures (5 Distinct Failure Patterns)
+
+**סטטוס:** ✅ Fixed (2026-03-17)
+**חומרה:** 🟡 Medium (tests red on master, no production impact)
+
+### Root Cause (5 patterns)
+
+1. **Generic error messages**: Hooks (`useGradeQuiz`, `useSubmitAssignment`) and components (`InviteUserModal`) return user-friendly generic messages, but tests asserted raw error strings
+2. **Missing module mocks**: `InstructorAnalyticsDashboard` and `HrisConfigPage` tests lacked mocks for `Breadcrumbs`, `PageShell`, `@/lib/constants`
+3. **Missing data-testid**: `PrivacyPage.tsx` and `TermsPage.tsx` had no `data-testid` attributes
+4. **CSS class mismatch**: `AssessmentPage` tests asserted `max-w-2xl` but `PageShell size="md"` = `max-w-4xl`
+5. **Duplicate heading query**: `ProgramDetailPage` used `getByRole('heading')` on a name with 2+ matches
+
+### Discovery Waves
+
+- **Wave 1 (exact match)**: 10 failing test files identified, 1 already passing (CourseCreatePage)
+- **Wave 2 (similarity)**: Checked all pages/hooks/components — no additional instances of same anti-patterns
+- **Wave 3 (class of bug)**: Proxy-based `lucide-react` mocks incompatible with vitest `pool: 'forks'` on Windows — reverted all to explicit named exports
+
+### Fix Rounds
+
+**Round 1** (`7c1e24d`): 7 files — useGradeQuiz.test.ts, useSubmitAssignment.test.ts, UserManagementPage.modals.test.tsx, AssessmentPage.test.tsx, PrivacyPage.tsx, TermsPage.tsx, ProgramDetailPage.test.tsx
+
+**Round 2** (`fed522a`): 2 files — HrisConfigPage.test.tsx, InstructorAnalyticsDashboard.test.tsx (lucide-react Proxy→explicit mocks, added Breadcrumbs/PageShell/constants mocks)
+
+### Anti-Recurrence
+
+- All 9 test files now pass (95 tests total)
+- Full `pnpm --filter @edusphere/web test` suite verified passing 4× consecutively
+- Pattern: never use `new Proxy()` for lucide-react mocks with vitest forks pool
 
 ---
 

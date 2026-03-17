@@ -202,6 +202,23 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
             'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
           context: { contentId },
         });
+        if (res.error) {
+          const consentErr = res.error.graphQLErrors?.find(
+            (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+          );
+          if (consentErr) {
+            setConfirmedMessages((prev) => [
+              ...prev,
+              {
+                id: `consent-${Date.now()}`,
+                role: 'agent' as const,
+                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+              },
+            ]);
+            setIsStreaming(false);
+            return;
+          }
+        }
         sid = res.data?.startAgentSession?.id ?? null;
         if (sid) setSessionId(sid);
       }
@@ -211,6 +228,23 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           sessionId: sid,
           content: trimmed,
         });
+        if (res.error) {
+          const consentErr = res.error.graphQLErrors?.find(
+            (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+          );
+          if (consentErr) {
+            setConfirmedMessages((prev) => [
+              ...prev,
+              {
+                id: `consent-${Date.now()}`,
+                role: 'agent' as const,
+                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+              },
+            ]);
+            setIsStreaming(false);
+            return;
+          }
+        }
         const reply = res.data?.sendMessage;
         if (reply) {
           setConfirmedMessages((prev) => {

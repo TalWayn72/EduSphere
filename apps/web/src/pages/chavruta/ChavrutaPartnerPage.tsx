@@ -42,10 +42,22 @@ export function ChavrutaPartnerPage() {
     setSelectedPartnerId(partnerId);
     const result = await createSession({ input: { partnerId, courseId, topic } });
     if (result.error) {
-      console.error(
-        '[ChavrutaPartnerPage] Failed to create session:',
-        result.error.message,
+      const consentErr = result.error.graphQLErrors?.find(
+        (e) => e.extensions?.code === 'CONSENT_REQUIRED'
       );
+      if (consentErr) {
+        console.error(
+          '[ChavrutaPartnerPage] AI features require consent:',
+          consentErr.message,
+        );
+        // TODO: surface consent banner to user
+        alert('AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.');
+      } else {
+        console.error(
+          '[ChavrutaPartnerPage] Failed to create session:',
+          result.error.message,
+        );
+      }
     }
   };
 

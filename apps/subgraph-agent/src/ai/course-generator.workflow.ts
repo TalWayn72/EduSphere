@@ -105,6 +105,10 @@ async function outlineGenerationNode(
     return { courseOutline: object };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    const isConnectionError = msg.includes('ECONNREFUSED') || msg.includes('fetch failed') || msg.includes('network');
+    if (isConnectionError) {
+      return { error: `LLM service unavailable. Ensure Ollama is running at ${process.env.OLLAMA_URL ?? 'http://localhost:11434'} or set OPENAI_API_KEY for cloud LLM.` };
+    }
     return { error: `outline_generation failed: ${msg}` };
   }
 }

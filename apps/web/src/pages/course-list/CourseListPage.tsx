@@ -67,7 +67,7 @@ export function CourseList() {
                 className="gap-2"
               >
                 <Sparkles className="h-4 w-4" />
-                AI Create Course
+                {t('aiCreator.aiCreateCourse')}
               </Button>
               <Button
                 onClick={() => navigate('/courses/new')}

@@ -85,14 +85,23 @@ export class CourseGeneratorService implements OnModuleDestroy {
 
     const executionId = execution.id;
 
-    // Fire-and-forget: run workflow asynchronously
-    this.runWorkflowAsync(executionId, options).catch((err: unknown) => {
-      const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error(
-        { executionId, err: msg },
-        'Course generation workflow failed'
-      );
-    });
+    // Fire-and-forget with 5-min timeout (Memory Safety: Promise.race required)
+    const WORKFLOW_TIMEOUT_MS = 5 * 60 * 1000;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Course generation timed out after 5 minutes')), WORKFLOW_TIMEOUT_MS)
+    );
+    Promise.race([this.runWorkflowAsync(executionId, options), timeoutPromise]).catch(
+      async (err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.error(
+          { executionId, err: msg },
+          'Course generation workflow failed'
+        );
+        await this.markFailed(executionId, msg).catch((dbErr) =>
+          this.logger.error({ executionId, dbErr }, 'Failed to mark execution as failed')
+        );
+      }
+    );
 
     return { executionId, status: 'RUNNING', modules: [] };
   }

@@ -160,13 +160,49 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           templateType: AGENT_TO_TEMPLATE[selectedAgent],
           context: {},
         });
+        if (res.error) {
+          const consentErr = res.error.graphQLErrors?.find(
+            (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+          );
+          if (consentErr) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `err-${Date.now()}`,
+                role: 'agent' as const,
+                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+                timestamp: new Date(),
+              },
+            ]);
+            setIsStreaming(false);
+            return;
+          }
+        }
         sid =
           (res.data?.startAgentSession as { id?: string } | undefined)?.id ??
           null;
         if (sid) setSessionId(sid);
       }
       if (sid) {
-        await sendMessage({ sessionId: sid, content: text });
+        const res = await sendMessage({ sessionId: sid, content: text });
+        if (res.error) {
+          const consentErr = res.error.graphQLErrors?.find(
+            (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+          );
+          if (consentErr) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `err-${Date.now()}`,
+                role: 'agent' as const,
+                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+                timestamp: new Date(),
+              },
+            ]);
+            setIsStreaming(false);
+            return;
+          }
+        }
       }
     } catch {
       setIsStreaming(false);

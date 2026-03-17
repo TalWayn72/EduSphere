@@ -334,10 +334,10 @@ export function CourseCreatePage() {
                   <span className="text-2xl">✨</span>
                   <div className="flex-1">
                     <h3 className="font-semibold text-indigo-300">
-                      AI Course Builder — Build in 10 Minutes
+                      {t('aiCreator.builderTitle')}
                     </h3>
                     <p className="mt-1 text-sm text-slate-400">
-                      Describe your course → AI creates all modules, lessons, and quiz questions automatically.
+                      {t('aiCreator.builderDescription')}
                     </p>
                   </div>
                   <Button
@@ -345,7 +345,7 @@ export function CourseCreatePage() {
                     onClick={() => setShowAiModal(true)}
                     className="bg-indigo-600 hover:bg-indigo-700"
                   >
-                    Launch AI Builder →
+                    {t('aiCreator.launchAiBuilder')}
                   </Button>
                 </div>
               </div>

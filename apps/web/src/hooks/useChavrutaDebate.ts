@@ -157,9 +157,18 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
           timerRef.current = setTimeout(() => setIsLoading(false), 30_000);
           return;
         }
-      } catch (err) {
-        console.error('[useChavrutaDebate] Failed to send argument:', err);
-        setError('Failed to send message. Please try again.');
+      } catch (err: unknown) {
+        const gqlErrors = (err as { graphQLErrors?: Array<{ extensions?: { code?: string }; message?: string }> })?.graphQLErrors;
+        const consentErr = gqlErrors?.find(
+          (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+        );
+        if (consentErr) {
+          setError('AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.');
+          setNeedsConsent(true);
+        } else {
+          console.error('[useChavrutaDebate] Failed to send argument:', err);
+          setError('Failed to send message. Please try again.');
+        }
       }
 
       // Fallback mock when backend is unavailable

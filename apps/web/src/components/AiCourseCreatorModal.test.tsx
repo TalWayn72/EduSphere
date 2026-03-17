@@ -162,6 +162,123 @@ describe('AiCourseCreatorModal', () => {
     expect(screen.getByText('Module 1: Intro')).toBeInTheDocument();
   });
 
+  it('shows consent error when CONSENT_REQUIRED is returned', async () => {
+    const consentExecute = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        graphQLErrors: [
+          {
+            message: 'blocked',
+            extensions: { code: 'CONSENT_REQUIRED' },
+          },
+        ],
+      },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      {} as never,
+      consentExecute,
+    ]);
+    renderModal();
+    const textarea = screen.getByPlaceholderText(
+      /introduction to machine learning/i
+    );
+    fireEvent.change(textarea, { target: { value: 'TypeScript basics' } });
+    fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/AI features require your consent/i)
+      ).toBeInTheDocument()
+    );
+    // Generic error should NOT appear
+    expect(
+      screen.queryByText(/failed to generate course outline/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows generic error for non-consent GraphQL errors', async () => {
+    const serverExecute = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        graphQLErrors: [
+          {
+            message: 'Internal error',
+            extensions: { code: 'INTERNAL_SERVER_ERROR' },
+          },
+        ],
+      },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      {} as never,
+      serverExecute,
+    ]);
+    renderModal();
+    const textarea = screen.getByPlaceholderText(
+      /introduction to machine learning/i
+    );
+    fireEvent.change(textarea, { target: { value: 'TypeScript basics' } });
+    fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/failed to generate course outline/i)
+      ).toBeInTheDocument()
+    );
+    // Consent error should NOT appear
+    expect(
+      screen.queryByText(/AI features require your consent/i)
+    ).not.toBeInTheDocument();
+  });
+
+  // ── i18n regression tests (BUG: modal showed English when locale=he) ──
+
+  it('does NOT contain hardcoded English strings — all text comes from i18n', () => {
+    renderModal();
+    // These are the i18n-resolved English strings (from test mock).
+    // The point: if someone reverts to hardcoded text, these still pass —
+    // but the NEGATIVE assertions below catch raw strings that bypass i18n.
+
+    // Title comes from t('aiCreator.title'), not hardcoded
+    expect(screen.getByText('AI Course Creator')).toBeInTheDocument();
+
+    // Verify NO raw untranslated fallback keys are rendered
+    expect(screen.queryByText('aiCreator.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('aiCreator.description')).not.toBeInTheDocument();
+    expect(screen.queryByText('aiCreator.topicLabel')).not.toBeInTheDocument();
+    expect(screen.queryByText('aiCreator.audienceLevel')).not.toBeInTheDocument();
+  });
+
+  it('renders translated module label with interpolation', async () => {
+    const successExecute = vi.fn().mockResolvedValue({
+      data: {
+        generateCourseFromPrompt: {
+          executionId: 'exec-i18n',
+          status: 'COMPLETED',
+          courseTitle: 'Test',
+          courseDescription: 'Desc',
+          modules: [
+            { title: 'Basics', description: 'D', contentItemTitles: ['A'] },
+          ],
+        },
+      },
+      error: undefined,
+    });
+    let mutationCallCount = 0;
+    vi.mocked(urql.useMutation).mockImplementation(() => {
+      const isFirst = mutationCallCount % 2 === 0;
+      mutationCallCount++;
+      return [{} as never, isFirst ? successExecute : NOOP_EXECUTE];
+    });
+    renderModal();
+    fireEvent.change(
+      screen.getByPlaceholderText(/introduction to machine learning/i),
+      { target: { value: 'test' } }
+    );
+    fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
+    await waitFor(() =>
+      // Interpolated: t('aiCreator.moduleNumber', {n:1, title:'Basics'}) → "Module 1: Basics"
+      expect(screen.getByText('Module 1: Basics')).toBeInTheDocument()
+    );
+  });
+
   it('does not render when open is false', () => {
     render(
       <MemoryRouter>
