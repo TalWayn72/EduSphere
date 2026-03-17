@@ -145,6 +145,33 @@ const CrmSettingsPage = lazy(() =>
   }))
 );
 
+// ── Admin MVP Dashboard Pages ─────────────────────────────────────────────────
+const AdminOverviewPage = lazy(() =>
+  import('@/pages/admin/AdminOverviewPage').then((m) => ({
+    default: m.AdminOverviewPage,
+  }))
+);
+const AdminUserManagementPage = lazy(() =>
+  import('@/pages/admin/AdminUserManagementPage').then((m) => ({
+    default: m.AdminUserManagementPage,
+  }))
+);
+const AdminRoleMatrixPage = lazy(() =>
+  import('@/pages/admin/AdminRoleMatrixPage').then((m) => ({
+    default: m.AdminRoleMatrixPage,
+  }))
+);
+const AdminAuditLogPage = lazy(() =>
+  import('@/pages/admin/AdminAuditLogPage').then((m) => ({
+    default: m.AdminAuditLogPage,
+  }))
+);
+const AdminAnnouncementsPage = lazy(() =>
+  import('@/pages/admin/AdminAnnouncementsPage').then((m) => ({
+    default: m.AdminAnnouncementsPage,
+  }))
+);
+
 const ADMIN_ROLES = { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] };
 
 /**
@@ -185,4 +212,10 @@ export const adminRoutes: RouteObject[] = [
   { path: '/admin/auto-grading', element: guarded(<AutoGradingResultsPage />, ADMIN_ROLES) },
   { path: '/admin/gap-analysis', element: guarded(<GapAnalysisDashboardPage />, ADMIN_ROLES) },
   { path: '/admin/invoices', element: guarded(<StripeInvoicePage />, ADMIN_ROLES) },
+  // ── Admin MVP Dashboard Pages ───────────────────────────────────────────────
+  { path: '/admin/overview', element: guarded(<AdminOverviewPage />, ADMIN_ROLES) },
+  { path: '/admin/user-management', element: guarded(<AdminUserManagementPage />, ADMIN_ROLES) },
+  { path: '/admin/role-matrix', element: guarded(<AdminRoleMatrixPage />, ADMIN_ROLES) },
+  { path: '/admin/audit-viewer', element: guarded(<AdminAuditLogPage />, ADMIN_ROLES) },
+  { path: '/admin/announcements-editor', element: guarded(<AdminAnnouncementsPage />, ADMIN_ROLES) },
 ];
