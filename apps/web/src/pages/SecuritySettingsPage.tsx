@@ -6,6 +6,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
+import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import {
@@ -118,16 +121,19 @@ export function SecuritySettingsPage() {
     });
     setSaved(true);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
+    savedTimerRef.current = setTimeout(() => setSaved(false), SAVED_CONFIRMATION_MS);
   };
 
   const props = { values: form, onChange: setForm };
 
   return (
-    <AdminLayout
-      title="Security Settings"
-      description="Configure authentication and access policies"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Security Settings"
+          description="Configure authentication and access policies"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Security Settings' }]}
+        />
       {fetching ? (
         <p className="text-sm text-muted-foreground">Loading settings...</p>
       ) : (
@@ -150,6 +156,7 @@ export function SecuritySettingsPage() {
           </p>
         </div>
       )}
+      </PageShell>
     </AdminLayout>
   );
 }

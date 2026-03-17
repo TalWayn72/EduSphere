@@ -14,8 +14,10 @@ import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/auth';
 import { CREATE_LESSON_MUTATION } from '@/lib/graphql/lesson.queries';
 import { useLessonPipelineStore } from '@/lib/lesson-pipeline.store';
+import { PageShell } from '@/components/PageShell';
 import { CreateLessonStep1 } from './CreateLessonPage.step1';
 import { CreateLessonStep2 } from './CreateLessonPage.step2';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export interface LessonFormData {
   title: string;
@@ -88,7 +90,15 @@ export function CreateLessonPage() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto p-6">
+      <PageShell size="sm" className="p-6">
+        <Breadcrumbs
+          className="mb-4"
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: 'Course', href: `/courses/${courseId}` },
+            { label: 'New Lesson' },
+          ]}
+        />
         <div className="flex items-center gap-2 mb-6">
           <Button
             variant="ghost"
@@ -186,7 +196,7 @@ export function CreateLessonPage() {
             </div>
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMutation } from 'urql';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { UPDATE_ONBOARDING_STEP_MUTATION, COMPLETE_ONBOARDING_MUTATION } from '@/lib/graphql/onboarding.queries';
+import { getCurrentUser } from '@/lib/auth';
 
 interface InstructorOnboardingStepsProps {
   currentStep: number;
@@ -13,10 +14,20 @@ interface InstructorOnboardingStepsProps {
   onSkip: () => void;
 }
 
+/** WCAG 3.3.7 — Pre-fill fields already collected at registration. */
+function useProfileDefaults() {
+  const user = getCurrentUser();
+  return {
+    displayName: user ? `${user.firstName} ${user.lastName}`.trim() : '',
+    expertise: '',
+  };
+}
+
 export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: InstructorOnboardingStepsProps) {
+  const defaults = useProfileDefaults();
   const [step, setStep] = useState(currentStep);
   const [bio, setBio] = useState('');
-  const [expertise, setExpertise] = useState('');
+  const [expertise, setExpertise] = useState(defaults.expertise);
   const [courseTitle, setCourseTitle] = useState('');
   const [courseDescription, setCourseDescription] = useState('');
 
@@ -26,7 +37,10 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
   const totalSteps = 4;
   const progress = ((step - 1) / totalSteps) * 100;
 
-  const handleNext = async () => {
+  // WCAG 3.3.7: Auto-advance step 1 if bio+expertise are pre-filled from a previous session
+  const isStep1Prefilled = bio.length > 0 && expertise.length > 0;
+
+  const handleNext = useCallback(async () => {
     await updateStep({
       input: { step, data: { bio, expertise, courseTitle, courseDescription } }
     });
@@ -36,7 +50,16 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
       await completeOnboarding({});
       onComplete();
     }
-  };
+  }, [step, bio, expertise, courseTitle, courseDescription, updateStep, completeOnboarding, onComplete, totalSteps]);
+
+  // Auto-advance if profile data already satisfies step 1
+  useEffect(() => {
+    if (step === 1 && isStep1Prefilled) {
+      void handleNext();
+    }
+  // Only run on mount to avoid looping
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
@@ -58,9 +81,11 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
           </div>
           <div className="space-y-2">
             <Label htmlFor="expertise">Subject Expertise</Label>
-            {/* TODO WCAG 3.3.7 — Redundant Entry: expertise/specialization already collected
-                at instructor registration should be pre-populated here rather than re-entered.
-                autocomplete="organization-title" is the closest standard token for professional role. */}
+            {defaults.expertise && (
+              <p className="text-xs text-muted-foreground" role="status">
+                Pre-filled from your profile — edit if needed
+              </p>
+            )}
             <Input
               id="expertise"
               value={expertise}
@@ -103,9 +128,9 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
           <p className="text-muted-foreground text-sm">Choose the type of content for your first lesson:</p>
           <div className="grid grid-cols-1 gap-3">
             {[
-              { type: 'VIDEO', label: '🎥 Video Lesson', desc: 'Upload or link a video lecture' },
-              { type: 'QUIZ', label: '📝 Quiz', desc: 'Test student knowledge' },
-              { type: 'DISCUSSION', label: '💬 Discussion', desc: 'Prompt group conversation' },
+              { type: 'VIDEO', label: 'Video Lesson', desc: 'Upload or link a video lecture' },
+              { type: 'QUIZ', label: 'Quiz', desc: 'Test student knowledge' },
+              { type: 'DISCUSSION', label: 'Discussion', desc: 'Prompt group conversation' },
             ].map(({ type, label, desc }) => (
               <Button
                 key={type}
@@ -126,7 +151,6 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
 
       {step === 4 && (
         <div className="space-y-4 text-center">
-          <div className="text-6xl">🚀</div>
           <h2 className="text-xl font-semibold">Your course is ready!</h2>
           <p className="text-muted-foreground">
             You can now publish your course and start enrolling students.

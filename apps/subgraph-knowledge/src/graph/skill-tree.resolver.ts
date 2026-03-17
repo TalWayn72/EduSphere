@@ -45,6 +45,19 @@ export class SkillTreeResolver {
     return this.skillTreeService.getSkillTree(courseId, tenantId, userId, role);
   }
 
+  @Query('myTopMasteryTopics')
+  async myTopMasteryTopics(
+    @Args('limit') limit: number = 5,
+    @Context() context: GraphQLContext
+  ) {
+    const { tenantId, userId, role } = this.getAuthContext(context);
+    this.logger.debug(
+      { limit, tenantId, userId },
+      '[SkillTreeResolver] myTopMasteryTopics query'
+    );
+    return this.skillTreeService.getTopMasteryTopics(tenantId, userId, role, limit);
+  }
+
   @Mutation('updateMasteryLevel')
   async updateMasteryLevel(
     @Args('nodeId') nodeId: string,

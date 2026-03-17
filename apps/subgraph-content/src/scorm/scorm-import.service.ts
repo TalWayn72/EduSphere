@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   BadRequestException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -113,7 +114,7 @@ export class ScormImportService implements OnModuleDestroy {
       })
       .returning();
 
-    if (!course) throw new Error('Failed to create course from SCORM package');
+    if (!course) throw new InternalServerErrorException('Failed to create course from SCORM package');
 
     // 5. Create one Module for the SCORM package (content.ts schema — snake_case)
     const [module] = await this.db
@@ -126,7 +127,7 @@ export class ScormImportService implements OnModuleDestroy {
       })
       .returning();
 
-    if (!module) throw new Error('Failed to create module from SCORM package');
+    if (!module) throw new InternalServerErrorException('Failed to create module from SCORM package');
 
     // 6. Create ContentItems per SCORM item (contentItems.ts schema — camelCase)
     const itemValues = manifest.items.map((item, idx) => ({

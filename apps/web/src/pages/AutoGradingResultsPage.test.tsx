@@ -5,12 +5,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AutoGradingResultsPage } from './AutoGradingResultsPage';
 
 vi.mock('@/components/admin/AdminLayout', () => ({
-  AdminLayout: ({ children, title }: { children: React.ReactNode; title?: string }) => (
-    <div data-testid="admin-layout">
-      {title && <h1>{title}</h1>}
-      {children}
-    </div>
+  AdminLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="admin-layout">{children}</div>
   ),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
 vi.mock('@/hooks/useAuthRole', () => ({
@@ -20,18 +25,28 @@ vi.mock('@/hooks/useAuthRole', () => ({
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
-  return { ...actual, useNavigate: () => mockNavigate };
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useSearchParams: () => [new URLSearchParams('submissionId=sub-1'), vi.fn()],
+  };
 });
+
+const MOCK_RESULTS = [
+  { questionId: 'q1', score: 8, maxScore: 10, explanation: 'Good coverage', suggestions: ['Add more examples'] },
+  { questionId: 'q2', score: 5, maxScore: 10, explanation: 'Missing key terms', suggestions: ['Review chapter 3'] },
+];
 
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
     useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
-    useQuery: vi.fn(() => [{ fetching: false, data: null }, vi.fn()]),
+    useQuery: vi.fn(() => [{ fetching: false, data: { autoGradingResults: MOCK_RESULTS } }, vi.fn()]),
   };
 });
 
+import * as urql from 'urql';
 import { useAuthRole } from '@/hooks/useAuthRole';
 
 function renderPage() {
@@ -109,5 +124,23 @@ describe('AutoGradingResultsPage', () => {
     vi.mocked(useAuthRole).mockReturnValue('SUPER_ADMIN');
     renderPage();
     expect(screen.getByTestId('auto-grading-page')).toBeInTheDocument();
+  });
+
+  it('shows empty state when no results returned', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { fetching: false, data: { autoGradingResults: [] } },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+  });
+
+  it('shows loading skeleton while fetching', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { fetching: true, data: null },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('grading-skeleton')).toBeInTheDocument();
   });
 });

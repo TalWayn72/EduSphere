@@ -68,7 +68,7 @@ export function SkillGapWidget() {
   }>({ query: SKILL_PROFILES_QUERY, pause: !mounted });
 
   const [{ data: reportData, fetching: reportFetching }] = useQuery<{
-    skillGapAnalysis: SkillGapReport;
+    skillGapReport: SkillGapReport;
   }>({
     query: SKILL_GAP_ANALYSIS_QUERY,
     variables: { roleId: selectedRoleId },
@@ -78,7 +78,7 @@ export function SkillGapWidget() {
   const [, createProfile] = useMutation(CREATE_SKILL_PROFILE_MUTATION);
 
   const profiles = profilesData?.skillProfiles ?? [];
-  const report = reportData?.skillGapAnalysis;
+  const report = reportData?.skillGapReport;
 
   const handleCreate = async () => {
     if (!newRole.trim() || !newConcepts.trim()) return;

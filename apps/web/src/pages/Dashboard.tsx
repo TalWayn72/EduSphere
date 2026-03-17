@@ -181,7 +181,7 @@ export function Dashboard() {
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <p className="text-destructive">
-                {t('errorLoadingUser')}: {meResult.error.message}
+                {t('errorLoadingUser')}
               </p>
             </CardContent>
           </Card>

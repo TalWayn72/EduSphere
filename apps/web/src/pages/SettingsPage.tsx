@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { HardDrive } from 'lucide-react';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import {
   Card,
   CardHeader,
@@ -62,7 +63,7 @@ export function SettingsPage() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto space-y-6">
+      <PageShell size="sm">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
         </div>
@@ -141,7 +142,7 @@ export function SettingsPage() {
             </CardContent>
           </Card>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

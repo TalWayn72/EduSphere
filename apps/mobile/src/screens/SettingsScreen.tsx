@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { useMutation, gql } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import {
   SUPPORTED_LOCALES,
@@ -256,14 +257,35 @@ function DownloadedCoursesSection() {
   );
 }
 
+const UPDATE_LOCALE_MUTATION = gql`
+  mutation UpdateUserPreferences($input: UpdateUserPreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      id
+      preferences { locale }
+    }
+  }
+`;
+
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation('settings');
   const currentLocale = i18n.language as SupportedLocale;
+  const [syncing, setSyncing] = useState(false);
+  const [updateLocale] = useMutation(UPDATE_LOCALE_MUTATION);
 
-  const handleLocaleChange = async (locale: SupportedLocale): Promise<void> => {
+  const handleLocaleChange = useCallback(async (locale: SupportedLocale): Promise<void> => {
+    // Save to AsyncStorage (offline cache) immediately
     await saveMobileLocale(locale);
-    // TODO: persist to DB via GraphQL mutation when Apollo client is configured
-  };
+
+    // Sync to backend
+    setSyncing(true);
+    try {
+      await updateLocale({ variables: { input: { locale } } });
+    } catch {
+      // Locale saved locally; will retry sync on next session
+    } finally {
+      setSyncing(false);
+    }
+  }, [updateLocale]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -300,7 +322,10 @@ export default function SettingsScreen() {
                   </Text>
                   <Text style={styles.englishLabel}>{info.english}</Text>
                 </View>
-                {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                {isSelected && syncing && (
+                  <ActivityIndicator size="small" color={COLORS.primary} style={styles.syncIndicator} />
+                )}
+                {isSelected && !syncing && <Text style={styles.checkmark}>✓</Text>}
               </TouchableOpacity>
             );
           }}
@@ -360,6 +385,7 @@ const styles = StyleSheet.create({
   selectedText: { color: COLORS.primary, fontWeight: '600' },
   englishLabel: { fontSize: FONT.sm, color: COLORS.textSecondary, marginTop: 1 },
   checkmark: { fontSize: 18, color: COLORS.primary, fontWeight: 'bold' },
+  syncIndicator: { marginLeft: SPACING.sm },
   loadingRow: { padding: SPACING.xl, alignItems: 'center' },
   storageSection: { paddingHorizontal: SPACING.lg, paddingBottom: 32 },
   warningBanner: {

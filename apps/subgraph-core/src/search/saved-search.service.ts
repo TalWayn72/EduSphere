@@ -4,6 +4,7 @@ import {
   OnModuleDestroy,
   NotFoundException,
   ForbiddenException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -50,7 +51,7 @@ export class SavedSearchService implements OnModuleDestroy {
       this.logger.error(
         `[SavedSearchService] Failed to create saved search: ${String(err)}`
       );
-      throw new Error('Failed to save search.');
+      throw new InternalServerErrorException('Failed to save search.');
     }
   }
 
@@ -69,7 +70,7 @@ export class SavedSearchService implements OnModuleDestroy {
       this.logger.error(
         `[SavedSearchService] Failed to list saved searches: ${String(err)}`
       );
-      throw new Error('Failed to fetch saved searches.');
+      throw new InternalServerErrorException('Failed to fetch saved searches.');
     }
   }
 
@@ -99,7 +100,7 @@ export class SavedSearchService implements OnModuleDestroy {
       this.logger.error(
         `[SavedSearchService] Failed to delete saved search ${id}: ${String(err)}`
       );
-      throw new Error('Failed to delete saved search.');
+      throw new InternalServerErrorException('Failed to delete saved search.');
     }
   }
 }

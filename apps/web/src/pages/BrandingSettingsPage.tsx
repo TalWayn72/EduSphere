@@ -8,8 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { Paintbrush, Loader2, CheckCircle2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 import {
   TENANT_BRANDING_QUERY,
   UPDATE_TENANT_BRANDING_MUTATION,
@@ -96,17 +99,23 @@ export function BrandingSettingsPage() {
     setSaveError(null);
     const result = await updateBranding({ input: form });
     if (result.error) {
-      setSaveError(result.error.message);
+      setSaveError('Failed to save branding settings. Please try again.');
     } else {
       setSaved(true);
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-      savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
+      savedTimerRef.current = setTimeout(() => setSaved(false), SAVED_CONFIRMATION_MS);
     }
   };
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <PageShell size="sm" className="max-w-3xl">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Branding' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Paintbrush className="h-6 w-6 text-primary" />
           <div>
@@ -151,7 +160,7 @@ export function BrandingSettingsPage() {
             </div>
           </>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

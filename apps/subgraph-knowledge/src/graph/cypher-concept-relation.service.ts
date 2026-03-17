@@ -11,7 +11,7 @@ import {
   findRelatedConcepts,
   createRelationship,
 } from '@edusphere/db';
-import type { RelationshipProperties } from '@edusphere/db';
+import type { RelationshipProperties, ConceptRelationshipType } from '@edusphere/db';
 import { graphConfig } from '@edusphere/config';
 
 const GRAPH_NAME = graphConfig.graphName;
@@ -49,7 +49,7 @@ export class CypherConceptRelationService {
   async linkConcepts(
     fromId: string,
     toId: string,
-    relationshipType: string,
+    relationshipType: ConceptRelationshipType,
     properties: RelationshipProperties = {}
   ): Promise<void> {
     return createRelationship(db, fromId, toId, relationshipType, properties);
@@ -62,7 +62,7 @@ export class CypherConceptRelationService {
   async linkConceptsAndFetch(
     fromId: string,
     toId: string,
-    relationshipType: string,
+    relationshipType: ConceptRelationshipType,
     properties: RelationshipProperties,
     tenantId: string
   ): Promise<{ from: unknown; to: unknown }> {

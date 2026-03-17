@@ -24,9 +24,9 @@ import {
   LIBRARY_COURSES_QUERY,
   ACTIVATE_LIBRARY_COURSE_MUTATION,
 } from '@/lib/graphql/library.queries';
-
-const GRAPHQL_URL =
-  (import.meta.env['VITE_GRAPHQL_URL'] as string | undefined) ?? '/graphql';
+import { PageShell } from '@/components/PageShell';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { GRAPHQL_URL } from '@/lib/constants';
 
 type LibraryTopic =
   | 'ALL'
@@ -100,9 +100,7 @@ export function CourseLibraryPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <LoadingSpinner />
     );
   }
 
@@ -118,7 +116,7 @@ export function CourseLibraryPage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-6xl mx-auto">
+      <PageShell size="xl" className="p-6">
       <h1 className="text-3xl font-bold mb-1">Compliance Course Library</h1>
       <p className="text-muted-foreground mb-6">
         Activate pre-built compliance courses to add them to your catalog
@@ -215,7 +213,7 @@ export function CourseLibraryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

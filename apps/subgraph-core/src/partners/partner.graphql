@@ -1,0 +1,28 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresScopes"])
+
+type RevenueByMonth {
+  month: String!
+  amount: Int!
+}
+
+type PartnerDashboard {
+  status: String!
+  apiKeyMasked: String!
+  totalRevenue: Int!
+  revenueByMonth: [RevenueByMonth!]!
+}
+
+type RegeneratedApiKey {
+  newApiKey: String!
+}
+
+extend type Query {
+  myPartnerDashboard(partnerId: ID!): PartnerDashboard! @authenticated
+}
+
+extend type Mutation {
+  regeneratePartnerApiKey(partnerId: ID!): RegeneratedApiKey!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
+}

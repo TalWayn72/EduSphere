@@ -55,7 +55,7 @@ export function InviteUserModal({
       input: { email, firstName, lastName, role, tenantId },
     });
     if (result.error) {
-      setError(result.error.message);
+      setError('Failed to create user. Please try again.');
       return;
     }
     setFirstName('');

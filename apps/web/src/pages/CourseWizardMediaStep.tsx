@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
 import {
   Upload,
@@ -229,7 +230,7 @@ export function CourseWizardMediaStep({
     setRichDocTitle('');
     setRichDocContent('');
     if (richDocSavedTimerRef.current) clearTimeout(richDocSavedTimerRef.current);
-    richDocSavedTimerRef.current = setTimeout(() => setRichDocSaved(false), 3000);
+    richDocSavedTimerRef.current = setTimeout(() => setRichDocSaved(false), SAVED_CONFIRMATION_MS);
   };
   return (
     <div className="space-y-6">

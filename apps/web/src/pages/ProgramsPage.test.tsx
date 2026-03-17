@@ -31,6 +31,11 @@ vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
 
+vi.mock('@/components/Layout', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Layout: ({ children }: any) => <div data-testid="layout">{children}</div>,
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { ProgramsPage } from './ProgramsPage';
@@ -112,7 +117,6 @@ describe('ProgramsPage', () => {
     ] as never);
     render(<ProgramsPage />);
     expect(screen.getByText(/failed to load programs/i)).toBeInTheDocument();
-    expect(screen.getByText(/graphql error/i)).toBeInTheDocument();
   });
 
   it('shows "No programs available yet" when program list is empty', () => {

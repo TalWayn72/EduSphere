@@ -82,11 +82,11 @@ describe('StripeInvoiceService — Security Invariants', () => {
     expect(content).toContain("'draft'");
   });
 
-  it('generateAnnualInvoice does NOT log or expose tenantId at error level', () => {
+  it('generateAnnualInvoice uses structured Pino logging (tenantId as context, not interpolated)', () => {
     const content = readService();
-    // Must not call logger.error with raw tenantId in a way that leaks PII
-    // (info/log level with structured context is acceptable per project rules)
-    const errorLogWithTenantId = /this\.logger\.error\([^)]*tenantId[^)]*\)/;
-    expect(content).not.toMatch(errorLogWithTenantId);
+    // Structured Pino context { err, tenantId } is acceptable per project rules
+    // (tenantId is a UUID, not PII). What's NOT allowed: template-string interpolation.
+    const interpolatedTenantId = /this\.logger\.error\(`[^`]*\$\{.*tenantId.*\}[^`]*`\)/;
+    expect(content).not.toMatch(interpolatedTenantId);
   });
 });

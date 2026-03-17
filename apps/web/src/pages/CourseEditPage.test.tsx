@@ -40,6 +40,17 @@ vi.mock('./CourseEditPage.metadata', () => ({
 vi.mock('./CourseEditPage.modules', () => ({
   CourseEditModules: vi.fn(() => null),
 }));
+vi.mock('@/components/SourceManager', () => ({
+  SourceManager: vi.fn(() => <div data-testid="source-manager-stub">SourceManager</div>),
+}));
+
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/Breadcrumbs', () => ({
+  Breadcrumbs: () => <nav aria-label="Breadcrumb">breadcrumbs</nav>,
+}));
 
 vi.mock('@/lib/graphql/content.queries', () => ({
   COURSE_DETAIL_QUERY: 'COURSE_DETAIL_QUERY',
@@ -114,7 +125,7 @@ describe('CourseEditPage', () => {
       makeQuery({ error: { message: 'Network error' }, data: undefined })
     );
     render(<CourseEditPage />);
-    expect(screen.getByText(/network error/i)).toBeInTheDocument();
+    expect(screen.getByText(/failed to load course/i)).toBeInTheDocument();
   });
 
   it('shows "Course not found" when course is null', () => {
@@ -143,12 +154,13 @@ describe('CourseEditPage', () => {
     expect(screen.getByText('Published')).toBeInTheDocument();
   });
 
-  it('renders "Basic Info" and "Modules & Content" tabs', () => {
+  it('renders "Basic Info", "Modules & Content", and "מקורות מידע" tabs', () => {
     render(<CourseEditPage />);
     expect(
       screen.getByRole('tab', { name: /basic info/i })
     ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /modules/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /מקורות מידע/i })).toBeInTheDocument();
   });
 
   it('shows "Publish" button for a draft course', () => {
@@ -172,5 +184,14 @@ describe('CourseEditPage', () => {
     render(<CourseEditPage />);
     fireEvent.click(screen.getByRole('button', { name: /back/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  it('renders a Sources tab ("מקורות מידע") for knowledge source management', () => {
+    render(<CourseEditPage />);
+    const sourcesTab = screen.getByRole('tab', { name: /מקורות מידע/i });
+    expect(sourcesTab).toBeInTheDocument();
+    // The associated panel should exist in the DOM
+    const sourcesPanel = document.querySelector('[role="tabpanel"][id$="-content-sources"]');
+    expect(sourcesPanel).not.toBeNull();
   });
 });

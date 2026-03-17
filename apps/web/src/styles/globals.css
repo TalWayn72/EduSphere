@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 (required for .dark class toggle) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Colors — mapped from HSL CSS variables to Tailwind v4 color tokens */
   --color-background: hsl(var(--background));
@@ -61,7 +64,7 @@
 @layer base {
   :root {
     /* Primary — Indigo (distinct from all competitors) */
-    --primary: 239 84% 67%;              /* #6366F1 indigo-500 */
+    --primary: 239 84% 58%;              /* #4F46E5 indigo-600 — WCAG AA 6.4:1 with white */
     --primary-foreground: 0 0% 100%;
     --primary-hover: 238 84% 60%;        /* #4F46E5 indigo-600 */
     --primary-subtle: 239 84% 95%;       /* indigo-50 */
@@ -82,7 +85,7 @@
     --muted-foreground: 215 16% 47%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 239 84% 67%;
+    --ring: 239 84% 58%;
 
     /* Semantic */
     --popover: 0 0% 100%;
@@ -97,7 +100,7 @@
     --mastery-attempted: 38 92% 60%;     /* amber — Attempted */
     --mastery-familiar: 199 89% 55%;     /* sky — Familiar */
     --mastery-proficient: 142 72% 45%;   /* green — Proficient */
-    --mastery-mastered: 239 84% 67%;     /* indigo — Mastered */
+    --mastery-mastered: 239 84% 58%;     /* indigo — Mastered */
 
     /* Streak / Gamification */
     --streak-fire: 24 95% 55%;           /* orange */
@@ -135,7 +138,7 @@
   }
 
   .dark {
-    --primary: 239 84% 72%;              /* slightly lighter indigo for dark */
+    --primary: 239 84% 63%;              /* indigo-500 adjusted for dark — WCAG AA ~5.5:1 with white */
     --primary-foreground: 0 0% 100%;
     --primary-hover: 239 84% 80%;
     --primary-subtle: 239 30% 15%;
@@ -153,7 +156,7 @@
     --muted-foreground: 215 20% 65%;
     --border: 217 33% 18%;
     --input: 217 33% 18%;
-    --ring: 239 84% 72%;
+    --ring: 239 84% 67%;
 
     --popover: 222 47% 9%;
     --popover-foreground: 210 40% 96%;
@@ -167,7 +170,7 @@
     --mastery-attempted: 38 92% 55%;
     --mastery-familiar: 199 89% 50%;
     --mastery-proficient: 142 72% 42%;
-    --mastery-mastered: 239 84% 72%;
+    --mastery-mastered: 239 84% 67%;
 
     --streak-fire: 24 95% 60%;
     --streak-cold: 215 16% 45%;

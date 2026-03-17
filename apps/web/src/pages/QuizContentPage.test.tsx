@@ -16,6 +16,16 @@ vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: any) => children,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PageHeader: ({ title }: any) => <h1>{title}</h1>,
+}));
+
 vi.mock('@/components/ContentViewerBreadcrumb', () => ({
   ContentViewerBreadcrumb: vi.fn(() => null),
 }));

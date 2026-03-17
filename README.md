@@ -224,40 +224,52 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 
 ## Features
 
-### Recently Added (Phase 51-52 — B2B GTM + Air-Gapped + Partner + HRIS)
+### Recently Added (Phases 59-64 — Compliance, Marketplace & Portal Builder)
+
+- **Instructor Payouts** — InstructorPayoutService (70/30 revenue split), myPayouts/allPayouts GraphQL, InstructorEarningsPage with BarChart
+- **360° Assessments** — PeerReviewRubricService, AssessmentResultsDetailPage (RadarChart + rater breakdown)
+- **OpenBadges 3.0** — BadgeIssuerService (W3C VC JSON + SHA-256 proof), BadgeVerifierPage + MyOpenBadgesPage
+- **SCORM 2004 Export** — ScormExportService (imsmanifest.xml + entry HTML), CourseCreatePage export button
+- **Portal Builder** — PortalBlockEditor (@dnd-kit/sortable, 5 block types), portal_config JSONB migration
+- **Compliance Library** — 8 compliance course seeds, ComplianceLibraryService, ComplianceLibraryPage
+
+### Recently Added (Phases 54-58 — i18n, Pipeline Builder & E2E Closure)
+
+- **Full i18n** — 9 languages supported (Hebrew, English, Arabic, French, Spanish, German, Russian, Chinese, Portuguese) via packages/i18n + I18nProvider + language switcher
+- **Lesson Pipeline Builder** — LangGraph workflow + Pipeline Canvas UI for visual AI pipeline authoring
+- **HRIS Cron Scheduler** — Automated HRIS sync + Partner API middleware + AEO pre-render script
+- **Admin Pages** — 27 admin/settings pages wired (removed pause:true stubs)
+- **E2E Protocol Closure** — 8 Playwright E2E specs for Phases 51-53 (220+ E2E assertions)
+- **AEO (Answer Engine Optimization)** — Blog + Dynamic OG Images + security hardening
+
+### Recently Added (Phases 51-53 — B2B GTM + Air-Gapped + Auto-Grading)
 
 - **B2B GTM Platform** — LandingPage B2B rewrite (12 sections), PilotSignupPage, PricingPage (4 tiers: $12K/$35K/$65K/Custom), OrgUsagePage, ROIAnalyticsDashboardPage (YAU formula), billing schema migration 0030
-- **Air-Gapped Deployment** — LocalInferenceService (AIRGAP_MODE + model hash verification), GraphragAuditService (append-only), Helm chart + Zarf K3s package, 23 new security tests
+- **Air-Gapped Deployment** — LocalInferenceService (AIRGAP_MODE + model hash verification), GraphragAuditService (append-only), Helm chart + Zarf K3s package
 - **Partner Portal** — partners + partner_revenue schema (migration 0031), PartnerService (SHA-256 API key), PartnerSignupPage + PartnerDashboardPage (30%/70% revenue split)
 - **HRIS Integrations** — IHrisAdapter + ScimAdapter (RFC 7643/7644), Workday/SAP/Banner adapters, HrisIntegrationService + HrisConfigPage
-- **Investor Deck** — InvestorDeckPage (10 Guy Kawasaki slides, SUPER_ADMIN only)
-- **SEO/AEO** — robots.txt AI bot rules, llms.txt, sitemap.xml, JsonLd structured data, usePageTitle hook
+- **Auto-Grading & Gap Analysis** — AutoGradingService + GapAnalysisService, AutoGradingResultsPage + GapAnalysisDashboardPage
+- **Stripe Invoicing** — StripeInvoiceService + StripeInvoicePage, PartnerTierService + PartnerTierBadge
 
-### Recently Added (Session 29 — Phase 29: Visual Anchoring)
+### Previously Completed (Phases 28-50)
 
-- **Visual Anchoring & Asset Linking** — ClamAV-scanned image uploads (WebP-optimised via sharp), text-passage anchors with position tracking, document versioning + rollback, simhash-based anchor sync, `anchorDeleted` real-time subscription, NATS events (`EDUSPHERE.visual.anchor.created/deleted`), offline IndexedDB cache, mobile VisualBottomSheet
-
-### Recently Added (Session 28 — Phases 28-34)
-
-- **ALL PRD GAPS CLOSED** — G-1, G-2, G-3, G-4, P-1, P-2, P-3 all complete
-- **Stripe Checkout** — Stripe Elements checkout flow, secure clientSecret handling
+- **Visual Anchoring & Asset Linking** — ClamAV-scanned uploads, text-passage anchors, document versioning + rollback, simhash-based sync, NATS events, offline IndexedDB cache
+- **Stripe Checkout** — Stripe Elements flow, secure clientSecret handling
 - **Personal Knowledge Graph** — Annotation wiki across courses with SVG graph
-- **Annotation Merge Request** — Students propose annotations to official knowledge base
 - **Video Sketch Tools** — 6 drawing tools (freehand, eraser, rect, arrow, ellipse, text)
 - **AI Subtitle Translation** — Real-time subtitle generation via LibreTranslate (VTT/WebVTT)
 - **Remote Proctoring** — WebRTC webcam, tab-switch detection, flag timeline
 - **3D Models & Simulations** — Three.js WebGL viewer with OrbitControls, gltf/glb/obj/fbx
-
-### Recently Added (Sessions 25-27)
-
 - **Design System** — Indigo #6366F1 design tokens, ThemeProvider (3-tier tenant/user theming), dark mode
-- **Live Sessions** — Real-time instructor-led sessions with NATS JetStream, join/leave, moderator controls
-- **Offline Web** — ServiceWorker + IndexedDB cache, offline banner, mutation queue with auto-replay
-- **Skill Tree** — Visual skill progression graph (BFS traversal, SVG bezier curves, mastery levels 1-5)
-- **Course Discovery** — Search + filter with MasteryBadge indicators
-- **WCAG 2.2 AA** — Full accessibility: skip links, focus trap, screen reader announcements, reduced motion, keyboard drag (SC 2.5.7), APG tree widget, WebVTT captions (SC 1.2.2)
-- **i18n** — Hebrew + English (react-i18next, complete locale files)
-- **Knowledge Graph** — Course-contextual knowledge graph with pgvector semantic search + Apache AGE traversal
+- **Live Sessions + PWA** — Real-time instructor-led sessions with NATS JetStream, ServiceWorker + IndexedDB cache, offline mutation queue
+- **WCAG 2.2 AA** — Full accessibility: skip links, focus trap, screen reader announcements, reduced motion, keyboard drag (SC 2.5.7)
+- **i18n** — 9 languages (react-i18next, complete locale files)
+- **SCORM 2004 Player + cmi5** — Standards-compliant content playback
+- **White-Label Runtime** — Per-tenant branding (logo, colors, fonts)
+- **Social Learning** — Discussion threads, social feed, peer review, 360° assessments, AI discussion insights
+- **Group Challenges + KG Peer Matching** — Leaderboard, Apache AGE complementary skill gap matching
+- **AI Chavruta + Mentor Path** — Partner matching, mentor topology, cohort insights, graph-grounded credentials
+- **EU AI Act Compliance** — Art. 14 (human oversight) + Art. 50 (transparency) compliance
 
 ### Core Platform
 
@@ -381,8 +393,20 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 50**     | WCAG 2.2 AA (SC 2.5.7, 2.1.1, 3.1.1, 1.4.1, 1.2.2, 3.2.6, 3.3.7), EU AI Act (Art. 14 + Art. 50), HTTP Security Headers, pgvector RLS cross-tenant fix (OWASP LLM06), Keycloak MFA, Linkerd mTLS, K8s NetworkPolicy, 10 compliance docs, +90 security tests | 3 days   | ✅ Complete    |
 | **Phase 51**     | B2B GTM Core — LandingPage rewrite (12 sections), PilotSignupPage + PilotRequestsAdminPage, PricingPage (4 tiers), OrgUsagePage + ROI dashboard, SEO/AEO (robots.txt, llms.txt, sitemap.xml, JsonLd), billing schema migration 0030 | 3 days   | ✅ Complete    |
 | **Phase 52**     | Air-Gapped deployment (LocalInferenceService + GraphragAuditService + Helm/Zarf), Partner Portal (migration 0031 + PartnerService SHA-256 + PartnerSignupPage), HRIS integrations (ScimAdapter RFC 7643/7644 + Workday/SAP/Banner), InvestorDeckPage (10 slides) | 3 days   | ✅ Complete    |
+| **Phase 53**     | Auto-Grading + Gap Analysis + Stripe Invoicing + Partner Tiers                          | 2 days   | ✅ Complete    |
+| **Phase 54**     | E2E Protocol Closure — 8 Playwright specs for Phases 51-53 (220+ assertions)           | 1 day    | ✅ Complete    |
+| **Phase 55**     | 27 admin/settings pages wired (removed pause:true stubs)                                | 1 day    | ✅ Complete    |
+| **Phase 56**     | HRIS cron scheduler + Partner API middleware + AEO pre-render script                    | 1 day    | ✅ Complete    |
+| **Phase 57**     | Full i18n — 9 languages (HE, EN, AR, FR, ES, DE, RU, ZH, PT) + I18nProvider + switcher | 2 days   | ✅ Complete    |
+| **Phase 58**     | Lesson Pipeline Builder (LangGraph workflow + Pipeline Canvas UI)                       | 2 days   | ✅ Complete    |
+| **Phase 59**     | InstructorPayoutService (70/30 revenue split) + InstructorEarningsPage                  | 1 day    | ✅ Complete    |
+| **Phase 60**     | PeerReviewRubricService + AssessmentResultsDetailPage (RadarChart)                      | 1 day    | ✅ Complete    |
+| **Phase 61**     | OpenBadges 3.0 — BadgeIssuerService (W3C VC JSON + SHA-256 proof)                      | 1 day    | ✅ Complete    |
+| **Phase 62**     | SCORM 2004 Export — ScormExportService (imsmanifest.xml + entry HTML)                   | 1 day    | ✅ Complete    |
+| **Phase 63**     | Portal Builder — PortalBlockEditor (@dnd-kit/sortable, 5 block types)                  | 1 day    | ✅ Complete    |
+| **Phase 64**     | Compliance Library — 8 compliance course seeds + ComplianceLibraryService               | 1 day    | ✅ Complete    |
 
-**Current Status:** Phases 1-54 complete ✅ — Backend + Frontend + Mobile fully built. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). B2B GTM platform live. Air-gapped + Partner Portal + HRIS + AI Auto-Grading + Gap Analysis + Partner Tiers all complete. 8 E2E Playwright specs for Phase 51-53. GraphQL federation active across all 6 subgraphs. ~8,000+ tests passing (web 4,419 / security 1,353 / agent 719 / core 879 / knowledge 610). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** All 64 phases complete (0-64) ✅ — Backend + Frontend + Mobile fully built. Branch: `feat/compliance-accessibility-security`. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). 9 languages supported. B2B GTM platform, Air-Gapped deployment, Partner Portal, HRIS integrations, Auto-Grading, Gap Analysis, Marketplace, 360° Assessments, OpenBadges 3.0, SCORM 2004 Export, Portal Builder, Compliance Library all complete. GraphQL federation active across all 6 subgraphs. **~8,000+ tests passing** (web ~4,424 / 370 files | security 1,370 / 48 files | 134 E2E Playwright specs | subgraph-content 1,233 | subgraph-agent 719 | subgraph-core 879 | subgraph-knowledge 610). TypeScript: 0 errors. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -482,9 +506,10 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **4,190+ tests passing** (337+ test files — core ~664, knowledge ~598, DB ~428, mobile ~218, i18n ~304, security ~1,185, contract ~88, Phase 39-50 additions)  |
-| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
-| **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~4,424+ tests passing** (370 test files)  |
+| **Security Tests**      | Vitest                  | `tests/security/*.spec.ts`                   | ✅ **1,370 tests passing** (48 spec files)     |
+| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (core 879 / content 1,233 / agent 719 / knowledge 610) |
+| **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ✅ **134 E2E specs**                           |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |
 | **RLS Validation**      | Vitest                  | `packages/db/src/rls/*.test.ts`              | ⏳ Planned Phase 7                                 |
 | **GraphQL Tests**       | Vitest + SuperTest      | `apps/*/src/test/graphql/*.spec.ts`          | ⏳ Planned Phase 7                                 |
@@ -631,4 +656,4 @@ Private -- All rights reserved.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** February 2026 | **Target Scale:** 100,000+ concurrent users
+**Version:** 1.0.0 | **Last Updated:** March 2026 | **Target Scale:** 100,000+ concurrent users

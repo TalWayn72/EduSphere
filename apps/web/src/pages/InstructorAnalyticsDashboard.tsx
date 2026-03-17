@@ -15,6 +15,8 @@ import { useAuthRole } from '@/hooks/useAuthRole';
 import { INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY } from '@/lib/graphql/analytics.queries';
 import { DropOffFunnelChart } from '@/components/analytics/DropOffFunnelChart';
 import { AtRiskLearnersPanel } from '@/components/analytics/AtRiskLearnersPanel';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -125,7 +127,13 @@ export function InstructorAnalyticsDashboard() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto space-y-6 p-6">
+      <PageShell size="lg" className="p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Instructor', href: '/instructor' },
+            { label: 'Analytics' },
+          ]}
+        />
         <h1 className="text-2xl font-bold">Instructor Analytics</h1>
 
         {/* Stat Cards */}
@@ -237,7 +245,7 @@ export function InstructorAnalyticsDashboard() {
             </CardContent>
           </Card>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

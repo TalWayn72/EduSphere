@@ -94,7 +94,7 @@ export function CourseCard({
         data-testid={`course-card-thumbnail-${id}`}
         aria-hidden="true"
       >
-        <span className="text-white/30 font-black text-5xl select-none">
+        <span className="text-white/60 font-black text-5xl select-none">
           {getCategoryInitials(category)}
         </span>
 

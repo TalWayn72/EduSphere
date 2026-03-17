@@ -7,6 +7,7 @@ import { AiLanggraphRunnerService } from '../ai/ai-langgraph-runner.service';
 import { AiLegacyRunnerService } from '../ai/ai-legacy-runner.service';
 import { CourseGeneratorResolver } from './course-generator.resolver.js';
 import { CourseGeneratorService } from '../ai/course-generator.service.js';
+import { LlmConsentGuard } from '../ai/llm-consent.guard.js';
 import { LessonPipelineResolver } from './lesson-pipeline.resolver.js';
 
 @Module({
@@ -19,6 +20,7 @@ import { LessonPipelineResolver } from './lesson-pipeline.resolver.js';
     AiLegacyRunnerService,
     CourseGeneratorResolver,
     CourseGeneratorService,
+    LlmConsentGuard,
     LessonPipelineResolver,
   ],
   exports: [AgentService, AIService, CourseGeneratorService],

@@ -4,8 +4,9 @@
  */
 import { useParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
-import { ContentViewerBreadcrumb } from '@/components/ContentViewerBreadcrumb';
 import { QuizPlayer } from '@/components/quiz/QuizPlayer';
 import { useQuizContent } from '@/hooks/useQuizContent';
 
@@ -26,9 +27,16 @@ export function QuizContentPage() {
 
   return (
     <Layout>
-      <ContentViewerBreadcrumb contentId={contentId} contentTitle={title} />
+      <PageShell size="md">
+        <PageHeader
+          title={title ?? 'Quiz'}
+          breadcrumbs={[
+            { label: 'Courses', href: '/courses' },
+            { label: title ?? 'Quiz' },
+          ]}
+        />
 
-      <div className="max-w-2xl mx-auto mt-6 space-y-4">
+        <div className="space-y-4">
         {fetching && (
           <Card>
             <CardContent className="p-6">
@@ -64,7 +72,8 @@ export function QuizContentPage() {
             </CardContent>
           </Card>
         )}
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 }

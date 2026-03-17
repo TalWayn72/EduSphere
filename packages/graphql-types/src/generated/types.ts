@@ -2532,7 +2532,7 @@ export type Query = {
   semanticSearchByContentItem: Array<SimilarityResult>;
   sessionPolls: Array<SessionPoll>;
   /** Analyze skill gap between the current user's mastery and a named skill profile. */
-  skillGapAnalysis: SkillGapReport;
+  skillGapReport: SkillGapReport;
   /** List all skill profiles available within the current tenant. */
   skillProfiles: Array<SkillProfile>;
   socialFeed: Array<SocialFeedItem>;

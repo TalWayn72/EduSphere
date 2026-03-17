@@ -148,6 +148,47 @@ export class SkillTreeService {
     });
   }
 
+  async getTopMasteryTopics(
+    tenantId: string,
+    userId: string,
+    role: string,
+    limit: number
+  ): Promise<{ topicName: string; level: MasteryLevel }[]> {
+    const ctx = { tenantId, userId, userRole: toUserRole(role) };
+
+    return withTenantContext(db, ctx, async (tx) => {
+      try {
+        const masteryOrder = `CASE mastery_level
+          WHEN 'MASTERED' THEN 5 WHEN 'PROFICIENT' THEN 4
+          WHEN 'FAMILIAR' THEN 3 WHEN 'ATTEMPTED' THEN 2 ELSE 1 END`;
+        const result = await tx.execute(sql`
+          SELECT usm.mastery_level, COALESCE(ci.title, usm.concept_id::text) AS topic_name
+          FROM user_skill_mastery usm
+          LEFT JOIN content_items ci ON ci.id = usm.concept_id
+          WHERE usm.user_id = ${userId}::uuid
+            AND usm.tenant_id = ${tenantId}::uuid
+            AND usm.mastery_level <> 'NONE'
+          ORDER BY ${sql.raw(masteryOrder)} DESC, usm.updated_at DESC
+          LIMIT ${limit}
+        `);
+        const rows = (result.rows ?? result) as unknown as {
+          mastery_level: string;
+          topic_name: string;
+        }[];
+        return rows.map((r) => ({
+          topicName: r.topic_name,
+          level: toMasteryLevel(r.mastery_level),
+        }));
+      } catch (err) {
+        this.logger.warn(
+          { tenantId, userId, err },
+          '[SkillTreeService] getTopMasteryTopics failed — returning empty'
+        );
+        return [];
+      }
+    });
+  }
+
   async updateMasteryLevel(
     nodeId: string,
     level: MasteryLevel,

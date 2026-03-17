@@ -7,8 +7,8 @@
  *   - Platform feature descriptions
  *   - FAQ items
  */
-import { Injectable, Logger } from '@nestjs/common';
-import { createDatabaseConnection } from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, closeAllPools } from '@edusphere/db';
 import { sql } from 'drizzle-orm';
 
 const BASE_URL = process.env['AEO_BASE_URL'] ?? 'https://app.edusphere.dev';
@@ -66,9 +66,13 @@ export interface InstructorProfile {
 }
 
 @Injectable()
-export class AeoService {
+export class AeoService implements OnModuleDestroy {
   private readonly logger = new Logger(AeoService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async getPublicCourses(): Promise<PublicCourse[]> {
     try {

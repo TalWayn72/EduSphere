@@ -7,10 +7,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { TenantAnalyticsCharts } from './TenantAnalyticsPage.charts';
 import { CohortRetentionTable } from './TenantAnalyticsPage.cohort';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ExportAnalyticsButton } from './TenantAnalyticsPage.export';
 import {
   TENANT_ANALYTICS_QUERY,
@@ -59,7 +62,16 @@ export function TenantAnalyticsPage() {
   const error = analyticsResult.error ?? cohortResult.error;
 
   return (
-    <AdminLayout title="Tenant Analytics" description="Platform-wide learning analytics">
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="Tenant Analytics"
+          description="Platform-wide learning analytics"
+          breadcrumbs={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Analytics' },
+          ]}
+        />
       {/* Period selector */}
       <div className="flex items-center justify-between mb-6">
         <nav role="tablist" aria-label="Analytics period" className="flex gap-1">
@@ -105,16 +117,14 @@ export function TenantAnalyticsPage() {
 
       {/* Loading */}
       {fetching && (
-        <div className="flex items-center justify-center py-16" aria-label="Loading analytics">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
+        <LoadingSpinner containerHeight="py-16" label="Loading analytics" />
       )}
 
       {/* Error */}
       {error && !fetching && (
         <Card>
           <CardContent className="py-8 text-center text-destructive text-sm">
-            Failed to load analytics: {error.message}
+            Failed to load analytics. Please try again.
           </CardContent>
         </Card>
       )}
@@ -134,6 +144,7 @@ export function TenantAnalyticsPage() {
           <CohortRetentionTable rows={cohort} />
         </div>
       )}
+      </PageShell>
     </AdminLayout>
   );
 }

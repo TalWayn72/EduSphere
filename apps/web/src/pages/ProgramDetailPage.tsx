@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -81,9 +84,7 @@ export function ProgramDetailPage(): React.ReactElement {
   if (programResult.fetching) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
+        <LoadingSpinner />
       </Layout>
     );
   }
@@ -103,14 +104,14 @@ export function ProgramDetailPage(): React.ReactElement {
 
   return (
     <Layout>
-    <div className="container mx-auto py-8 px-4 max-w-3xl">
-      <Button
-        variant="ghost"
-        className="mb-4"
-        onClick={() => navigate('/programs')}
-      >
-        Back to Programs
-      </Button>
+    <PageShell size="md">
+      <PageHeader
+        title={program.title}
+        breadcrumbs={[
+          { label: 'Programs', href: '/programs' },
+          { label: program.title },
+        ]}
+      />
 
       <Card className="mb-6">
         <CardHeader>
@@ -213,7 +214,7 @@ export function ProgramDetailPage(): React.ReactElement {
           <Button onClick={handleEnroll}>Enroll in Program</Button>
         )}
       </div>
-    </div>
+    </PageShell>
     </Layout>
   );
 }

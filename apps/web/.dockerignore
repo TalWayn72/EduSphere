@@ -1,0 +1,34 @@
+# Dependencies — installed inside container
+**/node_modules/
+
+# Build outputs — must be built fresh inside container
+**/dist/
+**/.turbo/
+**/.vite/
+**/tsconfig.tsbuildinfo
+
+# Test artifacts
+**/coverage/
+**/test-results/
+**/playwright-report/
+**/.nyc_output/
+
+# Dev files
+**/.env.local
+**/.env.*.local
+**/*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+
+# Documentation (not needed in container)
+docs/screenshots/
+docs/plans/
+
+# OS
+Thumbs.db
+.DS_Store

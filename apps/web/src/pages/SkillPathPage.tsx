@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Target } from 'lucide-react';
 import { SKILL_PATHS_QUERY, MY_SKILL_PROGRESS_QUERY } from '@/lib/graphql/skills.queries';
@@ -62,7 +63,7 @@ export function SkillPathPage() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto p-6 space-y-6">
+      <PageShell size="lg" className="p-6">
         {/* Header */}
         <div className="flex items-center gap-3">
           <Target className="h-6 w-6 text-primary" aria-hidden />
@@ -110,7 +111,7 @@ export function SkillPathPage() {
             ))}
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

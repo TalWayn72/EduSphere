@@ -58,6 +58,7 @@ export class XpService implements OnModuleDestroy {
     eventType: XpEventType,
     metadata?: Record<string, unknown>
   ): Promise<void> {
+    // eslint-disable-next-line security/detect-object-injection -- eventType is a typed XpEventType enum value
     const xpAmount = XP_TABLE[eventType];
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 

@@ -14,6 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/auth';
@@ -260,7 +261,7 @@ export function LiveSessionDetailPage() {
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto space-y-4">
+      <PageShell size="xl" spacing="compact">
         {/* Back + Header */}
         <div className="flex items-center gap-3">
           <Button
@@ -402,7 +403,7 @@ export function LiveSessionDetailPage() {
             />
           </Card>
         </div>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

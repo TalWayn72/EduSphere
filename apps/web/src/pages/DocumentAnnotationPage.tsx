@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { toast } from 'sonner';
 import {
   ResizablePanelGroup,
@@ -16,6 +17,7 @@ import { useDocumentScrollMemory } from '@/hooks/useDocumentScrollMemory';
 import { useRecentDocuments } from '@/hooks/useRecentDocuments';
 import { useDocumentUIStore } from '@/lib/store';
 import { getCurrentUser } from '@/lib/auth';
+import { PageHeader } from '@/components/PageHeader';
 import { DocumentToolbar } from '@/pages/DocumentAnnotationPage.toolbar';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
 import { mockDocumentContent } from '@/lib/mock-content-data';
@@ -147,9 +149,7 @@ export function DocumentAnnotationPage() {
 
   if (fetching || annotationsFetching) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <LoadingSpinner containerHeight="h-screen" />
     );
   }
 
@@ -175,6 +175,7 @@ export function DocumentAnnotationPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-muted/30">
+      <PageHeader title="Annotations" className="sr-only" />
       <DocumentToolbar
         title={effectiveItem.title ?? 'Document'}
         documentZoom={documentZoom}

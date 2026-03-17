@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getBlogPost } from '@/lib/blog-data';
 import { PageMeta, ArticleSchema, BreadcrumbSchema, PersonSchema } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const BASE_URL = 'https://app.edusphere.dev';
 
@@ -19,14 +20,14 @@ function renderBody(markdown: string) {
       return (
         <h2
           key={i}
-          className="text-xl font-bold text-gray-900 dark:text-foreground mt-8 mb-3"
+          className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-3"
         >
           {paragraph.slice(3)}
         </h2>
       );
     }
     return (
-      <p key={i} className="text-gray-700 dark:text-muted-foreground leading-relaxed mb-4">
+      <p key={i} className="text-gray-700 dark:text-slate-300 leading-relaxed mb-4">
         {paragraph}
       </p>
     );
@@ -50,7 +51,7 @@ export function BlogPostPage() {
   const ogImage = `${BASE_URL}/aeo/og?title=${encodeURIComponent(post.title)}&type=blog`;
 
   return (
-    <>
+    <PublicLayout navVariant="minimal">
       <PageMeta
         title={post.title}
         description={post.description}
@@ -79,7 +80,7 @@ export function BlogPostPage() {
       />
       <PersonSchema name={post.author} url={post.authorUrl} />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
             to="/blog"
@@ -92,12 +93,12 @@ export function BlogPostPage() {
             {post.category}
           </span>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-foreground mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-muted-foreground mb-8 pb-6 border-b border-gray-200 dark:border-border">
-            <span className="font-medium text-gray-700 dark:text-foreground">{post.author}</span>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-slate-400 mb-8 pb-6 border-b border-gray-200 dark:border-slate-700">
+            <span className="font-medium text-gray-700 dark:text-white">{post.author}</span>
             <span>{formatDate(post.datePublished)}</span>
             <span>{post.readingTimeMinutes} min read</span>
           </div>
@@ -105,7 +106,7 @@ export function BlogPostPage() {
           <article className="prose-sm">{renderBody(post.bodyMarkdown)}</article>
         </main>
       </div>
-    </>
+    </PublicLayout>
   );
 }
 

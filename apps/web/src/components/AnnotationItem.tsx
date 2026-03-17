@@ -75,10 +75,10 @@ export function AnnotationItem({
 
   return (
     <div
-      className={`${depth > 0 ? 'ml-8 mt-2 border-l-2 border-gray-200 dark:border-border pl-4' : ''}`}
+      className={`${depth > 0 ? 'ml-8 mt-2 border-l-2 border-gray-200 dark:border-slate-700 pl-4' : ''}`}
       data-annotation-id={annotation.id}
     >
-      <div className="bg-white dark:bg-card rounded-lg border p-4 space-y-3">
+      <div className="bg-white dark:bg-slate-800 rounded-lg border p-4 space-y-3">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 flex-wrap">
@@ -87,14 +87,14 @@ export function AnnotationItem({
             </span>
             <span className="text-sm font-semibold">
               {annotation.userName}
-              {isOwn && <span className="text-gray-500 dark:text-muted-foreground ml-1">(You)</span>}
+              {isOwn && <span className="text-gray-500 dark:text-slate-400 ml-1">(You)</span>}
             </span>
             {annotation.timestamp && (
-              <span className="text-xs text-gray-500 dark:text-muted-foreground font-mono bg-gray-100 dark:bg-muted px-2 py-0.5 rounded">
+              <span className="text-xs text-gray-500 dark:text-slate-400 font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
                 {annotation.timestamp}
               </span>
             )}
-            <span className="text-xs text-gray-400 dark:text-muted-foreground">
+            <span className="text-xs text-gray-400 dark:text-slate-400">
               {formatDate(annotation.createdAt)}
             </span>
           </div>
@@ -149,7 +149,7 @@ export function AnnotationItem({
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-700 dark:text-foreground whitespace-pre-wrap">
+          <p className="text-sm text-gray-700 dark:text-white whitespace-pre-wrap">
             {annotation.content}
           </p>
         )}
@@ -178,7 +178,7 @@ export function AnnotationItem({
               </Button>
             )}
             {annotation.replies && annotation.replies.length > 0 && (
-              <span className="text-xs text-gray-500 dark:text-muted-foreground self-center">
+              <span className="text-xs text-gray-500 dark:text-slate-400 self-center">
                 {annotation.replies.length}{' '}
                 {annotation.replies.length === 1 ? 'reply' : 'replies'}
               </span>

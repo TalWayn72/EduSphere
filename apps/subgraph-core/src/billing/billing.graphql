@@ -69,10 +69,31 @@ enum PilotRequestStatus {
   EXPIRED
 }
 
+type TenantUsage {
+  activeUsers: Int!
+  storageUsedMb: Float!
+  apiCalls: Int!
+  coursesCreated: Int!
+  agentSessions: Int!
+}
+
+type PlatformStats {
+  totalTenants: Int!
+  totalLearners: Int!
+  totalCoursesCreated: Int!
+  avgEngagementScore: Float!
+}
+
 extend type Query {
   mySubscription: TenantSubscription @authenticated
 
   myUsage: UsageSnapshot @authenticated
+
+  myTenantUsage(year: Int): TenantUsage @authenticated
+
+  platformLiveStats: PlatformStats
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
 
   allPilotRequests(status: PilotRequestStatus): [PilotRequest!]!
     @authenticated

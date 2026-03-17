@@ -32,6 +32,7 @@ const mockNatsService = {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeWorker() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock in test
   return new EmbeddingWorker(mockNatsService as any);
 }
 
@@ -66,6 +67,7 @@ describe('EmbeddingWorker', () => {
       mockNatsService.getConnection.mockReturnValue(null);
       const worker = makeWorker();
       // Access the private method via casting for testing
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private method in test
       await (worker as any).processEmbeddings({
         transcriptId: 't1',
         segmentIds: [],
@@ -86,6 +88,7 @@ describe('EmbeddingWorker', () => {
       vi.mocked(embed).mockResolvedValue([0.1, 0.2, 0.3]);
       mockExecute.mockResolvedValue([]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private method in test
       await (worker as any).processEmbeddings({
         transcriptId: 't1',
         segmentIds: ['seg-1', 'seg-2'],
@@ -111,6 +114,7 @@ describe('EmbeddingWorker', () => {
 
       mockExecute.mockResolvedValue([]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private method in test
       await (worker as any).processEmbeddings({
         transcriptId: 't1',
         segmentIds: ['seg-1', 'seg-2'],
@@ -128,6 +132,7 @@ describe('EmbeddingWorker', () => {
 
       makeSegmentQuery([]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private method in test
       await (worker as any).processEmbeddings({
         transcriptId: 'ghost-transcript',
         segmentIds: ['seg-missing'],
@@ -152,6 +157,7 @@ describe('EmbeddingWorker', () => {
       vi.mocked(embed).mockResolvedValue([0.1]);
       mockExecute.mockResolvedValue([]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private method in test
       await (worker as any).processEmbeddings({
         transcriptId: 't-large',
         segmentIds,

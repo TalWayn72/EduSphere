@@ -6,6 +6,7 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { db, withTenantContext } from '@edusphere/db';
+import type { ConceptRelationshipType } from '@edusphere/db';
 import { CypherConceptRelationService } from './cypher-concept-relation.service';
 import {
   toUserRole,
@@ -69,7 +70,7 @@ export class GraphConceptLinkService {
   async linkConcepts(
     fromId: string,
     toId: string,
-    relationshipType: string,
+    relationshipType: ConceptRelationshipType,
     strength: number | null,
     description: string | null,
     tenantId: string,

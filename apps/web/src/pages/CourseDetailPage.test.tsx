@@ -47,6 +47,14 @@ vi.mock('@/components/SourceManager', () => ({
   SourceManager: vi.fn(() => null),
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+}));
+
 vi.mock('@/lib/graphql/content.queries', () => ({
   COURSE_DETAIL_QUERY: 'COURSE_DETAIL_QUERY',
   MY_ENROLLMENTS_QUERY: 'MY_ENROLLMENTS_QUERY',
@@ -153,7 +161,8 @@ describe('CourseDetailPage', () => {
 
   it('renders the course title when data is loaded', () => {
     render(<CourseDetailPage />);
-    expect(screen.getByText('Test Course')).toBeInTheDocument();
+    const titles = screen.getAllByText('Test Course');
+    expect(titles.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the course description', () => {
@@ -193,10 +202,10 @@ describe('CourseDetailPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('navigates to /courses when back button is clicked', () => {
+  it('renders course title via PageHeader', () => {
     render(<CourseDetailPage />);
-    fireEvent.click(screen.getByRole('button', { name: /all courses/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses');
+    const headings = screen.getAllByRole('heading', { name: 'Test Course' });
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
   it('clicking "Edit Course" enters inline edit mode (does not navigate)', () => {

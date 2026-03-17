@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -70,7 +71,7 @@ export class QuizService implements OnModuleDestroy {
     });
 
     if (!saved) {
-      throw new Error('Failed to save quiz result');
+      throw new InternalServerErrorException('Failed to save quiz result');
     }
 
     this.logger.log(

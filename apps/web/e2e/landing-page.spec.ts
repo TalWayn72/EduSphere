@@ -268,23 +268,27 @@ test.describe('SmartRoot — "/" route behaviour', () => {
 // ─── Suite 5: Phase 39 — Hero video & VideoSection ────────────────────────────
 
 test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
-  test('hero background video has preload="none" (does not block LCP)', async ({ page }) => {
+  test('hero has Remotion Player background (KnowledgeGraphGrow)', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    // HeroSection renders: <video aria-hidden="true" preload="none" autoPlay muted loop playsInline>
-    const heroVideo = page.locator('[data-testid="hero-section"] video[aria-hidden="true"]').first();
-    await expect(heroVideo).toHaveAttribute('preload', 'none', { timeout: 10_000 });
-    await expect(heroVideo).toHaveAttribute('autoplay', '');
-    await expect(heroVideo).toHaveAttribute('muted', '');
+    // Remotion Player renders inside the hero section as an iframe or div
+    const heroSection = page.locator('[data-testid="hero-section"]');
+    await expect(heroSection).toBeVisible({ timeout: 10_000 });
+
+    // The Remotion Player container should exist (aria-hidden div wrapping the Player)
+    const remotionContainer = heroSection.locator('[aria-hidden="true"]').first();
+    await expect(remotionContainer).toBeVisible({ timeout: 10_000 });
   });
 
-  test('hero background video has poster attribute for instant paint', async ({ page }) => {
+  test('hero background is not empty (gradient + video layers)', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const heroVideo = page.locator('[data-testid="hero-section"] video[aria-hidden="true"]').first();
-    // poster="/hero-bg-poster.webp" — ensures browser can paint a frame before video loads
-    const poster = await heroVideo.getAttribute('poster');
-    expect(poster).toBeTruthy();
+    const heroSection = page.locator('[data-testid="hero-section"]');
+    await expect(heroSection).toBeVisible({ timeout: 10_000 });
+    // Hero should have background layers (gradient, overlay, orbs)
+    // Verify the hero is not an empty white box — it must have visual background
+    const bgGradient = heroSection.locator('div.absolute.inset-0').first();
+    await expect(bgGradient).toBeAttached();
   });
 
   test('VideoSection exists with data-testid and aria-label="Product demo"', async ({ page }) => {
@@ -295,13 +299,14 @@ test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
     await expect(videoSection).toHaveAttribute('aria-label', 'Product demo');
   });
 
-  test('VideoSection demo video has preload="none" (lazy-loaded)', async ({ page }) => {
+  test('VideoSection has Remotion Player (LiveCollab demo)', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const demoVideo = page.locator('[data-testid="video-section"] video');
-    await expect(demoVideo).toHaveAttribute('preload', 'none', { timeout: 10_000 });
-    // Must be muted (required for browser autoplay policy compliance)
-    await expect(demoVideo).toHaveAttribute('muted', '');
+    const videoSection = page.locator('[data-testid="video-section"]');
+    await expect(videoSection).toBeVisible({ timeout: 10_000 });
+    // Remotion Player renders inside the video section container
+    const playerContainer = videoSection.locator('.aspect-video');
+    await expect(playerContainer).toBeVisible({ timeout: 10_000 });
   });
 
   test('VideoSection heading "See EduSphere in Action" is visible', async ({ page }) => {

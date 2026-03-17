@@ -20,6 +20,12 @@ vi.mock('@/hooks/useAuthRole', () => ({
   useAuthRole: vi.fn(() => 'ORG_ADMIN'),
 }));
 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return { ...actual, useNavigate: () => mockNavigate };
+});
+
 vi.mock('@/lib/graphql/xapi.queries', () => ({
   XAPI_TOKENS_QUERY: 'XAPI_TOKENS_QUERY',
   XAPI_STATEMENTS_QUERY: 'XAPI_STATEMENTS_QUERY',
@@ -223,6 +229,7 @@ describe('XapiSettingsPage', () => {
     const { container } = renderPage();
     // Page renders null and calls navigate('/dashboard')
     expect(container.querySelector('h1')).not.toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
   it('clears copy timer on unmount (no memory leak)', async () => {

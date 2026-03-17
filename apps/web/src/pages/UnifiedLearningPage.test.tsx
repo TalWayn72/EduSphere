@@ -49,6 +49,11 @@ vi.mock('@/components/ContentViewerBreadcrumb', () => ({
   ),
 }));
 
+/* ── PageHeader ── */
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1 data-testid="page-header-title">{title}</h1>,
+}));
+
 /* ── Sub-panels ── */
 vi.mock('@/pages/UnifiedLearningPage.document-panel', () => ({
   DocumentPanel: ({
@@ -210,10 +215,9 @@ describe('UnifiedLearningPage', () => {
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
-  it('renders the breadcrumb', () => {
+  it('renders the page header', () => {
     renderPage('content-1');
-    expect(screen.getByTestId('breadcrumb')).toBeInTheDocument();
-    expect(screen.getByTestId('breadcrumb-id')).toHaveTextContent('content-1');
+    expect(screen.getByTestId('page-header-title')).toBeInTheDocument();
   });
 
   it('renders the document panel', () => {
@@ -238,14 +242,14 @@ describe('UnifiedLearningPage', () => {
     );
   });
 
-  it('uses video title as breadcrumb title when no content item', () => {
+  it('uses video title as page header title when no content item', () => {
     renderPage();
-    expect(screen.getByTestId('breadcrumb-title')).toHaveTextContent(
+    expect(screen.getByTestId('page-header-title')).toHaveTextContent(
       'Test Video'
     );
   });
 
-  it('uses content item title when query returns data', () => {
+  it('uses content item title as page header title when query returns data', () => {
     renderPage('content-1', '', {
       data: {
         contentItem: {
@@ -256,7 +260,7 @@ describe('UnifiedLearningPage', () => {
         },
       },
     });
-    expect(screen.getByTestId('breadcrumb-title')).toHaveTextContent(
+    expect(screen.getByTestId('page-header-title')).toHaveTextContent(
       'Fetched Title'
     );
   });

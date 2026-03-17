@@ -22,8 +22,8 @@ export class SkillGapResolver {
     };
   }
 
-  @Query('skillGapAnalysis')
-  async skillGapAnalysis(
+  @Query('skillGapReport')
+  async skillGapReport(
     @Args('roleId') roleId: string,
     @Context() context: GraphQLContext
   ) {

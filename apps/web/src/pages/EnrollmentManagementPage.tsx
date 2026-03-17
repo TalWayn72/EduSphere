@@ -8,6 +8,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -91,7 +94,8 @@ function EnrollUserDialog({
     }
     const result = await enrollUser({ courseId, userId: userId.trim() });
     if (result.error) {
-      setError(result.error.message);
+      console.error('[EnrollmentManagement] Enroll failed:', result.error.message);
+      setError('Failed to enroll user. Please try again.');
     } else {
       setUserId('');
       setError('');
@@ -161,7 +165,8 @@ function BulkEnrollDialog({
     }
     const result = await bulkEnroll({ courseId, userIds });
     if (result.error) {
-      setError(result.error.message);
+      console.error('[EnrollmentManagement] Bulk enroll failed:', result.error.message);
+      setError('Failed to enroll users. Please try again.');
     } else {
       const count =
         (result.data as { adminBulkEnroll: number })?.adminBulkEnroll ?? 0;
@@ -269,14 +274,14 @@ export function EnrollmentManagementPage() {
     reexecuteEnrollments({ requestPolicy: 'network-only' });
     setSuccessMessage('User enrolled successfully');
     if (successTimerRef.current) clearTimeout(successTimerRef.current);
-    successTimerRef.current = setTimeout(() => setSuccessMessage(''), 3000);
+    successTimerRef.current = setTimeout(() => setSuccessMessage(''), SAVED_CONFIRMATION_MS);
   };
 
   const handleBulkSuccess = (count: number) => {
     reexecuteEnrollments({ requestPolicy: 'network-only' });
     setSuccessMessage(`${count} user(s) enrolled successfully`);
     if (successTimerRef.current) clearTimeout(successTimerRef.current);
-    successTimerRef.current = setTimeout(() => setSuccessMessage(''), 3000);
+    successTimerRef.current = setTimeout(() => setSuccessMessage(''), SAVED_CONFIRMATION_MS);
   };
 
   const completedCount = enrollments.filter((e) => e.completedAt).length;
@@ -286,10 +291,13 @@ export function EnrollmentManagementPage() {
       : 0;
 
   return (
-    <AdminLayout
-      title="Enrollment"
-      description="Manage course enrollments and learning paths"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Enrollment"
+          description="Manage course enrollments and learning paths"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Enrollment' }]}
+        />
       {/* Course selector + actions */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
@@ -361,7 +369,7 @@ export function EnrollmentManagementPage() {
         </div>
       ) : enrollmentsResult.error ? (
         <div className="flex items-center justify-center h-48 text-destructive text-sm">
-          Error loading enrollments: {enrollmentsResult.error.message}
+          Error loading enrollments. Please try again.
         </div>
       ) : enrollments.length === 0 ? (
         <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
@@ -462,6 +470,7 @@ export function EnrollmentManagementPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </PageShell>
     </AdminLayout>
   );
 }

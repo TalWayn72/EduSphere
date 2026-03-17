@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -22,6 +23,8 @@ import {
   GENERATE_XAPI_TOKEN_MUTATION,
   REVOKE_XAPI_TOKEN_MUTATION,
 } from '@/lib/graphql/xapi.queries';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 import {
   Database,
   Copy,
@@ -89,7 +92,7 @@ export function XapiSettingsPage() {
     await navigator.clipboard.writeText(lrsBaseUrl);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
   };
   const handleGenerateToken = async () => {
     if (!description.trim()) return;
@@ -112,7 +115,13 @@ export function XapiSettingsPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'xAPI' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Database className="h-6 w-6 text-primary" />
           <div>
@@ -247,7 +256,7 @@ export function XapiSettingsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
       {showModal && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"

@@ -12,7 +12,7 @@ import {
 } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import type { NotificationPubSub } from './notifications.pubsub';
-import type { PushDispatchService } from './push-dispatch.service';
+import { PushDispatchService } from './push-dispatch.service';
 
 export type NotificationType =
   | 'BADGE_ISSUED'

@@ -7,6 +7,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  InternalServerErrorException,
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
@@ -119,7 +120,7 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
     );
 
     const created = rows[0];
-    if (!created) throw new Error('Failed to create SCIM group');
+    if (!created) throw new InternalServerErrorException('Failed to create SCIM group');
 
     if (courseIds.length > 0 && memberIds.length > 0) {
       this.publishEvent('EDUSPHERE.scim.group.enrollment', {

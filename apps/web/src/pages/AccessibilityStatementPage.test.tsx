@@ -1,6 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 import { AccessibilityStatementPage } from './AccessibilityStatementPage';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -35,7 +35,7 @@ export function HowPilotWorksSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
             Start Your 90-Day Pilot — No Credit Card Required
           </h2>
-          <p className="mt-4 text-lg text-slate-500">
+          <p className="mt-4 text-lg text-slate-600">
             Full feature access. Your own white-labeled domain. Up to 500 users.
           </p>
         </div>
@@ -46,9 +46,9 @@ export function HowPilotWorksSection() {
                 <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mb-5 shadow-lg">
                   <Icon className="h-7 w-7" aria-hidden="true" />
                 </div>
-                <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Step {num}</div>
+                <div className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-1">Step {num}</div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">{title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed max-w-xs">{desc}</p>
+                <p className="text-sm text-slate-600 leading-relaxed max-w-xs">{desc}</p>
               </div>
               {i < STEPS.length - 1 && (
                 <div className="hidden lg:flex items-center self-center text-indigo-300" aria-hidden="true">

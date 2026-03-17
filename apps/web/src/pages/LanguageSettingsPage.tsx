@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -17,6 +18,8 @@ import {
 } from '@/components/ui/card';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { Languages, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 import {
   TENANT_LANGUAGE_SETTINGS_QUERY,
   UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION,
@@ -143,11 +146,11 @@ export function LanguageSettingsPage() {
       input: { defaultLanguage, supportedLanguages: [...supported] },
     });
     if (result.error) {
-      setSaveError(result.error.message);
+      setSaveError('Failed to save language settings. Please try again.');
     } else {
       setSaved(true);
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-      savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
+      savedTimerRef.current = setTimeout(() => setSaved(false), SAVED_CONFIRMATION_MS);
     }
   };
 
@@ -157,7 +160,13 @@ export function LanguageSettingsPage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <PageShell size="sm" className="max-w-3xl">
+        <Breadcrumbs
+          items={[
+            { label: 'Settings', href: '/settings' },
+            { label: 'Language' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Languages className="h-6 w-6 text-primary" />
           <div>
@@ -306,7 +315,7 @@ export function LanguageSettingsPage() {
             </div>
           </>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

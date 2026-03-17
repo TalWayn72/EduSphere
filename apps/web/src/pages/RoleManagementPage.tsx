@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -105,7 +107,7 @@ export function RoleManagementPage() {
   async function handleDelete(role: RoleRecord) {
     const result = await deleteRole({ id: role.id });
     if (result.error) {
-      toast.error(`Failed to delete "${role.name}": ${result.error.message}`);
+      toast.error(`Failed to delete "${role.name}". Please try again.`);
     } else {
       if (selectedId === role.id) setSelectedId(SYSTEM_ROLES[0]!.id);
       reexecuteRoles({ requestPolicy: 'network-only' });
@@ -124,7 +126,7 @@ export function RoleManagementPage() {
         },
       });
       if (result.error) {
-        toast.error(`Failed to update role: ${result.error.message}`);
+        toast.error('Failed to update role. Please try again.');
         return;
       }
       reexecuteRoles({ requestPolicy: 'network-only' });
@@ -138,7 +140,7 @@ export function RoleManagementPage() {
         },
       });
       if (result.error) {
-        toast.error(`Failed to create role: ${result.error.message}`);
+        toast.error('Failed to create role. Please try again.');
         return;
       }
       const newId = (result.data as { createRole?: { id: string } })?.createRole
@@ -153,10 +155,13 @@ export function RoleManagementPage() {
   const customRoleCount = backendCustomRoles.length;
 
   return (
-    <AdminLayout
-      title="Roles & Permissions"
-      description="Define roles and control access across the platform"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Roles & Permissions"
+          description="Define roles and control access across the platform"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Roles & Permissions' }]}
+        />
       <div className="flex gap-4 h-[calc(100vh-160px)]">
         {/* Sidebar */}
         <aside className="w-64 flex-none flex flex-col gap-2">
@@ -217,6 +222,7 @@ export function RoleManagementPage() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
       />
+      </PageShell>
     </AdminLayout>
   );
 }

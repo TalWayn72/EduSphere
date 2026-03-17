@@ -257,4 +257,63 @@ describe('AuthMiddleware.validateRequest', () => {
     expect(ctx.authContext?.userId).toBe(VALID_PAYLOAD.sub);
     expect(ctx.authContext?.tenantId).toBeUndefined();
   });
+
+  // ── Gateway-forwarded headers fallback ────────────────────────────────────
+
+  it('uses gateway-forwarded x-user-id header as fallback when JWT validation fails', async () => {
+    mockJwtVerify.mockRejectedValueOnce(new Error('JWKS fetch failed'));
+
+    const ctx: GraphQLContext = {
+      req: {
+        headers: {
+          authorization: 'Bearer some.invalid.token',
+          'x-user-id': 'user-from-gateway',
+          'x-tenant-id': 'tenant-from-gateway',
+          'x-user-role': 'STUDENT',
+        },
+      } as IncomingMessage & {
+        headers: Record<string, string | string[] | undefined>;
+      },
+    };
+
+    await middleware.validateRequest(ctx);
+
+    expect(ctx.authContext).toBeDefined();
+    expect(ctx.authContext?.userId).toBe('user-from-gateway');
+    expect(ctx.authContext?.tenantId).toBe('tenant-from-gateway');
+    expect(ctx.authContext?.roles).toEqual(['STUDENT']);
+    expect(ctx.authContext?.isSuperAdmin).toBe(false);
+  });
+
+  it('sets isSuperAdmin=true when x-user-role is SUPER_ADMIN in fallback', async () => {
+    mockJwtVerify.mockRejectedValueOnce(new Error('JWKS fetch failed'));
+
+    const ctx: GraphQLContext = {
+      req: {
+        headers: {
+          authorization: 'Bearer some.invalid.token',
+          'x-user-id': 'admin-user',
+          'x-tenant-id': 'admin-tenant',
+          'x-user-role': 'SUPER_ADMIN',
+        },
+      } as IncomingMessage & {
+        headers: Record<string, string | string[] | undefined>;
+      },
+    };
+
+    await middleware.validateRequest(ctx);
+
+    expect(ctx.authContext?.isSuperAdmin).toBe(true);
+    expect(ctx.authContext?.roles).toEqual(['SUPER_ADMIN']);
+  });
+
+  it('leaves authContext undefined when JWT fails AND no x-user-id header', async () => {
+    mockJwtVerify.mockRejectedValueOnce(new Error('JWKS fetch failed'));
+
+    const ctx = makeContext('Bearer some.invalid.token');
+
+    await middleware.validateRequest(ctx);
+
+    expect(ctx.authContext).toBeUndefined();
+  });
 });

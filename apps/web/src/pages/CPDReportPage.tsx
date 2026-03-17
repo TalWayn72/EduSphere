@@ -13,6 +13,7 @@ import {
   EXPORT_CPD_REPORT_MUTATION,
 } from '@/lib/graphql/cpd.queries';
 import { BookOpen, Download, Loader2, AlertCircle } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
 
 interface CpdLogEntry {
   id: string;
@@ -60,7 +61,7 @@ export function CPDReportPage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <PageShell size="lg" className="p-6">
         <div className="flex items-center gap-3">
           <BookOpen className="h-7 w-7 text-blue-600" />
           <div>
@@ -79,7 +80,7 @@ export function CPDReportPage() {
         {error && (
           <div className="flex items-center gap-2 text-destructive">
             <AlertCircle className="h-4 w-4" />
-            <span>Failed to load CPD report: {error.message}</span>
+            <span>Failed to load CPD report. Please try again.</span>
           </div>
         )}
 
@@ -186,7 +187,7 @@ export function CPDReportPage() {
             </Card>
           </>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

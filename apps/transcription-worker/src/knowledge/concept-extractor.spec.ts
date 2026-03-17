@@ -50,6 +50,7 @@ describe('ConceptExtractor', () => {
           },
         ],
       },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock return
     } as any);
 
     const result = await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
@@ -93,6 +94,7 @@ describe('ConceptExtractor', () => {
           },
         ],
       },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock return
     } as any);
 
     const result = await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
@@ -112,6 +114,7 @@ describe('ConceptExtractor', () => {
           },
         ],
       },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock return
     } as any);
 
     const result = await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
@@ -126,6 +129,7 @@ describe('ConceptExtractor', () => {
 
     vi.mocked(generateObject).mockResolvedValueOnce({
       object: { concepts: [] },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock return
     } as any);
 
     await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
@@ -140,6 +144,7 @@ describe('ConceptExtractor', () => {
 
     vi.mocked(generateObject).mockResolvedValueOnce({
       object: { concepts: [] },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock return
     } as any);
 
     await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
@@ -153,10 +158,12 @@ describe('ConceptExtractor', () => {
     const longText = 'a'.repeat(10000);
     vi.mocked(generateObject).mockResolvedValueOnce({
       object: { concepts: [] },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock return
     } as any);
 
     await extractor.extract(longText, 'course-1', 'tenant-1');
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing mock call args
     const callArgs = vi.mocked(generateObject).mock.calls[0][0] as any;
     expect(callArgs.prompt.length).toBeLessThanOrEqual(
       8000 + 'Course ID: course-1\n\nTranscript:\n'.length

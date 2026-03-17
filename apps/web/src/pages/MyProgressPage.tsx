@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { useQuery } from 'urql';
 import { MY_GAMIFICATION_STATS_QUERY } from '@/lib/graphql/gamification.queries';
 
@@ -67,7 +68,7 @@ export function MyProgressPage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <PageShell size="md" className="p-6">
         <h1 className="text-3xl font-bold">My Progress</h1>
 
         {!stats ? (
@@ -102,7 +103,7 @@ export function MyProgressPage() {
             </div>
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

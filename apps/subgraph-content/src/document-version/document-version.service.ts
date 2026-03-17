@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   OnModuleDestroy,
@@ -154,7 +155,7 @@ export class DocumentVersionService implements OnModuleDestroy {
         .returning()
     );
 
-    if (!version) throw new Error('Failed to create document version');
+    if (!version) throw new InternalServerErrorException('Failed to create document version');
 
     this.logger.log(
       `[DocumentVersionService] Created version=${nextVersion} mediaAssetId=${mediaAssetId} tenantId=${authCtx.tenantId}`

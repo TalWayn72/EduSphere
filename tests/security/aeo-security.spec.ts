@@ -331,10 +331,9 @@ describe('AEO Security — Canonical URL safety', () => {
   });
 
   it('canonical URL must not be built from raw window.location.href', () => {
-    // This is a static code pattern check
-    const routerFile = resolve(ROOT, 'apps/web/src/lib/router.tsx');
-    if (!existsSync(routerFile)) return;
-    const content = readFileSync(routerFile, 'utf-8');
+    // This is a static code pattern check — read all route files
+    const content = readAllRoutes();
+    if (!content) return;
     // window.location.href in canonical context is dangerous — flag it
     // Acceptable: window.location.pathname (path only, no query string/hash)
     const hasHref = content.match(/canonical.*window\.location\.href/s);
@@ -474,12 +473,32 @@ describe('AEO Security — Gateway rate limiting', () => {
 
 // ── Public route isolation check ──────────────────────────────────────────────
 
+/** Read all route definition files (routes were split from router.tsx into routes/) */
+function readAllRoutes(): string {
+  const routeFiles = [
+    'apps/web/src/lib/routes/public-routes.tsx',
+    'apps/web/src/lib/routes/course-routes.tsx',
+    'apps/web/src/lib/routes/admin-routes.tsx',
+    'apps/web/src/lib/routes/assessment-routes.tsx',
+    'apps/web/src/lib/routes/social-routes.tsx',
+    'apps/web/src/lib/routes/learner-routes.tsx',
+    'apps/web/src/lib/routes/instructor-routes.tsx',
+    'apps/web/src/lib/routes/helpers.tsx',
+    'apps/web/src/lib/router.tsx',
+  ];
+  return routeFiles
+    .map((f) => {
+      const abs = resolve(ROOT, f);
+      return existsSync(abs) ? readFileSync(abs, 'utf-8') : '';
+    })
+    .join('\n');
+}
+
 describe('AEO Security — Public route isolation', () => {
   let routerContent: string;
 
   beforeAll(() => {
-    const routerPath = resolve(ROOT, 'apps/web/src/lib/router.tsx');
-    routerContent = existsSync(routerPath) ? readFileSync(routerPath, 'utf-8') : '';
+    routerContent = readAllRoutes();
   });
 
   it('/dashboard is wrapped in guarded() (ProtectedRoute)', () => {
@@ -533,12 +552,11 @@ describe('AEO Security — Public route isolation', () => {
   });
 
   it('/oauth/google/callback is public (required for OAuth flow)', () => {
-    // Verify it exists in the router
-    expect(routerContent).toContain("'/oauth/google/callback'");
-    // Verify its element block uses Suspense, not guarded()
-    // The block ends at the closing brace before the next route entry
+    // Verify it exists in the route definitions
+    expect(routerContent).toMatch(/['"]\/oauth\/google\/callback['"]/);
+    // Verify it is NOT wrapped in guarded()
     const oauthBlock = routerContent.match(
-      /path:\s*['"]\/oauth\/google\/callback['"]\s*,\s*element:\s*\([^)]*\),/
+      /path:\s*['"]\/oauth\/google\/callback['"]\s*,[\s\S]{0,200}/
     );
     expect(oauthBlock).not.toBeNull();
     expect(oauthBlock![0]).not.toContain('guarded(');
@@ -728,9 +746,8 @@ describe('AEO Security — JSON-LD XSS vectors in Phase 2 schemas', () => {
   });
 
   it('/catalog and /instructors routes are NOT wrapped in guarded() in router', () => {
-    const routerPath = resolve(ROOT, 'apps/web/src/lib/router.tsx');
-    if (!existsSync(routerPath)) return;
-    const content = readFileSync(routerPath, 'utf-8');
+    const content = readAllRoutes();
+    if (!content) return;
     const catalogBlock = content.match(/path:\s*['"]\/catalog['"]\s*,[\s\S]{0,300}/);
     expect(catalogBlock).not.toBeNull();
     if (catalogBlock) expect(catalogBlock[0]).not.toContain('guarded(');

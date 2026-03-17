@@ -90,7 +90,7 @@ export function VsCompetitorsSection() {
             </tbody>
           </table>
         </div>
-        <p className="text-center text-xs text-slate-400 mt-4">
+        <p className="text-center text-xs text-slate-500 mt-4">
           ✅ Yes &nbsp;⚠️ Partial / Add-on cost &nbsp;❌ Not available — Based on publicly available documentation, Q1 2026
         </p>
       </div>

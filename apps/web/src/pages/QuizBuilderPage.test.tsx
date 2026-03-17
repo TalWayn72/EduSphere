@@ -35,6 +35,14 @@ vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+}));
+
+vi.mock('@/components/PageHeader', () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+}));
+
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -147,7 +155,8 @@ describe('QuizBuilderPage', () => {
 
   it('renders "Quiz Builder" heading for INSTRUCTOR role', () => {
     renderPage();
-    expect(screen.getByText('Quiz Builder')).toBeDefined();
+    const headings = screen.getAllByRole('heading', { name: 'Quiz Builder' });
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
   it('"Add Question" button adds a question row', () => {

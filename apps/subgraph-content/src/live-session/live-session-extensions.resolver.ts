@@ -14,18 +14,9 @@ import {
 } from './breakout.service';
 import { PollService } from './poll.service';
 import type { PollVotePayload } from '@edusphere/nats-client';
+import type { GraphQLContext } from '../auth/auth.middleware';
 
 const NATS_POLL_VOTED = 'EDUSPHERE.poll.voted';
-
-interface GqlContext {
-  req: {
-    user?: {
-      sub?: string;
-      tenant_id?: string;
-      role?: string;
-    };
-  };
-}
 
 @Resolver()
 export class LiveSessionExtensionsResolver {
@@ -37,12 +28,14 @@ export class LiveSessionExtensionsResolver {
     private readonly pollService: PollService
   ) {}
 
-  private userId(ctx: GqlContext): string {
-    return ctx.req.user?.sub ?? '';
+  private userId(ctx: GraphQLContext): string {
+    return ctx.authContext?.userId ?? '';
   }
 
-  private tenantId(ctx: GqlContext): string {
-    return ctx.req.user?.tenant_id ?? '';
+  private tenantId(ctx: GraphQLContext): string {
+    if (ctx.authContext?.tenantId) return ctx.authContext.tenantId;
+    const header = ctx.req?.headers?.['x-tenant-id'];
+    return (Array.isArray(header) ? header[0] : header) ?? '';
   }
 
   // ── Queries ────────────────────────────────────────────────────────────────
@@ -50,7 +43,7 @@ export class LiveSessionExtensionsResolver {
   @Query('breakoutRooms')
   async breakoutRooms(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     return this.breakoutService.listRooms(
       sessionId,
@@ -62,7 +55,7 @@ export class LiveSessionExtensionsResolver {
   @Query('sessionPolls')
   async sessionPolls(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     return this.pollService.listPolls(
       sessionId,
@@ -74,7 +67,7 @@ export class LiveSessionExtensionsResolver {
   @Query('pollResults')
   async pollResults(
     @Args('pollId') pollId: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     return this.pollService.getPollResults(
       pollId,
@@ -89,7 +82,7 @@ export class LiveSessionExtensionsResolver {
   async createBreakoutRooms(
     @Args('sessionId') sessionId: string,
     @Args('rooms') rooms: CreateBreakoutRoomInput[],
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     return this.breakoutService.createBreakoutRooms(
       sessionId,
@@ -104,7 +97,7 @@ export class LiveSessionExtensionsResolver {
     @Args('sessionId') sessionId: string,
     @Args('question') question: string,
     @Args('options') options: string[],
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     return this.pollService.createPoll(
       sessionId,
@@ -118,7 +111,7 @@ export class LiveSessionExtensionsResolver {
   @Mutation('activatePoll')
   async activatePoll(
     @Args('pollId') pollId: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     return this.pollService.activatePoll(
       pollId,
@@ -128,7 +121,7 @@ export class LiveSessionExtensionsResolver {
   }
 
   @Mutation('closePoll')
-  async closePoll(@Args('pollId') pollId: string, @Context() ctx: GqlContext) {
+  async closePoll(@Args('pollId') pollId: string, @Context() ctx: GraphQLContext) {
     return this.pollService.closePoll(
       pollId,
       this.tenantId(ctx),
@@ -140,7 +133,7 @@ export class LiveSessionExtensionsResolver {
   async votePoll(
     @Args('pollId') pollId: string,
     @Args('optionIndex', { type: () => Int }) optionIndex: number,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     await this.pollService.vote(
       pollId,

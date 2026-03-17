@@ -3,6 +3,8 @@ import {
   Logger,
   OnModuleInit,
   OnModuleDestroy,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -432,7 +434,7 @@ export class BadgeService implements OnModuleInit, OnModuleDestroy {
         tenantId,
       })
       .returning();
-    if (!badge) throw new Error('Badge insert failed');
+    if (!badge) throw new InternalServerErrorException('Badge insert failed');
     return badge;
   }
 
@@ -453,7 +455,7 @@ export class BadgeService implements OnModuleInit, OnModuleDestroy {
       .set(input)
       .where(eq(schema.badges.id, id))
       .returning();
-    if (!badge) throw new Error('Badge not found');
+    if (!badge) throw new NotFoundException('Badge not found');
     return badge;
   }
 

@@ -4,6 +4,11 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PricingPage } from './PricingPage';
 
+// Mock PublicLayout — nav and footer are tested in their own test files
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 // PricingSection uses useMutation internally — mock urql to avoid Provider requirement
 vi.mock('urql', async () => {
   const actual = await vi.importActual<typeof import('urql')>('urql');
@@ -89,9 +94,9 @@ describe('PricingPage', () => {
     expect(screen.getByRole('heading', { name: /Pricing & Plans/i })).toBeInTheDocument();
   });
 
-  it('renders navigation with Log In link', () => {
+  it('renders inside PublicLayout wrapper', () => {
     renderPage();
-    expect(screen.getByRole('link', { name: /Log In/i })).toBeInTheDocument();
+    expect(screen.getByTestId('public-layout')).toBeInTheDocument();
   });
 
   it('renders Start Free Pilot CTA link', () => {

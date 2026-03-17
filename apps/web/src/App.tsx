@@ -10,6 +10,7 @@ import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 import { StorageWarningBanner } from '@/components/StorageWarningBanner';
 import { GlobalLocaleSync } from '@/components/GlobalLocaleSync';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { SkipLinks } from '@/components/a11y/SkipLinks';
@@ -68,7 +69,9 @@ function App() {
             <GlobalLocaleSync />
             <StorageWarningBanner />
             <Toaster />
-            <RouterProvider router={router} />
+            <ErrorBoundary pageName="App">
+              <RouterProvider router={router} />
+            </ErrorBoundary>
           </BrandingProvider>
         </UrqlProvider>
       </QueryClientProvider>

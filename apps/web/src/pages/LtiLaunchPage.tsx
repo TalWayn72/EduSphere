@@ -40,6 +40,7 @@ export const LtiLaunchPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
+      <h1 className="sr-only">LTI Launch</h1>
       <div className="text-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-3" />
         <p className="text-muted-foreground text-sm">Redirecting...</p>

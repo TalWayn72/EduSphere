@@ -32,6 +32,6 @@ extend type Mutation {
 }
 
 extend type Query {
-  mySubmissions(contentItemId: ID!): [TextSubmission!]! @authenticated
+  myTextSubmissions(contentItemId: ID!): [TextSubmission!]! @authenticated
   submissionPlagiarismReport(submissionId: ID!): PlagiarismReport @authenticated
 }

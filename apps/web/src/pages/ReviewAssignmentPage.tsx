@@ -9,6 +9,7 @@ import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import RubricScorer, { type RubricCriterion } from '@/components/peer-review/RubricScorer';
 import { SUBMIT_PEER_REVIEW_MUTATION } from '@/lib/graphql/peer-review.queries';
 
@@ -57,6 +58,13 @@ export function ReviewAssignmentPage() {
   return (
     <Layout>
       <div className="container mx-auto p-6 max-w-2xl space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Peer Review', href: '/peer-review' },
+            { label: 'Submit Review' },
+          ]}
+        />
+
         <div className="flex items-center gap-3">
           <Link
             to="/peer-review"

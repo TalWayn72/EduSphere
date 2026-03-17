@@ -95,7 +95,6 @@ describe('CPDReportPage', () => {
     ] as never);
     render(<CPDReportPage />);
     expect(screen.getByText(/failed to load cpd report/i)).toBeInTheDocument();
-    expect(screen.getByText(/network error/i)).toBeInTheDocument();
   });
 
   it('shows total CPD hours when report is loaded', () => {

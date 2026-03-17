@@ -60,14 +60,43 @@ jobs:
           echo "SDL files are pre-committed — skipping runtime SDL generation"
           ls apps/subgraph-*/src/**/*.graphql 2>/dev/null | head -20 || echo "GraphQL SDL files in subgraphs"
 
+      - name: Detect SDL changes in PR
+        id: sdl-check
+        run: |
+          # Check if any subgraph SDL files changed relative to the base branch
+          BASE_REF="${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}"
+          SDL_CHANGED=$(git diff --name-only "$BASE_REF" HEAD -- 'apps/subgraph-*/src/**/*.graphql' 2>/dev/null || true)
+          SUPERGRAPH_CHANGED=$(git diff --name-only "$BASE_REF" HEAD -- 'apps/gateway/supergraph.graphql' 2>/dev/null || true)
+          if [ -n "$SDL_CHANGED" ]; then
+            echo "sdl_changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changed SDL files:"
+            echo "$SDL_CHANGED"
+          else
+            echo "sdl_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -n "$SUPERGRAPH_CHANGED" ]; then
+            echo "supergraph_updated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "supergraph_updated=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Compose supergraph
         run: |
           # compose.js fetches SDL from live subgraphs — not available in CI.
           # Fall back to pre-committed supergraph.graphql if subgraphs are unreachable.
-          pnpm --filter @edusphere/gateway compose || {
+          COMPOSE_EXIT=0
+          pnpm --filter @edusphere/gateway compose || COMPOSE_EXIT=$?
+          if [ "$COMPOSE_EXIT" -ne 0 ]; then
+            # Compose failed — check if SDL files changed without supergraph update
+            if [ "${{ steps.sdl-check.outputs.sdl_changed }}" = "true" ] && \
+               [ "${{ steps.sdl-check.outputs.supergraph_updated }}" = "false" ]; then
+              echo "::error::Subgraph SDL files changed but supergraph.graphql was not updated and compose failed."
+              echo "Run 'pnpm --filter @edusphere/gateway compose' locally with all subgraphs running, then commit the updated supergraph.graphql."
+              exit 1
+            fi
             echo "::warning::Live subgraphs not reachable in CI — using committed supergraph.graphql"
             echo "Run 'pnpm --filter @edusphere/gateway compose' locally with all subgraphs running."
-          }
+          fi
           if [ ! -f apps/gateway/supergraph.graphql ]; then
             echo "ERROR: apps/gateway/supergraph.graphql not found"
             exit 1

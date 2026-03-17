@@ -4,6 +4,8 @@ import { Layout } from '@/components/Layout';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Sun, Moon, Monitor } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 import type { ThemeMode, FontSize, ThemePrimitives } from '@/lib/theme';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -74,7 +76,13 @@ export function ThemeSettingsPage() {
 
   return (
     <Layout>
-    <div className="max-w-2xl mx-auto py-8 px-4 space-y-10">
+    <PageShell size="sm" spacing="relaxed" className="py-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Settings', href: '/settings' },
+          { label: 'Theme' },
+        ]}
+      />
       <h1 className="text-2xl font-bold text-foreground">Theme &amp; Appearance Settings</h1>
 
       {/* ── Appearance ─────────────────────────────────────────────────────── */}
@@ -269,7 +277,7 @@ export function ThemeSettingsPage() {
           Reset to defaults
         </Button>
       </section>
-    </div>
+    </PageShell>
     </Layout>
   );
 }

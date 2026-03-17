@@ -13,12 +13,12 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageHeader } from '@/components/PageHeader';
 import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
-import { ContentViewerBreadcrumb } from '@/components/ContentViewerBreadcrumb';
 import { useContentData } from '@/hooks/useContentData';
 import { useSubtitleTracks } from '@/hooks/useSubtitleTracks';
 import { useAnnotations } from '@/hooks/useAnnotations';
@@ -53,7 +53,7 @@ interface VisualAnchorsResult {
 }
 
 export function UnifiedLearningPage() {
-  const { contentId = 'content-1' } = useParams<{ contentId: string }>();
+  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{ contentId: string }>();
   const [searchParams] = useSearchParams();
 
   // ── Content item query (contentType + document content) ──
@@ -179,9 +179,16 @@ export function UnifiedLearningPage() {
         />
       )}
       <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
-        {/* Breadcrumb */}
-        <div className="flex-shrink-0 px-1">
-          <ContentViewerBreadcrumb contentId={contentId} contentTitle={title} />
+        {/* Header */}
+        <div className="flex-shrink-0 px-4 pt-2">
+          <PageHeader
+            title={title ?? 'Learning'}
+            breadcrumbs={[
+              { label: 'Courses', href: '/courses' },
+              { label: title ?? 'Content' },
+            ]}
+            className="mb-0"
+          />
         </div>
 
         {/* Main resizable layout with visual sidebar */}

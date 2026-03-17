@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, BarChart2, Tag } from 'lucide-react';
 import { PageMeta, CourseSchema, BreadcrumbSchema } from '@/components/seo';
+import { PublicLayout } from '@/components/PublicLayout';
 
 interface FeaturedCourse {
   id: string;
@@ -88,23 +89,23 @@ interface CourseCardProps {
 function CourseCard({ course }: CourseCardProps) {
   return (
     <article
-      className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl p-6 flex flex-col gap-3 hover:shadow-md transition-shadow"
+      className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 flex flex-col gap-3 hover:shadow-md transition-shadow"
       aria-label={`Course: ${course.title}`}
     >
       <div className="flex items-start justify-between gap-2">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-foreground leading-tight">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
           {course.title}
         </h2>
         <span
-          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${LEVEL_COLORS[course.level] ?? 'bg-gray-100 text-gray-700'}`}
+          className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${LEVEL_COLORS[course.level] ?? 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'}`}
         >
           {course.level}
         </span>
       </div>
-      <p className="text-gray-600 dark:text-muted-foreground text-sm leading-relaxed flex-1">
+      <p className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed flex-1">
         {course.description}
       </p>
-      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-muted-foreground">
+      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-slate-400">
         <span className="flex items-center gap-1">
           <Clock className="h-4 w-4" aria-hidden="true" />
           {course.duration}
@@ -154,14 +155,15 @@ export function CourseCatalogPage() {
         ]}
       />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <PublicLayout>
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
         <div className="bg-indigo-700 text-white py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               Featured Learning Programs
             </h1>
-            <p className="text-indigo-200 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
               Explore our curated courses designed for modern professionals. AI-powered
               personalization adapts every course to your learning pace.
             </p>
@@ -190,10 +192,10 @@ export function CourseCatalogPage() {
 
           {/* CTA Section */}
           <div className="mt-14 p-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl text-center">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-foreground mb-2">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Ready to transform your organization&apos;s learning?
             </h2>
-            <p className="text-gray-600 dark:text-muted-foreground mb-6 max-w-xl mx-auto">
+            <p className="text-gray-600 dark:text-slate-300 mb-6 max-w-xl mx-auto">
               EduSphere supports 100,000+ concurrent learners with AI-powered tutoring,
               knowledge graphs, and enterprise-grade compliance.
             </p>
@@ -207,6 +209,7 @@ export function CourseCatalogPage() {
           </div>
         </main>
       </div>
+      </PublicLayout>
     </>
   );
 }

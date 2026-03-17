@@ -5,7 +5,7 @@
  * Uses userCourses completion status as proxy for concept mastery.
  * A COMPLETED enrollment implies 100% coverage; ACTIVE uses lesson progress.
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   withTenantContext,
@@ -126,7 +126,7 @@ export class GraphGroundedCredentialService implements OnModuleDestroy {
         .returning({ id: schema.knowledgePathCredentials.id });
 
       const credId = rows[0]?.id;
-      if (!credId) throw new Error('Credential insert returned no record');
+      if (!credId) throw new InternalServerErrorException('Credential insert returned no record');
 
       this.logger.log(
         `[GraphGroundedCredentialService] Credential recorded id=${credId}`,

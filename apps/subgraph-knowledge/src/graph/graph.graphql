@@ -234,7 +234,7 @@ extend type Query {
   """
   Analyze skill gap between the current user's mastery and a named skill profile.
   """
-  skillGapAnalysis(roleId: ID!): SkillGapReport! @authenticated
+  skillGapReport(roleId: ID!): SkillGapReport! @authenticated
 
   """
   List all skill profiles available within the current tenant.

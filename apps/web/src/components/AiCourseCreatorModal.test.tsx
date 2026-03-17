@@ -118,7 +118,7 @@ describe('AiCourseCreatorModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
     await waitFor(() =>
       expect(
-        screen.getByText(/generation service unavailable/i)
+        screen.getByText(/failed to generate course outline/i)
       ).toBeInTheDocument()
     );
   });

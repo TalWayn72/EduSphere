@@ -198,7 +198,7 @@ const gateway = createGatewayRuntime({
         });
       },
     },
-    // BUG-049: Forward Authorization header to every subgraph fetch
+    // BUG-049: Forward Authorization + tenant/user headers to every subgraph fetch
     {
       onFetch({
         options,
@@ -210,16 +210,19 @@ const gateway = createGatewayRuntime({
         context: unknown;
       }) {
         const ctx = context as
-          | { headers?: { authorization?: string | null } }
+          | { headers?: Record<string, string | null> }
           | null
           | undefined;
         const auth = ctx?.headers?.authorization;
         if (!auth) return;
         const prev = options.headers as Record<string, string> | undefined;
-        setOptions({
-          ...options,
-          headers: { ...(prev ?? {}), authorization: auth },
-        });
+        const forwarded: Record<string, string> = { ...(prev ?? {}), authorization: auth };
+        // Forward gateway-extracted identity headers so subgraph resolvers
+        // can read tenant/user context even if local JWT re-validation fails.
+        if (ctx?.headers?.['x-tenant-id']) forwarded['x-tenant-id'] = ctx.headers['x-tenant-id'];
+        if (ctx?.headers?.['x-user-id']) forwarded['x-user-id'] = ctx.headers['x-user-id'];
+        if (ctx?.headers?.['x-user-role']) forwarded['x-user-role'] = ctx.headers['x-user-role'];
+        setOptions({ ...options, headers: forwarded });
       },
     },
   ],

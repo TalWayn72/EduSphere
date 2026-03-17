@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
-const GRAPHQL_URL =
-  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { GRAPHQL_URL } from '@/lib/constants';
 
 const EARNINGS_QUERY = gql`
   query InstructorEarnings {
@@ -87,15 +88,20 @@ export function InstructorEarningsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <LoadingSpinner />
     );
   }
 
   return (
     <Layout>
-      <div className="p-6 max-w-4xl mx-auto">
+      <PageShell size="md" className="p-6">
+      <Breadcrumbs
+        className="mb-4"
+        items={[
+          { label: 'Instructor', href: '/instructor' },
+          { label: 'Earnings' },
+        ]}
+      />
       <h1 className="text-3xl font-bold mb-6">Instructor Earnings</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -191,7 +197,7 @@ export function InstructorEarningsPage() {
           )}
         </CardContent>
       </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

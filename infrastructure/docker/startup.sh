@@ -209,6 +209,18 @@ for SDL in tenant/tenant.graphql user/user.graphql gamification/gamification.gra
 done
 echo "✅ subgraph-core SDL sync complete"
 
+# ─── Web frontend dist check (idempotent) ─────────────────────
+# If apps/web/dist doesn't exist or is empty, rebuild the web frontend.
+# This handles the case where the image was built before the web build was added.
+if [ ! -f "/app/apps/web/dist/index.html" ]; then
+    echo "⚠️  apps/web/dist is missing — building web frontend..."
+    cd /app && pnpm turbo build --filter='./apps/web' > /var/log/edusphere/web-build.log 2>&1 \
+        && echo "✅ Web frontend built" \
+        || echo "⚠️  Web frontend build failed — see /var/log/edusphere/web-build.log"
+else
+    echo "✅ Web frontend dist is present"
+fi
+
 # ─── Initialize MinIO bucket (idempotent) ────────────────────
 # Pre-create bucket directory so MinIO recognizes it on startup.
 echo "🪣 Pre-creating MinIO bucket directory 'edusphere'..."

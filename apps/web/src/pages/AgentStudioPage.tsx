@@ -14,7 +14,10 @@ import { useState, useCallback, useRef } from 'react';
 import { useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
+import { TOAST_AUTO_DISMISS_MS, SIMULATED_SAVE_MS } from '@/lib/constants';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
@@ -172,12 +175,12 @@ export function AgentStudioPage() {
       if (res.error) {
         console.error('[AgentStudioPage] Save failed:', res.error.message);
         setSaveStatus('error');
-        setTimeout(() => setSaveStatus('idle'), 2000);
+        setTimeout(() => setSaveStatus('idle'), TOAST_AUTO_DISMISS_MS);
         return;
       }
     }
     setSaveStatus('saved');
-    setTimeout(() => setSaveStatus('idle'), 1500);
+    setTimeout(() => setSaveStatus('idle'), SIMULATED_SAVE_MS);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -186,6 +189,8 @@ export function AgentStudioPage() {
 
   return (
     <Layout>
+      <PageShell size="full">
+      <PageHeader title="Agent Studio" />
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <input
@@ -370,6 +375,7 @@ export function AgentStudioPage() {
           )}
         </Card>
       </div>
+      </PageShell>
     </Layout>
   );
 }

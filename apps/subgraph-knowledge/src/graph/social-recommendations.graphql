@@ -1,10 +1,7 @@
-type SocialRecommendation {
-  contentItemId: ID!
-  contentTitle: String!
-  followersCount: Int!
-  isMutualFollower: Boolean!
-  lastActivity: String!
-}
+# Social types and queries are owned by the core subgraph.
+# Resolvers in this subgraph are retained but not routed via SDL.
+# If knowledge needs to extend SocialFeedItem or SocialRecommendation,
+# use Federation @key entity extensions.
 
 enum SocialVerb {
   COMPLETED
@@ -12,19 +9,4 @@ enum SocialVerb {
   ACHIEVED_BADGE
   DISCUSSED
   STARTED_LEARNING
-}
-
-type SocialFeedItem {
-  userId: ID!
-  userDisplayName: String!
-  verb: SocialVerb
-  action: String!
-  contentItemId: ID!
-  contentTitle: String!
-  timestamp: String!
-}
-
-extend type Query {
-  socialRecommendations(limit: Int): [SocialRecommendation!]! @authenticated
-  socialFeed(limit: Int): [SocialFeedItem!]! @authenticated
 }

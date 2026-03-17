@@ -16,10 +16,10 @@ import {
 const SVG_W = 520, SVG_H = 380, CX = 260, CY = 195, R = 155;
 
 const COURSE_COLORS: Record<string, string> = {
-  'course-1': '#6366f1',
-  'course-2': '#22c55e',
-  'course-3': '#f97316',
-  'course-4': '#a855f7',
+  'cc000000-0000-0000-0000-000000000002': '#6366f1',
+  '22222222-2222-2222-2222-222222222221': '#22c55e',
+  'ea2e14c1-424e-4bcd-a209-13fb0c7ce84c': '#f97316',
+  '72d6a4b2-3728-4ce0-b748-f03e90e39d19': '#a855f7',
 };
 
 function getColor(courseId: string): string {

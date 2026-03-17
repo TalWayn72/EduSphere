@@ -1,4 +1,7 @@
 /**
+ * @vitest-environment jsdom
+ */
+/**
  * useSrsSession hook tests
  *
  * Verifies:

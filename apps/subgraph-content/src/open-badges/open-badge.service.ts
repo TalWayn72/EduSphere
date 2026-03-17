@@ -11,6 +11,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -155,7 +156,7 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
         })
         .returning();
 
-      if (!assertion) throw new Error('Assertion insert returned no record');
+      if (!assertion) throw new InternalServerErrorException('Assertion insert returned no record');
       this.logger.log(
         { assertionId: assertion.id, userId: input.userId },
         'OpenBadge issued'
@@ -279,7 +280,7 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
           issuerId: issuerId ?? this.keyPair.issuerDid,
         })
         .returning();
-      if (!def) throw new Error('Badge definition insert returned no record');
+      if (!def) throw new InternalServerErrorException('Badge definition insert returned no record');
       this.logger.log(
         { defId: def.id, name: def.name },
         'OpenBadge definition created'

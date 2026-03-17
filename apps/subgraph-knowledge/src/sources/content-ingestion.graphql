@@ -11,7 +11,7 @@ scalar Upload
 extend type Mutation {
   ingestContent(file: Upload!, courseId: ID!): ContentIngestionResult!
     @authenticated
-    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @requiresScopes(scopes: [["course:write"]])
 }
 
 type ContentIngestionResult {

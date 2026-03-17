@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleDestroy, Optional } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, Optional, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -256,7 +256,7 @@ export class EmbeddingService implements OnModuleDestroy {
       DO UPDATE SET embedding = EXCLUDED.embedding
       RETURNING id, segment_id, embedding, created_at
     `)) as unknown as R[];
-    if (!row) throw new Error('Failed to upsert content embedding');
+    if (!row) throw new InternalServerErrorException('Failed to upsert content embedding');
     this.logger.log(
       `Generated embedding: segmentId=${segmentId} dim=${vector.length}`
     );
@@ -362,7 +362,7 @@ export class EmbeddingService implements OnModuleDestroy {
           body: JSON.stringify({ model, prompt: text }),
         }
       );
-      if (!resp.ok) throw new Error(`Ollama error ${resp.status}`);
+      if (!resp.ok) throw new BadRequestException(`Ollama error ${resp.status}`);
       const json = (await resp.json()) as { embedding: number[] };
       return json.embedding;
     }
@@ -380,14 +380,14 @@ export class EmbeddingService implements OnModuleDestroy {
           dimensions: 768,
         }),
       });
-      if (!resp.ok) throw new Error(`OpenAI error ${resp.status}`);
+      if (!resp.ok) throw new BadRequestException(`OpenAI error ${resp.status}`);
       const json = (await resp.json()) as {
         data: Array<{ embedding: number[] }>;
       };
       return json.data[0]!.embedding;
     }
 
-    throw new Error('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
+    throw new BadRequestException('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
   }
 
   private mapContent(r: {

@@ -93,6 +93,13 @@ export async function createConcept(
   return result[0]?.id || '';
 }
 
+/** Shape returned by findRelatedConcepts Cypher query. */
+export interface RelatedConceptResult {
+  name: string;
+  definition: string;
+  strength?: number;
+}
+
 /**
  * Find related concepts (2-hop traversal) — all user-supplied values parameterized.
  */
@@ -102,11 +109,11 @@ export async function findRelatedConcepts(
   tenantId: string,
   maxDepth: number = 2,
   limit: number = 10
-): Promise<any[]> {
+): Promise<RelatedConceptResult[]> {
   // maxDepth and limit are internal integers, not user-facing strings — clamped for safety.
   const safeDepth = Math.max(1, Math.min(10, Math.trunc(maxDepth)));
   const safeLimit = Math.max(1, Math.min(100, Math.trunc(limit)));
-  return executeCypher(
+  return executeCypher<RelatedConceptResult>(
     db,
     GRAPH_NAME,
     `
@@ -120,14 +127,21 @@ export async function findRelatedConcepts(
   );
 }
 
+/** Shape returned by findContradictions Cypher query. */
+export interface ContradictionResult {
+  name: string;
+  description?: string;
+  source_id?: string;
+}
+
 /**
  * Find contradictions for a concept — conceptId parameterized.
  */
 export async function findContradictions(
   db: DrizzleDB,
   conceptId: string
-): Promise<any[]> {
-  return executeCypher(
+): Promise<ContradictionResult[]> {
+  return executeCypher<ContradictionResult>(
     db,
     GRAPH_NAME,
     `
@@ -138,14 +152,19 @@ export async function findContradictions(
   );
 }
 
+/** Shape returned by findLearningPath Cypher query. */
+export interface LearningPathResult {
+  path: Record<string, unknown>;
+}
+
 /**
  * Find learning path (prerequisite chain) — conceptId parameterized.
  */
 export async function findLearningPath(
   db: DrizzleDB,
   conceptId: string
-): Promise<any[]> {
-  return executeCypher(
+): Promise<LearningPathResult[]> {
+  return executeCypher<LearningPathResult>(
     db,
     GRAPH_NAME,
     `
@@ -156,6 +175,19 @@ export async function findLearningPath(
     { conceptId }
   );
 }
+
+/**
+ * Allowed relationship types in the EduSphere knowledge graph.
+ * Used as Cypher edge labels — must match the AGE graph schema.
+ */
+export type ConceptRelationshipType =
+  | 'RELATED_TO'
+  | 'RELATES_TO'
+  | 'PREREQUISITE_OF'
+  | 'CONTRADICTS'
+  | 'DERIVED_FROM'
+  | 'PART_OF'
+  | 'AUTHORED_BY';
 
 /**
  * Create relationship between concepts — all IDs parameterized.
@@ -171,7 +203,7 @@ export async function createRelationship(
   db: DrizzleDB,
   fromConceptId: string,
   toConceptId: string,
-  relationshipType: string,
+  relationshipType: ConceptRelationshipType,
   properties: RelationshipProperties = {}
 ): Promise<void> {
   const propsJson = JSON.stringify({

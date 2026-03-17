@@ -6,6 +6,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -86,7 +87,7 @@ export class AdminEnrollmentService implements OnModuleDestroy {
         .insert(schema.userCourses)
         .values({ userId: targetUserId, courseId, status: 'ACTIVE' })
         .returning();
-      if (!enrollment) throw new Error('Enrollment insert failed');
+      if (!enrollment) throw new InternalServerErrorException('Enrollment insert failed');
       this.logger.log(
         `Admin enrolled user ${targetUserId} in course ${courseId}`
       );

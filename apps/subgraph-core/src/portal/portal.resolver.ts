@@ -6,9 +6,20 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { PortalService } from './portal.service.js';
 import type { PortalBlock } from '@edusphere/db';
+import type { GraphQLContext } from '../auth/auth.middleware.js';
 
-interface GqlContext {
-  req: { headers: Record<string, string | undefined> };
+/** Extract tenant ID from authContext (preferred) or x-tenant-id header (gateway fallback). */
+function extractTenantId(ctx: GraphQLContext): string | undefined {
+  if (ctx.authContext?.tenantId) return ctx.authContext.tenantId;
+  const header = ctx.req?.headers?.['x-tenant-id'];
+  return (Array.isArray(header) ? header[0] : header) ?? undefined;
+}
+
+/** Extract user ID from authContext (preferred) or x-user-id header (gateway fallback). */
+function extractUserId(ctx: GraphQLContext): string {
+  if (ctx.authContext?.userId) return ctx.authContext.userId;
+  const header = ctx.req?.headers?.['x-user-id'];
+  return (Array.isArray(header) ? header[0] : header) ?? 'unknown';
 }
 
 interface PortalBlockGql {
@@ -53,8 +64,8 @@ export class PortalResolver {
   constructor(private readonly portalService: PortalService) {}
 
   @Query('myPortal')
-  async myPortal(@Context() ctx: GqlContext): Promise<PortalPageGql | null> {
-    const tenantId = ctx.req.headers['x-tenant-id'];
+  async myPortal(@Context() ctx: GraphQLContext): Promise<PortalPageGql | null> {
+    const tenantId = extractTenantId(ctx);
     if (!tenantId) return null;
     const page = await this.portalService.getPortalPage(tenantId);
     return page ? toGqlPage(page) : null;
@@ -62,9 +73,9 @@ export class PortalResolver {
 
   @Query('publicPortal')
   async publicPortal(
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ): Promise<PortalPageGql | null> {
-    const tenantId = ctx.req.headers['x-tenant-id'];
+    const tenantId = extractTenantId(ctx);
     if (!tenantId) return null;
     const page = await this.portalService.getPublishedPortalPage(tenantId);
     return page ? toGqlPage(page) : null;
@@ -74,10 +85,10 @@ export class PortalResolver {
   async savePortalLayout(
     @Args('title') title: string,
     @Args('blocksJson') blocksJson: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ): Promise<PortalPageGql> {
-    const tenantId = ctx.req.headers['x-tenant-id'];
-    const userId = ctx.req.headers['x-user-id'] ?? 'unknown';
+    const tenantId = extractTenantId(ctx);
+    const userId = extractUserId(ctx);
     if (!tenantId) throw new Error('Missing tenant context');
     const blocks = JSON.parse(blocksJson) as PortalBlock[];
     const page = await this.portalService.createOrUpdatePortal(
@@ -90,16 +101,16 @@ export class PortalResolver {
   }
 
   @Mutation('publishPortal')
-  async publishPortal(@Context() ctx: GqlContext): Promise<boolean> {
-    const tenantId = ctx.req.headers['x-tenant-id'];
+  async publishPortal(@Context() ctx: GraphQLContext): Promise<boolean> {
+    const tenantId = extractTenantId(ctx);
     if (!tenantId) return false;
     await this.portalService.publishPortal(tenantId);
     return true;
   }
 
   @Mutation('unpublishPortal')
-  async unpublishPortal(@Context() ctx: GqlContext): Promise<boolean> {
-    const tenantId = ctx.req.headers['x-tenant-id'];
+  async unpublishPortal(@Context() ctx: GraphQLContext): Promise<boolean> {
+    const tenantId = extractTenantId(ctx);
     if (!tenantId) return false;
     await this.portalService.unpublishPortal(tenantId);
     return true;

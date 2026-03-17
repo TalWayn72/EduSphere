@@ -24,6 +24,8 @@ import {
   ASSIGN_CPD_CREDITS_MUTATION,
 } from '@/lib/graphql/cpd.queries';
 import { Settings, Plus, Loader2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageShell } from '@/components/PageShell';
 
 interface CpdCreditType {
   id: string;
@@ -94,7 +96,13 @@ export function CPDSettingsPage() {
 
   return (
     <Layout>
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <PageShell size="lg" className="p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'CPD' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <Settings className="h-7 w-7 text-blue-600" />
           <div>
@@ -281,7 +289,7 @@ export function CPDSettingsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

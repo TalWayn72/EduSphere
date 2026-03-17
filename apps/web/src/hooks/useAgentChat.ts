@@ -197,11 +197,9 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       // Ensure we have an active session
       let sid = sessionId;
       if (!sid) {
-        // TODO: TemplateType.Chavruta does not exist in the schema — use
-        // TemplateType.ChavrutaDebate when the agent subgraph is updated.
         const res = await startSession({
           templateType:
-            'CHAVRUTA' as import('@edusphere/graphql-types').TemplateType,
+            'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
           context: { contentId },
         });
         sid = res.data?.startAgentSession?.id ?? null;

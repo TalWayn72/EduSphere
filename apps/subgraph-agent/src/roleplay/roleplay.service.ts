@@ -5,7 +5,7 @@
  * SI-10: Consent checked in RoleplaySessionService.startSession.
  * Memory safety: implements OnModuleDestroy + closes DB pool.
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -53,7 +53,7 @@ export class RoleplayService implements OnModuleDestroy {
         is_builtin: false,
       })
       .returning();
-    if (!row) throw new Error('Failed to create scenario template');
+    if (!row) throw new InternalServerErrorException('Failed to create scenario template');
     this.logger.log(
       { tenantId, title: data.title },
       'Scenario template created'

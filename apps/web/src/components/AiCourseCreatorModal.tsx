@@ -140,9 +140,10 @@ export function AiCourseCreatorModal({
     });
     if (error || !data) {
       setGenerating(false);
-      setErrorMsg(
-        error?.graphQLErrors?.[0]?.message ?? 'Failed to start generation'
-      );
+      // Map all server/network errors to a user-friendly message.
+      // Never expose raw GraphQL messages (e.g. "Cannot return null for
+      // non-nullable field") — these are internal implementation details.
+      setErrorMsg('Failed to generate course outline. Please try again.');
       return;
     }
     const { executionId: eid, status } = data.generateCourseFromPrompt;
@@ -171,9 +172,7 @@ export function AiCourseCreatorModal({
       },
     });
     if (error || !data) {
-      setErrorMsg(
-        error?.graphQLErrors?.[0]?.message ?? 'Failed to create course'
-      );
+      setErrorMsg('Failed to create course draft. Please try again.');
       return;
     }
     onClose();

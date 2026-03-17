@@ -10,6 +10,8 @@ import { UnauthorizedException } from '@nestjs/common';
 import { YauCounterService } from './yau-counter.service.js';
 import { SubscriptionService } from './subscription.service.js';
 import { PilotService } from './pilot.service.js';
+import { TenantUsageService } from './tenant-usage.service.js';
+import { PlatformStatsService } from './platform-stats.service.js';
 import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 
@@ -35,7 +37,9 @@ export class BillingQueryResolver {
   constructor(
     private readonly yauCounter: YauCounterService,
     private readonly subscriptions: SubscriptionService,
-    private readonly pilots: PilotService
+    private readonly pilots: PilotService,
+    private readonly tenantUsageSvc: TenantUsageService,
+    private readonly platformStats: PlatformStatsService
   ) {}
 
   @Query('mySubscription')
@@ -54,6 +58,28 @@ export class BillingQueryResolver {
     const auth = ctx.authContext;
     if (!auth) throw new UnauthorizedException('Unauthenticated');
     return this.yauCounter.getMonthlyUsageSnapshot(auth.tenantId ?? '');
+  }
+
+  @Query('myTenantUsage')
+  async myTenantUsage(
+    @Args('year') year: number | undefined,
+    @Context() ctx: GraphQLContext
+  ) {
+    const auth = ctx.authContext;
+    if (!auth) throw new UnauthorizedException('Unauthenticated');
+    const tenantCtx = buildTenantCtx(auth);
+    return this.tenantUsageSvc.getTenantUsage(tenantCtx, year ?? undefined);
+  }
+
+  @Query('platformLiveStats')
+  async platformLiveStats(@Context() ctx: GraphQLContext) {
+    const auth = ctx.authContext;
+    if (!auth) throw new UnauthorizedException('Unauthenticated');
+    const callerRole = auth.roles?.[0] as string | undefined;
+    if (callerRole !== 'SUPER_ADMIN') {
+      throw new UnauthorizedException('SUPER_ADMIN role required');
+    }
+    return this.platformStats.getPlatformStats();
   }
 
   @Query('allPilotRequests')

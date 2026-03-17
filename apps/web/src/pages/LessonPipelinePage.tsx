@@ -5,9 +5,11 @@
  * Layout: [palette | canvas | config panel] + [run results below]
  */
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
+import { REFETCH_DELAY_MS } from '@/lib/constants';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import {
   LESSON_QUERY,
@@ -40,7 +42,6 @@ interface LessonQueryData {
 
 export function LessonPipelinePage() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
-  const navigate = useNavigate();
   const { nodes, isDirty, selectedNodeId, addNode, removeNode, reorderNodes, setSelectedNode, setNodes, loadTemplate, clearNodes, resetDirty } = useLessonPipelineStore();
   const [pipelineError, setPipelineError] = useState<string | null>(null);
   const blocker = useUnsavedChangesGuard(isDirty, 'LessonPipelinePage');
@@ -72,7 +73,7 @@ export function LessonPipelinePage() {
   useEffect(() => {
     const status = data?.lesson?.pipeline?.currentRun?.status;
     if (status === 'RUNNING') {
-      const t = setTimeout(() => reexecute({ requestPolicy: 'network-only' }), 3000);
+      const t = setTimeout(() => reexecute({ requestPolicy: 'network-only' }), REFETCH_DELAY_MS);
       return () => clearTimeout(t);
     }
   }, [data?.lesson?.pipeline?.currentRun?.status, reexecute]);
@@ -145,13 +146,18 @@ export function LessonPipelinePage() {
         onStay={() => blocker.reset?.()}
       />
       <div className="flex flex-col h-[calc(100vh-4rem)]">
-        {/* Toolbar */}
+        {/* Header + Toolbar */}
         <div className="flex items-center justify-between px-6 py-3 border-b bg-card shrink-0">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(`/courses/${courseId}/lessons/${lessonId}`)}>
-              ← {data?.lesson?.title ?? 'שיעור'}
-            </Button>
-            <span className="text-sm text-muted-foreground">Pipeline Builder</span>
+            <PageHeader
+              title="Lesson Pipeline"
+              breadcrumbs={[
+                { label: 'Courses', href: '/courses' },
+                { label: 'Course', href: `/courses/${courseId}` },
+                { label: data?.lesson?.title ?? 'Lesson Pipeline' },
+              ]}
+              className="mb-0"
+            />
             <select
               className="text-xs border rounded px-2 py-1 bg-card"
               defaultValue=""

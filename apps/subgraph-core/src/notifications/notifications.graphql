@@ -53,5 +53,13 @@ extend type Mutation {
     webPushSubscription: String
   ): PushRegistration! @authenticated
 
+  """
+  F-11: Register a W3C Push API subscription for Web Push delivery.
+  Accepts the full PushSubscription JSON (endpoint + keys).
+  """
+  registerPushSubscription(
+    subscriptionJson: String!
+  ): PushRegistration! @authenticated
+
   unregisterPushToken(platform: PushPlatform!): Boolean! @authenticated
 }

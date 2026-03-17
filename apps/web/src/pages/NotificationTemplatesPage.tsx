@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { NotificationTemplateEditor } from './NotificationTemplatesPage.editor';
 import {
@@ -69,7 +72,7 @@ export function NotificationTemplatesPage() {
     await execUpdate({ id, input: { subject, bodyHtml } });
     setSavedId(id);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = setTimeout(() => setSavedId(null), 2000);
+    savedTimerRef.current = setTimeout(() => setSavedId(null), TOAST_AUTO_DISMISS_MS);
   };
 
   const handleReset = async (id: string) => {
@@ -82,15 +85,18 @@ export function NotificationTemplatesPage() {
   };
 
   return (
-    <AdminLayout
-      title="Notification Templates"
-      description="Customize email and push notification templates"
-    >
+    <AdminLayout>
+      <PageShell size="xl">
+        <PageHeader
+          title="Notification Templates"
+          description="Customize email and push notification templates"
+          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Notification Templates' }]}
+        />
       {fetching ? (
         <p className="text-sm text-muted-foreground">Loading templates...</p>
       ) : error ? (
         <p className="text-sm text-destructive">
-          Error loading templates: {error.message}
+          Error loading templates. Please try again.
         </p>
       ) : (
         <div className="flex gap-4 items-start">
@@ -167,6 +173,7 @@ export function NotificationTemplatesPage() {
           )}
         </div>
       )}
+      </PageShell>
     </AdminLayout>
   );
 }

@@ -4,9 +4,7 @@ import { request, gql } from 'graphql-request';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-
-const GRAPHQL_URL =
-  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
+import { GRAPHQL_URL } from '@/lib/constants';
 
 const PURCHASE_COURSE_MUTATION = gql`
   mutation PurchaseCourse($courseId: ID!) {

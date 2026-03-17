@@ -11,6 +11,7 @@
  * No `role as any` casts — all role coercion is in each sub-service via toUserRole().
  */
 import { Injectable } from '@nestjs/common';
+import type { ConceptRelationshipType } from '@edusphere/db';
 import { GraphConceptService } from './graph-concept.service';
 import { GraphConceptLinkService } from './graph-concept-link.service';
 import { GraphSearchService } from './graph-search.service';
@@ -109,7 +110,7 @@ export class GraphService {
   linkConcepts(
     fromId: string,
     toId: string,
-    relationshipType: string,
+    relationshipType: ConceptRelationshipType,
     strength: number | null,
     description: string | null,
     tenantId: string,

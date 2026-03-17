@@ -1,0 +1,16 @@
+type CompetencyGoal {
+  id: ID!
+  userId: ID!
+  targetConceptName: String!
+  targetLevel: String
+  createdAt: String!
+}
+
+extend type Query {
+  myCompetencyGoals: [CompetencyGoal!]! @authenticated
+}
+
+extend type Mutation {
+  addCompetencyGoal(targetConceptName: String!, targetLevel: String): CompetencyGoal! @authenticated
+  removeCompetencyGoal(goalId: ID!): Boolean! @authenticated
+}

@@ -8,8 +8,21 @@ import {
   RTL_LOCALES,
 } from '@edusphere/i18n';
 
-// Custom backend: lazy-loads namespace JSONs via Vite's dynamic import()
-// Vite resolves these at build time via the workspace package
+// Vite pre-discovers all locale JSON files at build time via import.meta.glob.
+// Keys are relative paths like "../../../../packages/i18n/src/locales/en/common.json".
+// Values are lazy loaders — called only when the locale/namespace is needed.
+const localeModules = import.meta.glob<Record<string, unknown>>(
+  '../../../../packages/i18n/src/locales/**/*.json'
+);
+
+/** Find a glob entry matching the given language + namespace */
+function findLocaleModule(lang: string, ns: string) {
+  return Object.entries(localeModules).find(
+    ([key]) => key.includes(`/${lang}/${ns}.json`)
+  );
+}
+
+// Custom backend: lazy-loads namespace JSONs via Vite's import.meta.glob
 const ViteLocaleBackend = {
   type: 'backend' as const,
   init() {},
@@ -19,25 +32,22 @@ const ViteLocaleBackend = {
     callback: (err: unknown, data: unknown) => void
   ): Promise<void> {
     try {
-      // Dynamic import resolved by Vite from @edusphere/i18n workspace package
-      // eslint-disable-next-line no-unsanitized/method
-      const module = await import(
-        /* @vite-ignore */
-        `../../node_modules/@edusphere/i18n/src/locales/${language}/${namespace}.json`
-      );
-      callback(null, module.default ?? module);
-    } catch {
-      // Graceful fallback to English if translation missing
-      try {
-        // eslint-disable-next-line no-unsanitized/method
-        const fallback = await import(
-          /* @vite-ignore */
-          `../../node_modules/@edusphere/i18n/src/locales/en/${namespace}.json`
-        );
-        callback(null, fallback.default ?? fallback);
-      } catch (err) {
-        callback(err, null);
+      const entry = findLocaleModule(language, namespace);
+      if (entry) {
+        const module = await entry[1]();
+        callback(null, (module as { default?: unknown }).default ?? module);
+        return;
       }
+      // Fallback to English if requested locale not found
+      const fallback = findLocaleModule('en', namespace);
+      if (fallback) {
+        const module = await fallback[1]();
+        callback(null, (module as { default?: unknown }).default ?? module);
+        return;
+      }
+      callback(new Error(`Missing locale: ${language}/${namespace}`), null);
+    } catch (err) {
+      callback(err, null);
     }
   },
 };

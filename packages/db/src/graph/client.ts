@@ -4,6 +4,27 @@ import type { Pool } from 'pg';
 export type DrizzleDB = NodePgDatabase<Record<string, unknown>>;
 
 /**
+ * Drizzle stores the underlying pg Pool on the `$client` property.
+ * This interface types that internal shape so we can access it safely
+ * without a double type-assertion (as unknown as ...).
+ */
+interface DrizzleWithClient {
+  $client: Pool;
+}
+
+/**
+ * Safely extracts the underlying pg Pool from a DrizzleDB instance.
+ *
+ * Drizzle's public types do not expose `$client`, but the runtime object
+ * always carries it. This single assertion is the only place in the
+ * codebase where we bridge Drizzle's type gap for raw pg access (Apache AGE).
+ */
+function extractPool(db: DrizzleDB): Pool {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Drizzle internal
+  return (db as unknown as DrizzleWithClient).$client;
+}
+
+/**
  * Convert a JS value to a safe Cypher literal string.
  *
  * - Strings are double-quoted and internal double-quotes / backslashes are escaped.
@@ -73,7 +94,7 @@ export async function executeCypher<T = Record<string, unknown>>(
   params?: Record<string, unknown>,
   tenantId?: string
 ): Promise<T[]> {
-  const pool = (db as unknown as { $client: Pool }).$client;
+  const pool = extractPool(db);
   const client = await pool.connect();
   try {
     await client.query("LOAD 'age'");

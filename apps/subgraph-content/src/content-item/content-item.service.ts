@@ -3,6 +3,8 @@ import {
   Logger,
   NotFoundException,
   OnModuleDestroy,
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -17,7 +19,6 @@ import {
   microlessonContentSchema,
   MICROLESSON_MAX_DURATION_SECONDS,
 } from '../microlearning/microlearning.schemas';
-import { BadRequestException } from '@nestjs/common';
 
 export interface CreateContentItemInput {
   moduleId: string;
@@ -166,7 +167,7 @@ export class ContentItemService implements OnModuleDestroy {
       })
       .returning();
     if (!row) {
-      throw new Error('Failed to create ContentItem');
+      throw new InternalServerErrorException('Failed to create ContentItem');
     }
     this.logger.log(
       `ContentItem created: id=${row.id} module=${input.moduleId}`

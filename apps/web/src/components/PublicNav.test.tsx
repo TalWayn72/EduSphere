@@ -1,0 +1,237 @@
+import { render, screen, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi } from 'vitest';
+
+// Mock lucide-react icons
+vi.mock('lucide-react', () =>
+  new Proxy({} as Record<string, unknown>, {
+    get: (_, name) => {
+      if (name === '__esModule') return true;
+      return function MockIcon(props: Record<string, unknown>) {
+        return <span data-testid={`icon-${String(name)}`} {...props} />;
+      };
+    },
+  })
+);
+
+// Mock Logo — it has its own tests
+vi.mock('@/components/Logo', () => ({
+  Logo: (props: Record<string, unknown>) => (
+    <div data-testid="logo" {...props}>
+      EduSphere
+    </div>
+  ),
+}));
+
+// Import after mocks
+import { PublicNav } from './PublicNav';
+
+function renderNav(props: Record<string, unknown> = {}, initialEntries = ['/']) {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <PublicNav {...props} />
+    </MemoryRouter>
+  );
+}
+
+describe('PublicNav', () => {
+  it('renders with data-testid="public-nav"', () => {
+    renderNav();
+    expect(screen.getByTestId('public-nav')).toBeInTheDocument();
+  });
+
+  describe('full variant (default)', () => {
+    it('shows Features link', () => {
+      renderNav();
+      expect(screen.getByText('Features')).toBeInTheDocument();
+    });
+
+    it('shows Pricing link', () => {
+      renderNav();
+      expect(screen.getByText('Pricing')).toBeInTheDocument();
+    });
+
+    it('shows Compliance link', () => {
+      renderNav();
+      expect(screen.getByText('Compliance')).toBeInTheDocument();
+    });
+
+    it('shows Pilot link', () => {
+      renderNav();
+      expect(screen.getByText('Pilot')).toBeInTheDocument();
+    });
+
+    it('shows "Log In" button', () => {
+      renderNav();
+      expect(screen.getByText('Log In')).toBeInTheDocument();
+    });
+
+    it('shows "Start Free Pilot" button', () => {
+      renderNav();
+      expect(screen.getByText('Start Free Pilot')).toBeInTheDocument();
+    });
+  });
+
+  describe('minimal variant', () => {
+    it('shows Logo', () => {
+      renderNav({ variant: 'minimal' });
+      expect(screen.getByTestId('logo')).toBeInTheDocument();
+    });
+
+    it('shows "Log In" button', () => {
+      renderNav({ variant: 'minimal' });
+      expect(screen.getByText('Log In')).toBeInTheDocument();
+    });
+
+    it('does NOT show Features link', () => {
+      renderNav({ variant: 'minimal' });
+      expect(screen.queryByText('Features')).not.toBeInTheDocument();
+    });
+
+    it('does NOT show Pricing link', () => {
+      renderNav({ variant: 'minimal' });
+      expect(screen.queryByText('Pricing')).not.toBeInTheDocument();
+    });
+
+    it('does NOT show Compliance link', () => {
+      renderNav({ variant: 'minimal' });
+      expect(screen.queryByText('Compliance')).not.toBeInTheDocument();
+    });
+  });
+
+  it('renders Logo component inside nav', () => {
+    renderNav();
+    const nav = screen.getByTestId('public-nav');
+    expect(within(nav).getByTestId('logo')).toBeInTheDocument();
+  });
+
+  it('has proper sticky positioning class', () => {
+    renderNav();
+    const nav = screen.getByTestId('public-nav');
+    // PublicNav should be sticky or fixed at the top
+    expect(
+      nav.className.includes('sticky') || nav.className.includes('fixed')
+    ).toBe(true);
+  });
+
+  it('renders mobile hamburger menu button', () => {
+    renderNav();
+    // The hamburger button should exist in the DOM (visible on small screens)
+    const menuButton = screen.getByRole('button', { name: /menu/i });
+    expect(menuButton).toBeInTheDocument();
+  });
+
+  describe('anchor link routing (landing vs non-landing)', () => {
+    const anchorHashes = ['#features', '#pricing', '#pilot-cta'];
+
+    describe.each(['/', '/landing'])('on landing page (%s)', (route) => {
+      it('desktop anchor links use hash-only hrefs', () => {
+        renderNav({}, [route]);
+        const nav = screen.getByTestId('public-nav');
+        // Desktop nav links (hidden on mobile, but in DOM)
+        for (const hash of anchorHashes) {
+          const links = nav.querySelectorAll<HTMLAnchorElement>(`a[href="${hash}"]`);
+          expect(links.length).toBeGreaterThanOrEqual(1);
+        }
+      });
+
+      it('does NOT prefix anchor links with /landing', () => {
+        renderNav({}, [route]);
+        const nav = screen.getByTestId('public-nav');
+        for (const hash of anchorHashes) {
+          const prefixed = nav.querySelectorAll(`a[href="/landing${hash}"]`);
+          expect(prefixed.length).toBe(0);
+        }
+      });
+    });
+
+    describe.each(['/compliance', '/about', '/faq', '/contact'])(
+      'on non-landing page (%s)',
+      (route) => {
+        it('desktop anchor links are prefixed with /landing', () => {
+          renderNav({}, [route]);
+          const nav = screen.getByTestId('public-nav');
+          for (const hash of anchorHashes) {
+            const links = nav.querySelectorAll<HTMLAnchorElement>(
+              `a[href="/landing${hash}"]`
+            );
+            expect(links.length).toBeGreaterThanOrEqual(1);
+          }
+        });
+
+        it('does NOT use hash-only hrefs for anchor links', () => {
+          renderNav({}, [route]);
+          const nav = screen.getByTestId('public-nav');
+          for (const hash of anchorHashes) {
+            const hashOnly = nav.querySelectorAll<HTMLAnchorElement>(
+              `a[href="${hash}"]`
+            );
+            expect(hashOnly.length).toBe(0);
+          }
+        });
+      }
+    );
+
+    it('Compliance link is always a React Router Link to /compliance regardless of route', () => {
+      // On landing
+      const { unmount } = renderNav({}, ['/']);
+      const complianceOnLanding = screen.getByText('Compliance').closest('a');
+      expect(complianceOnLanding).toHaveAttribute('href', '/compliance');
+      unmount();
+
+      // On non-landing
+      renderNav({}, ['/about']);
+      const complianceOnAbout = screen.getByText('Compliance').closest('a');
+      expect(complianceOnAbout).toHaveAttribute('href', '/compliance');
+    });
+
+    describe('mobile menu anchor links', () => {
+      function openMobileMenu(route: string) {
+        renderNav({}, [route]);
+        const menuBtn = screen.getByRole('button', { name: /menu/i });
+        menuBtn.click();
+      }
+
+      it('on landing page, mobile anchor links use hash-only hrefs', () => {
+        openMobileMenu('/');
+        // After menu opens, mobile links appear in the DOM
+        const featuresLink = screen.getAllByText('Features');
+        // At least one should have href="#features" (mobile)
+        const hrefs = featuresLink.map((el) => el.closest('a')?.getAttribute('href'));
+        expect(hrefs).toContain('#features');
+      });
+
+      it('on non-landing page, mobile anchor links are prefixed with /landing', () => {
+        openMobileMenu('/compliance');
+        const featuresLink = screen.getAllByText('Features');
+        const hrefs = featuresLink.map((el) => el.closest('a')?.getAttribute('href'));
+        expect(hrefs).toContain('/landing#features');
+        expect(hrefs).not.toContain('#features');
+      });
+
+      it('mobile "Free Pilot" button links correctly on non-landing page', () => {
+        openMobileMenu('/faq');
+        const pilotBtn = screen.getByText('Free Pilot').closest('a');
+        expect(pilotBtn).toHaveAttribute('href', '/landing#pilot-cta');
+      });
+
+      it('mobile "Free Pilot" button links correctly on landing page', () => {
+        openMobileMenu('/landing');
+        const pilotBtn = screen.getByText('Free Pilot').closest('a');
+        expect(pilotBtn).toHaveAttribute('href', '#pilot-cta');
+      });
+    });
+
+    it('"Start Free Pilot" desktop button has correct href on non-landing page', () => {
+      renderNav({}, ['/compliance']);
+      const btn = screen.getByText('Start Free Pilot').closest('a');
+      expect(btn).toHaveAttribute('href', '/landing#pilot-cta');
+    });
+
+    it('"Start Free Pilot" desktop button has hash-only href on landing page', () => {
+      renderNav({}, ['/']);
+      const btn = screen.getByText('Start Free Pilot').closest('a');
+      expect(btn).toHaveAttribute('href', '#pilot-cta');
+    });
+  });
+});

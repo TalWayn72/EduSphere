@@ -3,7 +3,7 @@
  * Raw tokens are NEVER stored; only SHA-256 hash is persisted.
  * Memory safety: OnModuleDestroy calls closeAllPools().
  */
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
   createDatabaseConnection,
@@ -59,7 +59,7 @@ export class BiTokenService implements OnModuleDestroy {
         .values({ tenantId, tokenHash, description, isActive: true })
         .returning()
     );
-    if (!rows[0]) throw new Error('Failed to create BI API token');
+    if (!rows[0]) throw new InternalServerErrorException('Failed to create BI API token');
     this.logger.log({ tenantId, description }, 'BI API token generated');
     return rawToken;
   }

@@ -3,10 +3,11 @@
  * Route: /discussions/:id
  */
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery, useSubscription } from 'urql';
 import { Layout } from '@/components/Layout';
-import { ArrowLeft } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import MessageItem from '@/components/social/MessageItem';
 import MessageComposer from '@/components/social/MessageComposer';
 import {
@@ -73,15 +74,14 @@ export function DiscussionDetailPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6 max-w-3xl space-y-6">
-        {/* Back link */}
-        <Link
-          to="/discussions"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to Discussions
-        </Link>
+      <PageShell size="md">
+        <PageHeader
+          title="Discussion"
+          breadcrumbs={[
+            { label: 'Discussions', href: '/discussions' },
+            { label: 'Discussion' },
+          ]}
+        />
 
         {/* Messages list */}
         <div
@@ -119,7 +119,7 @@ export function DiscussionDetailPage() {
             onReplyCleared={handleReplyClear}
           />
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

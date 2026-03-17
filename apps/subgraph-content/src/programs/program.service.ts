@@ -10,9 +10,11 @@ import {
   Logger,
   NotFoundException,
   ConflictException,
+  OnModuleDestroy,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
+  closeAllPools,
   schema,
   eq,
   and,
@@ -39,9 +41,13 @@ import type {
 // ─── Service ──────────────────────────────────────────────────────────────────
 
 @Injectable()
-export class ProgramService {
+export class ProgramService implements OnModuleDestroy {
   private readonly logger = new Logger(ProgramService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async listPrograms(
     tenantId: string,

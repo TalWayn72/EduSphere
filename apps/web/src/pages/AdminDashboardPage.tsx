@@ -7,10 +7,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { AdminActivityFeed } from '@/components/AdminActivityFeed';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { AdminStatCards } from '@/components/admin/AdminStatCards';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import {
   Palette,
   Users,
@@ -110,20 +113,20 @@ export function AdminDashboardPage() {
   const { data, fetching, error } = result;
 
   return (
-    <AdminLayout
-      title={t('dashboard.title')}
-      description={t('dashboard.description')}
-    >
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title={t('dashboard.title')}
+          description={t('dashboard.description')}
+        />
       {fetching && (
-        <div className="flex items-center justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
+        <LoadingSpinner containerHeight="py-16" />
       )}
 
       {error && (
         <Card>
           <CardContent className="py-8 text-center text-destructive text-sm">
-            {t('dashboard.loadError')}: {error.message}
+            {t('dashboard.loadError')}
           </CardContent>
         </Card>
       )}
@@ -159,6 +162,7 @@ export function AdminDashboardPage() {
         </h2>
         <AdminActivityFeed loading={fetching} />
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

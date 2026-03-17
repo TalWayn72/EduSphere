@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageHeader } from '@/components/PageHeader';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -124,6 +125,17 @@ export function RichDocumentPage() {
   return (
     <Layout>
       <div className="flex flex-col h-[calc(100vh-4rem)]">
+        {/* Page header */}
+        <div className="px-6 pt-2">
+          <PageHeader
+            title={fetching ? 'Loading...' : (item?.title ?? 'Document')}
+            breadcrumbs={[
+              { label: 'Courses', href: '/courses' },
+              { label: item?.title ?? 'Document' },
+            ]}
+            className="mb-2"
+          />
+        </div>
         {/* Toolbar */}
         <DocumentToolbar
           title={fetching ? '' : (item?.title ?? '')}

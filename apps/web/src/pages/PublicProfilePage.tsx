@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import {
   Flame,
   BookOpen,
@@ -17,6 +19,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { FollowButton } from '@/components/FollowButton';
 import { FollowersList } from '@/components/FollowersList';
 import { PUBLIC_PROFILE_QUERY } from '@/lib/graphql/profile.queries';
+import { PublicLayout } from '@/components/PublicLayout';
+import { PageShell } from '@/components/PageShell';
 
 interface PublicCourse {
   id: string;
@@ -78,7 +82,7 @@ function useCopyLink(userId: string) {
     const url = `${window.location.origin}/u/${userId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
-      timerRef.current = setTimeout(() => setCopied(false), 2000);
+      timerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
     });
   }, [userId]);
   return { copied, copy };
@@ -106,24 +110,26 @@ export function PublicProfilePage() {
 
   if (fetching) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-      </div>
+      <PublicLayout navVariant="minimal">
+        <LoadingSpinner size="lg" containerHeight="min-h-screen" />
+      </PublicLayout>
     );
   }
 
   if (error || !data?.publicProfile) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-4">
-        <Lock className="h-16 w-16 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Profile Not Available</h1>
-        <p className="text-muted-foreground max-w-sm">
-          This profile is private or does not exist.
-        </p>
-        <Button asChild variant="outline">
-          <Link to="/courses">Browse Courses</Link>
-        </Button>
-      </div>
+      <PublicLayout navVariant="minimal">
+        <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-4">
+          <Lock className="h-16 w-16 text-muted-foreground" />
+          <h1 className="text-2xl font-bold">Profile Not Available</h1>
+          <p className="text-muted-foreground max-w-sm">
+            This profile is private or does not exist.
+          </p>
+          <Button asChild variant="outline">
+            <Link to="/courses">Browse Courses</Link>
+          </Button>
+        </div>
+      </PublicLayout>
     );
   }
 
@@ -156,7 +162,8 @@ export function PublicProfilePage() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
+    <PublicLayout navVariant="minimal">
+    <PageShell size="sm" className="py-10">
       {/* Hero card */}
       <Card className="p-6 flex items-center gap-6">
         <Avatar className="h-20 w-20">
@@ -276,6 +283,7 @@ export function PublicProfilePage() {
           onClose={() => setFollowListOpen(null)}
         />
       )}
-    </div>
+    </PageShell>
+    </PublicLayout>
   );
 }

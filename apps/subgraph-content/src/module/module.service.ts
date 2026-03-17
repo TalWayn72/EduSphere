@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -114,7 +115,7 @@ export class ModuleService implements OnModuleDestroy {
       .returning();
 
     if (!row) {
-      throw new Error('Failed to create module');
+      throw new InternalServerErrorException('Failed to create module');
     }
 
     return this.mapModule(row);

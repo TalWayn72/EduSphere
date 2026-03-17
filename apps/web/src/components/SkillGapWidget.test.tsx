@@ -161,7 +161,7 @@ describe('SkillGapWidget', () => {
         vi.fn(),
       ] as never)
       .mockReturnValue([
-        { data: { skillGapAnalysis: MOCK_REPORT }, fetching: false },
+        { data: { skillGapReport: MOCK_REPORT }, fetching: false },
         vi.fn(),
       ] as never);
     renderWidget();
@@ -179,7 +179,7 @@ describe('SkillGapWidget', () => {
         vi.fn(),
       ] as never)
       .mockReturnValue([
-        { data: { skillGapAnalysis: MOCK_REPORT }, fetching: false },
+        { data: { skillGapReport: MOCK_REPORT }, fetching: false },
         vi.fn(),
       ] as never);
     renderWidget();
@@ -197,7 +197,7 @@ describe('SkillGapWidget', () => {
         vi.fn(),
       ] as never)
       .mockReturnValue([
-        { data: { skillGapAnalysis: fullReport }, fetching: false },
+        { data: { skillGapReport: fullReport }, fetching: false },
         vi.fn(),
       ] as never);
     renderWidget();

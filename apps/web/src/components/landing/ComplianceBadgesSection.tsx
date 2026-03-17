@@ -16,6 +16,7 @@ const BADGES = [
 export function ComplianceBadgesSection() {
   return (
     <section
+      id="compliance"
       data-testid="compliance-badges-section"
       className="bg-white py-20"
       aria-label="Compliance certifications"
@@ -51,7 +52,7 @@ export function ComplianceBadgesSection() {
         {/* SOC2 note */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center gap-3">
-            <Shield className="h-5 w-5 text-slate-400" aria-hidden="true" />
+            <Shield className="h-5 w-5 text-slate-500" aria-hidden="true" />
             <span className="text-sm text-slate-500">
               <strong className="text-slate-700">SOC 2 Type II</strong> — In progress (Roadmap Q3 2026)
             </span>

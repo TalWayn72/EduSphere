@@ -125,10 +125,11 @@ RUN cd /opt && \
     rm keycloak-26.5.3.tar.gz
 
 # ═══════════════════════════════════════════════════════════════
-# STAGE 6: Ollama
+# STAGE 6: Ollama (copied from official image — avoids corporate proxy failures)
 # ═══════════════════════════════════════════════════════════════
 
-RUN curl -fsSL https://ollama.com/install.sh | sh
+COPY --from=ollama/ollama:latest /usr/bin/ollama /usr/local/bin/ollama
+RUN mkdir -p /var/log/ollama
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 7: Configure PostgreSQL 18 — AGE + pgvector + edusphere DB
@@ -169,9 +170,11 @@ COPY packages ./packages
 COPY apps ./apps
 
 # Install + build (cached unless packages/apps change)
-# Build only backend services — web/mobile frontends are not served from this container
+# Build all services including web frontend (served via vite preview inside container)
 RUN pnpm install --no-frozen-lockfile
-RUN pnpm turbo build --filter='./packages/*' --filter='./apps/subgraph-*' --filter='./apps/gateway' --filter='./apps/transcription-worker'
+# Clear stale build artifacts to force fresh build (prevents .dockerignore bypass)
+RUN rm -rf apps/web/dist apps/web/.vite .turbo
+RUN pnpm turbo build --filter='./packages/*' --filter='./apps/subgraph-*' --filter='./apps/gateway' --filter='./apps/transcription-worker' --filter='./apps/web'
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 9: Runtime config (after build — changes here don't bust build cache)
@@ -189,6 +192,8 @@ RUN chmod +x /startup.sh
 
 # GraphQL Gateway + Subgraphs
 EXPOSE 4000 4001 4002 4003 4004 4005 4006
+# Web Frontend
+EXPOSE 5173
 # Infrastructure services
 EXPOSE 5432 6379 8080 4222 8222 9000 9001 11434
 

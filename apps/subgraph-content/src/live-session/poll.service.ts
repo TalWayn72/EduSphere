@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  InternalServerErrorException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import { connect, StringCodec, type NatsConnection } from 'nats';
@@ -77,7 +78,7 @@ export class PollService implements OnModuleDestroy {
           .values({ sessionId, tenantId, question, options })
           .returning()
     );
-    if (!poll) throw new Error('Failed to insert poll');
+    if (!poll) throw new InternalServerErrorException('Failed to insert poll');
     this.logger.log(`Poll created: pollId=${poll.id} sessionId=${sessionId}`);
     return this.mapPoll(poll);
   }

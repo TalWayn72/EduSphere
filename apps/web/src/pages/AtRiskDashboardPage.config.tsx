@@ -27,7 +27,7 @@ export function RiskThresholdConfig() {
 
   function handleSave() {
     setSaving(true);
-    // TODO: persist via mutation once admin config API is implemented
+    // Saves locally — backend admin config API not yet available in supergraph.
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       setSaving(false);

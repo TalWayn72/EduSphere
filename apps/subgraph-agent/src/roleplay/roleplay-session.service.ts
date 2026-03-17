@@ -2,9 +2,16 @@
  * RoleplaySessionService — session lifecycle (start, send, get).
  * Split from RoleplayService to keep files under 150 lines.
  */
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
+  closeAllPools,
   scenario_templates,
   scenario_sessions,
   type EvaluationResult,
@@ -18,11 +25,15 @@ import type { RoleplayStateType } from '../ai/roleplay.workflow.js';
 const MAX_MESSAGE_LENGTH = 2000;
 
 @Injectable()
-export class RoleplaySessionService {
+export class RoleplaySessionService implements OnModuleDestroy {
   private readonly logger = new Logger(RoleplaySessionService.name);
   readonly db = createDatabaseConnection();
 
   constructor(private readonly consentGuard: LlmConsentGuard) {}
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async startSession(scenarioId: string, userId: string, tenantId: string) {
     const isExternal = Boolean(
@@ -49,7 +60,7 @@ export class RoleplaySessionService {
       .values({ user_id: userId, scenario_id: scenarioId, tenant_id: tenantId })
       .returning();
 
-    if (!session) throw new Error('Failed to create scenario session');
+    if (!session) throw new InternalServerErrorException('Failed to create scenario session');
 
     this.runWorkflowAsync(session.id, template).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);

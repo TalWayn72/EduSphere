@@ -3,6 +3,8 @@ import {
   Logger,
   OnModuleDestroy,
   OnModuleInit,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -153,7 +155,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
           .insert(schema.spacedRepetitionCards)
           .values({ userId, tenantId, conceptName })
           .returning();
-        if (!row) throw new Error('Failed to create SRS card');
+        if (!row) throw new InternalServerErrorException('Failed to create SRS card');
         this.logger.debug(
           { userId, tenantId, conceptName },
           'SRS card created'
@@ -187,7 +189,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
               eq(schema.spacedRepetitionCards.userId, userId)
             )
           );
-        if (!existing) throw new Error(`SRS card not found: ${cardId}`);
+        if (!existing) throw new NotFoundException(`SRS card not found: ${cardId}`);
 
         const next = computeNextReview(
           {
@@ -210,7 +212,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
           .where(eq(schema.spacedRepetitionCards.id, cardId))
           .returning();
 
-        if (!updated) throw new Error('Failed to update SRS card');
+        if (!updated) throw new InternalServerErrorException('Failed to update SRS card');
         this.logger.debug({ cardId, quality, next }, 'SRS review submitted');
         return this.mapCard(updated);
       }
@@ -272,7 +274,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
           .set({ dueDate: parsedDate })
           .where(eq(schema.spacedRepetitionCards.id, card.id))
           .returning();
-        if (!updated) throw new Error('Failed to update SRS card due date');
+        if (!updated) throw new InternalServerErrorException('Failed to update SRS card due date');
         return this.mapCard(updated);
       }
     );

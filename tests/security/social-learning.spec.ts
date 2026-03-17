@@ -271,30 +271,41 @@ describe('Cross-feature: notification types extended', () => {
 
 // ── New routes exist in router ────────────────────────────────────────────────
 
+/** Read all route definition files (routes were split from router.tsx into routes/) */
+const allRoutesSrc = (): string => {
+  const routeFiles = [
+    'apps/web/src/lib/routes/public-routes.tsx',
+    'apps/web/src/lib/routes/course-routes.tsx',
+    'apps/web/src/lib/routes/admin-routes.tsx',
+    'apps/web/src/lib/routes/assessment-routes.tsx',
+    'apps/web/src/lib/routes/social-routes.tsx',
+    'apps/web/src/lib/routes/learner-routes.tsx',
+    'apps/web/src/lib/routes/instructor-routes.tsx',
+    'apps/web/src/lib/routes/helpers.tsx',
+    'apps/web/src/lib/router.tsx',
+  ];
+  return routeFiles.map((f) => read(f)).join('\n');
+};
+
 describe('New routes exist in router', () => {
-  it('router.tsx has /discussions route', () => {
-    const router = read('apps/web/src/lib/router.tsx');
-    expect(router).toMatch(/\/discussions/);
+  it('route files have /discussions route', () => {
+    expect(allRoutesSrc()).toMatch(/\/discussions/);
   });
 
-  it('router.tsx has /social route', () => {
-    const router = read('apps/web/src/lib/router.tsx');
-    expect(router).toMatch(/\/social/);
+  it('route files have /social route', () => {
+    expect(allRoutesSrc()).toMatch(/\/social/);
   });
 
-  it('router.tsx has /peer-review route', () => {
-    const router = read('apps/web/src/lib/router.tsx');
-    expect(router).toMatch(/\/peer-review/);
+  it('route files have /peer-review route', () => {
+    expect(allRoutesSrc()).toMatch(/\/peer-review/);
   });
 
-  it('router.tsx has /assessments route', () => {
-    const router = read('apps/web/src/lib/router.tsx');
-    expect(router).toMatch(/\/assessments/);
+  it('route files have /assessments route', () => {
+    expect(allRoutesSrc()).toMatch(/\/assessments/);
   });
 
-  it('router.tsx has /people route', () => {
-    const router = read('apps/web/src/lib/router.tsx');
-    expect(router).toMatch(/\/people/);
+  it('route files have /people route', () => {
+    expect(allRoutesSrc()).toMatch(/\/people/);
   });
 });
 

@@ -7,6 +7,8 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CollaborativeEditor } from '@/components/CollaborativeEditor';
+import { PageShell } from '@/components/PageShell';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import {
   DISCUSSION_QUERY,
   JOIN_DISCUSSION_MUTATION,
@@ -97,7 +99,7 @@ export function CollaborationSessionPage() {
   const handleSave = () => {
     setSaved(true);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
+    savedTimerRef.current = setTimeout(() => setSaved(false), TOAST_AUTO_DISMISS_MS);
   };
 
   const SAMPLE_CONTENT = `<h1>${docTitle}</h1>
@@ -107,7 +109,7 @@ export function CollaborationSessionPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-4">
+      <PageShell size="md" spacing="compact">
         {/* Header */}
         <div className="flex items-center gap-3">
           <Button
@@ -183,7 +185,7 @@ export function CollaborationSessionPage() {
             ? t('crdtSyncActive', { key: discussionId.slice(0, 8) })
             : t('crdtSyncInactive')}
         </p>
-      </div>
+      </PageShell>
     </Layout>
   );
 }

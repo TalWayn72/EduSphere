@@ -138,4 +138,29 @@ describe('BadgesGrid', () => {
     // fetching=true but badges prop provided → no skeletons
     expect(container.querySelectorAll('.animate-pulse').length).toBe(0);
   });
+
+  it('renders earned date for each badge', () => {
+    render(<BadgesGrid />);
+    // Dates should be formatted — look for the month abbreviation
+    const timeElements = document.querySelectorAll('time');
+    expect(timeElements.length).toBe(2);
+  });
+
+  it('does not show raw i18n keys in the output', () => {
+    render(<BadgesGrid />);
+    const html = document.body.innerHTML;
+    expect(html).not.toMatch(/\bt\(\s*['"][^'"]+['"]\s*\)/);
+  });
+
+  it('renders correct number of badge cards in the grid', () => {
+    render(<BadgesGrid />);
+    const names = screen.getAllByRole('img');
+    expect(names).toHaveLength(2);
+  });
+
+  it('shows empty state message with emoji when no badges from query', () => {
+    mockUseQuery.mockReturnValue(makeQueryResponse({ data: { myBadges: [] } }));
+    render(<BadgesGrid />);
+    expect(screen.getByText(/keep learning/i)).toBeInTheDocument();
+  });
 });

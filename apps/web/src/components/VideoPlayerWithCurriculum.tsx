@@ -117,7 +117,7 @@ export function VideoPlayerWithCurriculum({
             </video>
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center text-white/50 text-sm"
+              className="w-full h-full flex items-center justify-center text-white/70 text-sm"
               data-testid="video-placeholder"
             >
               [Video preview unavailable in development mode]

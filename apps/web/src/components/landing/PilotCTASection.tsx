@@ -66,7 +66,7 @@ export function PilotCTASection() {
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
             Ready to Transform Your Learning Experience?
           </h2>
-          <p className="mt-4 text-indigo-200 text-lg max-w-2xl mx-auto">
+          <p className="mt-4 text-indigo-100 text-lg max-w-2xl mx-auto">
             Apply for your free 90-day pilot and see why institutions choose EduSphere.
           </p>
         </div>
@@ -79,14 +79,14 @@ export function PilotCTASection() {
                   <Check className="h-8 w-8 text-white" aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">Application received!</h3>
-                <p className="text-indigo-200">We&apos;ll respond within 24 hours with your pilot details.</p>
+                <p className="text-indigo-100">We&apos;ll respond within 24 hours with your pilot details.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Pilot application form">
                 <div className="space-y-5">
                   <div>
                     <Label htmlFor="orgName" className="text-white text-sm font-medium">Organization Name *</Label>
-                    <Input id="orgName" {...register('orgName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/40" placeholder="University of..." aria-required="true" />
+                    <Input id="orgName" {...register('orgName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="University of..." aria-required="true" />
                     {errors.orgName && <p className="text-red-300 text-xs mt-1" role="alert">{errors.orgName.message}</p>}
                   </div>
                   <div>
@@ -108,29 +108,29 @@ export function PilotCTASection() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="contactName" className="text-white text-sm font-medium">Contact Name *</Label>
-                      <Input id="contactName" {...register('contactName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/40" placeholder="Dr. Jane Smith" aria-required="true" />
+                      <Input id="contactName" {...register('contactName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="Dr. Jane Smith" aria-required="true" />
                       {errors.contactName && <p className="text-red-300 text-xs mt-1" role="alert">{errors.contactName.message}</p>}
                     </div>
                     <div>
                       <Label htmlFor="email" className="text-white text-sm font-medium">Email *</Label>
-                      <Input id="email" type="email" {...register('email')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/40" placeholder="jane@university.edu" aria-required="true" />
+                      <Input id="email" type="email" {...register('email')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="jane@university.edu" aria-required="true" />
                       {errors.email && <p className="text-red-300 text-xs mt-1" role="alert">{errors.email.message}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="phone" className="text-white text-sm font-medium">Phone</Label>
-                      <Input id="phone" {...register('phone')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/40" placeholder="+1 (555) 000-0000" />
+                      <Input id="phone" {...register('phone')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="+1 (555) 000-0000" />
                     </div>
                     <div>
                       <Label htmlFor="estimatedUsers" className="text-white text-sm font-medium">Estimated Users *</Label>
-                      <Input id="estimatedUsers" type="number" {...register('estimatedUsers')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/40" placeholder="500" aria-required="true" />
+                      <Input id="estimatedUsers" type="number" {...register('estimatedUsers')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="500" aria-required="true" />
                       {errors.estimatedUsers && <p className="text-red-300 text-xs mt-1" role="alert">{errors.estimatedUsers.message}</p>}
                     </div>
                   </div>
                   <div>
                     <Label htmlFor="useCase" className="text-white text-sm font-medium">Use Case *</Label>
-                    <Textarea id="useCase" {...register('useCase')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/40 min-h-[80px]" placeholder="Describe your learning goals..." aria-required="true" />
+                    <Textarea id="useCase" {...register('useCase')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 min-h-[80px]" placeholder="Describe your learning goals..." aria-required="true" />
                     {errors.useCase && <p className="text-red-300 text-xs mt-1" role="alert">{errors.useCase.message}</p>}
                   </div>
                   <Button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3">

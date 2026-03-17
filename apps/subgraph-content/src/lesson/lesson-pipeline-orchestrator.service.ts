@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -93,7 +93,7 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
         .where(eq(schema.lesson_pipelines.id, pipelineId))
         .limit(1);
 
-      if (!pipelineRow) throw new Error(`Pipeline ${pipelineId} not found`);
+      if (!pipelineRow) throw new NotFoundException(`Pipeline ${pipelineId} not found`);
 
       const nodes = (pipelineRow.nodes as PipelineNode[])
         .filter((n) => n.enabled !== false)

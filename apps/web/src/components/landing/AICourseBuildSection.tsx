@@ -43,13 +43,14 @@ export function AICourseBuildSection() {
 
   return (
     <section
+      id="ai-course-builder"
       data-testid="ai-course-build-section"
       className="bg-slate-900 py-20 text-white"
       aria-label="AI Course Builder"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-200 mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-100 mb-6">
             <Zap className="h-4 w-4" aria-hidden="true" />
             AI Course Builder
           </div>
@@ -67,7 +68,7 @@ export function AICourseBuildSection() {
             {STEPS.map((step) => (
               <li
                 key={step.num}
-                className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-xl px-5 py-4"
+                className="flex items-center gap-4 bg-white/5 border border-white/20 rounded-xl px-5 py-4"
               >
                 <span
                   className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center flex-shrink-0"
@@ -82,8 +83,8 @@ export function AICourseBuildSection() {
 
           {/* Counter */}
           <div className="text-center lg:text-left">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-              <p className="text-sm text-slate-400 font-medium mb-2 uppercase tracking-wider">
+            <div className="bg-white/5 border border-white/20 rounded-2xl p-8">
+              <p className="text-sm text-slate-300 font-medium mb-2 uppercase tracking-wider">
                 Estimated instructor hours saved
               </p>
               <div
@@ -93,8 +94,8 @@ export function AICourseBuildSection() {
               >
                 {count.toLocaleString()}
               </div>
-              <p className="text-slate-400 text-sm">hours/year</p>
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="text-slate-300 text-sm">hours/year</p>
+              <p className="mt-4 text-xs text-slate-300">
                 Based on 5 instructors × 8 hrs/week × 60% reduction in course creation time
               </p>
             </div>
@@ -104,7 +105,7 @@ export function AICourseBuildSection() {
                 className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold w-full lg:w-auto"
                 asChild
               >
-                <a href="/demo#course-builder">See AI Course Builder Demo</a>
+                <a href="#pilot-cta">See AI Course Builder Demo</a>
               </Button>
             </div>
           </div>

@@ -4,6 +4,7 @@
  */
 import { useParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import { Model3DViewer } from '@/components/Model3DViewer';
 
 export function Model3DPage() {
@@ -15,10 +16,10 @@ export function Model3DPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto mt-6 p-4">
+      <PageShell size="md" className="mt-6 p-4">
         <h1 className="text-xl font-semibold mb-4">3D Model Viewer</h1>
         <Model3DViewer src={src} className="w-full h-96" />
-      </div>
+      </PageShell>
     </Layout>
   );
 }

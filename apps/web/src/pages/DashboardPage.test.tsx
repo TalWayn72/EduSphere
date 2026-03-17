@@ -321,9 +321,7 @@ describe('DashboardPage — real data integration', () => {
     renderDashboard();
     // The count stat uses real data (1 enrolled)
     expect(screen.getByText(/1 in progress/i)).toBeInTheDocument();
-    // NOTE: course cards themselves still use MOCK_IN_PROGRESS until
-    // the myEnrollments resolver returns courseTitle + progress fields.
-    // This is intentional per the TODO comment in DashboardPage.tsx.
+    // NOTE: course cards use mock fallback data until real queries resolve.
     expect(screen.getByTestId('continue-learning-section')).toBeInTheDocument();
   });
 

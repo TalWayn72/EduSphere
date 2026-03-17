@@ -5,10 +5,10 @@ export const MY_CERTIFICATES_QUERY = gql`
     myCertificates {
       id
       courseId
+      courseName
       issuedAt
       verificationCode
       pdfUrl
-      metadata
     }
   }
 `;

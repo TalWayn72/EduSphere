@@ -80,7 +80,7 @@ export function CourseEditMetadata({
     const { error } = await executeUpdate({ id: courseId, input });
     if (error) {
       onSaved(
-        `Save failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+        'Save failed. Please try again.'
       );
     } else {
       onSaved('Course info saved!');

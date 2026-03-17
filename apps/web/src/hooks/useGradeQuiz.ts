@@ -38,14 +38,14 @@ export function useGradeQuiz(contentItemId: string): UseGradeQuizReturn {
       try {
         const result = await executeMutation({ contentItemId, answers });
         if (result.error) {
-          setError(result.error.message);
+          console.error('[useGradeQuiz] Grading failed:', result.error.message);
+          setError('Failed to grade quiz. Please try again.');
           return null;
         }
         return result.data?.gradeQuizSubmission ?? null;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Submission failed';
-        setError(message);
+        console.error('[useGradeQuiz] Unexpected error:', err);
+        setError('Failed to grade quiz. Please try again.');
         return null;
       } finally {
         setLoading(false);

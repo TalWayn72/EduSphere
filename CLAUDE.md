@@ -379,6 +379,53 @@ Fix any errors before moving to next file. Do not batch lint at the end.
 
 ---
 
+## Skills Integration
+
+### Overview
+
+Skills are markdown-based expertise guides that auto-load when Claude detects relevant context (file paths, keywords, patterns). 8 custom EduSphere skills + ~200 external skills are installed in `~/.agents/skills/`.
+
+### EduSphere Custom Skills (Auto-Loaded)
+
+| Skill | Auto-Triggers On | Content |
+|-------|-------------------|---------|
+| `graphql-federation-edusphere` | `.graphql` files, `apps/gateway/`, resolver files | Federation v2.7, 6-subgraph map, entity resolution, SDL-first workflow |
+| `apache-age-knowledge-graph` | `packages/db/src/graph/`, `apps/subgraph-knowledge/` | Cypher queries, 5-node ontology, executeCypher(), RLS in graph |
+| `pgvector-hybrid-rag` | embeddings schema, `apps/subgraph-knowledge/` | HNSW indexes, 768-dim embeddings, HybridRAG fusion, RRF reranking |
+| `langgraph-agent-workflows` | `apps/subgraph-agent/`, AI agent code | StateGraph, assess-quiz-explain-debate, Vercel AI SDK v6, gVisor |
+| `drizzle-orm-edusphere` | `packages/db/`, schema/migration files | pgTable.withRLS(), withTenantContext(), SI-1/SI-3/SI-8 compliance |
+| `nats-jetstream-patterns` | `packages/nats-client/`, NATS imports | 23 event subjects, stream retention, KV stores, SI-7 TLS |
+| `session-completion-gate` | task completion, before git push | 10-check gate, 5-user auth, Docker health, failure protocol |
+| `discovery-wave-automator` | bug fixes, test failures | 3-wave search, 7-dir checklist, Discovery List, pattern-class search |
+
+### Skills per Wave (Mandatory Loading)
+
+Skills are loaded per Enterprise Execution Protocol wave:
+
+- **Wave 1 (Product/Arch/UX):** `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere`, `accessibility-compliance`, `wcag-audit-patterns`, `writing-plans`, `brainstorming`
+- **Wave 2 (FE/BE/DB/Security/QA):** `nestjs-best-practices`, `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `langgraph-agent-workflows`, `nats-jetstream-patterns`, `react-state-management`, `e2e-testing-patterns`, `auth-implementation-patterns`, `secrets-management`, `sast-configuration`, `test-driven-development`
+- **Wave 3 (Docs/DevOps):** `changelog-automation`, `deployment-pipeline-design`, `distributed-tracing`, `turborepo-caching`, `github-actions-templates`
+
+### Bug Fix Protocol Skills
+
+Load at the START of every bug investigation:
+1. `systematic-debugging` — root cause investigation framework
+2. `discovery-wave-automator` — 3-wave search automation
+3. Domain skill based on bug location (e.g., `drizzle-orm-edusphere` for DB bugs, `graphql-federation-edusphere` for schema bugs)
+
+### Session Completion Skills
+
+Load `session-completion-gate` skill before declaring ANY task complete. It automates all 10 checks from the Session Completion Gate.
+
+### Skill Trigger Rules
+
+- Skills auto-load based on `description` field in SKILL.md frontmatter
+- Custom EduSphere skills (`*-edusphere`) take precedence for overlapping domains
+- Multiple matching skills load additively (not exclusively)
+- Skills location: `~/.agents/skills/<skill-name>/SKILL.md`
+
+---
+
 ## Commands Reference
 
 ### Development
@@ -941,26 +988,38 @@ Each task is decomposed and routed to the relevant division(s). Each division mu
 | 10 | **Documentation** | Update all affected docs (README, API, runbooks, release notes) after QA approval |
 | 11 | **DevOps & Release** | CI/CD validation, build, staging, prod readiness, rollback plan, post-deploy monitoring |
 
-### C. Mandatory Execution Order (No Exceptions)
+### C. Mandatory Execution Order — Wave-Based Parallel Model
 
-1. Product & Requirements
-2. Architecture Review
-3. UX/UI Review
-4. Development — FE + BE + DB **(parallelize these three)**
-5. Security Audit
-6. QA Full Validation
-7. Documentation Update
-8. DevOps Release Validation
-9. Production Update
-10. Post-Release Validation
+**The sequential order defines APPROVAL dependency, NOT launch timing.**
+Stages are grouped into parallel waves. Within each wave, all stages launch simultaneously.
 
-**If any stage fails:** fix → re-run all downstream stages from that point onward.
+```
+Wave 1 (parallel):  Stage 1 (Product) + Stage 2 (Architecture) + Stage 3 (UX/UI)
+Wave 2 (parallel):  Stage 4 (FE+BE+DB dev) + Stage 5 (Security prep) + Stage 6 (QA test writing)
+Wave 3 (parallel):  Stage 7 (Documentation) + Stage 8 (DevOps validation)
+Wave 4 (sequential): Stage 9 (Deploy to production)
+Wave 5 (sequential): Stage 10 (Post-release verification)
+```
+
+**Wave launch rules:**
+- Wave 1 launches ALL 3 stages in a single message (3 parallel agents)
+- Wave 2 launches AFTER Wave 1 approvals — but ALL 5+ agents launch together (dev×3 + security + QA prep)
+- Wave 3 launches AFTER Wave 2 approvals — both agents in parallel
+- Waves 4-5 are sequential (deploy then verify)
+
+**Platform constraint:** Claude Code SDK supports max ~5 concurrent agents. Waves with >5 agents execute as **sub-waves** (5 agents → wait for first to finish → launch next batch). This is transparent to the user.
+
+**If any stage fails:** fix → re-run all downstream stages from that wave onward.
 
 ### D. Agent Orchestration
 
 - All division work performed by specialized sub-agents via the `Agent` tool
-- Maximize parallel spawning — FE + BE + DB always run concurrently (step 4)
+- **Wave-based execution:** max ~5 concurrent agents per sub-wave (SDK limit)
+- Large waves (e.g., Wave 2 with 6 agents) split into sub-waves automatically: first 5 launch → as agents complete, remaining launch
+- FE + BE + DB always run concurrently within Wave 2
+- Security + QA prep launch WITH dev agents, not after them
 - Progress reported every 3 minutes: `[Progress: XX%] Active: <Division>`
+- **Never wait for a full wave to finish before preparing the next wave's inputs**
 
 ### E. Completion Gate (All required before declaring done)
 
@@ -1066,11 +1125,15 @@ Then proceed autonomously without waiting for user approval.
 - Proceed directly from phase to phase
 - Only stop for: logical contradiction, security violation, missing credentials
 
-### 3. Maximum Parallelism
+### 3. Maximum Parallelism — Wave Execution Model
 - Always spawn the MAXIMUM number of parallel agents the task allows
 - Frontend + Backend + DB agents ALWAYS run in parallel
 - Never run sequentially what can run in parallel
-- Hardware limit: up to 5 parallel agents at once
+- **Platform limit:** max ~5 concurrent agents (Claude Code SDK constraint)
+- **Wave model:** stages grouped into waves; within each wave all agents launch together
+- **Sub-waves:** if a wave has >5 agents, split into batches of 5; as agents complete, launch remaining
+- **Cross-wave preparation:** downstream stages begin prep work while upstream stages execute
+- The total agent count per task may reach 10-15+, but they execute in waves of 5, not all at once
 
 ### 4. Protocol Compliance
 - Run Session Completion Gate after EVERY phase (not just at session end)

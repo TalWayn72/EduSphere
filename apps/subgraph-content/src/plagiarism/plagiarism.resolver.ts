@@ -49,8 +49,8 @@ export class PlagiarismResolver {
     );
   }
 
-  @Query('mySubmissions')
-  async mySubmissions(
+  @Query('myTextSubmissions')
+  async myTextSubmissions(
     @Args('contentItemId') contentItemId: string,
     @Context() ctx: GraphQLContext
   ) {

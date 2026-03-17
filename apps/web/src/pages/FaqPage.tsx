@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { PageMeta, FAQSchema, BreadcrumbSchema, OrganizationSchema } from '@/components/seo';
 import { FAQ_ITEMS } from '@/lib/aeo-data';
 import { Input } from '@/components/ui/input';
+import { PublicLayout } from '@/components/PublicLayout';
 
 const CATEGORIES = [
   { id: 'all', label: 'All Questions' },
@@ -30,7 +31,7 @@ interface AccordionItemProps {
 function AccordionItem({ question, answer, isOpen, onToggle, index }: AccordionItemProps) {
   return (
     <div
-      className="border border-gray-200 dark:border-border rounded-lg overflow-hidden"
+      className="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden"
       itemScope
       itemType="https://schema.org/Question"
     >
@@ -39,10 +40,10 @@ function AccordionItem({ question, answer, isOpen, onToggle, index }: AccordionI
         aria-expanded={isOpen}
         aria-controls={`faq-answer-${index}`}
         id={`faq-question-${index}`}
-        className="w-full flex items-center justify-between p-5 text-left bg-white dark:bg-card hover:bg-gray-50 dark:hover:bg-accent/30 transition-colors"
+        className="w-full flex items-center justify-between p-5 text-left bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors"
       >
         <span
-          className="font-medium text-gray-900 dark:text-foreground pr-4"
+          className="font-medium text-gray-900 dark:text-white pr-4"
           itemProp="name"
         >
           {question}
@@ -50,7 +51,7 @@ function AccordionItem({ question, answer, isOpen, onToggle, index }: AccordionI
         {isOpen ? (
           <ChevronUp className="h-5 w-5 text-indigo-600 flex-shrink-0" aria-hidden="true" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-gray-400 flex-shrink-0" aria-hidden="true" />
+          <ChevronDown className="h-5 w-5 text-gray-400 dark:text-slate-400 flex-shrink-0" aria-hidden="true" />
         )}
       </button>
       {isOpen && (
@@ -60,10 +61,10 @@ function AccordionItem({ question, answer, isOpen, onToggle, index }: AccordionI
           aria-labelledby={`faq-question-${index}`}
           itemScope
           itemType="https://schema.org/Answer"
-          className="px-5 pb-5 bg-white dark:bg-card"
+          className="px-5 pb-5 bg-white dark:bg-slate-800"
         >
           <p
-            className="text-gray-600 dark:text-muted-foreground leading-relaxed"
+            className="text-gray-600 dark:text-slate-300 leading-relaxed"
             itemProp="text"
           >
             {answer}
@@ -106,19 +107,20 @@ export function FaqPage() {
       />
       <OrganizationSchema />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <PublicLayout navVariant="minimal">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
         <div className="bg-indigo-700 text-white py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               Frequently Asked Questions
             </h1>
-            <p className="text-indigo-200 text-lg mb-8">
+            <p className="text-indigo-100 text-lg mb-8">
               Everything you need to know about EduSphere.
             </p>
             <div className="relative max-w-xl mx-auto">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-slate-400"
                 aria-hidden="true"
               />
               <Input
@@ -126,7 +128,7 @@ export function FaqPage() {
                 placeholder="Search questions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white text-gray-900 border-0"
+                className="pl-10 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border-0"
                 aria-label="Search frequently asked questions"
               />
             </div>
@@ -152,7 +154,7 @@ export function FaqPage() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeCategory === cat.id
                     ? 'bg-indigo-600 text-white'
-                    : 'bg-white dark:bg-card text-gray-600 dark:text-muted-foreground hover:bg-indigo-50 dark:hover:bg-accent border border-gray-200 dark:border-border'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
                 }`}
               >
                 {cat.label}
@@ -162,7 +164,7 @@ export function FaqPage() {
 
           {/* FAQ Accordion */}
           {filteredItems.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-muted-foreground">
+            <div className="text-center py-12 text-gray-500 dark:text-slate-400">
               <p>No questions found matching &ldquo;{searchQuery}&rdquo;.</p>
             </div>
           ) : (
@@ -186,10 +188,10 @@ export function FaqPage() {
 
           {/* Contact CTA */}
           <div className="mt-12 p-6 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl text-center">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-2">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Still have questions?
             </h2>
-            <p className="text-gray-600 dark:text-muted-foreground mb-4">
+            <p className="text-gray-600 dark:text-slate-300 mb-4">
               Our team is happy to help. Reach out and we&apos;ll respond within one business day.
             </p>
             <a
@@ -201,6 +203,7 @@ export function FaqPage() {
           </div>
         </main>
       </div>
+      </PublicLayout>
     </>
   );
 }

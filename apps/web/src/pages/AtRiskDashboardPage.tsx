@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -213,10 +215,12 @@ export function AtRiskDashboardPage() {
   ] as const;
 
   return (
-    <AdminLayout
-      title="At-Risk Learners"
-      description="Identify and support learners who may need intervention"
-    >
+    <AdminLayout>
+      <PageShell size="2xl">
+        <PageHeader
+          title="At-Risk Learners"
+          description="Identify and support learners who may need intervention"
+        />
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {statCards.map(({ icon: Icon, label, value, color }) => (
@@ -302,6 +306,7 @@ export function AtRiskDashboardPage() {
 
         <RiskThresholdConfig />
       </div>
+      </PageShell>
     </AdminLayout>
   );
 }

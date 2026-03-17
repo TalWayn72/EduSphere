@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from 'urql';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { ExternalLink, Copy, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,7 +53,7 @@ export function ProfileVisibilityCard({
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+      copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
     });
   }, [userId]);
 

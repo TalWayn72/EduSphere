@@ -4,6 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PartnerSignupPage } from './PartnerSignupPage';
 
+vi.mock('@/components/PublicLayout', () => ({
+  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+}));
+
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {

@@ -158,9 +158,8 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
           return;
         }
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to send argument'
-        );
+        console.error('[useChavrutaDebate] Failed to send argument:', err);
+        setError('Failed to send message. Please try again.');
       }
 
       // Fallback mock when backend is unavailable

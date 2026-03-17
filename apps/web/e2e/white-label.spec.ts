@@ -194,4 +194,96 @@ test.describe('White-label runtime', () => {
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveScreenshot('login-default-branding.png', { fullPage: false });
   });
+
+  test('login page with invalid tenant slug handles error gracefully', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const req = route.request();
+      const body = req.postDataJSON?.() as Record<string, unknown> | null;
+      if (typeof body?.query === 'string' && body.query.includes('publicBranding')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: { publicBranding: null },
+            errors: [
+              {
+                message: 'Tenant not found: nonexistent-slug',
+                extensions: { code: 'NOT_FOUND' },
+              },
+            ],
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto('/login?tenant=nonexistent-slug');
+    await page.waitForLoadState('networkidle');
+
+    // Must fall back to default branding, not crash
+    const body = (await page.locator('body').textContent()) ?? '';
+    expect(body).not.toContain('Tenant not found');
+    expect(body).not.toContain('NOT_FOUND');
+    expect(body).not.toContain('[GraphQL]');
+
+    await expect(page).toHaveScreenshot('white-label-invalid-tenant.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('branding API network failure falls back to default branding', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const req = route.request();
+      const body = req.postDataJSON?.() as Record<string, unknown> | null;
+      if (typeof body?.query === 'string' && body.query.includes('publicBranding')) {
+        await route.abort('connectionrefused');
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto('/login?tenant=demo');
+    await page.waitForLoadState('networkidle');
+
+    // Page should still render with default branding
+    await expect(page).toHaveTitle(/EduSphere|Login/i);
+    const body = (await page.locator('body').textContent()) ?? '';
+    expect(body).not.toContain('ERR_CONNECTION_REFUSED');
+    expect(body).not.toContain('NetworkError');
+  });
+
+  test('no raw i18n keys on branded login page', async ({ page }) => {
+    await page.goto('/login');
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.locator('body').textContent()) ?? '';
+    expect(body).not.toMatch(/\bbranding\.[a-z]+\.[a-z]+\b/);
+    expect(body).not.toMatch(/\blogin\.[a-z]+\.[a-z]+\b/);
+    expect(body).not.toContain('[object Object]');
+  });
+
+  test('XSS in tenant slug parameter does not execute', async ({ page }) => {
+    // Navigate with a XSS attempt in the tenant param
+    await page.goto('/login?tenant=<script>alert(1)</script>');
+    await page.waitForLoadState('networkidle');
+
+    // Ensure no alert dialog was triggered
+    let alertFired = false;
+    page.on('dialog', () => {
+      alertFired = true;
+    });
+
+    // Check the page source does not contain unescaped script tag
+    const html = await page.content();
+    expect(html).not.toContain('<script>alert(1)</script>');
+    expect(alertFired).toBe(false);
+
+    await expect(page).toHaveScreenshot('white-label-xss-attempt.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
 });

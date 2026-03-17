@@ -19,6 +19,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { BookOpen, ShieldCheck } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
 
 const COMPLIANCE_COURSES_QUERY = `
   query ComplianceCourses {
@@ -88,7 +89,7 @@ export function ComplianceLibraryPage() {
   };
 
   return (
-    <main className="p-6 max-w-6xl mx-auto" aria-label="Compliance Course Library">
+    <PageShell size="xl" className="p-6">
       <header className="mb-8">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-8 w-8 text-indigo-600" aria-hidden="true" />
@@ -161,7 +162,7 @@ export function ComplianceLibraryPage() {
           ))}
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }
 

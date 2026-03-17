@@ -62,6 +62,7 @@ describe('GraphBuilder', () => {
 
     const [, payload] = vi.mocked(mockNatsService.publish).mock.calls[0] as [
       string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock call args type
       any,
     ];
     expect(payload.concepts).toHaveLength(2);

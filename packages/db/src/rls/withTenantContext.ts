@@ -2,6 +2,17 @@ import { sql } from 'drizzle-orm';
 import { Histogram } from 'prom-client';
 import type { DrizzleDB } from '../index';
 
+/**
+ * Drizzle transaction objects are structurally compatible with DrizzleDB
+ * but TypeScript sees them as a different branded type. This helper
+ * performs a single, well-documented type assertion in one place rather
+ * than scattering `as unknown as DrizzleDB` across the codebase.
+ */
+function txAsDb(tx: Parameters<Parameters<DrizzleDB['transaction']>[0]>[0]): DrizzleDB {
+  // The transaction object implements the same query interface as the parent db.
+  return tx as unknown as DrizzleDB;
+}
+
 // Lazily-initialised histogram — shared across all DB connections in this process.
 // NestJS MetricsService registers its own copy; this provides a fallback for
 // packages that call withTenantContext() outside of the NestJS container.
@@ -54,7 +65,7 @@ export async function withTenantContext<T>(
       );
 
       // Execute operation with RLS context
-      return operation(tx as unknown as DrizzleDB);
+      return operation(txAsDb(tx));
     });
   } finally {
     endTimer();
@@ -70,7 +81,7 @@ export async function withBypassRLS<T>(
 ): Promise<T> {
   return db.transaction(async (tx) => {
     await tx.execute(sql`SET LOCAL row_security = OFF`);
-    const result = await operation(tx as unknown as DrizzleDB);
+    const result = await operation(txAsDb(tx));
     await tx.execute(sql`SET LOCAL row_security = ON`);
     return result;
   });

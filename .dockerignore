@@ -3,8 +3,9 @@ node_modules/
 **/node_modules/
 
 # Build outputs (built inside Docker, not needed in build context)
-dist/
-build/
+# Use **/ prefix to match nested directories (apps/web/dist/, packages/*/dist/)
+**/dist/
+**/build/
 .next/
 out/
 # TypeScript incremental build info — causes nest build to skip compilation in Docker
@@ -34,12 +35,15 @@ pnpm-debug.log*
 *~
 
 # Testing
-coverage/
+**/coverage/
 .nyc_output/
+**/test-results/
+**/playwright-report/
 
 # Cache
 .cache/
-.turbo/
+**/.turbo/
+**/.vite/
 .nx/
 
 # Documentation

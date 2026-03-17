@@ -134,3 +134,96 @@ test.describe('Drive Import — @visual', () => {
     });
   });
 });
+
+// ── Suite 4: Error handling and edge cases ───────────────────────────────────
+
+test.describe('Drive Import — error handling', () => {
+  test('import page handles GraphQL 500 error gracefully', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('importFromDrive')) {
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [
+              {
+                message: 'Google API quota exceeded: rate limit 100/min',
+                extensions: { code: 'INTERNAL_SERVER_ERROR' },
+              },
+            ],
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('Google API quota exceeded');
+    expect(body).not.toContain('rate limit 100/min');
+    expect(body).not.toContain('INTERNAL_SERVER_ERROR');
+  });
+
+  test('import page handles network failure without crash', async ({ page }) => {
+    await page.route('**/graphql', async (route) => {
+      const body = route.request().postData() ?? '';
+      if (body.includes('importFromDrive') || body.includes('importFrom')) {
+        await route.abort('connectionrefused');
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('ERR_CONNECTION_REFUSED');
+    expect(body).not.toContain('NetworkError');
+    expect(body).not.toContain('[Network]');
+
+    await expect(page).toHaveScreenshot('drive-import-network-error.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('OAuth callback with error param shows user-friendly message', async ({
+    page,
+  }) => {
+    await page.goto(
+      `${OAUTH_CALLBACK_URL}?error=access_denied&error_description=User+denied+consent`,
+      { waitUntil: 'domcontentloaded' }
+    );
+
+    const body = (await page.textContent('body')) ?? '';
+    // Must not show raw OAuth error parameters as-is
+    expect(body).not.toContain('access_denied');
+
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+
+    await expect(page).toHaveScreenshot('oauth-callback-error-param.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('no raw i18n keys on import page', async ({ page }) => {
+    await mockImportGraphQL(page);
+    await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toMatch(/\bimport\.[a-z]+\.[a-z]+\b/);
+    expect(body).not.toMatch(/\bdrive\.[a-z]+\.[a-z]+\b/);
+    expect(body).not.toContain('[object Object]');
+  });
+});

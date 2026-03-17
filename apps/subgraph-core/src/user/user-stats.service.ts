@@ -106,6 +106,7 @@ export class UserStatsService implements OnModuleDestroy {
     let run = 1;
     for (let i = 1; i < activeDates.length; i++) {
       const prev = new Date(activeDates[i - 1] as string);
+      // eslint-disable-next-line security/detect-object-injection -- numeric index from for-loop
       const curr = new Date(activeDates[i] as string);
       const diffMs = curr.getTime() - prev.getTime();
       const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));

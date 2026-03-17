@@ -7,20 +7,14 @@ import { Logger } from '@nestjs/common';
 import { RoleplayService } from './roleplay.service.js';
 import { RoleplaySessionService } from './roleplay-session.service.js';
 import type { EvaluationResult, RubricCriterion } from '@edusphere/db';
+import type { GraphQLContext } from '../auth/auth.middleware';
 
-interface GqlContext {
-  req: {
-    user?: { sub?: string; userId?: string };
-    headers: Record<string, string | undefined>;
-  };
+function getUserId(ctx: GraphQLContext): string {
+  return ctx.authContext?.userId ?? '';
 }
 
-function getUserId(ctx: GqlContext): string {
-  return ctx.req.user?.sub ?? ctx.req.user?.userId ?? '';
-}
-
-function getTenantId(ctx: GqlContext): string {
-  return ctx.req.headers['x-tenant-id'] ?? '';
+function getTenantId(ctx: GraphQLContext): string {
+  return ctx.authContext?.tenantId ?? '';
 }
 
 @Resolver()
@@ -33,7 +27,7 @@ export class RoleplayResolver {
   ) {}
 
   @Query('scenarioTemplates')
-  async scenarioTemplates(@Context() ctx: GqlContext) {
+  async scenarioTemplates(@Context() ctx: GraphQLContext) {
     const tenantId = getTenantId(ctx);
     const rows = await this.roleplayService.listScenarios(tenantId);
     return rows.map((r) => ({
@@ -50,7 +44,7 @@ export class RoleplayResolver {
   @Query('myScenarioSession')
   async myScenarioSession(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
@@ -66,7 +60,7 @@ export class RoleplayResolver {
   @Mutation('startRoleplaySession')
   async startRoleplaySession(
     @Args('scenarioId') scenarioId: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
@@ -86,7 +80,7 @@ export class RoleplayResolver {
   async sendRoleplayMessage(
     @Args('sessionId') sessionId: string,
     @Args('message') message: string,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
@@ -106,7 +100,7 @@ export class RoleplayResolver {
     @Args('characterPersona') characterPersona: string,
     @Args('sceneDescription') sceneDescription: string,
     @Args('maxTurns') maxTurns: number | undefined,
-    @Context() ctx: GqlContext
+    @Context() ctx: GraphQLContext
   ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);

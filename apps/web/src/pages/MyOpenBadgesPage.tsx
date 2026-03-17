@@ -1,6 +1,7 @@
 import { useQuery } from 'urql';
 import { Trophy } from 'lucide-react';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
 import {
   Card,
   CardContent,
@@ -158,7 +159,7 @@ export function MyOpenBadgesPage() {
 
   return (
     <Layout>
-      <div className="space-y-6 max-w-3xl mx-auto">
+      <PageShell size="sm" className="max-w-3xl">
         <div>
           <h1 className="text-2xl font-bold">My Open Badges</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -169,7 +170,7 @@ export function MyOpenBadgesPage() {
 
         {error && (
           <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-            Failed to load badges: {error.message}
+            Failed to load badges. Please try again.
           </div>
         )}
 
@@ -200,7 +201,7 @@ export function MyOpenBadgesPage() {
             ))}
           </div>
         )}
-      </div>
+      </PageShell>
     </Layout>
   );
 }

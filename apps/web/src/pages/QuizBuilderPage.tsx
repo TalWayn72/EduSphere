@@ -8,6 +8,8 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { toast } from 'sonner';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -88,6 +90,8 @@ export function QuizBuilderPage() {
 
   return (
     <Layout>
+      <PageShell size="full">
+      <PageHeader title="Quiz Builder" />
       <div className="container mx-auto p-6 max-w-2xl">
         <Card>
           <CardHeader>
@@ -152,6 +156,7 @@ export function QuizBuilderPage() {
           </div>
         </DialogContent>
       </Dialog>
+      </PageShell>
     </Layout>
   );
 }

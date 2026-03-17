@@ -158,4 +158,48 @@ describe('RoleplaySimulator', () => {
       expect(input).toBeTruthy();
     });
   });
+
+  it('has close button with accessible aria-label', () => {
+    render(<RoleplaySimulator scenario={mockScenario} onClose={onClose} />);
+    const closeBtn = screen.getByRole('button', {
+      name: 'Close roleplay simulator',
+    });
+    expect(closeBtn).toHaveAttribute('aria-label', 'Close roleplay simulator');
+  });
+
+  it('renders with BEGINNER difficulty level color', async () => {
+    const beginnerScenario = { ...mockScenario, difficultyLevel: 'BEGINNER' };
+    render(
+      <RoleplaySimulator scenario={beginnerScenario} onClose={onClose} />
+    );
+    await waitFor(() => {
+      expect(screen.getByText('BEGINNER')).toBeInTheDocument();
+    });
+  });
+
+  it('renders with ADVANCED difficulty level color', async () => {
+    const advancedScenario = { ...mockScenario, difficultyLevel: 'ADVANCED' };
+    render(
+      <RoleplaySimulator scenario={advancedScenario} onClose={onClose} />
+    );
+    await waitFor(() => {
+      expect(screen.getByText('ADVANCED')).toBeInTheDocument();
+    });
+  });
+
+  it('does not show raw i18n keys in the output', () => {
+    render(<RoleplaySimulator scenario={mockScenario} onClose={onClose} />);
+    const html = document.body.innerHTML;
+    expect(html).not.toMatch(/\bt\(\s*['"][^'"]+['"]\s*\)/);
+    expect(html).not.toMatch(/^[a-z]+\.[a-z]+\.[a-z]+$/m);
+  });
+
+  it('send button is disabled when input is empty', () => {
+    render(<RoleplaySimulator scenario={mockScenario} onClose={onClose} />);
+    const buttons = screen.getAllByRole('button');
+    const sendBtn = buttons.find(
+      (b) => !b.getAttribute('aria-label')?.includes('Close')
+    );
+    expect(sendBtn).toBeDisabled();
+  });
 });

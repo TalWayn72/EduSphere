@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -21,6 +22,7 @@ import {
   GENERATE_BI_API_KEY_MUTATION,
   REVOKE_BI_API_KEY_MUTATION,
 } from '@/lib/graphql/bi-export.queries';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   BarChart2,
   Copy,
@@ -29,6 +31,7 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
+import { PageShell } from '@/components/PageShell';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 const ODATA_BASE = `${window.location.protocol}//${window.location.hostname}:4002/odata/v1`;
@@ -85,7 +88,7 @@ export function BiExportSettingsPage() {
     await navigator.clipboard.writeText(url);
     setCopiedUrl(url);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopiedUrl(null), 2000);
+    copyTimerRef.current = setTimeout(() => setCopiedUrl(null), TOAST_AUTO_DISMISS_MS);
   };
 
   const handleGenerate = async () => {
@@ -106,7 +109,13 @@ export function BiExportSettingsPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <PageShell size="md">
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'BI Export' },
+          ]}
+        />
         <div className="flex items-center gap-3">
           <BarChart2 className="h-6 w-6 text-primary" />
           <div>
@@ -221,7 +230,7 @@ export function BiExportSettingsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </PageShell>
       {showModal && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"

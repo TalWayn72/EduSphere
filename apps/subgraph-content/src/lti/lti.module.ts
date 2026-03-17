@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { LtiResolver } from './lti.resolver';
 import { LtiController } from './lti.controller';
 import { LtiService } from './lti.service';
+import { LtiPlatformService } from './lti-platform.service';
 
 /**
  * LtiModule wires together the LTI 1.3 controller, resolver, and service.
@@ -13,7 +14,7 @@ import { LtiService } from './lti.service';
  */
 @Module({
   controllers: [LtiController],
-  providers: [LtiResolver, LtiService],
-  exports: [LtiService],
+  providers: [LtiResolver, LtiService, LtiPlatformService],
+  exports: [LtiService, LtiPlatformService],
 })
 export class LtiModule {}

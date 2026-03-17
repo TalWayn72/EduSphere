@@ -8,6 +8,7 @@ import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AppSidebar } from '@/components/AppSidebar';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { AuthFooter } from '@/components/AuthFooter';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -74,6 +75,7 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Page content */}
         <main id="main-content" className="flex-1 overflow-auto px-4 py-8">{children}</main>
+        <AuthFooter />
       </div>
       {/* Offline indicator — renders only when browser is offline */}
       <OfflineBanner />

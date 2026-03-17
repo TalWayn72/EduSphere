@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
+import { PageShell } from '@/components/PageShell';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Leaderboard } from '@/components/challenge/Leaderboard';
 import { CountdownTimer } from '@/components/challenge/CountdownTimer';
 import {
@@ -58,17 +60,14 @@ export function ChallengeDetailPage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Link
-            to="/challenges"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Challenges
-          </Link>
-          <span className="text-muted-foreground">/</span>
-          <span className="text-sm font-medium text-foreground">Detail</span>
-        </div>
+      <PageShell size="sm" className="max-w-3xl py-6">
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Challenges', href: '/challenges' },
+            { label: 'Challenge Leaderboard' },
+          ]}
+        />
 
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-foreground">Challenge Leaderboard</h1>
@@ -140,7 +139,7 @@ export function ChallengeDetailPage() {
         </div>
 
         <Leaderboard entries={entries} />
-      </div>
+      </PageShell>
     </Layout>
   );
 }

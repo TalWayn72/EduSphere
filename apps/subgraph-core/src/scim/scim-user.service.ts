@@ -6,6 +6,7 @@ import {
   Logger,
   OnModuleInit,
   OnModuleDestroy,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -126,7 +127,7 @@ export class ScimUserService implements OnModuleInit, OnModuleDestroy {
       return inserted;
     });
     const created = rows[0];
-    if (!created) throw new Error('Failed to create user');
+    if (!created) throw new InternalServerErrorException('Failed to create user');
     this.publishEvent('EDUSPHERE.user.created', {
       userId: created.id,
       tenantId,

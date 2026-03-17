@@ -161,4 +161,55 @@ describe('AssessmentResultReport', () => {
     render(<AssessmentResultReport campaignId="c-1" />);
     expect(screen.getByText(/generated:/i)).toBeInTheDocument();
   });
+
+  it('passes campaignId as query variable', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { data: undefined, fetching: true, error: undefined },
+      vi.fn(),
+    ] as never);
+    render(<AssessmentResultReport campaignId="test-campaign-99" />);
+    const [queryOptions] = vi.mocked(urql.useQuery).mock.calls[0]!;
+    expect(queryOptions.variables).toEqual({ campaignId: 'test-campaign-99' });
+  });
+
+  it('does not show raw i18n keys in the output', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        data: { assessmentResult: MOCK_RESULT },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as never);
+    render(<AssessmentResultReport campaignId="c-1" />);
+    const html = document.body.innerHTML;
+    expect(html).not.toMatch(/\bt\(\s*['"][^'"]+['"]\s*\)/);
+  });
+
+  it('hides manager score bar when managerScore is null', () => {
+    const singleCriteria = {
+      ...MOCK_RESULT,
+      aggregatedScores: [
+        {
+          criteriaId: 'cr-null',
+          label: 'Solo',
+          selfScore: 3.0,
+          peerAvg: 3.5,
+          managerScore: null,
+          overallAvg: 3.25,
+        },
+      ],
+    };
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        data: { assessmentResult: singleCriteria },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as never);
+    render(<AssessmentResultReport campaignId="c-1" />);
+    expect(screen.getByText('Solo')).toBeInTheDocument();
+    expect(screen.queryByText('Manager')).not.toBeInTheDocument();
+  });
 });

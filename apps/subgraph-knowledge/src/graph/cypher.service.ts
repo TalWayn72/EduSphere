@@ -17,7 +17,7 @@
  * enforces security via AGE parameterized queries.
  */
 import { Injectable } from '@nestjs/common';
-import type { ConceptProperties, RelationshipProperties } from '@edusphere/db';
+import type { ConceptProperties, RelationshipProperties, ConceptRelationshipType } from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
 import { CypherConceptRelationService } from './cypher-concept-relation.service';
 import { CypherPersonService } from './cypher-person.service';
@@ -112,7 +112,7 @@ export class CypherService {
   linkConcepts(
     fromId: string,
     toId: string,
-    relationshipType: string,
+    relationshipType: ConceptRelationshipType,
     properties: RelationshipProperties = {}
   ) {
     return this.conceptRelation.linkConcepts(
@@ -126,7 +126,7 @@ export class CypherService {
   linkConceptsAndFetch(
     fromId: string,
     toId: string,
-    relationshipType: string,
+    relationshipType: ConceptRelationshipType,
     properties: RelationshipProperties,
     tenantId: string
   ): Promise<{ from: unknown; to: unknown }> {

@@ -153,4 +153,57 @@ describe('TranscriptPanel', () => {
     );
     expect(screen.queryByText('No results found')).not.toBeInTheDocument();
   });
+
+  it('highlights the active segment based on currentTime', () => {
+    const { container } = render(
+      <TranscriptPanel
+        segments={MOCK_SEGMENTS}
+        currentTime={15}
+        onSeek={vi.fn()}
+      />
+    );
+    // Segment 2 (10-20) should be active and have the primary border class
+    const activeEl = container.querySelector('.border-primary');
+    expect(activeEl).toBeInTheDocument();
+    expect(activeEl?.textContent).toContain(
+      'Today we will discuss the Mishna'
+    );
+  });
+
+  it('does not show raw i18n keys in the output', () => {
+    render(
+      <TranscriptPanel
+        segments={MOCK_SEGMENTS}
+        currentTime={0}
+        onSeek={vi.fn()}
+      />
+    );
+    const html = document.body.innerHTML;
+    // i18n keys look like content.searchTranscript — should be translated
+    expect(html).not.toContain('searchTranscript');
+    expect(html).not.toContain('transcriptNoResults');
+  });
+
+  it('calls scrollIntoView when active segment changes', () => {
+    const scrollSpy = vi.fn();
+    HTMLElement.prototype.scrollIntoView = scrollSpy;
+
+    const { rerender } = render(
+      <TranscriptPanel
+        segments={MOCK_SEGMENTS}
+        currentTime={5}
+        onSeek={vi.fn()}
+      />
+    );
+
+    rerender(
+      <TranscriptPanel
+        segments={MOCK_SEGMENTS}
+        currentTime={15}
+        onSeek={vi.fn()}
+      />
+    );
+
+    expect(scrollSpy).toHaveBeenCalled();
+  });
 });

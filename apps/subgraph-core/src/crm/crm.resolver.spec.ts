@@ -1,10 +1,19 @@
 /**
  * crm.resolver.spec.ts — Unit tests for CrmResolver.
- * Covers: header extraction, null/empty returns, delegation to CrmService.
+ *
+ * Covers the authContext→header fallback pattern introduced when migrating
+ * from `ctx.req.headers['x-tenant-id']` to `ctx.authContext?.tenantId`.
+ *
+ * Test matrix:
+ *  1. authContext.tenantId preferred when present
+ *  2. x-tenant-id header fallback when authContext missing
+ *  3. Returns null/empty when no tenant context at all
+ *  4. Regression guard: old ctx.req.user?.tenant_id does NOT work
+ *  5. Service delegation with correct tenantId
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Mocks ─────────────────────────────────────────────────────────────────────
+// ── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
@@ -23,11 +32,12 @@ vi.mock('@edusphere/db', () => ({
   desc: vi.fn(),
 }));
 
-// ── Import after mocks ────────────────────────────────────────────────────────
+// ── Import after mocks ──────────────────────────────────────────────────────
 
 import { CrmResolver } from './crm.resolver.js';
+import type { GraphQLContext } from '../auth/auth.middleware.js';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 const CONN = {
   id: 'conn-1',
@@ -55,15 +65,52 @@ function makeCrmService(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function makeCtx(tenantId?: string) {
+/** Build context with authContext (JWT-extracted tenant). */
+function makeAuthCtx(tenantId?: string): GraphQLContext {
+  return {
+    req: { headers: {} },
+    authContext: tenantId
+      ? { tenantId, userId: 'jwt-user', email: 'a@b.com', roles: ['ORG_ADMIN'], scopes: [] }
+      : undefined,
+  } as unknown as GraphQLContext;
+}
+
+/** Build context with x-tenant-id header only (no JWT/authContext). */
+function makeHeaderCtx(tenantId?: string): GraphQLContext {
   return {
     req: {
       headers: tenantId ? { 'x-tenant-id': tenantId } : {},
     },
-  };
+  } as unknown as GraphQLContext;
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
+/** Build context with BOTH authContext and header (authContext should win). */
+function makeDualCtx(
+  authTenantId: string,
+  headerTenantId: string
+): GraphQLContext {
+  return {
+    req: { headers: { 'x-tenant-id': headerTenantId } },
+    authContext: { tenantId: authTenantId, userId: 'jwt-user', email: 'a@b.com', roles: ['ORG_ADMIN'], scopes: [] },
+  } as unknown as GraphQLContext;
+}
+
+/** Build empty context — no authContext, no headers. */
+function makeEmptyCtx(): GraphQLContext {
+  return { req: { headers: {} } } as unknown as GraphQLContext;
+}
+
+/** Regression: old pattern with ctx.req.user?.tenant_id */
+function makeOldPatternCtx(tenantId: string): GraphQLContext {
+  return {
+    req: {
+      headers: {},
+      user: { tenant_id: tenantId },
+    },
+  } as unknown as GraphQLContext;
+}
+
+// ── Tests ────────────────────────────────────────────────────────────────────
 
 describe('CrmResolver', () => {
   let resolver: CrmResolver;
@@ -75,62 +122,158 @@ describe('CrmResolver', () => {
     resolver = new CrmResolver(mockService as never);
   });
 
-  // 1. crmConnection returns null when x-tenant-id header is absent
-  it('crmConnection returns null when x-tenant-id header is missing', async () => {
-    const result = await resolver.crmConnection(makeCtx());
-    expect(result).toBeNull();
-    expect(mockService.getConnection).not.toHaveBeenCalled();
+  // ── extractTenantId: authContext preferred ─────────────────────────────────
+
+  describe('extractTenantId — authContext preferred', () => {
+    it('crmConnection uses authContext.tenantId when present', async () => {
+      mockService.getConnection.mockResolvedValue(CONN);
+      await resolver.crmConnection(makeAuthCtx('tenant-jwt'));
+      expect(mockService.getConnection).toHaveBeenCalledWith('tenant-jwt');
+    });
+
+    it('crmSyncLog uses authContext.tenantId when present', async () => {
+      mockService.getSyncLog.mockResolvedValue([SYNC_ENTRY]);
+      await resolver.crmSyncLog(makeAuthCtx('tenant-jwt'), 5);
+      expect(mockService.getSyncLog).toHaveBeenCalledWith('tenant-jwt', 5);
+    });
+
+    it('disconnectCrm uses authContext.tenantId when present', async () => {
+      await resolver.disconnectCrm(makeAuthCtx('tenant-jwt'));
+      expect(mockService.disconnectCrm).toHaveBeenCalledWith('tenant-jwt');
+    });
+
+    it('prefers authContext.tenantId over x-tenant-id header', async () => {
+      mockService.getConnection.mockResolvedValue(CONN);
+      await resolver.crmConnection(makeDualCtx('jwt-tenant', 'header-tenant'));
+      expect(mockService.getConnection).toHaveBeenCalledWith('jwt-tenant');
+    });
   });
 
-  // 2. crmConnection returns null when service returns null (no connection)
-  it('crmConnection returns null when service has no connection for tenant', async () => {
-    mockService.getConnection.mockResolvedValue(null);
-    const result = await resolver.crmConnection(makeCtx('tenant-1'));
-    expect(result).toBeNull();
+  // ── extractTenantId: header fallback ──────────────────────────────────────
+
+  describe('extractTenantId — header fallback', () => {
+    it('crmConnection falls back to x-tenant-id header', async () => {
+      mockService.getConnection.mockResolvedValue(CONN);
+      await resolver.crmConnection(makeHeaderCtx('header-t'));
+      expect(mockService.getConnection).toHaveBeenCalledWith('header-t');
+    });
+
+    it('crmSyncLog falls back to x-tenant-id header', async () => {
+      mockService.getSyncLog.mockResolvedValue([]);
+      await resolver.crmSyncLog(makeHeaderCtx('header-t'), 10);
+      expect(mockService.getSyncLog).toHaveBeenCalledWith('header-t', 10);
+    });
+
+    it('disconnectCrm falls back to x-tenant-id header', async () => {
+      await resolver.disconnectCrm(makeHeaderCtx('header-t'));
+      expect(mockService.disconnectCrm).toHaveBeenCalledWith('header-t');
+    });
+
+    it('handles x-tenant-id as string array (takes first element)', async () => {
+      const ctx = {
+        req: { headers: { 'x-tenant-id': ['arr-tenant', 'ignored'] } },
+      } as unknown as GraphQLContext;
+      mockService.getConnection.mockResolvedValue(CONN);
+      await resolver.crmConnection(ctx);
+      expect(mockService.getConnection).toHaveBeenCalledWith('arr-tenant');
+    });
   });
 
-  // 3. crmConnection returns shaped object when service returns a connection
-  it('crmConnection returns mapped object with ISO createdAt when connection exists', async () => {
-    mockService.getConnection.mockResolvedValue(CONN);
-    const result = (await resolver.crmConnection(
-      makeCtx('tenant-1')
-    )) as Record<string, unknown>;
-    expect(result).not.toBeNull();
-    expect(result?.['id']).toBe('conn-1');
-    expect(result?.['provider']).toBe('SALESFORCE');
-    expect(result?.['createdAt']).toBe(CONN.createdAt.toISOString());
+  // ── extractTenantId: no tenant context ────────────────────────────────────
+
+  describe('extractTenantId — no tenant context', () => {
+    it('crmConnection returns null when no authContext and no header', async () => {
+      const result = await resolver.crmConnection(makeEmptyCtx());
+      expect(result).toBeNull();
+      expect(mockService.getConnection).not.toHaveBeenCalled();
+    });
+
+    it('crmSyncLog returns [] when no tenant context', async () => {
+      const result = await resolver.crmSyncLog(makeEmptyCtx(), 10);
+      expect(result).toEqual([]);
+      expect(mockService.getSyncLog).not.toHaveBeenCalled();
+    });
+
+    it('disconnectCrm returns false when no tenant context', async () => {
+      const result = await resolver.disconnectCrm(makeEmptyCtx());
+      expect(result).toBe(false);
+      expect(mockService.disconnectCrm).not.toHaveBeenCalled();
+    });
+
+    it('returns null when authContext exists but tenantId is undefined', async () => {
+      const ctx = {
+        req: { headers: {} },
+        authContext: { userId: 'u1', email: 'a@b.com', roles: ['STUDENT'], scopes: [] },
+      } as unknown as GraphQLContext;
+      const result = await resolver.crmConnection(ctx);
+      expect(result).toBeNull();
+      expect(mockService.getConnection).not.toHaveBeenCalled();
+    });
   });
 
-  // 4. crmSyncLog returns empty array when x-tenant-id header is absent
-  it('crmSyncLog returns [] when x-tenant-id header is missing', async () => {
-    const result = await resolver.crmSyncLog(makeCtx(), 10);
-    expect(result).toEqual([]);
-    expect(mockService.getSyncLog).not.toHaveBeenCalled();
+  // ── Regression guard: old ctx.req.user?.tenant_id does NOT work ───────────
+
+  describe('regression guard — old pattern ctx.req.user?.tenant_id', () => {
+    it('crmConnection does NOT extract tenantId from ctx.req.user.tenant_id', async () => {
+      const result = await resolver.crmConnection(makeOldPatternCtx('old-t'));
+      expect(result).toBeNull();
+      expect(mockService.getConnection).not.toHaveBeenCalled();
+    });
+
+    it('crmSyncLog does NOT extract tenantId from ctx.req.user.tenant_id', async () => {
+      const result = await resolver.crmSyncLog(makeOldPatternCtx('old-t'), 5);
+      expect(result).toEqual([]);
+      expect(mockService.getSyncLog).not.toHaveBeenCalled();
+    });
+
+    it('disconnectCrm does NOT extract tenantId from ctx.req.user.tenant_id', async () => {
+      const result = await resolver.disconnectCrm(makeOldPatternCtx('old-t'));
+      expect(result).toBe(false);
+      expect(mockService.disconnectCrm).not.toHaveBeenCalled();
+    });
   });
 
-  // 5. crmSyncLog maps entries with ISO createdAt
-  it('crmSyncLog returns mapped entries with ISO createdAt', async () => {
-    mockService.getSyncLog.mockResolvedValue([SYNC_ENTRY]);
-    const result = (await resolver.crmSyncLog(
-      makeCtx('tenant-1'),
-      5
-    )) as Record<string, unknown>[];
-    expect(result).toHaveLength(1);
-    expect(result[0]?.['createdAt']).toBe(SYNC_ENTRY.createdAt.toISOString());
-    expect(result[0]?.['operation']).toBe('COMPLETION_SYNC');
-  });
+  // ── Service delegation with correct tenantId ──────────────────────────────
 
-  // 6. disconnectCrm returns false when x-tenant-id header is absent
-  it('disconnectCrm returns false when x-tenant-id header is missing', async () => {
-    const result = await resolver.disconnectCrm(makeCtx());
-    expect(result).toBe(false);
-    expect(mockService.disconnectCrm).not.toHaveBeenCalled();
-  });
+  describe('service delegation', () => {
+    it('crmConnection returns null when service returns null', async () => {
+      mockService.getConnection.mockResolvedValue(null);
+      const result = await resolver.crmConnection(makeAuthCtx('tenant-1'));
+      expect(result).toBeNull();
+    });
 
-  // 7. disconnectCrm returns true after calling service.disconnectCrm
-  it('disconnectCrm delegates to service and returns true', async () => {
-    const result = await resolver.disconnectCrm(makeCtx('tenant-1'));
-    expect(result).toBe(true);
-    expect(mockService.disconnectCrm).toHaveBeenCalledWith('tenant-1');
+    it('crmConnection returns mapped object with ISO createdAt', async () => {
+      mockService.getConnection.mockResolvedValue(CONN);
+      const result = (await resolver.crmConnection(
+        makeAuthCtx('tenant-1')
+      )) as Record<string, unknown>;
+      expect(result).not.toBeNull();
+      expect(result?.['id']).toBe('conn-1');
+      expect(result?.['provider']).toBe('SALESFORCE');
+      expect(result?.['createdAt']).toBe(CONN.createdAt.toISOString());
+    });
+
+    it('crmSyncLog maps entries with ISO createdAt', async () => {
+      mockService.getSyncLog.mockResolvedValue([SYNC_ENTRY]);
+      const result = (await resolver.crmSyncLog(
+        makeAuthCtx('tenant-1'),
+        5
+      )) as Record<string, unknown>[];
+      expect(result).toHaveLength(1);
+      expect(result[0]?.['createdAt']).toBe(SYNC_ENTRY.createdAt.toISOString());
+      expect(result[0]?.['operation']).toBe('COMPLETION_SYNC');
+    });
+
+    it('crmSyncLog defaults limit to 20 when not provided', async () => {
+      mockService.getSyncLog.mockResolvedValue([]);
+      await resolver.crmSyncLog(makeAuthCtx('tenant-1'));
+      expect(mockService.getSyncLog).toHaveBeenCalledWith('tenant-1', 20);
+    });
+
+    it('disconnectCrm delegates to service and returns true', async () => {
+      const result = await resolver.disconnectCrm(makeAuthCtx('tenant-1'));
+      expect(result).toBe(true);
+      expect(mockService.disconnectCrm).toHaveBeenCalledWith('tenant-1');
+    });
   });
 });

@@ -7,6 +7,7 @@ export function VideoSection() {
 
   return (
     <section
+      id="demo"
       data-testid="video-section"
       className="py-20 px-6 bg-muted/30"
       aria-label="Product demo"
@@ -20,8 +21,8 @@ export function VideoSection() {
         <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-[#0f1117]">
           {prefersReducedMotion ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-              <p className="text-muted-foreground text-sm">Live Collaboration Demo</p>
-              <p className="text-xs text-muted-foreground/60">
+              <p className="text-slate-200 text-sm">Live Collaboration Demo</p>
+              <p className="text-xs text-slate-300">
                 Motion reduced — enable animations to watch the demo
               </p>
             </div>

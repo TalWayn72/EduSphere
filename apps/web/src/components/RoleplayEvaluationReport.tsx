@@ -61,7 +61,7 @@ function ScoreRing({ score }: { score: number }) {
         <span className="text-3xl font-bold text-white">
           {Math.round(score)}
         </span>
-        <span className="text-gray-400 text-xs block">/ 100</span>
+        <span className="text-gray-300 text-xs block">/ 100</span>
       </div>
     </div>
   );
@@ -79,7 +79,7 @@ export function RoleplayEvaluationReport({
         {/* Header */}
         <div className="text-center space-y-2">
           <h2 className="text-white text-2xl font-bold">Session Complete</h2>
-          <p className="text-gray-400 text-sm">{scenarioTitle}</p>
+          <p className="text-gray-300 text-sm">{scenarioTitle}</p>
         </div>
 
         {/* Overall score */}
@@ -109,7 +109,7 @@ export function RoleplayEvaluationReport({
                   style={{ width: `${c.score}%` }}
                 />
               </div>
-              <p className="text-gray-400 text-xs">{c.feedback}</p>
+              <p className="text-gray-300 text-xs">{c.feedback}</p>
             </div>
           ))}
         </div>
@@ -164,7 +164,7 @@ export function RoleplayEvaluationReport({
           <Button
             onClick={onBack}
             variant="outline"
-            className="flex-1 border-gray-700 text-gray-300 hover:text-white"
+            className="flex-1 border-gray-600 text-gray-200 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4 mr-2" /> Back to Scenarios
           </Button>

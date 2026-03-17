@@ -113,6 +113,7 @@ describe('DEFAULT_AI_PREFERENCES', () => {
       'TUTOR',
     ];
     for (const type of agentTypes) {
+      // eslint-disable-next-line security/detect-object-injection -- type is from known agentTypes array
       expect(DEFAULT_AI_PREFERENCES.agentTypes[type]).toBe(true);
     }
   });

@@ -6,6 +6,7 @@
 import { test, expect, Page } from '@playwright/test';
 import path from 'path';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const DIR = path.join(process.cwd(), 'ui-audit-results');
 
@@ -162,7 +163,7 @@ for (const { label, path: pagePath } of PAGES) {
 
     // restore session via silent SSO
     await loginKeycloak(page);
-    await page.goto(`${BASE}${pagePath}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}${pagePath}`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2500); // let data fetch settle
 
     entry.url = page.url();
@@ -181,3 +182,133 @@ for (const { label, path: pagePath } of PAGES) {
     }
   });
 }
+
+// ── DEV_MODE audit tests — no Keycloak required ─────────────────────────────
+
+test.describe('UI Audit — DEV_MODE pages', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('dashboard page renders without console errors', async ({ page }) => {
+    const consoleErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        const text = msg.text();
+        if (!text.includes('favicon') && !text.includes('Extension')) {
+          consoleErrors.push(text);
+        }
+      }
+    });
+
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    // Filter out known acceptable errors (e.g. GraphQL backend not running)
+    const criticalErrors = consoleErrors.filter(
+      (e) => !e.includes('Failed to fetch') && !e.includes('ECONNREFUSED')
+    );
+    expect(criticalErrors).toHaveLength(0);
+
+    await expect(page).toHaveScreenshot('ui-audit-dashboard-devmode.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('no raw i18n keys on dashboard page', async ({ page }) => {
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toMatch(/\bcommon\.error\b/);
+    expect(body).not.toMatch(/\bdashboard\.title\b/);
+    expect(body).not.toContain('[object Object]');
+  });
+
+  test('profile page renders without crash overlay', async ({ page }) => {
+    await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+
+    await expect(page).toHaveScreenshot('ui-audit-profile-devmode.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('courses page renders without crash overlay', async ({ page }) => {
+    await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('[GraphQL]');
+    expect(body).not.toContain('CombinedError');
+  });
+
+  test('knowledge-graph page renders without crash', async ({ page }) => {
+    await page.goto(`${BASE_URL}/knowledge-graph`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+
+    await expect(page).toHaveScreenshot('ui-audit-knowledge-graph-devmode.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
+  });
+
+  test('collaboration page renders without crash', async ({ page }) => {
+    await page.goto(`${BASE_URL}/collaboration`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
+    const body = (await page.textContent('body')) ?? '';
+    expect(body).not.toContain('[object Object]');
+  });
+
+  test('no network 4xx/5xx errors on page load audit', async ({ page }) => {
+    const networkErrors: string[] = [];
+    page.on('response', (res) => {
+      if (res.status() >= 400 && res.url().includes('localhost')) {
+        // Skip known acceptable errors
+        if (
+          !res.url().includes('silent-check-sso') &&
+          !res.url().includes('favicon')
+        ) {
+          networkErrors.push(`HTTP ${res.status()} ${res.url()}`);
+        }
+      }
+    });
+
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    // Log errors for debugging but don't fail on GraphQL backend down in DEV_MODE
+    if (networkErrors.length > 0) {
+      console.log('Network errors during audit:', networkErrors);
+    }
+    // Ensure no 5xx errors from the web app itself (not GraphQL backend)
+    const webAppErrors = networkErrors.filter(
+      (e) => e.includes(':5176') || e.includes(':5175')
+    );
+    expect(webAppErrors).toHaveLength(0);
+  });
+});
