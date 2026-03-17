@@ -215,20 +215,22 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                 {t('stats.studyTime')}
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA</span>
               </CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalMinutesDisplay}</div>
-              <p className="text-xs text-muted-foreground">Total recorded</p>
+              <p className="text-xs text-muted-foreground">Estimated — real tracking coming soon</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                 {t('stats.conceptsMastered')}
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA</span>
               </CardTitle>
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -237,7 +239,7 @@ export function Dashboard() {
                 {MOCK_STATS.conceptsMastered}
               </div>
               <p className="text-xs text-muted-foreground">
-                Completed content items
+                Estimated — real tracking coming soon
               </p>
             </CardContent>
           </Card>
@@ -309,14 +311,18 @@ export function Dashboard() {
         {/* Skill Gap Analysis Widget (F-006) */}
         <SkillGapWidget />
 
-        {/* Course Progress + Weekly Stats */}
-        <LearningStats
-          courses={MOCK_COURSE_PROGRESS}
-          weeklyStats={MOCK_WEEKLY_STATS}
-        />
+        {/* Course Progress + Weekly Stats (mock data — real analytics coming soon) */}
+        <div className="relative">
+          <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA DATA</span>
+          <LearningStats
+            courses={MOCK_COURSE_PROGRESS}
+            weeklyStats={MOCK_WEEKLY_STATS}
+          />
+        </div>
 
-        {/* Activity Heatmap */}
-        <Card>
+        {/* Activity Heatmap (mock data) */}
+        <Card className="relative">
+          <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA DATA</span>
           <CardHeader>
             <CardTitle>{t('studyActivity')}</CardTitle>
             <CardDescription>{t('activityDescription')}</CardDescription>
@@ -328,7 +334,8 @@ export function Dashboard() {
 
         {/* Activity Feed + Profile */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card>
+          <Card className="relative">
+            <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA DATA</span>
             <CardHeader>
               <CardTitle>{t('recentActivity')}</CardTitle>
               <CardDescription>{t('latestEvents')}</CardDescription>
