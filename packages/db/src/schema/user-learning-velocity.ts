@@ -15,7 +15,7 @@ export const userLearningVelocity = pgTable('user_learning_velocity', {
   lessonsCompleted: integer('lessons_completed').notNull().default(0),
   minutesStudied: integer('minutes_studied').notNull().default(0),
   annotationsAdded: integer('annotations_added').notNull().default(0),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const userLearningVelocityRLS = sql`

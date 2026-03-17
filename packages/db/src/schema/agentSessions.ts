@@ -8,6 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
+import { tenants } from './tenants';
 
 export const sessionStatusEnum = pgEnum('session_status', [
   'ACTIVE',
@@ -18,14 +19,17 @@ export const sessionStatusEnum = pgEnum('session_status', [
 
 export const agentSessions = pgTable('agent_sessions', {
   id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id, { onDelete: 'cascade' }),
   userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   agentType: varchar('agent_type', { length: 100 }).notNull(),
   status: sessionStatusEnum('status').notNull().default('ACTIVE'),
   metadata: jsonb('metadata'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
 });
 
 export const agentSessionsRLS = sql`

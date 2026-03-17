@@ -18,8 +18,8 @@ export const users = pgTable('users', {
   lastName: varchar('last_name', { length: 100 }).notNull(),
   role: userRoleEnum('role').notNull().default('STUDENT'),
   tenantId: uuid('tenant_id').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // RLS Policy: Users can only see users in their tenant

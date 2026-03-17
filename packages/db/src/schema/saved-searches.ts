@@ -11,7 +11,7 @@ export const savedSearches = pgTable('saved_searches', {
   name: varchar('name', { length: 100 }).notNull(),
   query: text('query').notNull(),
   filters: jsonb('filters'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const savedSearchesRLS = sql`

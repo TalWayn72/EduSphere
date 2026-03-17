@@ -27,7 +27,7 @@ export const tenantAnalyticsSnapshots = pgTable('tenant_analytics_snapshots', {
   totalLearningMinutes: integer('total_learning_minutes').notNull().default(0),
   newEnrollments: integer('new_enrollments').notNull().default(0),
   snapshotType: analyticsSnapshotTypeEnum('snapshot_type').notNull().default('daily'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const tenantAnalyticsSnapshotsRLS = sql`

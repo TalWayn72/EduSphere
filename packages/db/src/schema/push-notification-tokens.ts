@@ -18,8 +18,8 @@ export const pushNotificationTokens = pgTable('push_notification_tokens', {
   platform: pushPlatformEnum('platform').notNull(),
   expoPushToken: text('expo_push_token'),
   webPushSubscription: json('web_push_subscription'),
-  lastSeenAt: timestamp('last_seen_at').notNull().defaultNow(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const pushNotificationTokensRLS = sql`

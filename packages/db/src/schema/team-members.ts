@@ -7,7 +7,7 @@ export const teamMembers = pgTable(
     managerId: uuid('manager_id').notNull(),
     memberId: uuid('member_id').notNull(),
     tenantId: uuid('tenant_id').notNull(),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     uniqueManagerMember: uniqueIndex('idx_team_members_unique').on(t.managerId, t.memberId, t.tenantId),

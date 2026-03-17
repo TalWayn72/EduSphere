@@ -1,4 +1,5 @@
 import { pgTable, uuid, timestamp, vector } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { pk } from './_shared';
 import { transcript_segments } from './content';
 import { annotations } from './annotation';
@@ -42,6 +43,25 @@ export const concept_embeddings = pgTable('concept_embeddings', {
     .notNull()
     .defaultNow(),
 });
+
+// HNSW indexes for cosine similarity search (applied via migration)
+export const contentEmbeddingsHnswIdx = sql`
+CREATE INDEX IF NOT EXISTS idx_content_embeddings_hnsw
+  ON content_embeddings USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+`;
+
+export const annotationEmbeddingsHnswIdx = sql`
+CREATE INDEX IF NOT EXISTS idx_annotation_embeddings_hnsw
+  ON annotation_embeddings USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+`;
+
+export const conceptEmbeddingsHnswIdx = sql`
+CREATE INDEX IF NOT EXISTS idx_concept_embeddings_hnsw
+  ON concept_embeddings USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+`;
 
 export type ContentEmbedding = typeof content_embeddings.$inferSelect;
 export type NewContentEmbedding = typeof content_embeddings.$inferInsert;

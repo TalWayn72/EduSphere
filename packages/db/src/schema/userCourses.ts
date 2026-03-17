@@ -19,8 +19,8 @@ export const userCourses = pgTable('user_courses', {
     .notNull()
     .references(() => courses.id, { onDelete: 'cascade' }),
   status: enrollmentStatusEnum('status').notNull().default('ACTIVE'),
-  enrolledAt: timestamp('enrolled_at').notNull().defaultNow(),
-  completedAt: timestamp('completed_at'),
+  enrolledAt: timestamp('enrolled_at', { withTimezone: true }).notNull().defaultNow(),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
 });
 
 export const userCoursesRLS = sql`

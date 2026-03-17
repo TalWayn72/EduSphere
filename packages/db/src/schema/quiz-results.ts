@@ -27,7 +27,7 @@ export const quizResults = pgTable('quiz_results', {
   passed: boolean('passed').notNull(),
   answers: jsonb('answers').notNull(),
   itemResults: jsonb('item_results').notNull(),
-  submittedAt: timestamp('submitted_at').notNull().defaultNow(),
+  submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 /**

@@ -18,9 +18,9 @@ export const liveSessions = pgTable('live_sessions', {
   tenantId: uuid('tenant_id').notNull(),
   bbbMeetingId: text('bbb_meeting_id').notNull().unique(),
   meetingName: text('meeting_name').notNull(),
-  scheduledAt: timestamp('scheduled_at').notNull(),
-  startedAt: timestamp('started_at'),
-  endedAt: timestamp('ended_at'),
+  scheduledAt: timestamp('scheduled_at', { withTimezone: true }).notNull(),
+  startedAt: timestamp('started_at', { withTimezone: true }),
+  endedAt: timestamp('ended_at', { withTimezone: true }),
   recordingUrl: text('recording_url'),
   // SI-3: These fields MUST be stored encrypted. Service layer MUST call
   // encryptField(value, tenantKey) before INSERT and decryptField() on SELECT.
@@ -28,7 +28,7 @@ export const liveSessions = pgTable('live_sessions', {
   attendeePasswordEnc: text('attendee_password_enc').notNull(),
   moderatorPasswordEnc: text('moderator_password_enc').notNull(),
   status: liveSessionStatusEnum('status').notNull().default('SCHEDULED'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const liveSessionsRLS = sql`
