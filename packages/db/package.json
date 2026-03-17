@@ -15,7 +15,8 @@
       "import": "./dist/schema/index.js",
       "require": "./dist/schema/index.js",
       "types": "./dist/schema/index.d.ts"
-    }
+    },
+    "./config/pii-bearing-tables.json": "./src/config/pii-bearing-tables.json"
   },
   "scripts": {
     "build": "tsc",

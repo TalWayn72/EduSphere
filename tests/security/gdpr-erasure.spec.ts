@@ -150,7 +150,7 @@ describe('G-11: Data Portability (GDPR Art.20)', () => {
 
   it('export writes audit log with EXPORT action', () => {
     const content = readFile(EXPORT_SERVICE);
-    expect(content).toContain("'EXPORT'");
+    expect(content).toContain("'GDPR_EXPORT'");
     expect(content).toContain("gdprArticle: '20'");
   });
 

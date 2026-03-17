@@ -13,7 +13,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
  *  8. gdprArticle field is always '20'.
  */
 
-import { UserExportService } from './user-export.service';
+import { UserExportService, computeExportHash } from './user-export.service';
 
 // ── DB mocks ─────────────────────────────────────────────────────────────────
 
@@ -148,16 +148,20 @@ describe('UserExportService — GDPR Art.20', () => {
   });
 
   // ── Test 3 ──────────────────────────────────────────────────────────────────
-  it('should write an audit log entry after a successful export', async () => {
+  it('should write an audit log entry with GDPR_EXPORT action and sha256 hash', async () => {
     await service.exportUserData('user-1', 'tenant-1');
 
     expect(mockInsert).toHaveBeenCalledTimes(1);
     expect(mockAuditLogInsert.values).toHaveBeenCalledWith(
       expect.objectContaining({
-        action: 'EXPORT',
+        action: 'GDPR_EXPORT',
         resourceType: 'USER',
         resourceId: 'user-1',
         status: 'SUCCESS',
+        metadata: expect.objectContaining({
+          sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          gdprArticle: '20',
+        }),
       })
     );
   });
@@ -214,5 +218,78 @@ describe('UserExportService — GDPR Art.20', () => {
     const result = await service.exportUserData('user-1', 'tenant-1');
 
     expect(result.gdprArticle).toBe('20');
+  });
+
+  // ── Test 9 — PII manifest included ────────────────────────────────────────
+  it('should include piiManifest array in the export', async () => {
+    const result = await service.exportUserData('user-1', 'tenant-1');
+
+    expect(Array.isArray(result.piiManifest)).toBe(true);
+    expect(result.piiManifest.length).toBeGreaterThan(0);
+    // Each entry has required fields
+    for (const entry of result.piiManifest) {
+      expect(entry).toHaveProperty('name');
+      expect(entry).toHaveProperty('piiColumns');
+      expect(Array.isArray(entry.piiColumns)).toBe(true);
+    }
+  });
+
+  // ── Test 10 — SHA-256 deterministic ────────────────────────────────────────
+  it('computeExportHash produces a 64-char hex SHA-256 hash', () => {
+    const mockExport = {
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      gdprArticle: '20' as const,
+      format: 'EduSphere-UserExport/1.0',
+      userId: 'user-1',
+      profile: null,
+      annotations: [],
+      agentSessions: [],
+      learningProgress: [],
+      enrollments: [],
+      piiManifest: [],
+    };
+
+    const hash = computeExportHash(mockExport);
+    expect(hash).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  // ── Test 11 — Same input produces same hash ───────────────────────────────
+  it('computeExportHash is deterministic (same input = same hash)', () => {
+    const mockExport = {
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      gdprArticle: '20' as const,
+      format: 'EduSphere-UserExport/1.0',
+      userId: 'user-1',
+      profile: null,
+      annotations: [],
+      agentSessions: [],
+      learningProgress: [],
+      enrollments: [],
+      piiManifest: [],
+    };
+
+    const hash1 = computeExportHash(mockExport);
+    const hash2 = computeExportHash(mockExport);
+    expect(hash1).toBe(hash2);
+  });
+
+  // ── Test 12 — Different input produces different hash ─────────────────────
+  it('computeExportHash returns different hash for different data', () => {
+    const base = {
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      gdprArticle: '20' as const,
+      format: 'EduSphere-UserExport/1.0',
+      userId: 'user-1',
+      profile: null,
+      annotations: [],
+      agentSessions: [],
+      learningProgress: [],
+      enrollments: [],
+      piiManifest: [],
+    };
+
+    const hash1 = computeExportHash(base);
+    const hash2 = computeExportHash({ ...base, userId: 'user-2' });
+    expect(hash1).not.toBe(hash2);
   });
 });

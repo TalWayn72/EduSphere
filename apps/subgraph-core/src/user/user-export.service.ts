@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import {
   createDatabaseConnection,
@@ -7,11 +8,12 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
+import piiManifest from '@edusphere/db/config/pii-bearing-tables.json';
 
 /**
  * GDPR Art.20 — Right to Data Portability.
  * Exports all user-owned personal data as a structured JSON object.
- * Caller may serialize, zip, and deliver the result to the user.
+ * Generates a SHA-256 attestation hash and records it in the audit log.
  */
 @Injectable()
 export class UserExportService implements OnModuleDestroy {
@@ -73,14 +75,21 @@ export class UserExportService implements OnModuleDestroy {
           agentSessions: agentSessions as Record<string, unknown>[],
           learningProgress: progress as Record<string, unknown>[],
           enrollments: enrollments as Record<string, unknown>[],
+          piiManifest: piiManifest.tables,
         };
       }
     );
 
-    // Write audit log for the export operation
-    await this.writeAuditLog(tenantId, userId, exportData);
+    // Compute SHA-256 attestation hash of the export payload
+    const sha256Hash = computeExportHash(exportData);
 
-    this.logger.log({ userId, tenantId }, 'GDPR Art.20 data export completed');
+    // Write audit log with GDPR_EXPORT action and attestation hash
+    await this.writeAuditLog(tenantId, userId, exportData, sha256Hash);
+
+    this.logger.log(
+      { userId, tenantId, sha256Hash },
+      'GDPR Art.20 data export completed with attestation'
+    );
 
     return exportData;
   }
@@ -88,24 +97,27 @@ export class UserExportService implements OnModuleDestroy {
   private async writeAuditLog(
     tenantId: string,
     userId: string,
-    exportData: UserDataExport
+    exportData: UserDataExport,
+    sha256Hash: string
   ): Promise<void> {
     try {
       await this.db.insert(schema.auditLog).values({
         tenantId,
         userId,
-        action: 'EXPORT',
+        action: 'GDPR_EXPORT',
         resourceType: 'USER',
         resourceId: userId,
         status: 'SUCCESS',
         metadata: {
           gdprArticle: '20',
+          sha256: sha256Hash,
           exportedEntityCounts: {
             annotations: exportData.annotations.length,
             agentSessions: exportData.agentSessions.length,
             learningProgress: exportData.learningProgress.length,
             enrollments: exportData.enrollments.length,
           },
+          piiTablesIncluded: exportData.piiManifest.length,
         },
       });
     } catch (auditError) {
@@ -115,6 +127,19 @@ export class UserExportService implements OnModuleDestroy {
       );
     }
   }
+}
+
+/** Compute a deterministic SHA-256 hash of the export payload. */
+export function computeExportHash(data: UserDataExport): string {
+  const json = JSON.stringify(data);
+  return createHash('sha256').update(json, 'utf-8').digest('hex');
+}
+
+export interface PiiTableEntry {
+  name: string;
+  schemaFile: string;
+  piiColumns: string[];
+  note?: string;
 }
 
 export interface UserDataExport {
@@ -127,4 +152,5 @@ export interface UserDataExport {
   agentSessions: Record<string, unknown>[];
   learningProgress: Record<string, unknown>[];
   enrollments: Record<string, unknown>[];
+  piiManifest: PiiTableEntry[];
 }
