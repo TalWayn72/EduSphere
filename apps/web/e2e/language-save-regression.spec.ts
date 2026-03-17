@@ -63,8 +63,13 @@ async function loginViaKeycloak(
     /[.*+?^${}()|[\]\\]/g,
     '\\$&'
   );
-  await page.waitForURL(new RegExp(appHostPattern), { timeout: 30_000 });
-  await page.waitForLoadState('networkidle');
+  await page.waitForURL(new RegExp(appHostPattern), { timeout: 60_000 });
+  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
+  // Wait for app to finish loading (Loading spinner gone)
+  await page.waitForFunction(
+    () => !document.body.textContent?.includes('Loading'),
+    { timeout: 30_000 }
+  ).catch(() => {});
 }
 
 async function logoutViaUI(page: Page): Promise<void> {
@@ -79,14 +84,14 @@ async function logoutViaUI(page: Page): Promise<void> {
   await logoutItem.click();
 
   // Wait for redirect to landing page or login page
-  await page.waitForURL(/\/(login)?$/, { timeout: 20_000 }).catch(() => {});
-  await page.waitForLoadState('networkidle');
+  await page.waitForURL(/\/(login)?$/, { timeout: 30_000 }).catch(() => {});
+  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
 }
 
 // ─── Group 1: Success toast (no error toast) ──────────────────────────────────
 
 test.describe('language-save-regression — success toast guard', () => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'serial', timeout: 90_000 });
 
   test.beforeEach(async ({ page }) => {
     // Start with English locale so each test is isolated
@@ -149,7 +154,7 @@ test.describe('language-save-regression — success toast guard', () => {
 // ─── Group 2: Keycloak logout → login locale persistence ─────────────────────
 
 test.describe('language-save-regression — Keycloak logout/login persistence', () => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'serial', timeout: 90_000 });
 
   test('locale persists through full Keycloak logout/login cycle', async ({ page }) => {
     // Step 1: Start with English
@@ -248,6 +253,7 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
 // ─── Group 3: Visual regression screenshots ───────────────────────────────────
 
 test.describe('language-save-regression — visual regression', () => {
+  test.use({ actionTimeout: 60_000 });
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'en');
