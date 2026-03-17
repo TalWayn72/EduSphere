@@ -7,3 +7,20 @@ if [ -n "$staged_violations" ]; then
   echo "Move PNGs -> docs/screenshots/ | logs -> docs/logs/"
   exit 1
 fi
+
+# GraphQL SDL change check — warn if subgraph SDL changed but supergraph not updated
+sdl_changed=$(git diff --cached --name-only | grep -E "^apps/subgraph-.*/src/.*\.graphql$" || true)
+if [ -n "$sdl_changed" ]; then
+  supergraph_staged=$(git diff --cached --name-only | grep -E "^apps/gateway/supergraph\.graphql$" || true)
+  echo ""
+  echo "GraphQL SDL files modified:"
+  echo "$sdl_changed"
+  if [ -z "$supergraph_staged" ]; then
+    echo ""
+    echo "WARNING: apps/gateway/supergraph.graphql is NOT staged."
+    echo "Run 'pnpm --filter @edusphere/gateway compose' with subgraphs running,"
+    echo "then stage the updated supergraph.graphql."
+    echo "(Not blocking — subgraphs may not be running locally.)"
+    echo ""
+  fi
+fi

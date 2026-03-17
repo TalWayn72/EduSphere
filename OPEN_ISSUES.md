@@ -71,7 +71,7 @@
 
 ## BUG-065 — שמירת העדפות שפה נכשלה (Language Preference Save Failure — Recurring)
 
-**סטטוס:** ✅ Fixed (2026-03-15 — second recurrence fixed)
+**סטטוס:** ✅ Fixed (2026-03-16 — second recurrence fixed, structural prevention added)
 **חומרה:** 🔴 Critical (recurring — root cause was incomplete supergraph)
 **קומפוננטות:** `apps/gateway/supergraph.graphql`, `apps/subgraph-core/`, Docker/supervisord
 
@@ -120,6 +120,13 @@ Added CORE and KNOWLEDGE subgraphs to `apps/gateway/supergraph.graphql`:
 1. `tests/security/federation-link-imports.spec.ts` — CI gate blocks SDL files from importing custom directives from Federation spec URL
 2. **NEW:** Same test file now verifies all 6 subgraphs (AGENT, ANNOTATION, COLLABORATION, CONTENT, CORE, KNOWLEDGE) are present in `supergraph.graphql`
 3. **NEW:** Same test verifies `updateUserPreferences` mutation has `@join__field(graph: CORE)` annotation
+
+### Wave 3 — Structural Root Cause (Class of Bug)
+**Bug class:** supergraph.graphql manually maintained, no automation to keep in sync with subgraph SDL files.
+- `pnpm compose` must be run manually — no pre-commit/pre-push hook triggers it
+- CI `federation.yml` falls back silently when compose fails (subgraphs down in CI)
+- No drift detection: no test compares committed supergraph vs. what SDL files would produce
+- **Fix (2026-03-16):** Added pre-commit guard in `.husky/pre-commit` + CI failure when SDL changed but supergraph wasn't updated
 
 ### Discovery List (Wave 2 — Missing CORE subgraph impact)
 All of these operations were unreachable through the gateway before the fix:
