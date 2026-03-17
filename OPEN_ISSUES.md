@@ -1,6 +1,35 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 17 מרץ 2026 (BUG-070 — Landing page Compliance tab navigation broken)
+**תאריך עדכון:** 17 מרץ 2026
+
+---
+
+## Status Summary (Quick Reference)
+
+| ID | Issue | Status | Fixed In |
+|----|-------|--------|----------|
+| SEC-1 | Dev-token grants SUPER_ADMIN | ✅ Fixed | `a13c080` |
+| SEC-3 | Subgraphs skip JWT audience | ✅ Fixed | `a13c080` |
+| SEC-4 | PII encryption no key versioning | ✅ Fixed | `06ad847` |
+| SEC-5 | No Cypher injection tests | ✅ Fixed | `ca885a2` |
+| SEC-8 | APQ registry in-memory only | ✅ Fixed | `06ad847` |
+| BE-7 | Auth header fallback no stripping | ✅ Fixed | `a13c080` |
+| SI-7 | 15 services raw NATS without TLS | ✅ Fixed | `e2a714d` |
+| OPS-4 | Alertmanager routes to null | ✅ Fixed | `06ad847` |
+| DB-2 | HNSW indexes missing on 3 tables | ✅ Fixed | `dfa5dda` |
+| DB-3 | agentSessions lacks tenant_id | ✅ Fixed | `dfa5dda` |
+| DB-4 | 29 schemas missing withTimezone | ✅ Fixed | `dfa5dda` |
+| BE-2 | AgentService no Promise.race | ✅ Fixed | `202d8f0` |
+| BE-3 | adminUsers O(N) full fetch | ✅ Fixed | `202d8f0` |
+| BE-5 | MediaService NATS per upload | ✅ Fixed | `202d8f0` |
+| BE-9 | resetUserPassword stub | ✅ Fixed | `bcec7c4` |
+| BE-4 | Mutations accept unknown no Zod | ✅ Fixed | `d4e1eea` |
+| FE-1 | No route-level error boundaries | ✅ Fixed | `ad488c2` |
+| QA-4 | Visual snapshots disabled in CI | ✅ Fixed | `4aa2626` |
+| BUG-070 | Landing tab navigation | ✅ Fixed | `b2338e3` |
+| BUG-071 | AI Course consent error | ✅ Fixed | `fed522a` |
+| BUG-072 | APQ gateway error cascade | ✅ Fixed | `390a623` |
+| BUG-073 | Media upload failure | ✅ Fixed | `256655c` |
 
 ---
 
