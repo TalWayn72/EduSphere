@@ -146,7 +146,7 @@ export const PROTECTED_ROUTES_CONCRETE = [
 export const LANDING_NAV_LINKS = [
   { text: 'Features', href: '#features' },
   { text: 'Pricing', href: '#pricing' },
-  { text: 'Compliance', href: '/compliance' },
+  { text: 'Compliance', href: '#compliance' },
   { text: 'Pilot', href: '#pilot-cta' },
 ];
 

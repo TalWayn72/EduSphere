@@ -122,7 +122,7 @@ describe('PublicNav', () => {
   });
 
   describe('anchor link routing (landing vs non-landing)', () => {
-    const anchorHashes = ['#features', '#pricing', '#pilot-cta'];
+    const anchorHashes = ['#features', '#pricing', '#compliance', '#pilot-cta'];
 
     describe.each(['/', '/landing'])('on landing page (%s)', (route) => {
       it('desktop anchor links use hash-only hrefs', () => {
@@ -145,7 +145,7 @@ describe('PublicNav', () => {
       });
     });
 
-    describe.each(['/compliance', '/about', '/faq', '/contact'])(
+    describe.each(['/about', '/faq', '/contact'])(
       'on non-landing page (%s)',
       (route) => {
         it('desktop anchor links are prefixed with /landing', () => {
@@ -172,17 +172,17 @@ describe('PublicNav', () => {
       }
     );
 
-    it('Compliance link is always a React Router Link to /compliance regardless of route', () => {
-      // On landing
+    it('Compliance link uses anchor hash, not a separate route (BUG-070 regression)', () => {
+      // On landing page — should be #compliance
       const { unmount } = renderNav({}, ['/']);
       const complianceOnLanding = screen.getByText('Compliance').closest('a');
-      expect(complianceOnLanding).toHaveAttribute('href', '/compliance');
+      expect(complianceOnLanding).toHaveAttribute('href', '#compliance');
       unmount();
 
-      // On non-landing
+      // On non-landing page — should be /landing#compliance
       renderNav({}, ['/about']);
       const complianceOnAbout = screen.getByText('Compliance').closest('a');
-      expect(complianceOnAbout).toHaveAttribute('href', '/compliance');
+      expect(complianceOnAbout).toHaveAttribute('href', '/landing#compliance');
     });
 
     describe('mobile menu anchor links', () => {
@@ -202,7 +202,7 @@ describe('PublicNav', () => {
       });
 
       it('on non-landing page, mobile anchor links are prefixed with /landing', () => {
-        openMobileMenu('/compliance');
+        openMobileMenu('/about');
         const featuresLink = screen.getAllByText('Features');
         const hrefs = featuresLink.map((el) => el.closest('a')?.getAttribute('href'));
         expect(hrefs).toContain('/landing#features');
@@ -223,7 +223,7 @@ describe('PublicNav', () => {
     });
 
     it('"Start Free Pilot" desktop button has correct href on non-landing page', () => {
-      renderNav({}, ['/compliance']);
+      renderNav({}, ['/about']);
       const btn = screen.getByText('Start Free Pilot').closest('a');
       expect(btn).toHaveAttribute('href', '/landing#pilot-cta');
     });
@@ -232,6 +232,64 @@ describe('PublicNav', () => {
       renderNav({}, ['/']);
       const btn = screen.getByText('Start Free Pilot').closest('a');
       expect(btn).toHaveAttribute('href', '#pilot-cta');
+    });
+  });
+
+  describe('BUG-070: all nav tabs use consistent <a> elements', () => {
+    const tabLabels = ['Features', 'Pricing', 'Compliance', 'Pilot'];
+
+    it('all 4 desktop tabs render as <a> elements (not React Router Link)', () => {
+      renderNav({}, ['/']);
+      const nav = screen.getByTestId('public-nav');
+      // Desktop nav is the hidden md:flex div — get all links inside nav
+      for (const label of tabLabels) {
+        const el = screen.getByText(label);
+        const anchor = el.closest('a');
+        expect(anchor).not.toBeNull();
+        // Verify it is a plain <a> with hash href, not a React Router Link (which would have href="/...")
+        expect(anchor?.getAttribute('href')).toMatch(/^(#|\/landing#)/);
+      }
+    });
+
+    it('all 4 mobile tabs render as <a> elements after opening menu', () => {
+      renderNav({}, ['/']);
+      const menuBtn = screen.getByRole('button', { name: /menu/i });
+      menuBtn.click();
+
+      for (const label of tabLabels) {
+        // getAllByText because label appears in both desktop and mobile
+        const elements = screen.getAllByText(label);
+        for (const el of elements) {
+          const anchor = el.closest('a');
+          expect(anchor).not.toBeNull();
+          expect(anchor?.getAttribute('href')).toMatch(/^(#|\/landing#)/);
+        }
+      }
+    });
+
+    it('Compliance tab should NOT use React Router Link (regression guard)', () => {
+      renderNav({}, ['/']);
+      const complianceEl = screen.getByText('Compliance');
+      const anchor = complianceEl.closest('a');
+      // React Router Link to="/compliance" renders href="/compliance" (no hash)
+      // After BUG-070 fix, it should be "#compliance" or "/landing#compliance"
+      expect(anchor?.getAttribute('href')).not.toBe('/compliance');
+      expect(anchor?.getAttribute('href')).toContain('#compliance');
+    });
+
+    it('mobile menu includes Pilot tab (was missing before BUG-070)', () => {
+      renderNav({}, ['/']);
+      const menuBtn = screen.getByRole('button', { name: /menu/i });
+      menuBtn.click();
+
+      const pilotElements = screen.getAllByText('Pilot');
+      // Should appear at least twice: desktop + mobile
+      expect(pilotElements.length).toBeGreaterThanOrEqual(2);
+      // Mobile pilot link should have anchor href
+      const mobileHrefs = pilotElements.map(
+        (el) => el.closest('a')?.getAttribute('href')
+      );
+      expect(mobileHrefs).toContain('#pilot-cta');
     });
   });
 });

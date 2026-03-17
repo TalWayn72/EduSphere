@@ -51,6 +51,17 @@ const authErrorExchange = errorExchange({
   // Subscriptions degrade gracefully: real-time updates pause, the page stays.
   // Only query/mutation auth failures indicate a genuinely expired session.
   onError(error: CombinedError, operation: Operation) {
+    // Log network errors for devtools visibility (never exposed to UI)
+    if (error.networkError) {
+      const opDef = operation.query.definitions.find(
+        (d) => d.kind === 'OperationDefinition'
+      ) as { name?: { value: string } } | undefined;
+      const opName = opDef?.name?.value ?? 'unknown';
+      console.warn(
+        `[GraphQL][Network] ${operation.kind} "${opName}": ${error.networkError.message}`
+      );
+    }
+
     if (operation.kind === 'subscription') {
       if (hasAuthError(error)) {
         const opDef = operation.query.definitions.find(
@@ -95,10 +106,19 @@ const wsClient = createWsClient({
 });
 
 // ─── Persisted queries exchange (production only) ─────────────────────────────
-// In production, requests are sent as GET with a SHA-256 hash instead of the
-// full query string, reducing payload size and enabling CDN caching.
-// Disabled in development so queries remain human-readable in DevTools.
-const maybePersistedExchange = import.meta.env.PROD
+// Enabled only when VITE_APQ_ENABLED is explicitly set to "true".
+// This prevents the exchange from firing in environments where the gateway
+// has no persisted-query manifest (e.g. Docker `vite preview` without APQ
+// setup), which previously caused every query to fail with "Must provide
+// query string" — the root cause of BUG-039 recurrences.
+//
+// When APQ IS enabled, generateHash is used on the first request; if the
+// gateway responds with PersistedQueryNotFound the exchange automatically
+// retries with the full query document (standard APQ protocol).
+const apqEnabled =
+  import.meta.env.VITE_APQ_ENABLED === 'true';
+
+const maybePersistedExchange = apqEnabled
   ? [
       persistedExchange({
         preferGetForPersistedQueries: true,

@@ -17,6 +17,7 @@ ARG VITE_GRAPHQL_WS_URL
 ARG VITE_KEYCLOAK_URL=http://localhost:8080
 ARG VITE_KEYCLOAK_REALM=edusphere
 ARG VITE_KEYCLOAK_CLIENT_ID=edusphere-app
+ARG VITE_APQ_ENABLED=false
 
 RUN pnpm --filter @edusphere/web build
 

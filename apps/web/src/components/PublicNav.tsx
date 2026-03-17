@@ -27,7 +27,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600 dark:text-slate-200">
             <a href={anchor('#features')} className="hover:text-indigo-600 transition-colors">Features</a>
             <a href={anchor('#pricing')} className="hover:text-indigo-600 transition-colors">Pricing</a>
-            <Link to="/compliance" className="hover:text-indigo-600 transition-colors">Compliance</Link>
+            <a href={anchor('#compliance')} className="hover:text-indigo-600 transition-colors">Compliance</a>
             <a href={anchor('#pilot-cta')} className="hover:text-indigo-600 transition-colors">Pilot</a>
           </div>
         )}
@@ -59,7 +59,8 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
             <>
               <a href={anchor('#features')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Features</a>
               <a href={anchor('#pricing')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Pricing</a>
-              <Link to="/compliance" onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Compliance</Link>
+              <a href={anchor('#compliance')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Compliance</a>
+              <a href={anchor('#pilot-cta')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Pilot</a>
             </>
           )}
           <div className="flex gap-3 pt-2">

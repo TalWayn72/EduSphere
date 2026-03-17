@@ -1,6 +1,55 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 17 מרץ 2026 (BUG-071 — AI Course Creator generic error handling + Memory Safety)
+**תאריך עדכון:** 17 מרץ 2026 (BUG-072 — persistedExchange causes false "server unavailable" banner)
+
+---
+
+## BUG-072 — persistedExchange Causes False "Server Unavailable" Banner on /courses (17 Mar 2026)
+
+**סטטוס:** ✅ Fixed (2026-03-17)
+**חומרה:** 🔴 Critical (recurring — every page load in Docker container shows error banner + fallback data)
+**קשור ל:** BUG-039 (same symptom — "שרת לא נגיש" banner, different root cause)
+
+### שורש הבעיה
+
+`@urql/exchange-persisted` was enabled whenever `import.meta.env.PROD === true` (urql-client.ts:101-108). In the Docker container, `vite preview` runs in production mode → `persistedExchange` activates → sends GET requests with SHA-256 hash only (no query body) → Hive Gateway responds with `"Must provide query string"` (BAD_REQUEST) because no persisted-query manifest exists → urql treats this as a real error → `useCourseListData` receives `error` → shows `OfflineBanner` + `MOCK_COURSES_FALLBACK`.
+
+**Why it recurred:** BUG-039 fixed the banner's TEXT (clean i18n instead of raw urql strings), but the root cause of FALSE errors was never identified — the `persistedExchange` silently broke ALL queries in production mode without manifest.
+
+### Discovery Waves
+
+**Wave 1 — Exact match:**
+- `apps/web/src/lib/urql-client.ts:101-108` — `persistedExchange` gated on `import.meta.env.PROD`
+
+**Wave 2 — Similar patterns:**
+- No other urql client configs found (mobile uses Apollo)
+- No other `import.meta.env.PROD` guards with similar APQ issues
+- Gateway `apps/gateway/gateway.config.ts:292-300` — correctly loads manifest only if file exists
+
+**Wave 3 — Class of bug (env-gated features without env validation):**
+- `.env`, `.env.example`, Dockerfile — all missing `VITE_APQ_ENABLED` declaration
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/web/src/lib/urql-client.ts` | Replace `import.meta.env.PROD` guard with explicit `VITE_APQ_ENABLED === 'true'`; add network error logging in `errorExchange.onError` |
+| `apps/web/.env` | Add `VITE_APQ_ENABLED=false` |
+| `apps/web/.env.example` | Add `VITE_APQ_ENABLED=false` with documentation |
+| `apps/web/Dockerfile` | Add `ARG VITE_APQ_ENABLED=false` |
+
+### Tests Added
+
+| File | Test |
+|------|------|
+| `apps/web/src/lib/urql-client.test.ts` | `APQ guard — VITE_APQ_ENABLED` (2 tests): verifies exchange disabled by default |
+| `apps/web/src/lib/urql-client.test.ts` | `network error logging` (2 tests): verifies `[GraphQL][Network]` prefix in console.warn |
+
+### Anti-Recurrence
+
+- `VITE_APQ_ENABLED` must be explicitly set to `"true"` to enable APQ — default is disabled
+- Network error logging now visible in devtools with `[GraphQL][Network]` prefix
+- Regression guard: `urql-client.test.ts` APQ guard tests will fail if someone reverts to `import.meta.env.PROD`
 
 ---
 
