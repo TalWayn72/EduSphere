@@ -5,10 +5,24 @@ const __dirname = dirname(__filename);
 
 import { defineConfig } from '@graphql-hive/gateway';
 import { useResponseCache } from '@graphql-yoga/plugin-response-cache';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+// ─── JWT Validation at Gateway Level ─────────────────────────────────────────
+// Validates the JWT and extracts identity claims (userId, tenantId, role) before
+// forwarding to subgraphs. This ensures subgraphs receive both the raw
+// Authorization header AND pre-extracted identity headers as a fallback when
+// local Keycloak JWKS validation fails (e.g. Keycloak startup race condition).
+const KEYCLOAK_URL =
+  process.env.KEYCLOAK_URL || 'http://localhost:8080';
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'edusphere';
+const JWKS_URL = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`;
+const KEYCLOAK_ISSUER = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
+const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
+const DEV_TOKEN = 'dev-token-mock-jwt';
 
 // Load the persisted query manifest if it exists.
 // In development the manifest is optional — arbitrary queries are allowed.
@@ -163,30 +177,107 @@ export const gatewayConfig = defineConfig({
     //   HTTP (query/mutation): token in Authorization request header
     //   WebSocket (subscription): token in graphql-ws connectionParams
     //     → `context.connectionParams.authorization` (set by urql-client.ts)
+    //
+    // Phase 1: onContextBuilding captures auth header from the original request
+    // and stores it in the context under `_authHeader`. This is more reliable
+    // than reading from `context.request` in onFetch, which may not be
+    // available in all Hive Gateway v2 execution paths.
+    {
+      async onContextBuilding({ context, extendContext }) {
+        const req = (context as Record<string, unknown>)['request'] as
+          | Request
+          | undefined;
+        const connParams = (context as Record<string, unknown>)[
+          'connectionParams'
+        ] as Record<string, string> | undefined;
+
+        const auth =
+          req?.headers?.get('authorization') ??
+          connParams?.['authorization'] ??
+          null;
+
+        const tenantId =
+          req?.headers?.get('x-tenant-id') ??
+          connParams?.['x-tenant-id'] ??
+          null;
+
+        // Extract identity from JWT for header forwarding to subgraphs
+        let userId: string | null = null;
+        let role: string | null = null;
+        let resolvedTenantId = tenantId;
+
+        if (auth?.startsWith('Bearer ')) {
+          const token = auth.slice(7);
+          // Dev bypass: accept mock token in non-production environments
+          if (token === DEV_TOKEN && !isProduction) {
+            userId = '00000000-0000-0000-0000-000000000001';
+            resolvedTenantId = '00000000-0000-0000-0000-000000000000';
+            role = 'SUPER_ADMIN';
+          } else {
+            try {
+              const { payload } = await jwtVerify(token, JWKS, {
+                issuer: KEYCLOAK_ISSUER,
+              });
+              userId = (payload.sub as string) ?? null;
+              resolvedTenantId =
+                (payload.tenant_id as string) ?? tenantId;
+              const roles =
+                (payload.realm_access as { roles?: string[] })?.roles ?? [];
+              const knownRoles = [
+                'SUPER_ADMIN',
+                'ORG_ADMIN',
+                'INSTRUCTOR',
+                'STUDENT',
+                'RESEARCHER',
+              ];
+              role = roles.find((r) => knownRoles.includes(r)) ?? null;
+            } catch {
+              // JWT validation failure at gateway — subgraph will re-validate.
+              // Auth header is still forwarded so subgraph can attempt validation.
+            }
+          }
+        }
+
+        extendContext({
+          _authHeader: auth,
+          _tenantId: resolvedTenantId,
+          userId,
+          role,
+        } as Record<string, unknown>);
+      },
+    },
+    // Phase 2: onFetch reads the captured auth header from context and forwards
+    // it to every subgraph HTTP fetch request.
     {
       onFetch({ options, setOptions, context }) {
-        const gqlCtx = context as
-          | {
-              request?: Request;
-              connectionParams?: Record<string, string>;
-              tenantId?: string | null;
-              userId?: string | null;
-              role?: string | null;
-            }
-          | null
-          | undefined;
+        const ctx = context as Record<string, unknown> | null | undefined;
+
+        // Primary: read from context built by onContextBuilding above
+        // Fallback: read directly from request headers (original pattern)
         const auth =
-          gqlCtx?.request?.headers?.get('authorization') ??
-          gqlCtx?.connectionParams?.['authorization'] ??
+          (ctx?.['_authHeader'] as string | null) ??
+          (ctx?.['request'] as Request | undefined)?.headers?.get(
+            'authorization'
+          ) ??
+          (ctx?.['connectionParams'] as Record<string, string> | undefined)?.[
+            'authorization'
+          ] ??
           null;
+
         if (!auth) return;
+
         const prev = options.headers as Record<string, string> | undefined;
-        const forwarded: Record<string, string> = { ...(prev ?? {}), authorization: auth };
-        // Forward gateway-extracted identity headers so subgraph resolvers
-        // can read tenant/user context even if local JWT re-validation fails.
-        if (gqlCtx?.tenantId) forwarded['x-tenant-id'] = gqlCtx.tenantId;
-        if (gqlCtx?.userId) forwarded['x-user-id'] = gqlCtx.userId;
-        if (gqlCtx?.role) forwarded['x-user-role'] = gqlCtx.role;
+        const forwarded: Record<string, string> = {
+          ...(prev ?? {}),
+          authorization: auth,
+        };
+
+        // Forward tenant/identity headers for subgraph resolvers
+        const tenantId = ctx?.['_tenantId'] as string | null;
+        if (tenantId) forwarded['x-tenant-id'] = tenantId;
+        if (ctx?.['userId']) forwarded['x-user-id'] = ctx['userId'] as string;
+        if (ctx?.['role']) forwarded['x-user-role'] = ctx['role'] as string;
+
         setOptions({ ...options, headers: forwarded });
       },
     },

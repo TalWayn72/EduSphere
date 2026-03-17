@@ -63,9 +63,40 @@ export class AuthMiddleware {
       // extractAuthContext() will reject it if @authenticated is required.
       const reason = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `JWT validation failed — request proceeds unauthenticated: ${reason}`
+        `[AuthMiddleware] JWT validation failed: ${reason}`
       );
+
+      // Fallback: if gateway already validated the JWT and forwarded identity
+      // headers (x-user-id, x-tenant-id, x-user-role), use those to populate
+      // authContext. This ensures auth works even when subgraph JWT validation
+      // fails (e.g. Keycloak JWKS endpoint temporarily unreachable).
+      const userId = this.extractHeader(context, 'x-user-id');
+      const tenantId = this.extractHeader(context, 'x-tenant-id');
+      const role = this.extractHeader(context, 'x-user-role');
+      if (userId) {
+        context.authContext = {
+          userId,
+          email: '',
+          username: '',
+          roles: role ? [role as AuthContext['roles'][number]] : [],
+          scopes: [],
+          tenantId: tenantId ?? undefined,
+          isSuperAdmin: role === 'SUPER_ADMIN',
+        };
+        this.logger.warn(
+          `[AuthMiddleware] Using gateway-forwarded headers fallback: userId=${userId}, tenantId=${tenantId}`
+        );
+      }
     }
+  }
+
+  private extractHeader(
+    context: GraphQLContext,
+    name: string
+  ): string | undefined {
+    const val = context.req?.headers?.[name];
+    if (Array.isArray(val)) return val[0];
+    return typeof val === 'string' && val.length > 0 ? val : undefined;
   }
 }
 
