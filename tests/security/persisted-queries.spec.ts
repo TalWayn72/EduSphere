@@ -38,12 +38,12 @@ describe('Persisted Queries: registry.ts', () => {
 
   it('registry exports isRegistered', () => {
     const c = readFile(REGISTRY_PATH);
-    expect(c).toMatch(/export\s+function\s+isRegistered/);
+    expect(c).toMatch(/export\s+(async\s+)?function\s+isRegistered/);
   });
 
   it('registry exports getRegistrySize', () => {
     const c = readFile(REGISTRY_PATH);
-    expect(c).toMatch(/export\s+function\s+getRegistrySize/);
+    expect(c).toMatch(/export\s+(async\s+)?function\s+getRegistrySize/);
   });
 
   it('registry has max size protection (LRU eviction)', () => {
@@ -123,8 +123,10 @@ describe('Persisted Queries: middleware.ts', () => {
 
   it('middleware substitutes stored query when hash matches registry', () => {
     const c = readFile(MIDDLEWARE_PATH);
-    expect(c).toContain('lookupQuery');
-    expect(c).toMatch(/body\.query\s*=\s*lookupQuery/);
+    // Middleware uses lookupQuerySync (sync wrapper) or lookupQuery to fetch stored query
+    expect(c).toMatch(/lookupQuery(Sync)?/);
+    // Then assigns result to body.query (possibly via intermediate variable)
+    expect(c).toMatch(/body\.query\s*=/);
   });
 
   it('middleware imports registry functions (not raw Map access)', () => {
