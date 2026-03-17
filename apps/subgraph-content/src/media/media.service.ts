@@ -14,7 +14,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec, type NatsConnection } from 'nats';
-import { buildNatsOptions } from '@edusphere/nats-client';
+import { buildNatsOptions, CircuitBreaker } from '@edusphere/nats-client';
 import { and, eq, isNotNull } from 'drizzle-orm';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import { minioConfig } from '@edusphere/config';
@@ -60,6 +60,16 @@ export class MediaService implements OnModuleDestroy {
   private readonly db = createDatabaseConnection();
   private readonly sc = StringCodec();
   private natsConn: NatsConnection | null = null;
+  private readonly minioBreaker = new CircuitBreaker({
+    name: 'MinIO',
+    failureThreshold: 5,
+    resetTimeout: 30_000,
+    logger: {
+      warn: (msg: string) => this.logger.warn(msg),
+      error: (msg: string) => this.logger.error(msg),
+      info: (msg: string) => this.logger.log(msg),
+    },
+  });
 
   constructor() {
     this.bucket = minioConfig.bucket;
@@ -115,9 +125,11 @@ export class MediaService implements OnModuleDestroy {
     });
 
     try {
-      const uploadUrl = await getSignedUrl(this.s3, command, {
-        expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
-      });
+      const uploadUrl = await this.minioBreaker.execute(() =>
+        getSignedUrl(this.s3, command, {
+          expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
+        })
+      );
 
       const expiresAt = new Date(
         Date.now() + PRESIGNED_URL_EXPIRY_SECONDS * 1000
@@ -139,9 +151,11 @@ export class MediaService implements OnModuleDestroy {
     });
 
     try {
-      return await getSignedUrl(this.s3, command, {
-        expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
-      });
+      return await this.minioBreaker.execute(() =>
+        getSignedUrl(this.s3, command, {
+          expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
+        })
+      );
     } catch (error) {
       this.logger.error(`Failed to generate presigned download URL: ${error}`);
       throw new InternalServerErrorException('Failed to generate download URL');
@@ -358,9 +372,11 @@ export class MediaService implements OnModuleDestroy {
 
     let uploadUrl: string;
     try {
-      uploadUrl = await getSignedUrl(this.s3, command, {
-        expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
-      });
+      uploadUrl = await this.minioBreaker.execute(() =>
+        getSignedUrl(this.s3, command, {
+          expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
+        })
+      );
     } catch (err) {
       this.logger.error(
         `createModel3DUpload: failed to generate presigned URL for key=${key}`,

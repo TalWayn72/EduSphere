@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { CircuitBreaker } from '@edusphere/nats-client';
 import { LangGraphService } from './langgraph.service.js';
 import { AiLanggraphRunnerService } from './ai-langgraph-runner.service.js';
 import { AiLegacyRunnerService } from './ai-legacy-runner.service.js';
@@ -36,12 +37,24 @@ export interface ExecutionInput {
 @Injectable()
 export class AIService {
   private readonly logger = new Logger(AIService.name);
+  private readonly llmBreaker: CircuitBreaker;
 
   constructor(
     private readonly langGraphService: LangGraphService,
     private readonly langgraphRunner: AiLanggraphRunnerService,
     private readonly legacyRunner: AiLegacyRunnerService
-  ) {}
+  ) {
+    this.llmBreaker = new CircuitBreaker({
+      name: 'Ollama/LLM',
+      failureThreshold: 5,
+      resetTimeout: 30_000,
+      logger: {
+        warn: (msg: string) => this.logger.warn(msg),
+        error: (msg: string) => this.logger.error(msg),
+        info: (msg: string) => this.logger.log(msg),
+      },
+    });
+  }
 
   /** Primary entry point from resolver. Uses session.id as LangGraph thread_id. */
   async continueSession(
@@ -55,53 +68,55 @@ export class AIService {
       `continueSession: session=${sessionId} template=${templateType}`
     );
     try {
-      if (templateType === 'CHAVRUTA_DEBATE') {
-        // Use chavruta.workflow.ts for turn-by-turn Socratic dialogue.
-        // runLangGraphDebate runs a full autonomous loop and ignores user input.
-        const model = this.legacyRunner.getModel();
-        const ctx: ChavrutaContext = {
+      return await this.llmBreaker.execute(async () => {
+        if (templateType === 'CHAVRUTA_DEBATE') {
+          // Use chavruta.workflow.ts for turn-by-turn Socratic dialogue.
+          // runLangGraphDebate runs a full autonomous loop and ignores user input.
+          const model = this.legacyRunner.getModel();
+          const ctx: ChavrutaContext = {
+            sessionId,
+            content:
+              (context['topic'] as string) ??
+              (context['topicId'] as string) ??
+              '',
+            history: [{ role: 'user', text: message }],
+            understandingScore: 3,
+            turn: 0,
+            currentState: 'ASSESS',
+          };
+          const result = await createChavrutaWorkflow(model, locale).step(ctx);
+          return {
+            text: result.text,
+            workflowResult: {
+              nextState: result.nextState,
+              understandingScore: result.understandingScore,
+              isComplete: result.isComplete,
+            },
+          };
+        }
+
+        // LangGraph templates (QUIZ_GENERATOR, QUIZ_ASSESS, TUTOR, EXPLANATION_GENERATOR).
+        const lgResult = await this.langgraphRunner.run(
           sessionId,
-          content:
-            (context['topic'] as string) ??
-            (context['topicId'] as string) ??
-            '',
-          history: [{ role: 'user', text: message }],
-          understandingScore: 3,
-          turn: 0,
-          currentState: 'ASSESS',
-        };
-        const result = await createChavrutaWorkflow(model, locale).step(ctx);
-        return {
-          text: result.text,
-          workflowResult: {
-            nextState: result.nextState,
-            understandingScore: result.understandingScore,
-            isComplete: result.isComplete,
-          },
-        };
-      }
+          message,
+          templateType,
+          context,
+          locale
+        );
+        if (lgResult !== null) return lgResult;
 
-      // LangGraph templates (QUIZ_GENERATOR, QUIZ_ASSESS, TUTOR, EXPLANATION_GENERATOR).
-      const lgResult = await this.langgraphRunner.run(
-        sessionId,
-        message,
-        templateType,
-        context,
-        locale
-      );
-      if (lgResult !== null) return lgResult;
-
-      // Legacy templates: SUMMARIZE, EXPLAIN, RESEARCH_SCOUT, CUSTOM, …
-      const model = this.legacyRunner.getModel();
-      const input: ExecutionInput = { message, context, sessionId };
-      if (templateType === 'SUMMARIZE')
-        return this.legacyRunner.runSummarizer(model, input, locale);
-      return this.legacyRunner.runGeneric(
-        model,
-        { template: templateType },
-        input,
-        locale
-      );
+        // Legacy templates: SUMMARIZE, EXPLAIN, RESEARCH_SCOUT, CUSTOM, …
+        const model = this.legacyRunner.getModel();
+        const input: ExecutionInput = { message, context, sessionId };
+        if (templateType === 'SUMMARIZE')
+          return this.legacyRunner.runSummarizer(model, input, locale);
+        return this.legacyRunner.runGeneric(
+          model,
+          { template: templateType },
+          input,
+          locale
+        );
+      });
     } catch (error) {
       this.logger.error(
         `continueSession failed: ${error instanceof Error ? error.message : error}`
@@ -117,14 +132,16 @@ export class AIService {
   ): Promise<AIResult> {
     this.logger.debug(`Executing agent: ${agent.template}`);
     try {
-      const model = this.legacyRunner.getModel();
-      if (agent.template === 'CHAVRUTA_DEBATE')
-        return this.legacyRunner.runChavruta(model, input);
-      if (agent.template === 'QUIZ_ASSESS')
-        return this.legacyRunner.runQuiz(model, input);
-      if (agent.template === 'SUMMARIZE')
-        return this.legacyRunner.runSummarizer(model, input);
-      return this.legacyRunner.runGeneric(model, agent, input);
+      return await this.llmBreaker.execute(async () => {
+        const model = this.legacyRunner.getModel();
+        if (agent.template === 'CHAVRUTA_DEBATE')
+          return this.legacyRunner.runChavruta(model, input);
+        if (agent.template === 'QUIZ_ASSESS')
+          return this.legacyRunner.runQuiz(model, input);
+        if (agent.template === 'SUMMARIZE')
+          return this.legacyRunner.runSummarizer(model, input);
+        return this.legacyRunner.runGeneric(model, agent, input);
+      });
     } catch (error) {
       this.logger.error(
         `AI execution failed: ${error instanceof Error ? error.message : error}`

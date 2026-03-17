@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import type { IncomingMessage } from 'node:http';
 import { keycloakConfig } from '@edusphere/config';
 import { JWTValidator, type AuthContext } from './jwt.js';
+import { CircuitBreaker } from '@edusphere/nats-client';
 
 export interface GraphQLContext {
   req: IncomingMessage & {
@@ -13,8 +14,19 @@ export interface GraphQLContext {
 export class AuthMiddleware {
   private readonly logger = new Logger(AuthMiddleware.name);
   private readonly jwtValidator: JWTValidator;
+  private readonly jwksBreaker: CircuitBreaker;
 
   constructor() {
+    this.jwksBreaker = new CircuitBreaker({
+      name: 'JWKS',
+      failureThreshold: 5,
+      resetTimeout: 30_000,
+      logger: {
+        warn: (msg: string) => this.logger.warn(msg),
+        error: (msg: string) => this.logger.error(msg),
+        info: (msg: string) => this.logger.log(msg),
+      },
+    });
     // SEC-3: Subgraphs now validate JWT audience. The Keycloak Client-ID
     // default was fixed from 'edusphere-app' to 'edusphere-web' (packages/config).
     // BUG-073 root cause was the mismatch, not audience validation itself.
@@ -39,7 +51,9 @@ export class AuthMiddleware {
         return;
       }
 
-      const authContext = await this.jwtValidator.validate(token);
+      const authContext = await this.jwksBreaker.execute(() =>
+        this.jwtValidator.validate(token)
+      );
 
       // Fallback: use x-tenant-id header if JWT has no tenant_id claim
       if (!authContext.tenantId) {
