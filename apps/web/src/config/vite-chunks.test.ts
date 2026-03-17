@@ -30,7 +30,6 @@ function extractManualChunks(): (id: string) => string | undefined {
   if (!fnMatch) throw new Error('Could not extract manualChunks from vite.config.ts');
 
   const fnBody = fnMatch[1];
-  // eslint-disable-next-line no-new-func
   return new Function('id', fnBody) as (id: string) => string | undefined;
 }
 
