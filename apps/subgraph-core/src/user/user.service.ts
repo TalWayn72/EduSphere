@@ -9,6 +9,7 @@ import {
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
+import { keycloakConfig } from '@edusphere/config';
 import { parsePreferences } from './user-preferences.service';
 
 type MappedUser = ReturnType<UserService['mapUser']>;
@@ -181,12 +182,74 @@ export class UserService implements OnModuleDestroy {
     userId: string,
     authContext: AuthContext
   ): Promise<boolean> {
-    // Stub: Keycloak Admin API — POST /auth/admin/realms/{realm}/users/{id}/execute-actions-email
-    this.logger.log(
-      { userId, tenantId: authContext.tenantId },
-      'Password reset requested'
-    );
-    return true;
+    const adminSecret = process.env['KEYCLOAK_ADMIN_CLIENT_SECRET'];
+    if (!adminSecret) {
+      this.logger.warn(
+        { userId, tenantId: authContext.tenantId },
+        '[UserService] KEYCLOAK_ADMIN_CLIENT_SECRET not set — skipping password reset (dev mode)'
+      );
+      return true;
+    }
+
+    const adminClientId =
+      process.env['KEYCLOAK_ADMIN_CLIENT_ID'] ?? 'admin-cli';
+
+    try {
+      // 1. Obtain admin access token via client_credentials grant
+      const tokenUrl = `${keycloakConfig.url}/realms/master/protocol/openid-connect/token`;
+      const tokenRes = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'client_credentials',
+          client_id: adminClientId,
+          client_secret: adminSecret,
+        }),
+      });
+
+      if (!tokenRes.ok) {
+        this.logger.error(
+          { userId, status: tokenRes.status, tenantId: authContext.tenantId },
+          '[UserService] Failed to obtain Keycloak admin token'
+        );
+        return false;
+      }
+
+      const tokenData = (await tokenRes.json()) as { access_token: string };
+
+      // 2. Trigger password reset email via execute-actions-email
+      const actionsUrl =
+        `${keycloakConfig.url}/admin/realms/${keycloakConfig.realm}` +
+        `/users/${userId}/execute-actions-email`;
+      const actionsRes = await fetch(actionsUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(['UPDATE_PASSWORD']),
+      });
+
+      if (!actionsRes.ok) {
+        this.logger.error(
+          { userId, status: actionsRes.status, tenantId: authContext.tenantId },
+          '[UserService] Keycloak execute-actions-email failed'
+        );
+        return false;
+      }
+
+      this.logger.log(
+        { userId, tenantId: authContext.tenantId },
+        '[UserService] Password reset email sent via Keycloak'
+      );
+      return true;
+    } catch (err) {
+      this.logger.error(
+        { userId, tenantId: authContext.tenantId, error: String(err) },
+        '[UserService] resetUserPassword failed'
+      );
+      return false;
+    }
   }
 
   async bulkImportUsers(
