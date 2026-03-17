@@ -154,7 +154,7 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
       .getByRole('heading', { name: /Knowledge Graph/i })
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
-    await page.waitForTimeout(800); // let SVG layout settle
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // BUG-040 regression guard
     for (const forbidden of FORBIDDEN_GRAPH_STRINGS) {
@@ -173,7 +173,7 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
   test('screenshot: global graph — statistics panel', async ({ page }) => {
     await gotoGraph(page, GRAPH_URL);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const statsPanel = page.getByText('Graph Statistics').locator('..');
     const hasStats = await statsPanel.isVisible({ timeout: 8_000 }).catch(() => false);
@@ -189,7 +189,7 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
   test('screenshot: global graph — search input', async ({ page }) => {
     await gotoGraph(page, GRAPH_URL);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Type in the search input
     const searchInput = page.getByPlaceholder('Search concepts...');
@@ -197,7 +197,7 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
 
     if (hasSearch) {
       await searchInput.fill('Free Will');
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
 
       await expect(page).toHaveScreenshot('knowledge-graph-search-active.png', {
         fullPage: false,
@@ -209,7 +209,7 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
 
   test('screenshot: global graph — no course-context badge', async ({ page }) => {
     await gotoGraph(page, GRAPH_URL);
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Global route must NOT show the course context badge
     const badge = page.getByTestId('kg-course-context-badge');
@@ -228,7 +228,7 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
   test('screenshot (dark): global graph view', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await gotoGraph(page, GRAPH_URL);
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('knowledge-graph-global-dark.png', {
       fullPage: false,
@@ -254,7 +254,7 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
       .getByRole('heading', { name: /Course Knowledge Graph/i })
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Verify course-context badge is visible (regression guard for T2.3)
     const badge = page.getByTestId('kg-course-context-badge');
@@ -290,7 +290,7 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
       .first()
       .waitFor({ timeout: 10_000 })
       .catch(() => {});
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Locate breadcrumb
     const breadcrumb = page
@@ -309,7 +309,7 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
   test('screenshot: course-context badge isolated', async ({ page }) => {
     await gotoGraph(page, COURSE_GRAPH_URL);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const badge = page.getByTestId('kg-course-context-badge');
     const hasBadge = await badge.isVisible({ timeout: 8_000 }).catch(() => false);
@@ -326,7 +326,7 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     page,
   }) => {
     await gotoGraph(page, COURSE_GRAPH_URL);
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     for (const forbidden of FORBIDDEN_GRAPH_STRINGS) {
       await expect(
@@ -340,7 +340,7 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     page,
   }) => {
     await gotoGraph(page, COURSE_GRAPH_URL);
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
     });
@@ -351,7 +351,7 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
   test('screenshot (dark): course-filtered graph', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await gotoGraph(page, COURSE_GRAPH_URL);
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('knowledge-graph-course-filtered-dark.png', {
       fullPage: false,
@@ -373,7 +373,7 @@ test.describe('KnowledgeGraph — error state (GraphQL blocked)', () => {
     await page.goto(GRAPH_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // REGRESSION GUARD: no raw technical strings in error banner
     const body = (await page.locator('body').textContent()) ?? '';

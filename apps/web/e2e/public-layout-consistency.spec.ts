@@ -108,7 +108,7 @@ test.describe('Public Layout Consistency — Sticky navigation', () => {
 
     // Scroll down significantly
     await page.evaluate(() => window.scrollTo(0, 1000));
-    await page.waitForTimeout(300); // let scroll settle
+    await page.waitForLoadState('domcontentloaded');
 
     const nav = page.getByTestId('public-nav');
     await expect(nav).toBeVisible({ timeout: 5_000 });

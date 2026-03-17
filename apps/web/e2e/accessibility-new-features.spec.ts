@@ -334,7 +334,7 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     const cardVisible = await firstCard.isVisible().catch(() => false);
     if (cardVisible) {
       await firstCard.click();
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
@@ -441,7 +441,7 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
     const btnVisible = await registerBtn.isVisible().catch(() => false);
     if (btnVisible) {
       await registerBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
     }
     // Audit with form visible
     const violations = await new AxeBuilder({ page })
@@ -481,7 +481,7 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
       await btn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
     }
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
@@ -501,12 +501,12 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
       await btn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       const modal = page.locator('.fixed.inset-0').first();
       const modalVisible = await modal.isVisible().catch(() => false);
       if (modalVisible) {
         await page.keyboard.press('Escape');
-        await page.waitForTimeout(300);
+        await page.waitForLoadState('domcontentloaded');
         const modalAfter = await modal.isVisible().catch(() => false);
         // Modal should be dismissed by Escape — soft assertion, log if not
         if (modalAfter) {
@@ -718,7 +718,7 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
       await btn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       const dialog = page.locator('[role="dialog"]');
       const dialogVisible = await dialog.isVisible().catch(() => false);
       if (dialogVisible) {

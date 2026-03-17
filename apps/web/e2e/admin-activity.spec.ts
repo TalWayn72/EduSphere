@@ -154,7 +154,7 @@ test.describe('AdminActivityFeed — activity feed with items', () => {
     const feedCard = page.getByTestId('admin-activity-feed');
     await feedCard.waitFor({ timeout: 10_000 }).catch(() => {});
 
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     // Component-level screenshot (the card itself)
     const isVisible = await feedCard.isVisible().catch(() => false);
@@ -180,7 +180,7 @@ test.describe('AdminActivityFeed — activity feed with items', () => {
     const feedList = page.getByTestId('activity-feed-list');
     await feedList.waitFor({ timeout: 10_000 }).catch(() => {});
 
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const isVisible = await feedList.isVisible().catch(() => false);
     if (isVisible) {
@@ -220,7 +220,7 @@ test.describe('AdminActivityFeed — activity feed with items', () => {
   test('screenshot (dark): activity feed with items', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await gotoAdmin(page);
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const feedCard = page.getByTestId('admin-activity-feed');
     const isVisible = await feedCard.isVisible({ timeout: 10_000 }).catch(() => false);
@@ -297,7 +297,7 @@ test.describe('AdminActivityFeed — full admin page', () => {
     await mockAdminGraphQL(page, () => ({ data: {} }));
     await gotoAdmin(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: page must not crash
     const body = (await page.locator('body').textContent()) ?? '';
@@ -319,7 +319,7 @@ test.describe('AdminActivityFeed — full admin page', () => {
     await login(page);
     await page.goto(ADMIN_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('admin-page-full-dark.png', {
       fullPage: false,

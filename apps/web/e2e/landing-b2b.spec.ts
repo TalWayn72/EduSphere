@@ -544,7 +544,7 @@ test.describe('B2B Landing Page — Pilot Form Success Flow', () => {
     await page.getByText('College').click();
 
     await section.getByRole('button', { name: /Apply for Free Pilot/i }).click();
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('domcontentloaded');
 
     await assertNoRawErrors(page);
     const bodyText = await page.textContent('body') ?? '';
@@ -593,7 +593,7 @@ test.describe('B2B Landing Page — Pilot Form Error Handling', () => {
     await page.getByText('University').last().click();
 
     await section.getByRole('button', { name: /Apply for Free Pilot/i }).click();
-    await page.waitForTimeout(1_500);
+    await page.waitForLoadState('domcontentloaded');
 
     // After error: form should still be visible (not replaced by success state)
     // The component currently sets submitted=true regardless of error — this test
@@ -616,7 +616,7 @@ test.describe('B2B Landing Page — Pilot Form Error Handling', () => {
     await page.getByText('College').click();
 
     await section.getByRole('button', { name: /Apply for Free Pilot/i }).click();
-    await page.waitForTimeout(1_500);
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.textContent('body') ?? '';
     expect(bodyText).not.toContain('Internal server error: database timeout');

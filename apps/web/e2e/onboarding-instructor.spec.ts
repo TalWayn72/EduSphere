@@ -124,7 +124,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
       const visible = await nextBtn.isVisible().catch(() => false);
       if (visible) {
         await nextBtn.click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('domcontentloaded');
       } else {
         break;
       }
@@ -161,7 +161,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
       const visible = await nextBtn.isVisible().catch(() => false);
       if (visible) {
         await nextBtn.click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('domcontentloaded');
       } else {
         break;
       }
@@ -192,14 +192,14 @@ test.describe('Instructor Onboarding — Flow tests', () => {
       const nextVisible = await nextBtn.isVisible().catch(() => false);
       if (nextVisible) {
         await nextBtn.click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('domcontentloaded');
       } else {
         break;
       }
     }
 
     // Should not crash
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 3_000,
     });
@@ -209,7 +209,7 @@ test.describe('Instructor Onboarding — Flow tests', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('onboarding-instructor-welcome.png', {
       fullPage: false,

@@ -65,7 +65,7 @@ async function clickTabAndVerify(page: Page, tab: Tab): Promise<void> {
   await link.click();
 
   // Wait for scroll to complete (smooth scrolling may take time)
-  await page.waitForTimeout(600);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   // Verify URL still contains /landing (did NOT navigate away)
   const url = new URL(page.url());
@@ -129,7 +129,7 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
       const nav = page.locator('[data-testid="public-nav"]');
       const complianceLink = nav.locator('a:text-is("Compliance")').first();
       await complianceLink.click();
-      await page.waitForTimeout(600);
+      await page.waitForLoadState('domcontentloaded');
 
       const url = new URL(page.url());
       // MUST stay on /landing — not /compliance
@@ -186,12 +186,12 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
       await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
       // Allow initial animations to settle
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       for (const tab of TABS) {
         await clickTabAndVerify(page, tab);
         // Wait for scroll to fully settle before taking screenshot
-        await page.waitForTimeout(300);
+        await page.waitForLoadState('domcontentloaded');
 
         await expect(page).toHaveScreenshot(
           `landing-tab-${tab.hash.replace('#', '')}.png`,
@@ -216,7 +216,7 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
         const nav = page.locator('[data-testid="public-nav"]');
         const link = nav.locator(`a:text-is("${tab.name}")`).first();
         await link.click();
-        await page.waitForTimeout(600);
+        await page.waitForLoadState('domcontentloaded');
 
         const url = new URL(page.url());
         expect(url.pathname).toBe('/landing');
@@ -239,7 +239,7 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
         const link = nav.locator(`a:text-is("${tab.name}")`).first();
         await link.click();
         // Minimal wait — just enough for the click to register
-        await page.waitForTimeout(100);
+        await page.waitForLoadState('domcontentloaded');
       }
 
       // After rapid clicking, URL must still be on /landing

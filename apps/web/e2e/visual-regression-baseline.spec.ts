@@ -55,7 +55,7 @@ test.describe('Visual Regression Baseline — Public Pages', () => {
           waitUntil: 'domcontentloaded',
           timeout: 15000,
         });
-        await page.waitForTimeout(1500);
+        await page.waitForLoadState('networkidle').catch(() => {});
 
         await expect(page).toHaveScreenshot(
           `${pg.name}-${vp.label}.png`,

@@ -41,7 +41,7 @@ export default async function globalSetup(_config: FullConfig) {
 
   // Go to login page
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3000); // Wait for check-sso
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   const url = page.url();
   console.log(`[setup] URL after check-sso: ${url}`);
@@ -72,7 +72,7 @@ export default async function globalSetup(_config: FullConfig) {
 
     // Wait for redirect back
     await page.waitForURL(/localhost:5175/, { timeout: 25_000 });
-    await page.waitForTimeout(2500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     console.log(`[setup] Authenticated: ${page.url()}`);
   }
 

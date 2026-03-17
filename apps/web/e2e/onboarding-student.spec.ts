@@ -141,7 +141,7 @@ test.describe('Student Onboarding — Flow tests', () => {
         const btn = page.getByRole('button', { name: /next|continue/i }).first();
         const visible = await btn.isVisible().catch(() => false);
         if (visible) await btn.click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('domcontentloaded');
       }
     }
 
@@ -245,14 +245,14 @@ test.describe('Student Onboarding — Flow tests', () => {
       const nextVisible = await nextBtn.isVisible().catch(() => false);
       if (nextVisible) {
         await nextBtn.click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('domcontentloaded');
       } else {
         break;
       }
     }
 
     // Should eventually leave onboarding or show completion
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 3_000,
     });
@@ -262,7 +262,7 @@ test.describe('Student Onboarding — Flow tests', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('onboarding-student-welcome.png', {
       fullPage: false,

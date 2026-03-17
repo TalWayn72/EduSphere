@@ -20,7 +20,7 @@ async function waitForAppReady(page: any, timeout = 15000) {
       { timeout }
     )
     .catch(() => {});
-  await page.waitForTimeout(1000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 test('Super Admin Full Login Flow', async ({ page }) => {
@@ -42,7 +42,7 @@ test('Super Admin Full Login Flow', async ({ page }) => {
 
   if (btnVisible) {
     await signInBtn.click();
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     console.log('After click URL:', page.url());
     await page.screenshot({
       path: `${SCREENSHOTS}/sa-02-after-signin-click.png`,
@@ -64,7 +64,7 @@ test('Super Admin Full Login Flow', async ({ page }) => {
             .fill('[name="username"]', 'super.admin@edusphere.dev')
             .catch(() => {})
         );
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
       await page
         .fill('#password', 'SuperAdmin123!')
         .catch(() =>
@@ -80,7 +80,7 @@ test('Super Admin Full Login Flow', async ({ page }) => {
         .click('#kc-login, input[type="submit"], button[type="submit"]')
         .catch(() => {});
       await page.waitForLoadState('domcontentloaded').catch(() => {});
-      await page.waitForTimeout(4000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       console.log('After Keycloak submit URL:', page.url());
       await page.screenshot({

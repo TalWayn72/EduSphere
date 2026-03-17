@@ -24,7 +24,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
   test('full tab navigation flow with screenshots', async ({ page }) => {
     // 1. Navigate to landing page
     await page.goto(`${TARGET_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1500); // Let animations settle
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Screenshot: initial state
     await page.screenshot({
@@ -38,7 +38,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
     // 2. Click Features tab
     const featuresLink = nav.locator('a:text-is("Features")').first();
     await featuresLink.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     let url = new URL(page.url());
     expect(url.pathname).toBe('/landing');
@@ -53,7 +53,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
     // 3. Click Pricing tab
     const pricingLink = nav.locator('a:text-is("Pricing")').first();
     await pricingLink.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     url = new URL(page.url());
     expect(url.pathname).toBe('/landing');
@@ -68,7 +68,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
     // 4. Click Compliance tab — THIS IS THE BUG FIX
     const complianceLink = nav.locator('a:text-is("Compliance")').first();
     await complianceLink.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     url = new URL(page.url());
     // BUG-070: Must stay on /landing, NOT go to /compliance
@@ -85,7 +85,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
     // 5. Click Pilot tab
     const pilotLink = nav.locator('a:text-is("Pilot")').first();
     await pilotLink.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     url = new URL(page.url());
     expect(url.pathname).toBe('/landing');
@@ -99,7 +99,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
 
     // 6. Reverse test: Click Compliance first, then Features
     await complianceLink.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     url = new URL(page.url());
     expect(url.pathname).toBe('/landing');
@@ -113,7 +113,7 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
 
     // Now click Features — must still work after Compliance
     await featuresLink.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     url = new URL(page.url());
     expect(url.pathname).toBe('/landing');

@@ -92,7 +92,7 @@ async function goTo(page: Page, path: string) {
       // Fallback: page may not have a <main> — continue anyway
     });
   // Extra settle tick to let CSS transitions complete
-  await page.waitForTimeout(150);
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -310,7 +310,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
         .first()
         .waitFor({ state: 'visible', timeout: 8_000 })
         .catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
     }
     await expect(page).toHaveScreenshot('roleplay-simulator-chat.png', {
       ...LOOSE_OPTS,
@@ -339,7 +339,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
         .first()
         .waitFor({ state: 'visible', timeout: 8_000 })
         .catch(() => {});
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
     }
     const header = page.locator('.bg-gray-900').first();
     const headerVisible = await header.isVisible().catch(() => false);
@@ -377,7 +377,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
         .first()
         .waitFor({ state: 'visible', timeout: 8_000 })
         .catch(() => {});
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
     }
     const inputArea = page.locator('.bg-gray-900').last();
     const inputVisible = await inputArea.isVisible().catch(() => false);
@@ -538,7 +538,7 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     const startVisible = await startBtn.isVisible().catch(() => false);
     if (startVisible) {
       await startBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
     }
     const widget = page
       .locator('.card', { hasText: /all done for today/i })
@@ -609,7 +609,7 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     const btnVisible = await newProfileBtn.isVisible().catch(() => false);
     if (btnVisible) {
       await newProfileBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       const dialog = page.locator('[role="dialog"]');
       const dialogVisible = await dialog.isVisible().catch(() => false);
       if (dialogVisible) {
@@ -828,7 +828,7 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     const btnVisible = await registerBtn.isVisible().catch(() => false);
     if (btnVisible) {
       await registerBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       const form = page.locator('.card', {
         hasText: /Register LTI 1.3 Platform/i,
       });
@@ -867,7 +867,7 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     const btnVisible = await generateBtn.isVisible().catch(() => false);
     if (btnVisible) {
       await generateBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       const modal = page.locator('[class*="fixed inset-0"]').first();
       const modalVisible = await modal.isVisible().catch(() => false);
       if (modalVisible) {

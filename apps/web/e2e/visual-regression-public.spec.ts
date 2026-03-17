@@ -70,7 +70,7 @@ test.describe('Visual Regression — Public Pages Dark Mode @visual', () => {
       // Toggle dark mode via Tailwind dark class
       await page.evaluate(() => document.documentElement.classList.add('dark'));
       // Allow CSS transitions to settle
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveScreenshot(`${pg.name}-dark.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,

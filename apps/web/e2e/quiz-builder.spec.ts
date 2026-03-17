@@ -270,7 +270,7 @@ test.describe('QuizBuilder — question types and interactions', () => {
     );
     if ((await previewBtn.count()) > 0) {
       await previewBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

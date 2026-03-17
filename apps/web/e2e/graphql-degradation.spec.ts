@@ -41,7 +41,7 @@ test.describe('GraphQL Graceful Degradation', () => {
           waitUntil: 'domcontentloaded',
           timeout: 15000,
         });
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState('networkidle').catch(() => {});
 
         const bodyText = await page.locator('body').innerText();
 
@@ -65,7 +65,7 @@ test.describe('GraphQL Graceful Degradation', () => {
         waitUntil: 'domcontentloaded',
         timeout: 15000,
       });
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       const anchors = ['ferpa', 'wcag', 'scorm', 'gdpr', 'air-gapped', 'security'];
       for (const id of anchors) {
@@ -87,7 +87,7 @@ test.describe('GraphQL Graceful Degradation', () => {
         waitUntil: 'domcontentloaded',
         timeout: 15000,
       });
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // Should still show all section content
       const bodyText = await page.locator('body').innerText();
@@ -108,7 +108,7 @@ test.describe('GraphQL Graceful Degradation', () => {
         waitUntil: 'domcontentloaded',
         timeout: 15000,
       });
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       const bodyText = await page.locator('body').innerText();
       expect(bodyText).toContain('EduSphere');

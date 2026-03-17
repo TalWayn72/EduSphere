@@ -439,7 +439,7 @@ test.describe('AI Course Builder — Modal Close & Memory Safety', () => {
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5_000 });
 
     // Wait briefly to catch any async errors from dangling subscriptions
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // No React "Can't perform a state update on unmounted component" or urql errors
     const dangling = consoleErrors.filter(

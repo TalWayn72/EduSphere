@@ -23,7 +23,7 @@ async function loginAsSuperAdmin(page: any) {
       { timeout: 15000 }
     )
     .catch(() => {});
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('domcontentloaded');
 
   const signInBtn = page.locator('button', { hasText: /sign in/i }).first();
   const btnVisible = await signInBtn
@@ -31,7 +31,7 @@ async function loginAsSuperAdmin(page: any) {
     .catch(() => false);
   if (btnVisible) {
     await signInBtn.click();
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     if (page.url().includes('localhost:8080')) {
       await page.fill('#username', 'super.admin@edusphere.dev').catch(() => {});
       await page.fill('#password', 'Admin1234').catch(() => {});
@@ -39,14 +39,14 @@ async function loginAsSuperAdmin(page: any) {
         .click('#kc-login')
         .catch(() => page.click('input[type="submit"]').catch(() => {}));
       await page.waitForURL(`${BASE_URL}/**`).catch(() => {});
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
   }
 }
 
 test('SA-01 Content Viewer (Default landing)', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-01-content-viewer.png`,
     fullPage: true,
@@ -66,7 +66,7 @@ test('SA-02 Dashboard', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-02-dashboard.png`,
     fullPage: true,
@@ -80,7 +80,7 @@ test('SA-03 Courses List', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/courses`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-03-courses.png`,
     fullPage: true,
@@ -94,7 +94,7 @@ test('SA-04 Course Create (Admin feature)', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/courses/new`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-04-course-create.png`,
     fullPage: true,
@@ -108,7 +108,7 @@ test('SA-05 Knowledge Graph', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/graph`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(4000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-05-knowledge-graph.png`,
     fullPage: true,
@@ -122,7 +122,7 @@ test('SA-06 Annotations', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/annotations`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-06-annotations.png`,
     fullPage: true,
@@ -136,7 +136,7 @@ test('SA-07 Agents', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/agents`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-07-agents.png`,
     fullPage: true,
@@ -150,7 +150,7 @@ test('SA-08 Collaboration', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/collaboration`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-08-collaboration.png`,
     fullPage: true,
@@ -164,7 +164,7 @@ test('SA-09 Search', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/search`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-09-search.png`,
     fullPage: true,
@@ -178,7 +178,7 @@ test('SA-10 Profile', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/profile`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.screenshot({
     path: `${SCREENSHOTS}/sa-10-profile.png`,
     fullPage: true,
@@ -192,7 +192,7 @@ test('SA-11 User Menu - Check admin options', async ({ page }) => {
   await loginAsSuperAdmin(page);
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   // Click on user avatar/menu
   const userMenu = page
@@ -205,7 +205,7 @@ test('SA-11 User Menu - Check admin options', async ({ page }) => {
 
   if (menuVisible) {
     await userMenu.click();
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('domcontentloaded');
     await page.screenshot({
       path: `${SCREENSHOTS}/sa-11-user-menu.png`,
       fullPage: false,

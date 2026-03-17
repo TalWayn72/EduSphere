@@ -95,7 +95,7 @@ test('01 — Login page renders', async ({ page }) => {
 
   await page.goto(`${BASE_URL}/login`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(1000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '01-login');
@@ -134,7 +134,7 @@ test('02 — Keycloak login flow', async ({ page }) => {
   collectErrors(page, entry);
 
   await loginKeycloak(page);
-  await page.waitForTimeout(1500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '02-post-login');
@@ -164,7 +164,7 @@ for (const { label, path: pagePath } of PAGES) {
     // restore session via silent SSO
     await loginKeycloak(page);
     await page.goto(`${BASE_URL}${pagePath}`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2500); // let data fetch settle
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     entry.url = page.url();
     entry.screenshot = await snap(page, label);

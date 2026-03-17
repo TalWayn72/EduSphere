@@ -66,7 +66,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     const beginnerBtn = page.getByRole('button', { name: 'Beginner' }).first();
     await beginnerBtn.waitFor({ timeout: 10_000 });
     await beginnerBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Beginner courses in mock data: UI/UX Design Fundamentals, Modern Spanish, Digital Photography, Entrepreneurship, Ancient Civilizations
     await expect(page.getByText(/UI\/UX Design Fundamentals/i)).toBeVisible({
@@ -89,7 +89,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       .first();
     await intermediateBtn.waitFor({ timeout: 10_000 });
     await intermediateBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Intermediate courses: Business Strategy, React 19, Linear Algebra, Brand Identity, Data Structures
     await expect(
@@ -117,7 +117,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       .first();
     await advancedBtn.waitFor({ timeout: 10_000 });
     await advancedBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Advanced courses: Complete TypeScript Bootcamp, Quantum Computing
     await expect(
@@ -142,7 +142,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     const beginnerBtn = page.getByRole('button', { name: 'Beginner' }).first();
     await beginnerBtn.waitFor({ timeout: 10_000 });
     await beginnerBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Confirm filtering applied
     await expect(
@@ -154,7 +154,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       .getByRole('button', { name: 'Any Level' })
       .first();
     await anyLevelBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // All courses should appear again
     await expect(
@@ -173,7 +173,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       .first();
     await intermediateBtn.waitFor({ timeout: 10_000 });
     await intermediateBtn.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(intermediateBtn).toHaveAttribute('aria-pressed', 'true');
 
@@ -194,7 +194,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
 
     // Open the select
     await sortTrigger.first().click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // Pick "Highest Rated"
     const highestRatedOption = page.getByRole('option', {
@@ -211,7 +211,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       await page.getByText(/Highest Rated/i).first().click();
     }
 
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should still render without crashing
     const body = await page.textContent('body');
@@ -233,7 +233,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     );
     await sortTrigger.first().waitFor({ timeout: 10_000 });
     await sortTrigger.first().click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const newestOption = page.getByRole('option', { name: /Newest/i });
     const optionVisible = await newestOption
@@ -246,7 +246,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       await page.getByText(/Newest/i).first().click();
     }
 
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     const grid = page.locator('[data-testid="courses-grid"]');
     await expect(grid).toBeVisible({ timeout: 5_000 });
@@ -263,14 +263,14 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       .first();
     await intermediateBtn.waitFor({ timeout: 10_000 });
     await intermediateBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Then change sort
     const sortTrigger = page.locator('[data-testid="sort-select"]').or(
       page.locator('#sort-select')
     );
     await sortTrigger.first().click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const newestOption = page.getByRole('option', { name: /Newest/i });
     const optionVisible = await newestOption
@@ -282,7 +282,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       await page.getByText(/Newest/i).first().click();
     }
 
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // No raw errors visible
     const body = await page.textContent('body');
@@ -373,7 +373,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('course-discovery-filters-default.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,
@@ -389,7 +389,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       .first();
     await intermediateBtn.waitFor({ timeout: 10_000 });
     await intermediateBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(page).toHaveScreenshot(
       'course-discovery-filters-intermediate.png',

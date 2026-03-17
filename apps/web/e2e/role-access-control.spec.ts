@@ -342,7 +342,7 @@ test.describe('API authorization context', () => {
 
     await login(page);
     await page.goto(`${BASE_URL}/courses`, NAV_TIMEOUT);
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // The page should handle 401 gracefully — no stack traces visible
     const bodyText = await page.locator('body').innerText();

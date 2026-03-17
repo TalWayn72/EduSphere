@@ -34,7 +34,7 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
     page,
   }) => {
     await page.getByTestId('kg-tab-personal').click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     // At least one personal node should exist
     const nodes = page.locator('[data-personal-node]');
     await expect(nodes.first()).toBeVisible({ timeout: 5000 });
@@ -46,7 +46,7 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
     page,
   }) => {
     await page.getByTestId('kg-tab-personal').click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     const firstNode = page.locator('[data-personal-node]').first();
     await firstNode.click();
     // Course name should appear in sidebar
@@ -68,7 +68,7 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
     page,
   }) => {
     await page.getByTestId('kg-tab-personal').click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     const bodyText = await page.evaluate(() => document.body.textContent ?? '');
     expect(bodyText).not.toMatch(/TypeError|Error:/);
     expect(bodyText).not.toMatch(/at\s+\w+\s*\(/);
@@ -82,7 +82,7 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
 
   test('visual regression — Personal Knowledge Wiki', async ({ page }) => {
     await page.getByTestId('kg-tab-personal').click();
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('kg-personal-wiki.png', {
       fullPage: false,
     });
@@ -146,7 +146,7 @@ test.describe('InstructorMergeQueuePage', () => {
 
   test('visual regression — Merge Queue after approval', async ({ page }) => {
     await page.getByTestId('approve-btn-mr-1').click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('instructor-merge-queue-after-approve.png', {
       fullPage: false,
     });

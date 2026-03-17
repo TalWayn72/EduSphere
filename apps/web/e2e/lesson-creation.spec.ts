@@ -87,9 +87,9 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Should see template selection
     await expect(page.getByText('בחר תבנית Pipeline')).toBeVisible({
@@ -109,9 +109,9 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Create button should be disabled until template selected
     const createBtn = page.getByRole('button', {
@@ -130,9 +130,9 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E בדיקת שגיאה');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Select a template
     await page.getByText('שיעור כללי').click();
@@ -170,9 +170,9 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await page.getByText('שיעור כללי').click();
     await page
@@ -192,9 +192,9 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Click back button
     await page.getByRole('button', { name: 'חזרה' }).click();
@@ -211,9 +211,9 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     const titleInput = page.locator('input').first();
     await titleInput.fill('שיעור E2E ויזואלי');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('בחר תבנית Pipeline')).toBeVisible({
       timeout: 8_000,

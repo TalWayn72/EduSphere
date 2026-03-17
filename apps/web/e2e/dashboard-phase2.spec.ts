@@ -143,7 +143,7 @@ test.describe('Dashboard — Phase 2 clean rendering', () => {
   test('visual regression — dashboard Phase 2 render', async ({ page }) => {
     // Disable animations for stable snapshot
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500); // allow React paint to settle
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('dashboard-phase2.png', {
       fullPage: false,

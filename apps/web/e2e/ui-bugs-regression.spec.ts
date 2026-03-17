@@ -242,7 +242,7 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
     await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
     // Give React time to process the error response
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
     expect(bodyText, 'Raw urql error string "[GraphQL] Unexpected error." must not appear in DOM').not.toContain(
@@ -269,7 +269,7 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
     await login(page);
     await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // If an error state is rendered, it must use friendly i18n text
     const errorState = page.locator('[data-testid="error-state"]');

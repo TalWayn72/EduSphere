@@ -74,7 +74,7 @@ test.describe('Route Smoke Tests — Public Routes', () => {
       }
 
       // Wait for content to render
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // Page should not be blank
       const bodyText = await page.locator('body').innerText();
@@ -117,7 +117,7 @@ test.describe('Route Smoke Tests — Protected Routes (mocked auth)', () => {
       await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
       // Should either redirect to login or show the landing page (SmartRoot behavior)
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle').catch(() => {});
       const url = page.url();
       const bodyText = await page.locator('body').innerText();
 
@@ -141,7 +141,7 @@ test.describe('Route Smoke Tests — 404 handling', () => {
   for (const route of INVALID_ROUTES) {
     test(`invalid route ${route} does not crash`, async ({ page }) => {
       await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 15000 });
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // Should show SOME content (landing page via SmartRoot catch-all, or a 404 page)
       const bodyText = await page.locator('body').innerText();

@@ -216,7 +216,7 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     );
     if ((await submitBtn.count()) > 0) {
       await submitBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

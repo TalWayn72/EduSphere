@@ -111,7 +111,7 @@ test.describe('i18n Smoke Guard — English (en)', () => {
     test(`no raw i18n keys on /${name} (en)`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
       // Give translations time to load (lazy-loaded chunks)
-      await page.waitForTimeout(1_000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       await assertNoRawI18nKeys(page, name);
 
@@ -159,7 +159,7 @@ test.describe('i18n Smoke Guard — Hebrew (he)', () => {
     test(`no raw i18n keys on /${name} (he)`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
       // Give translations time to load (lazy-loaded chunks)
-      await page.waitForTimeout(1_000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       await assertNoRawI18nKeys(page, name);
     });
@@ -167,7 +167,7 @@ test.describe('i18n Smoke Guard — Hebrew (he)', () => {
 
   test('document direction is RTL when Hebrew is active', async ({ page }) => {
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const dir = await page.evaluate(() => document.documentElement.dir);
     expect(dir).toBe('rtl');

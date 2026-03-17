@@ -29,7 +29,7 @@ async function gotoDashboard(page: import('@playwright/test').Page) {
   // Widget tests (DailyLearning, SkillGap, Leaderboard) remain at /dashboard/legacy.
   await page.goto(`${BASE_URL}/dashboard/legacy`, { waitUntil: 'domcontentloaded' });
   // Wait for React to finish rendering and mock queries to settle
-  await page.waitForTimeout(2_500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 // BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
@@ -451,7 +451,7 @@ test.describe('Dashboard Widgets — BadgesGrid', () => {
    */
   async function gotoBadgesPage(page: import('@playwright/test').Page) {
     await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2_500);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   test('profile page loads without crash', async ({ page }) => {
@@ -559,7 +559,7 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
     await page.goto(`${BASE_URL}/courses/${MOCK_COURSE_ID}/analytics`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(2_500);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   test('CourseAnalyticsPage loads without crash', async ({ page }) => {
@@ -788,7 +788,7 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
   test('visual: BadgesGrid on profile page', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('badges-grid-profile.png', {
       maxDiffPixels: 200,
@@ -814,7 +814,7 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
     }
 
     await startBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Capture just the MicrolessonCard area
     const card = page.locator('.shadow-lg.border-0').first();

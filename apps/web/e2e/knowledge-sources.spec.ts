@@ -42,7 +42,7 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1_000); // let React settle
+    await page.waitForLoadState('networkidle').catch(() => {});
   });
 
   test('course detail page loads without crash', async ({ page }) => {
@@ -356,7 +356,7 @@ test.describe('Knowledge Sources — BUG-055 (raw errorMessage must not reach UI
     });
 
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     // Open sources panel
     await page.getByTestId('toggle-sources').click();
     await expect(page.getByTestId('sources-panel')).toBeVisible({
@@ -442,7 +442,7 @@ test.describe('Knowledge Sources — Loading state fix (sources must not be stuc
     });
 
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await page.getByTestId('toggle-sources').click();
     await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
 
@@ -473,13 +473,13 @@ test.describe('Knowledge Sources — Loading state fix (sources must not be stuc
     });
 
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await page.getByTestId('toggle-sources').click();
     await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
 
     // Should show error indicator (⚠️) and retry button, NOT stuck on "טוען..."
     // Wait for react-query retries to exhaust (retry: 2)
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     const bodyText = await page.evaluate(() => document.body.textContent ?? '');
     // Should NOT be showing the infinite loading state
     expect(bodyText).not.toContain('טוען מקורות');
@@ -516,7 +516,7 @@ test.describe('Knowledge Sources — Loading state fix (sources must not be stuc
     });
 
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await page.getByTestId('toggle-sources').click();
     await expect(page.getByText('מבוא לתלמוד')).toBeVisible({ timeout: UI_TIMEOUT });
     await expect(page.getByTestId('sources-panel')).toHaveScreenshot(
@@ -533,7 +533,7 @@ test.describe('CourseEditPage — Sources tab', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
     await page.goto(EDIT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   });
 
   test('edit page has a "מקורות מידע" tab', async ({ page }) => {
@@ -552,7 +552,7 @@ test.describe('CourseEditPage — Sources tab', () => {
 
   test('visual: edit page with Sources tab active', async ({ page }) => {
     await page.getByRole('tab', { name: /מקורות מידע/i }).click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('.max-w-4xl')).toHaveScreenshot(
       'course-edit-sources-tab.png'
     );
@@ -583,7 +583,7 @@ test.describe('Knowledge Sources — BUG-056 (subscription auth warning rate-lim
     await login(page);
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
     // Wait long enough for any reconnect loops to manifest
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Rate limiter must prevent the same warning from appearing more than once
     // per subscription operation name

@@ -167,7 +167,7 @@ test.describe('Instructor Merge Queue — Pending Proposals', () => {
     const btn = page.locator('[data-testid="approve-btn-prop-1"]');
     await btn.click();
     // Wait for the mutation response to resolve
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     expect(approvedIds).toContain('prop-1');
   });
 

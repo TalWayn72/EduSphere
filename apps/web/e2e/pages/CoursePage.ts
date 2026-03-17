@@ -117,7 +117,7 @@ export class CoursePage {
     );
     await searchInput.fill(query);
     // Debounce is 300ms in the real component; allow 500ms here
-    await this.page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
   }
 
   /**

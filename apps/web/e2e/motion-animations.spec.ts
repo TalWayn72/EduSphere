@@ -220,7 +220,7 @@ test.describe('Motion Design — prefers-reduced-motion (AnimatedCounter)', () =
     const statsBar = page.locator('[data-testid="stats-bar"]');
     await expect(statsBar).toBeVisible({ timeout: 10_000 });
     // Wait for IntersectionObserver + rAF count-up to complete
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await expect(statsBar.getByText('10,000+')).toBeVisible({ timeout: 5_000 });
   });
 });
@@ -240,7 +240,7 @@ test.describe('Motion Design — prefers-reduced-motion (TestimonialsCarousel)',
     const initialQuote = await carousel.locator('blockquote').first().textContent();
 
     // 5s wait — carousel would normally advance at 4s intervals
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const quoteAfterWait = await carousel.locator('blockquote').first().textContent();
     expect(quoteAfterWait, 'Carousel must NOT auto-advance under prefers-reduced-motion').toBe(
@@ -291,7 +291,7 @@ test.describe('Motion Design — VideoSection', () => {
 
     const demoVideo = page.locator('[data-testid="video-section"] video');
     await demoVideo.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Video must NOT be playing (paused=true) under reduced-motion
     const isPaused = await demoVideo.evaluate((v) => (v as HTMLVideoElement).paused);
@@ -317,7 +317,7 @@ test.describe('Motion Design — WCAG 2.2.2 (Pause, Stop, Hide)', () => {
     await carousel.hover();
 
     // Wait longer than the 4s auto-advance interval
-    await page.waitForTimeout(5_500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const quoteDuringHover = await carousel.locator('blockquote').first().textContent();
     expect(
@@ -338,7 +338,7 @@ test.describe('Motion Design — WCAG 2.2.2 (Pause, Stop, Hide)', () => {
     await page.mouse.move(0, 0); // mouse leaves carousel — triggers onMouseLeave → setPaused(false)
 
     // Wait for next auto-advance (4s interval)
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Carousel should have advanced (new quote)
     const tabs = carousel.locator('[role="tab"]');

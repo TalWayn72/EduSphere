@@ -187,7 +187,7 @@ test.describe('Discussions — thread and reply flows', () => {
     );
     if ((await newThreadBtn.count()) > 0) {
       await newThreadBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -262,7 +262,7 @@ test.describe('Discussions — thread and reply flows', () => {
     );
     if ((await pinBtn.count()) > 0) {
       await pinBtn.first().click().catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     const lockBtn = page.locator(
@@ -270,7 +270,7 @@ test.describe('Discussions — thread and reply flows', () => {
     );
     if ((await lockBtn.count()) > 0) {
       await lockBtn.first().click().catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -318,7 +318,7 @@ test.describe('Discussions — thread and reply flows', () => {
     );
     if ((await searchInput.count()) > 0) {
       await searchInput.first().fill('GraphQL');
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

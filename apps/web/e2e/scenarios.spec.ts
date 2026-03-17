@@ -25,7 +25,7 @@ const BASE = BASE_URL;
 
 async function gotoScenarios(page: import('@playwright/test').Page) {
   await page.goto(`${BASE}/scenarios`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2_500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 /**
@@ -386,7 +386,7 @@ test.describe('Scenarios — Visual regression @visual', () => {
     await page
       .locator('.fixed.inset-0.bg-gray-950')
       .waitFor({ state: 'visible', timeout: 8_000 });
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('scenario-player-open.png', {
       maxDiffPixels: 200,

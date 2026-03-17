@@ -190,7 +190,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     );
     if ((await searchInput.count()) > 0) {
       await searchInput.first().fill('GraphQL');
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -209,7 +209,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     );
     if ((await categoryLink.count()) > 0) {
       await categoryLink.first().click().catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -292,7 +292,7 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     );
     if ((await courseCard.count()) > 0) {
       await courseCard.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

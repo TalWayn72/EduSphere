@@ -18,7 +18,7 @@ async function waitForAppReady(page: any, timeout = 15000) {
       { timeout }
     )
     .catch(() => {});
-  await page.waitForTimeout(1000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 test('01 - Homepage loads and redirects correctly', async ({ page }) => {
@@ -189,7 +189,7 @@ test('13 - Keycloak login flow as super admin', async ({ page }) => {
       .click('input[type="submit"]')
       .catch(() => page.click('button[type="submit"]').catch(() => {}));
     await page.waitForLoadState('domcontentloaded').catch(() => {});
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await page.screenshot({
       path: `${SCREENSHOTS}/13c-after-login.png`,
       fullPage: true,

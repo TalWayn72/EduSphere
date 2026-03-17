@@ -122,7 +122,7 @@ test.describe('Audit Log Export', () => {
     });
 
     // React state update — wait for re-render
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // The component calls toast.error when dates are empty and submit is clicked,
     // but the buttons themselves are NOT disabled by value — they are disabled

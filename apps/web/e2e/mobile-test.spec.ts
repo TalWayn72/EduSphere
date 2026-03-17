@@ -116,7 +116,7 @@ test('M-05 touch scroll works on dashboard', async ({ page }) => {
   // Simulate touch scroll by using mouse wheel (Playwright maps to touch on mobile)
   const initialScrollY = await page.evaluate(() => window.scrollY);
   await page.mouse.wheel(0, 300);
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('domcontentloaded');
   const newScrollY = await page.evaluate(() => window.scrollY);
 
   // Page should be scrollable if content is long enough
@@ -300,14 +300,14 @@ test('M-14 hamburger menu close after link click', async ({ page }) => {
 
   if (isHamburgerVisible) {
     await hamburger.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Click a nav link
     const navLink = page.locator('nav a').first();
     const linkExists = await navLink.isVisible().catch(() => false);
     if (linkExists) {
       await navLink.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // After clicking a link, the menu should close (or page should navigate)
       await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -342,7 +342,7 @@ test('M-16 visual regression — mobile dashboard', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(400);
+  await page.waitForLoadState('domcontentloaded');
 
   await expect(page).toHaveScreenshot('mobile-dashboard.png', {
     fullPage: false,
@@ -382,7 +382,7 @@ test('M-18 mobile — focus is visible on interactive elements', async ({ page }
 
   // Tab through first few interactive elements and verify focus is shown
   await page.keyboard.press('Tab');
-  await page.waitForTimeout(200);
+  await page.waitForLoadState('domcontentloaded');
 
   const activeTag = await page.evaluate(() => document.activeElement?.tagName);
   // Something should receive focus
@@ -413,7 +413,7 @@ test('M-20 visual regression — mobile courses page', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${BASE_URL}/courses`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(400);
+  await page.waitForLoadState('domcontentloaded');
 
   await expect(page).toHaveScreenshot('mobile-courses.png', {
     fullPage: false,

@@ -272,7 +272,7 @@ test.describe('Org Usage Page — Visual Regression', () => {
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
 
     // Allow SVG transition to settle (0.4s ease in UsageMeter)
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('org-usage-normal.png', {
       fullPage: false,
@@ -295,7 +295,7 @@ test.describe('Org Usage Page — Visual Regression', () => {
     await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
     await page.locator('[data-testid="overage-callout"]').waitFor({ timeout: 5_000 });
 
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('org-usage-overage.png', {
       fullPage: false,

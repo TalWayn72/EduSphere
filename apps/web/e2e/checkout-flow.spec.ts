@@ -118,7 +118,7 @@ test.describe('PurchaseCourseButton → /checkout navigation', () => {
     if (btnCount > 0) {
       await purchaseBtn.click();
       // Wait briefly for navigation to /checkout
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     // Whether clicked or not: /checkout must be accessible
@@ -409,7 +409,7 @@ test.describe('CheckoutPage — extended coverage', () => {
     );
     if ((await cancelBtn.count()) > 0) {
       await cancelBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -454,7 +454,7 @@ test.describe('CheckoutPage — extended coverage', () => {
       await submitBtn.first().click().catch(() => {});
       await submitBtn.first().click().catch(() => {});
       await submitBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // Page should not crash from rapid clicks

@@ -247,7 +247,7 @@ test('01 — Login page renders with EduSphere branding', async ({ page }) => {
       );
     });
 
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('domcontentloaded');
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '01-login-page');
@@ -338,7 +338,7 @@ test('02 — Keycloak login flow completes and lands on app', async ({
   report.push(entry);
 
   await loginViaKeycloak(page);
-  await page.waitForTimeout(2000); // let React settle after PKCE redirect
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '02-post-keycloak-login');
@@ -386,7 +386,7 @@ test('03 — Dashboard page — stats cards and user profile', async ({ page }) 
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3000); // allow GraphQL queries to settle
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '03-dashboard');
@@ -445,7 +445,7 @@ test('04 — Course List page — courses grid', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/courses`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '04-courses-list');
@@ -491,7 +491,7 @@ test('05 — Content Viewer — video player and transcript', async ({ page }) =
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/learn/content-1`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '05-content-viewer');
@@ -542,7 +542,7 @@ test('06 — Content Viewer — create an annotation', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/learn/content-1`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(5000); // extra wait for Vite HMR to settle
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   // Try to add an annotation — button has text "Add" with Plus icon
   const addBtn = page
@@ -562,7 +562,7 @@ test('06 — Content Viewer — create an annotation', async ({ page }) => {
   }
 
   await addBtn.click();
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('domcontentloaded');
 
   const textarea = page.locator('textarea').first();
   const textareaVisible = await textarea.isVisible().catch(() => false);
@@ -590,7 +590,7 @@ test('06 — Content Viewer — create an annotation', async ({ page }) => {
     entry.notes.push('MISSING: Save button not visible in annotation form');
   } else {
     await saveBtn.click();
-    await page.waitForTimeout(1500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Check if annotation appears
     const annotationText = page.getByText(
@@ -631,7 +631,7 @@ test('07 — Annotations Page — layer tabs and list', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/annotations`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '07-annotations-page');
@@ -670,7 +670,7 @@ test('08 — Knowledge Graph page', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(4000); // graphs take longer to render
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '08-knowledge-graph');
@@ -719,7 +719,7 @@ test('09 — Search Page — semantic search', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/search`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '09-search-empty');
@@ -732,7 +732,7 @@ test('09 — Search Page — semantic search', async ({ page }) => {
 
   if (inputVisible) {
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(800); // debounce
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     entry.screenshot = await snap(page, '09-search-results');
 
@@ -779,7 +779,7 @@ test('10 — AI Agents Page — Chavruta mode and chat', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/agents`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '10-agents-page');
@@ -825,7 +825,7 @@ test('10 — AI Agents Page — Chavruta mode and chat', async ({ page }) => {
   if (inputVisible) {
     await chatInput.fill('What is free will from a Talmudic perspective?');
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     entry.screenshot = await snap(page, '10-agents-message-sent');
 
@@ -838,7 +838,7 @@ test('10 — AI Agents Page — Chavruta mode and chat', async ({ page }) => {
       entry.notes.push('BUG: User message not visible after sending');
 
     // Wait for AI response
-    await page.waitForTimeout(3500); // 600ms delay + ~2s streaming
+    await page.waitForLoadState('networkidle').catch(() => {});
     entry.screenshot = await snap(page, '10-agents-ai-response');
 
     const agentBubbles = page.locator(
@@ -875,7 +875,7 @@ test('11 — Collaboration Page', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/collaboration`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '11-collaboration');
@@ -915,7 +915,7 @@ test('12 — Profile Page', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/profile`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '12-profile');
@@ -958,7 +958,7 @@ test('13 — User Menu and Logout flow', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   // Find and click UserMenu button
   const userMenuBtn = page
@@ -992,7 +992,7 @@ test('13 — User Menu and Logout flow', async ({ page }) => {
     await userMenuBtn.click();
   }
 
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('domcontentloaded');
   entry.screenshot = await snap(page, '13-usermenu-open');
 
   // Check dropdown items
@@ -1008,7 +1008,7 @@ test('13 — User Menu and Logout flow', async ({ page }) => {
     );
   } else {
     await logoutItem.click();
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const finalUrl = page.url();
     entry.notes.push(`After logout URL: ${finalUrl}`);
@@ -1052,7 +1052,7 @@ test('14 — Navigation sidebar — all links reachable', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '14-sidebar-navigation');
@@ -1104,7 +1104,7 @@ test('15 — Unknown route redirects gracefully', async ({ page }) => {
   await page.goto(`${BASE}/this-page-does-not-exist-xyz`, {
     waitUntil: 'domcontentloaded',
   });
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   entry.url = page.url();
   entry.screenshot = await snap(page, '15-unknown-route');

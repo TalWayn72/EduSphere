@@ -133,7 +133,7 @@ test.describe('Course Discovery — interactivity', () => {
     await searchInput.fill('TypeScript');
 
     // Wait for debounce (300ms) + React re-render
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // The TypeScript Bootcamp course must remain visible
     await expect(
@@ -155,7 +155,7 @@ test.describe('Course Discovery — interactivity', () => {
     await searchInput.waitFor({ timeout: 10_000 });
 
     await searchInput.fill('zzz_no_match_xyz_9999');
-    await page.waitForTimeout(500); // debounce
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(
       page.locator('[data-testid="courses-empty-state"]')
@@ -201,7 +201,7 @@ test.describe('Course Discovery — interactivity', () => {
 
   test('visual regression — course discovery grid view', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('course-discovery-grid.png', {
       fullPage: false,
@@ -218,7 +218,7 @@ test.describe('Course Discovery — interactivity', () => {
       waitUntil: 'domcontentloaded',
     });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('course-discovery-mobile.png', {
       fullPage: false,

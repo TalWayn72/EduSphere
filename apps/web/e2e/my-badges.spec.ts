@@ -294,7 +294,7 @@ test.describe('My Open Badges', () => {
 
     // Click the badge card/name to open details
     await badgeName.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Look for a modal/dialog or expanded detail view
     const modal = page.locator('[role="dialog"], [data-testid*="badge-detail"], [data-testid*="modal"]').first();
@@ -322,7 +322,7 @@ test.describe('My Open Badges', () => {
 
     if (shareExists) {
       await shareBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for copy link option
       const copyLink = page.locator(
@@ -370,7 +370,7 @@ test.describe('My Open Badges', () => {
     if (!tagVisible) {
       // Click to open detail and check there
       await page.getByText('Course Completion Hero').click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
       const tagInDetail = page.getByText('onboarding');
       const detailTagVisible = await tagInDetail.isVisible().catch(() => false);
       // Tag should be somewhere in the UI
@@ -448,7 +448,7 @@ test.describe('My Open Badges', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/my-badges');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('badges-grid-mixed.png', {
       fullPage: false,
@@ -471,7 +471,7 @@ test.describe('My Open Badges', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/my-badges');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('badges-empty-state.png', {
       fullPage: false,

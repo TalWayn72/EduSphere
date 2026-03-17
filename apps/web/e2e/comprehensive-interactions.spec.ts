@@ -21,9 +21,9 @@ import { login } from './auth.helpers';
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 /** Wait for page to settle (no spinner, no navigation in progress). */
-async function settle(page: Page, ms = 500): Promise<void> {
+async function settle(page: Page): Promise<void> {
   await page.waitForLoadState('domcontentloaded').catch(() => {});
-  await page.waitForTimeout(ms);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 /** Assert no raw SQL is visible anywhere on the page. */
@@ -127,7 +127,7 @@ test.describe('Top Navigation — all tabs', () => {
     const isVisible = await graphLink.isVisible().catch(() => false);
     if (isVisible) {
       await graphLink.click();
-      await settle(page, 2000);
+      await settle(page);
       await assertNoCrash(page);
       await assertNoSql(page);
     }
@@ -232,7 +232,7 @@ test.describe('User Menu', () => {
     }
 
     await menuBtn.click();
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify dropdown opened
     const dropdown = page.locator('[role="menu"]');
@@ -260,7 +260,7 @@ test.describe('User Menu', () => {
     }
 
     await menuBtn.click();
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const menuItems = await page.evaluate(() => {
       return Array.from(document.querySelectorAll('[role="menuitem"]')).map(
@@ -299,7 +299,7 @@ test.describe('User Menu', () => {
     }
 
     await menuBtn.click();
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const profileItem = page.getByRole('menuitem', { name: /profile/i });
     const profileVisible = await profileItem.isVisible().catch(() => false);
@@ -374,7 +374,7 @@ test.describe('Course Detail Page (/courses/:courseId)', () => {
     await expect(enrollBtn).toBeVisible({ timeout: 8_000 });
     // Click and verify no crash
     await enrollBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -471,7 +471,7 @@ test.describe('Courses Page — all interactions', () => {
 
     const firstCard = page.locator('h3').filter({ hasText: /.{3,}/ }).first();
     await firstCard.click();
-    await settle(page, 2000);
+    await settle(page);
 
     await assertNoSql(page);
     await assertNoCrash(page);
@@ -503,7 +503,7 @@ test.describe('Courses Page — all interactions', () => {
 test.describe('Content Viewer — all interactions', () => {
   test('content viewer loads with video', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
 
     await expect(page.locator('video')).toBeVisible({ timeout: 10_000 });
     await assertNoSql(page);
@@ -512,7 +512,7 @@ test.describe('Content Viewer — all interactions', () => {
 
   test('Transcript tab is clickable and shows content', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
 
     const transcriptTab = page.getByRole('tab', { name: /transcript/i });
     const isVisible = await transcriptTab
@@ -524,7 +524,7 @@ test.describe('Content Viewer — all interactions', () => {
     }
 
     await transcriptTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     const panel = page.getByRole('tabpanel');
     await expect(panel).toBeVisible({ timeout: 3_000 });
@@ -533,7 +533,7 @@ test.describe('Content Viewer — all interactions', () => {
 
   test('Annotations tab is clickable', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
 
     const annotationsTab = page
       .getByRole('tab', { name: /annotations/i })
@@ -547,14 +547,14 @@ test.describe('Content Viewer — all interactions', () => {
     }
 
     await annotationsTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoSql(page);
     await assertNoCrash(page);
   });
 
   test('Search tab is clickable', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
 
     const searchTab = page.getByRole('tab', { name: /search/i });
     const isVisible = await searchTab
@@ -566,14 +566,14 @@ test.describe('Content Viewer — all interactions', () => {
     }
 
     await searchTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoSql(page);
     await assertNoCrash(page);
   });
 
   test('play/pause button toggles video state', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
 
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
@@ -590,7 +590,7 @@ test.describe('Content Viewer — all interactions', () => {
     }
 
     await playBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // After clicking play, the button should now show pause
     const pauseBtn = page.locator('.lucide-pause').first();
@@ -599,7 +599,7 @@ test.describe('Content Viewer — all interactions', () => {
 
   test('mute button toggles audio', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
     const muteBtn = page
@@ -615,7 +615,7 @@ test.describe('Content Viewer — all interactions', () => {
     }
 
     await muteBtn.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
   });
 
@@ -623,7 +623,7 @@ test.describe('Content Viewer — all interactions', () => {
     page,
   }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
     const layerBtn = page
@@ -638,14 +638,14 @@ test.describe('Content Viewer — all interactions', () => {
     }
 
     await layerBtn.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await layerBtn.click(); // toggle back
     await assertNoCrash(page);
   });
 
   test('add annotation button opens form', async ({ page }) => {
     await page.goto('/learn/content-1');
-    await settle(page, 1000);
+    await settle(page);
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
     const addBtn = page.getByRole('button', { name: /^add$/i });
@@ -689,7 +689,7 @@ test.describe('Annotations Page — all tabs', () => {
     }
 
     await allTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -708,7 +708,7 @@ test.describe('Annotations Page — all tabs', () => {
     }
 
     await privateTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoSql(page);
   });
 
@@ -726,7 +726,7 @@ test.describe('Annotations Page — all tabs', () => {
     }
 
     await publicTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoSql(page);
   });
 
@@ -746,7 +746,7 @@ test.describe('Annotations Page — all tabs', () => {
     }
 
     await authorityTab.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoSql(page);
   });
 });
@@ -807,7 +807,7 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     }
 
     await chavrutaCard.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -826,7 +826,7 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     }
 
     await card.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -849,7 +849,7 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     }
 
     await firstCard.click();
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('domcontentloaded');
 
     const chatInput = page
       .locator('input[placeholder], textarea[placeholder]')
@@ -869,7 +869,7 @@ test.describe('Agents Page — all agent templates and interactions', () => {
 test.describe('Knowledge Graph page', () => {
   test('graph page loads without SQL error', async ({ page }) => {
     await page.goto('/graph');
-    await settle(page, 2000);
+    await settle(page);
 
     await assertNoCrash(page);
     await assertNoSql(page);
@@ -877,7 +877,7 @@ test.describe('Knowledge Graph page', () => {
 
   test('graph has canvas or SVG element', async ({ page }) => {
     await page.goto('/graph');
-    await settle(page, 2000);
+    await settle(page);
 
     const hasCanvas = await page
       .locator('canvas')
@@ -897,7 +897,7 @@ test.describe('Knowledge Graph page', () => {
 
   test('graph search input accepts text', async ({ page }) => {
     await page.goto('/graph');
-    await settle(page, 2000);
+    await settle(page);
 
     const searchInput = page
       .locator(
@@ -913,7 +913,7 @@ test.describe('Knowledge Graph page', () => {
     }
 
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -943,7 +943,7 @@ test.describe('Search Page — input and results', () => {
     await expect(searchInput).toBeVisible({ timeout: 8_000 });
 
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(800); // debounce
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await assertNoSql(page);
     await assertNoCrash(page);
@@ -961,9 +961,9 @@ test.describe('Search Page — input and results', () => {
     await expect(searchInput).toBeVisible({ timeout: 8_000 });
 
     await searchInput.fill('hello world');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await searchInput.clear();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await assertNoCrash(page);
     await assertNoSql(page);
@@ -982,11 +982,11 @@ test.describe('Search Page — input and results', () => {
 
     // Test XSS-like and SQL injection-like strings
     await searchInput.fill("<script>alert('xss')</script>");
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await assertNoCrash(page);
 
     await searchInput.fill("'; DROP TABLE users; --");
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -1023,7 +1023,7 @@ test.describe('Course Creation Wizard (/courses/new)', () => {
     }
 
     await titleInput.fill('My Test Course');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
   });
 
@@ -1072,7 +1072,7 @@ test.describe('Course Creation Wizard (/courses/new)', () => {
     }
 
     await difficultyTrigger.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     const beginner = page
       .getByRole('option', { name: /beginner/i })
@@ -1137,7 +1137,7 @@ test.describe('Settings Page', () => {
         .catch(() => false);
       if (visible) {
         await option.click();
-        await page.waitForTimeout(200);
+        await page.waitForLoadState('domcontentloaded');
         await assertNoCrash(page);
       }
     }
@@ -1164,7 +1164,7 @@ test.describe('Settings Page', () => {
     }
 
     await langSelector.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     const options = page.locator('[role="option"]');
     const count = await options.count();
@@ -1236,7 +1236,7 @@ test.describe('Collaboration Page', () => {
       .catch(() => false);
     if (isVisible) {
       await createBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('domcontentloaded');
       await assertNoCrash(page);
       await assertNoSql(page);
     }
@@ -1264,7 +1264,7 @@ test.describe('Error Resilience — no raw SQL, no crash on any route', () => {
   for (const route of routes) {
     test(`no SQL exposed on ${route}`, async ({ page }) => {
       await page.goto(route);
-      await settle(page, 1500);
+      await settle(page);
 
       await assertNoSql(page);
       await assertNoCrash(page);
@@ -1295,7 +1295,7 @@ test.describe('Mobile Navigation', () => {
     }
 
     await hamburger.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await assertNoCrash(page);
   });
 

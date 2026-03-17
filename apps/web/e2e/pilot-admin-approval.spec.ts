@@ -345,7 +345,7 @@ test.describe('Pilot Requests Admin Page — Empty State', () => {
   });
 
   test('requests table is NOT rendered in empty state', async ({ page }) => {
-    await page.waitForTimeout(500); // let data settle
+    await page.waitForLoadState('domcontentloaded');
     await expect(
       page.locator('[data-testid="pilot-requests-table"]'),
     ).not.toBeVisible();

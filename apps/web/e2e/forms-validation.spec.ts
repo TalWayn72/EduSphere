@@ -66,7 +66,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
       .locator('input[placeholder*="Introduction"]')
       .first();
     await titleInput.fill('AB');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const nextBtn = page.getByRole('button', { name: /next/i });
     await expect(nextBtn).toBeDisabled();
@@ -79,7 +79,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
       .locator('input[placeholder*="Introduction"]')
       .first();
     await titleInput.fill('ABC');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const nextBtn = page.getByRole('button', { name: /next/i });
     await expect(nextBtn).toBeEnabled({ timeout: 3_000 });
@@ -92,7 +92,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
       .locator('input[placeholder*="Introduction"]')
       .first();
     await titleInput.fill('Introduction to Talmud');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // No error message should appear while value is valid
     const errorMsg = page.getByText(/at least 3 characters/i);
@@ -116,7 +116,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     await titleInput.fill('A');
     // Tab away to trigger blur
     await titleInput.press('Tab');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Zod validation: "Title must be at least 3 characters"
     await expect(
@@ -144,7 +144,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     const textarea = page.locator('textarea').first();
     await textarea.fill('Short');
     await textarea.press('Tab');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Zod message: "Description must be at least 10 characters"
     await expect(page.getByText(/at least 10 characters/i)).toBeVisible({
@@ -159,7 +159,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     // Leave empty — tab away to trigger onTouched
     await textarea.focus();
     await textarea.press('Tab');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // No error for empty description (z.string().min(10).or(z.literal('')))
     await expect(page.getByText(/at least 10 characters/i)).not.toBeVisible({
@@ -296,7 +296,7 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
       .locator('input[placeholder*="Introduction"]')
       .first();
     await titleInput.fill('Valid Course Title');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const nextBtn = page.getByRole('button', { name: /next/i });
     await expect(nextBtn).toBeEnabled({ timeout: 3_000 });
@@ -328,10 +328,10 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
       .locator('input[placeholder*="Introduction"]')
       .first();
     await titleInput.fill('Valid Course Title');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     const nextBtn = page.getByRole('button', { name: /next/i });
     await nextBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('step 2 shows empty-modules placeholder by default', async ({
@@ -361,7 +361,7 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
       .first();
 
     await moduleTitleInput.fill('Module 1: Introduction');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const addBtn = page.getByRole('button', { name: /add module/i }).first();
     await expect(addBtn).toBeEnabled({ timeout: 3_000 });
@@ -482,7 +482,7 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
     for (const title of ['Module Alpha', 'Module Beta', 'Module Gamma']) {
       await moduleTitleInput.fill(title);
       await addBtn.click();
-      await page.waitForTimeout(100);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText('Module Alpha')).toBeVisible({
@@ -510,13 +510,13 @@ test.describe('Course Creation Wizard — Step 4 (Publish / Review)', () => {
       .locator('input[placeholder*="Introduction"]')
       .first();
     await titleInput.fill('A Valid Course Title');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /next/i }).click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /next/i }).click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByRole('button', { name: /next/i }).click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('step 4 shows the Publish Course button', async ({ page }) => {
@@ -599,7 +599,7 @@ test.describe('Search form — input behaviour and validation', () => {
       .first();
 
     await input.fill('T');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Result count label only renders when query.length >= 2
     await expect(page.getByText(/result/i)).not.toBeVisible({ timeout: 2_000 });
@@ -611,7 +611,7 @@ test.describe('Search form — input behaviour and validation', () => {
     const input = page.locator('input[placeholder*="earch"]').first();
     await input.fill('Ta');
     // Wait for debounce (300ms) + render
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Results should appear (mock search finds "Talmud" matches)
     const resultCount = page.locator('text=/\\d+ result/');
@@ -628,10 +628,10 @@ test.describe('Search form — input behaviour and validation', () => {
   test('clearing the input resets to empty state', async ({ page }) => {
     const input = page.locator('input[placeholder*="earch"]').first();
     await input.fill('Talmud');
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await input.fill('');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Empty state should return
     await expect(page.getByRole('button', { name: 'Talmud' })).toBeVisible({
@@ -652,7 +652,7 @@ test.describe('Search form — input behaviour and validation', () => {
 
     for (const chars of specialChars) {
       await input.fill(chars);
-      await page.waitForTimeout(400);
+      await page.waitForLoadState('networkidle').catch(() => {});
       // Page must remain intact — heading still visible
       await expect(input).toBeVisible({ timeout: 2_000 });
     }
@@ -662,7 +662,7 @@ test.describe('Search form — input behaviour and validation', () => {
     page,
   }) => {
     await page.getByRole('button', { name: 'chavruta' }).click();
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('domcontentloaded');
 
     const input = page.locator('input[placeholder*="earch"]').first();
     const value = await input.inputValue();
@@ -679,7 +679,7 @@ test.describe('Search form — input behaviour and validation', () => {
     const input = page.locator('input[placeholder*="earch"]').first();
     await input.focus();
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     // Page stays functional (no JS errors result in a blank page)
     expect(page.url()).toBeTruthy();
   });
@@ -689,7 +689,7 @@ test.describe('Search form — input behaviour and validation', () => {
   }) => {
     const input = page.locator('input[placeholder*="earch"]').first();
     await input.fill('Talmud');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Course section header rendered as h3 with uppercase CSS class
     await expect(
@@ -886,7 +886,7 @@ test.describe('Annotation creation form — /learn/content-1', () => {
 
     // Toggle off then on
     await personalChip.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await personalChip.click();
 
     // Page should not crash

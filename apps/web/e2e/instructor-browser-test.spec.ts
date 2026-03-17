@@ -78,11 +78,11 @@ async function doLogin(browser: Browser): Promise<void> {
       '[login] DEV_MODE: auto-authenticated, skipping Keycloak login'
     );
     await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   } else {
     console.log('[login] Starting Keycloak login flow...');
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(3500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const url = page.url();
     console.log(`[login] Post-check-sso URL: ${url}`);
@@ -125,7 +125,7 @@ async function doLogin(browser: Browser): Promise<void> {
         await page.click('#kc-login');
 
         await page.waitForURL(/localhost/, { timeout: 25_000 });
-        await page.waitForTimeout(2500);
+        await page.waitForLoadState('networkidle').catch(() => {});
         console.log(`[login] Back on app: ${page.url()}`);
         await shot(page, '02-post-login-app');
       }
@@ -157,7 +157,7 @@ test.describe.serial('Instructor Browser Session', () => {
 
     // Navigate to app to verify session
     await sharedPage.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
-    await sharedPage.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     const verifyUrl = sharedPage.url();
     console.log(`[beforeAll] Shared page URL: ${verifyUrl}`);
     await shot(sharedPage, '03-shared-page-ready');
@@ -168,7 +168,7 @@ test.describe.serial('Instructor Browser Session', () => {
   // -------------------------------------------------------------------------
   test('1. Post-login landing — no auth errors', async () => {
     await sharedPage.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
-    await sharedPage.waitForTimeout(1500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const url = sharedPage.url();
     console.log(`[test1] URL: ${url}`);
@@ -201,7 +201,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '05-dashboard');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -239,7 +239,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/courses`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '06-courses');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -285,7 +285,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/collaboration`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '07-collaboration');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -327,7 +327,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/collaboration`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const selectors = [
       'textarea[placeholder*="message" i]',
@@ -354,7 +354,7 @@ test.describe.serial('Instructor Browser Session', () => {
           const b = sharedPage.locator(s).first();
           if (await b.isVisible({ timeout: 2000 }).catch(() => false)) {
             await b.click();
-            await sharedPage.waitForTimeout(1500);
+            await page.waitForLoadState('domcontentloaded');
             await shot(sharedPage, '08b-collab-sent');
             console.log(`[post] Submitted via ${s}`);
             posted = true;
@@ -363,7 +363,7 @@ test.describe.serial('Instructor Browser Session', () => {
         }
         if (!posted) {
           await el.press('Enter');
-          await sharedPage.waitForTimeout(1000);
+          await page.waitForLoadState('domcontentloaded');
           posted = true;
         }
         break;
@@ -385,7 +385,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/graph`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(4000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '09-knowledge-graph');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -429,7 +429,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/profile`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '10-profile');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -464,7 +464,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '11-nav-full');
 
     const navEls = await sharedPage
@@ -538,7 +538,7 @@ test.describe.serial('Instructor Browser Session', () => {
       await sharedPage.goto(`${BASE_URL}${path}`, {
         waitUntil: 'domcontentloaded',
       });
-      await sharedPage.waitForTimeout(1200);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       const finalUrl = sharedPage.url();
       const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -606,7 +606,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '12-pre-menu');
 
     const selectors = [
@@ -629,7 +629,7 @@ test.describe.serial('Instructor Browser Session', () => {
           `[usermenu] Trigger: ${sel} text="${t?.trim()}" aria="${a}"`
         );
         await el.click();
-        await sharedPage.waitForTimeout(800);
+        await page.waitForLoadState('domcontentloaded');
         await shot(sharedPage, '12b-menu-open');
         opened = true;
 
@@ -680,7 +680,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/learn/content-1`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '13-content-viewer');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
@@ -715,7 +715,7 @@ test.describe.serial('Instructor Browser Session', () => {
     await sharedPage.goto(`${BASE_URL}/agents`, {
       waitUntil: 'domcontentloaded',
     });
-    await sharedPage.waitForTimeout(2500);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await shot(sharedPage, '14-agents');
 
     const bodyText = (await sharedPage.locator('body').textContent()) ?? '';

@@ -189,7 +189,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     // Prefer the specific sidebar element; fall back to the ARIA complementary landmark
     const sidebarLocator = page.locator('[data-testid="visual-sidebar"]').first();
@@ -234,7 +234,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(600); // allow image to settle
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const sidebarLocator = page.locator('[data-testid="visual-sidebar"]').first();
     const sidebarVisible = await sidebarLocator.isVisible().catch(() => false);
@@ -270,7 +270,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const anchorFrame = page.locator('[data-testid="anchor-frame"]').first();
     const frameVisible = await anchorFrame.isVisible().catch(() => false);
@@ -302,7 +302,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Capture the full page to verify sidebar positioning (right side in RTL)
     await expect(page).toHaveScreenshot('sidebar-rtl-layout.png', {
@@ -318,7 +318,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const uploader = page.locator('[data-testid="asset-uploader"]').first();
     const uploaderVisible = await uploader.isVisible().catch(() => false);
@@ -355,7 +355,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const panel = page
       .locator('[aria-label="לוח עוגנים חזותיים"]')
@@ -397,7 +397,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(600); // allow bottom sheet snap animation to complete
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Try to trigger the bottom sheet if it has a trigger element
     const sheetTrigger = page
@@ -406,7 +406,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     const triggerVisible = await sheetTrigger.isVisible().catch(() => false);
     if (triggerVisible) {
       await sheetTrigger.click();
-      await page.waitForTimeout(300); // snap animation
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // Capture the full mobile viewport including the bottom sheet

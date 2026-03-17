@@ -239,7 +239,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
     for (const name of tabNames) {
       const tab = page.getByRole('tab', { name });
       await tab.click();
-      await page.waitForTimeout(150);
+      await page.waitForLoadState('domcontentloaded');
       await expect(tab).toHaveAttribute('data-state', 'active', {
         timeout: 2_000,
       });
@@ -287,7 +287,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
       .first();
 
     await personalCard.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // The corresponding tab should become active
     const personalTab = page.getByRole('tab', { name: /Personal/i });
@@ -305,7 +305,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
       .first();
 
     await sharedCard.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     const sharedTab = page.getByRole('tab', { name: /Shared/i });
     await expect(sharedTab).toHaveAttribute('data-state', 'active', {
@@ -330,7 +330,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
 
     // Click to select
     await personalCard.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // After click, aria-pressed should be true
     await expect(personalCard).toHaveAttribute('aria-pressed', 'true', {
@@ -367,9 +367,9 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
     const layerSortBtn = page.getByRole('button', { name: /layer/i });
 
     await layerSortBtn.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await timeSortBtn.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // Page heading must still be visible
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
@@ -533,7 +533,7 @@ test.describe('Agents page — 5 agent template mode cards', () => {
     for (const name of modes) {
       const card = page.locator('button').filter({ hasText: name }).first();
       await card.click();
-      await page.waitForTimeout(200);
+      await page.waitForLoadState('domcontentloaded');
       await expect(card).toHaveClass(/ring-2/, { timeout: 2_000 });
     }
 
@@ -571,7 +571,7 @@ test.describe('Agents page — 5 agent template mode cards', () => {
       .filter({ hasText: /Quiz Master/i })
       .first()
       .click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Quiz prompts appear
     await expect(page.getByText(/Quiz me/i).first()).toBeVisible({
@@ -587,11 +587,11 @@ test.describe('Agents page — 5 agent template mode cards', () => {
   test('each mode card is keyboard-navigable (focusable)', async ({ page }) => {
     // Tab to first mode card and verify it can receive focus
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(100);
+    await page.waitForLoadState('domcontentloaded');
 
     // Press Enter to activate the focused mode card
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should not crash
     await expect(
@@ -796,7 +796,7 @@ test.describe('Settings page — Language combobox', () => {
     const firstOption = page.getByRole('option').first();
     const firstOptionText = await firstOption.innerText();
     await firstOption.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Reopen and verify aria-selected is set
     await selector.click();

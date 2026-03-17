@@ -164,7 +164,7 @@ for (const locale of LOCALES) {
           waitUntil: 'domcontentloaded',
         });
         // Allow lazy-loaded translation chunks to resolve
-        await page.waitForTimeout(1_000);
+        await page.waitForLoadState('networkidle').catch(() => {});
 
         // 1. Assert no raw i18n keys are visible
         await assertNoRawI18nKeys(page, name, locale);

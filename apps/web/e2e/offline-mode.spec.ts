@@ -223,7 +223,7 @@ test.describe('Offline mode', () => {
       await navLinks.first().click().catch(() => {
         // Link click may fail if element not interactive while offline
       });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // Page should not show crash overlay
       await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -263,11 +263,11 @@ test.describe('Offline mode', () => {
     for (let i = 0; i < 5; i++) {
       await context.setOffline(true);
       await page.evaluate(() => window.dispatchEvent(new Event('offline')));
-      await page.waitForTimeout(200);
+      await page.waitForLoadState('domcontentloaded');
 
       await context.setOffline(false);
       await page.evaluate(() => window.dispatchEvent(new Event('online')));
-      await page.waitForTimeout(200);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // End online — banner should be gone
@@ -312,7 +312,7 @@ test.describe('Offline mode', () => {
     await expect(page.getByTestId('offline-banner')).not.toBeVisible({ timeout: 5000 });
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('offline-restored-online.png', {
       fullPage: false,

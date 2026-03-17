@@ -116,7 +116,7 @@ test('complete learning loop — student session from login to logout', async ({
   // Type a topic related to the course content
   await searchInput.fill('Talmud');
   // Wait for debounce (300ms) + rendering
-  await page.waitForTimeout(700);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   // Results appear from mock transcript segments — in DEV_MODE, transcript search matches
   // segments with "Talmud" in text; their title is 'Introduction to Talmudic Reasoning'
@@ -132,7 +132,7 @@ test('complete learning loop — student session from login to logout', async ({
   // The card's parent has an onClick that calls navigate(r.href)
   // We just click and verify navigation happened
   await firstResult.click();
-  await page.waitForTimeout(1_000);
+  await page.waitForLoadState('domcontentloaded');
   // Navigation may go to /courses or /learn/<id> depending on result type
   // Use pathname (not the full URL) to extract the first path segment.
   const firstPathSegment =

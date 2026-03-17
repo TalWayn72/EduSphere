@@ -161,7 +161,7 @@ test.describe('Offline Sync — Online Flush', () => {
     await page.evaluate(() => window.dispatchEvent(new Event('online')));
 
     // Give the flush handler time to process
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Queue should be cleared (flush() writes empty array)
     const after = await page.evaluate(() => {
@@ -217,7 +217,7 @@ test.describe('Offline Sync — Online Flush', () => {
     await context.setOffline(false);
     await page.evaluate(() => window.dispatchEvent(new Event('online')));
 
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // The expired item's operationName "OldMutation" should NOT appear in any mutation call
     const sentExpired = mutationCalls.some((call) =>
@@ -359,11 +359,11 @@ test.describe('Offline Sync — Online Flush', () => {
     for (let cycle = 0; cycle < 3; cycle++) {
       await context.setOffline(true);
       await page.evaluate(() => window.dispatchEvent(new Event('offline')));
-      await page.waitForTimeout(200);
+      await page.waitForLoadState('domcontentloaded');
 
       await context.setOffline(false);
       await page.evaluate(() => window.dispatchEvent(new Event('online')));
-      await page.waitForTimeout(200);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     // Page should still be functional

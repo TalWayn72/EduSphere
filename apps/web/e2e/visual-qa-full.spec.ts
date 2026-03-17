@@ -169,7 +169,7 @@ async function keycloakLogin(
   await page
     .click('#kc-login')
     .catch(() => page.click('button[type="submit"]').catch(() => {}));
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 async function login(
@@ -180,18 +180,18 @@ async function login(
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForTimeout(1500);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   const btn = page.getByRole('button', { name: /sign in with keycloak/i });
   if (await btn.isVisible().catch(() => false)) {
     await btn.click();
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   if (page.url().includes('8080') || page.url().includes('auth')) {
     await keycloakLogin(page, user.email, user.password);
     await page.waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 25000 }).catch(() => {});
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   // Retry if still on login
@@ -201,13 +201,13 @@ async function login(
     });
     if (await retryBtn.isVisible().catch(() => false)) {
       await retryBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle').catch(() => {});
       if (page.url().includes('8080')) {
         await keycloakLogin(page, user.email, user.password);
         await page
           .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 25000 })
           .catch(() => {});
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState('networkidle').catch(() => {});
       }
     }
   }
@@ -227,7 +227,7 @@ async function visitRoute(
   await page
     .goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded', timeout: 20000 })
     .catch(() => {});
-  await page.waitForTimeout(waitMs);
+  await page.waitForLoadState('domcontentloaded');
 
   r.url = page.url();
   r.headings = await headings(page);
@@ -275,7 +275,7 @@ test('01 — Public: Login page', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   r.url = page.url();
   r.headings = await headings(page);

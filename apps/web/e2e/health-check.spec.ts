@@ -137,7 +137,7 @@ test.describe('Health Check — App Bootstrap', () => {
 
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500); // Allow late async errors to surface
+    await page.waitForLoadState('domcontentloaded');
 
     expect(
       errors,

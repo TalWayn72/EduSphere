@@ -186,7 +186,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     );
     if ((await createBtn.count()) > 0) {
       await createBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -285,7 +285,7 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     );
     if ((await exportBtn.count()) > 0) {
       await exportBtn.first().click().catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('domcontentloaded');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

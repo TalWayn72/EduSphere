@@ -36,7 +36,7 @@ test.describe('KnowledgeGraphPage — global route /knowledge-graph', () => {
   });
 
   test('does NOT show course-context badge on global route', async ({ page }) => {
-    await page.waitForTimeout(500); // settle React
+    await page.waitForLoadState('domcontentloaded');
     const badge = page.getByTestId('kg-course-context-badge');
     expect(await badge.count()).toBe(0);
   });
@@ -110,7 +110,7 @@ test.describe('KnowledgeGraphPage — course-context route /knowledge-graph/:cou
 
   test('visual screenshot — course-context knowledge graph @visual', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await expect(page).toHaveScreenshot('knowledge-graph-course-context.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,

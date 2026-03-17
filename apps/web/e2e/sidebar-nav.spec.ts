@@ -182,7 +182,7 @@ test.describe('AppSidebar — visual regression screenshots', () => {
       ).toBeVisible({ timeout: 10_000 });
 
       // Allow any post-load micro-animations to settle
-      await page.waitForTimeout(400);
+      await page.waitForLoadState('domcontentloaded');
 
       await expect(page).toHaveScreenshot(`sidebar-on-${route.slug}.png`, {
         fullPage: false,
@@ -286,7 +286,7 @@ test.describe('AppSidebar — /explore regression guard (BUG: missing Layout)', 
       page.locator('[data-testid="app-sidebar"]')
     ).toBeVisible({ timeout: 10_000 });
 
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('sidebar-regression-explore.png', {
       fullPage: false,
@@ -321,7 +321,7 @@ test.describe('AppSidebar — interaction tests', () => {
 
       // Click toggle
       await toggleBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // Sidebar should still be in DOM but width should change
       await expect(sidebar).toBeAttached();
@@ -336,7 +336,7 @@ test.describe('AppSidebar — interaction tests', () => {
         'button[aria-label*="collapse" i], button[aria-label*="expand" i], button[aria-label*="toggle" i], [data-testid*="sidebar-toggle"]'
       ).first();
       await expandBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
     }
   });
 
@@ -414,11 +414,11 @@ test.describe('AppSidebar — interaction tests', () => {
     // Focus the first focusable element in the sidebar
     const firstLink = sidebar.locator('a[href], button').first();
     await firstLink.focus();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // Tab through sidebar items
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     // Check that focus moved to another element within the sidebar
     const activeElement = await page.evaluate(() => {
@@ -433,7 +433,7 @@ test.describe('AppSidebar — interaction tests', () => {
   test('mobile drawer — sidebar opens as overlay on small viewport', async ({ page }) => {
     // Resize to mobile
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // On mobile, sidebar may be hidden behind a hamburger
     const hamburger = page.locator(
@@ -443,7 +443,7 @@ test.describe('AppSidebar — interaction tests', () => {
 
     if (hamburgerVisible) {
       await hamburger.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // Sidebar or nav drawer should now be visible
       const sidebar = page.locator('[data-testid="app-sidebar"]');
@@ -468,7 +468,7 @@ test.describe('AppSidebar — interaction tests', () => {
 
     if (toggleExists) {
       await toggleBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // Hover over a collapsed nav item to trigger tooltip
       const navItems = sidebar.locator('a[href], button').filter({ hasText: /./ });
@@ -476,7 +476,7 @@ test.describe('AppSidebar — interaction tests', () => {
 
       if (itemCount > 0) {
         await navItems.first().hover();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for tooltip (role="tooltip" or [data-state="open"])
         const tooltip = page.locator(
@@ -507,7 +507,7 @@ test.describe('AppSidebar — interaction tests', () => {
       await sidebar.evaluate((el) => {
         el.scrollTop = 100;
       });
-      await page.waitForTimeout(200);
+      await page.waitForLoadState('domcontentloaded');
 
       const scrollTop = await sidebar.evaluate((el) => el.scrollTop);
       expect(scrollTop).toBeGreaterThan(0);
@@ -529,7 +529,7 @@ test.describe('AppSidebar — interaction tests', () => {
 
     if (toggleExists) {
       await toggleBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       await expect(page).toHaveScreenshot('sidebar-collapsed-state.png', {
         fullPage: false,

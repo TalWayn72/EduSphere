@@ -212,7 +212,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
 
     await forkBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // fork-error-banner should appear
     await expect(page.getByTestId('fork-error-banner')).toBeVisible({ timeout: 5_000 });
@@ -227,7 +227,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
 
     await forkBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     const pageText = await page.textContent('body');
     // BUG-048 regression guard: no raw DB / GraphQL strings should appear
@@ -249,7 +249,7 @@ test.describe('Fork Course — BUG-048 Regression', () => {
     if (!(await forkBtn.isVisible())) { test.skip(); return; }
 
     await forkBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     const banner = page.getByTestId('fork-error-banner');
     if (!(await banner.isVisible())) { test.skip(); return; }
@@ -294,7 +294,7 @@ test.describe('Fork Course — Visual regression', () => {
     }
 
     await forkBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     if (!(await page.getByTestId('fork-error-banner').isVisible())) {
       test.skip(); return;

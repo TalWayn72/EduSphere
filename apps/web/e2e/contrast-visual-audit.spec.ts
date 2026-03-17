@@ -35,7 +35,7 @@ async function setDarkMode(
     }
   }, enabled);
   // Allow Tailwind to repaint
-  await page.waitForTimeout(300);
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /** Run axe-core color-contrast audit on the current page. */

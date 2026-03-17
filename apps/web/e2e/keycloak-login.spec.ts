@@ -78,7 +78,7 @@ async function assertNoKeycloakInitError(page: Page): Promise<void> {
   });
 
   // Give time for any async errors to surface
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('domcontentloaded');
 
   const doubleInitError = errors.find((e) =>
     e.includes('can only be initialized once')
@@ -106,7 +106,7 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Allow StrictMode double-effect to fire
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const doubleInitError = errors.find((e) =>
       e.includes('can only be initialized once')
@@ -132,7 +132,7 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
 
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const devModeFallback = warnings.find((w) =>
       w.includes('Falling back to DEV MODE')

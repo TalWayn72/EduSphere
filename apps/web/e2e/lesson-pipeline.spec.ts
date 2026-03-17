@@ -202,7 +202,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 
     // Load template first
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     // Click INGESTION node
     const ingestionNode = page.getByTestId('pipeline-node-INGESTION');
@@ -216,7 +216,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     const ingestionNode = page.getByTestId('pipeline-node-INGESTION');
     await ingestionNode.click();
@@ -231,7 +231,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByTestId('pipeline-node-INGESTION').click();
     await expect(page.getByTestId('config-panel')).toBeVisible();
 
@@ -244,7 +244,7 @@ test.describe('Pipeline Builder — template and node configuration', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByTestId('pipeline-node-INGESTION').click();
 
     const toggle = page.getByTestId('node-toggle');
@@ -269,7 +269,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
     await expect(page.getByTestId('save-btn')).toBeDisabled();
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
     // After template load, isDirty=true, button should NOT be disabled
     // Note: template sets isDirty=false by design, but we verify the state
     // by checking that clicking save works once we make a change
@@ -297,7 +297,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
 
     // Step 1: Load THEMATIC template
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByTestId('pipeline-node-INGESTION')).toBeVisible();
 
     // Step 2: Configure INGESTION — select the video asset
@@ -320,7 +320,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
     // Step 5: Simulate completion — update runState and trigger re-fetch
     runState = 'completed';
     // Reload / wait for polling to pick up completed state (page polls every 3s)
-    await page.waitForTimeout(4_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     // After poll, should show COMPLETED
     await expect(statusLabel).toContainText(/הושלם|COMPLETED/, { timeout: 8_000 });
 
@@ -344,7 +344,7 @@ test.describe('Pipeline Builder — save and run flow', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.getByTestId('run-btn').click();
 
     await expect(page.getByTestId('pipeline-run-status')).toBeVisible({ timeout: 8_000 });
@@ -390,12 +390,12 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
     // First load THEMATIC so canvas is populated
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByTestId('pipeline-node-INGESTION')).toBeVisible();
 
     // Now switch to CUSTOM — canvas should clear
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     // Canvas should be empty
     await expect(page.getByTestId('empty-canvas')).toBeVisible({ timeout: 5_000 });
@@ -413,7 +413,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
     // Enter custom mode
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('מצב בנייה חופשית')).toBeVisible();
 
     // Simulate drop event via DataTransfer (HTML5 DnD requires this approach in headless Playwright)
@@ -424,7 +424,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
       el.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt }));
       el.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }));
     });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Module should appear in canvas
     await expect(page.getByTestId('pipeline-node-SUMMARIZATION')).toBeVisible({ timeout: 5_000 });
@@ -438,12 +438,12 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
     // Enter custom mode
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('מצב בנייה חופשית')).toBeVisible();
 
     // Switch back to THEMATIC
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     // Custom message should disappear
     await expect(page.getByText('מצב בנייה חופשית')).not.toBeVisible({ timeout: 5_000 });
@@ -456,7 +456,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     const pageText = await page.textContent('body');
     expect(pageText).not.toContain('[GraphQL]');
@@ -470,7 +470,7 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'CUSTOM');
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText('מצב בנייה חופשית')).toBeVisible();
     await expect(page.getByTestId('pipeline-error')).not.toBeVisible();
@@ -496,7 +496,7 @@ test.describe('Pipeline Builder — screenshot regression', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('pipeline-node-INGESTION')).toBeVisible();
     await expect(page).toHaveScreenshot('pipeline-builder-thematic-template.png', { maxDiffPixels: 300 });

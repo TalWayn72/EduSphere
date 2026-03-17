@@ -206,7 +206,7 @@ test.describe('AI Chat Panel', () => {
     const loadingDots = page.getByText(/\.\.\.|thinking|loading/i).first();
 
     // Wait a bit for response handling
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const assistantVisible = await assistantArea.isVisible().catch(() => false);
     const loadingVisible = await loadingDots.isVisible().catch(() => false);
@@ -260,7 +260,7 @@ test.describe('AI Chat Panel', () => {
 
     if (clearExists) {
       await clearBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // After clearing, the old message should be gone
       await expect(page.getByText('Hello AI')).not.toBeVisible({ timeout: 5_000 });
@@ -297,7 +297,7 @@ test.describe('AI Chat Panel', () => {
     await page.keyboard.press('Enter');
 
     // Wait for error handling
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Should NOT show raw error strings to user
     const body = await page.textContent('body');
@@ -321,7 +321,7 @@ test.describe('AI Chat Panel', () => {
       const firstSuggestion = suggestions.first();
       const suggestionText = await firstSuggestion.textContent();
       await firstSuggestion.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       // The input should be filled with the suggestion OR the message should be sent
       const input = page.locator('input[placeholder*="Ask "]').first();
@@ -344,7 +344,7 @@ test.describe('AI Chat Panel', () => {
     await input.fill('Show me: function hello() { return "world"; }');
     await page.keyboard.press('Enter');
 
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should not crash
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -378,7 +378,7 @@ test.describe('AI Chat Panel', () => {
     const closeBtn = page.locator('[aria-label="Close AI chat"]');
     await expect(closeBtn).toBeVisible({ timeout: 10_000 });
 
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('ai-chat-panel-open.png', {
       fullPage: false,

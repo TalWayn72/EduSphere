@@ -117,7 +117,7 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
     page,
   }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2_000); // let React + GraphQL settle
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Specific schema mismatch: preferences field missing from gateway supergraph
     // Regression: old user.graphql in Docker container — UserPreferences type absent
@@ -147,7 +147,7 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
 
   test('visual snapshot — dashboard DEV_MODE render', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const file = path.join(SCREENSHOTS_DIR, 'dashboard-dev-mode.png');
     await page.screenshot({ path: file, fullPage: true });
@@ -192,7 +192,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(5_000); // allow ME_QUERY to resolve
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // CRITICAL: schema mismatch error must be absent
     await expect(
@@ -221,7 +221,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // The header shows the user's name — must not be empty
     const header = page.locator('header');
@@ -237,7 +237,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page.getByText('Active Courses')).toBeVisible({
       timeout: 5_000,
@@ -252,7 +252,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const file = path.join(SCREENSHOTS_DIR, 'dashboard-live-backend.png');
     await page.screenshot({ path: file, fullPage: true });

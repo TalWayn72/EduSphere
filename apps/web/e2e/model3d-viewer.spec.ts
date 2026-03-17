@@ -128,7 +128,7 @@ test.describe('3D Model Viewer — Phase 34', () => {
     const uploadBtn = page.locator('[data-testid="model3d-upload-btn"]');
     if (await uploadBtn.isVisible()) {
       await uploadBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
       expect(uploadCalled).toBe(true);
     }
     // If upload button not present in this view, verify the mutation mock was set up correctly

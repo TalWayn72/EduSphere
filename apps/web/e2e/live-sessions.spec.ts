@@ -517,7 +517,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
     await login(page);
     await page.goto('/sessions');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Error UI MUST appear — but must NOT expose raw technical strings
     const bodyText = (await page.locator('body').textContent()) ?? '';
@@ -547,7 +547,7 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
     await page.goto('/sessions');
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: error state must NOT appear in the screenshot
     await expect(page.locator('[data-testid="sessions-error"]')).not.toBeVisible();
@@ -695,7 +695,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await login(page);
     await page.goto('/sessions');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const bodyText = (await page.locator('body').textContent()) ?? '';
 
@@ -751,7 +751,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await login(page);
     await page.goto('/sessions');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const bodyText = (await page.locator('body').textContent()) ?? '';
 
@@ -771,7 +771,7 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await page.goto('/sessions');
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: error state must NOT appear
     await expect(page.locator('[data-testid="sessions-error"]')).not.toBeVisible();
@@ -813,7 +813,7 @@ test.describe('LiveSessionDetailPage — /sessions/:id route', () => {
     await page.goto('/sessions/content-1');
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('live-session-detail-page.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,

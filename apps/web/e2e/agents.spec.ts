@@ -291,7 +291,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     // Immediately after sending, the input should become disabled during the
     // 600ms pre-stream delay + streaming phase
     // We check within 800ms window (before streaming completes)
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     const isDisabled = await chatInput.isDisabled();
     // Input is disabled while isTyping=true or streamingContent is non-empty

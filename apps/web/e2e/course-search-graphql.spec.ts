@@ -147,7 +147,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
     await searchInput.fill('Talmud');
 
     // Wait for debounce (300ms) + React render
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Course results from our mock should appear
     // The Search page renders course results in card-like elements containing the title
@@ -162,7 +162,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const bodyText = await page.textContent('body');
     expect(bodyText).toContain('Introduction to Talmud Study');
@@ -177,7 +177,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Rambam');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const bodyText = await page.textContent('body');
     expect(bodyText).toContain('Jewish Philosophy: Rambam');
@@ -190,7 +190,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Find the card / clickable element for the Talmud course
     // Search renders results as clickable cards with href="/courses/<id>"
@@ -221,7 +221,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('xyzzy');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const bodyText = await page.textContent('body');
     // No results — should NOT show raw error strings
@@ -262,7 +262,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const bodyText = await page.textContent('body');
     // Even with a GraphQL error the page must not show raw error internals
@@ -291,7 +291,7 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.fill('T');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // The query `pause: query.length < 2` means searchCourses is NOT called for 1-char input
     expect(searchCoursesCalled).toBe(false);
@@ -309,7 +309,7 @@ test.describe('Course Search — Visual regression', () => {
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]').first();
     await searchInput.waitFor({ timeout: 8_000 });
     await searchInput.fill('Talmud');
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('course-search-results.png', {
       maxDiffPixels: 400,

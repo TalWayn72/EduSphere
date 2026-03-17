@@ -110,7 +110,7 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
     page,
   }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2_000); // ensure React has settled
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Generic "Failed to load graph" text must not appear
     await expect(
@@ -146,7 +146,7 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
 
   test('visual snapshot — DEV_MODE graph render', async ({ page }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1_000); // let CSS transitions settle
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const file = path.join(SCREENSHOTS_DIR, 'knowledge-graph-dev-mode.png');
     await page.screenshot({ path: file, fullPage: true });
@@ -193,7 +193,7 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
     });
 
     // Wait generously for the GraphQL concepts query to resolve
-    await page.waitForTimeout(6_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // CRITICAL: specific AGE error fragment must be absent from the page
     const ageErrorEl = page.getByText(AGE_PG17_ERROR, { exact: false });
@@ -225,7 +225,7 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(6_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // At least one SVG circle (graph node) must be rendered from real API data
     await expect(page.locator('svg circle').first()).toBeVisible({
@@ -240,7 +240,7 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(6_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page.getByText('Graph Statistics')).toBeVisible({
       timeout: 5_000,
@@ -264,7 +264,7 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(6_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const file = path.join(SCREENSHOTS_DIR, 'knowledge-graph-live-backend.png');
     await page.screenshot({ path: file, fullPage: true });
@@ -384,7 +384,7 @@ test.describe('Knowledge Graph — BUG-043: clean error banner (no raw error str
     await retryBtn.click();
 
     // After retry the banner may disappear (or reload) — either way no raw strings
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     for (const forbidden of FORBIDDEN_UI_STRINGS) {
       const el = page.getByText(forbidden, { exact: false });
       await expect(el).not.toBeVisible({ timeout: 2_000 });
@@ -403,7 +403,7 @@ test.describe('Knowledge Graph — BUG-043: clean error banner (no raw error str
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(
       page.getByText('Invalid time value', { exact: false })

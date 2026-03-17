@@ -24,7 +24,7 @@ test.describe('BUG-072: APQ courses regression', () => {
 
   test('/courses loads WITHOUT OfflineBanner', async ({ page }) => {
     await page.goto('/courses', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Primary BUG-072 guard: OfflineBanner must NOT be visible
     const banner = page.getByTestId('offline-banner');
@@ -45,7 +45,7 @@ test.describe('BUG-072: APQ courses regression', () => {
 
   test('no APQ/technical error strings visible on /courses', async ({ page }) => {
     await page.goto('/courses', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const body = await page.textContent('body');
     expect(body).not.toContain('PersistedRequestNotFound');

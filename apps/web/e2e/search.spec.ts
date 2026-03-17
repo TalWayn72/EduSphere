@@ -134,7 +134,7 @@ test.describe('Search — keyboard shortcut', () => {
     await page.keyboard.press('Escape');
 
     // Should navigate back (browser history goes back)
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     // We can only assert we are no longer on /search or the URL changed
     // (depends on browser history depth — in a fresh context this may stay on /search)
     // This is a best-effort assertion
@@ -212,7 +212,7 @@ test.describe('Search — results behaviour', () => {
     await searchPage.searchFor('kal vachomer');
 
     // Wait for results
-    await page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Look for a transcript result card (green color for transcript type)
     const transcriptResult = page
@@ -255,7 +255,7 @@ test.describe('Search — results behaviour', () => {
 
     // Type a single character — mockSearch() requires query.length >= 2
     await searchPage.searchInput.fill('T');
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Empty state should still be visible (no results rendered)
     await searchPage.assertEmptyState();
@@ -270,7 +270,7 @@ test.describe('Search — results behaviour', () => {
     // Click the 'chavruta' chip
     const chip = page.getByRole('button', { name: 'chavruta' });
     await chip.click();
-    await page.waitForTimeout(700);
+    await page.waitForLoadState('domcontentloaded');
 
     // The input should now contain 'chavruta'
     const inputValue = await searchPage.searchInput.inputValue();

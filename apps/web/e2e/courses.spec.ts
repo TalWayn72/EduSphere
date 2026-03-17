@@ -167,7 +167,7 @@ test.describe('Course List — offline/network error banner (BUG-039)', () => {
     // After a successful retry (if gateway is now available), banner should hide.
     // In CI with VITE_DEV_MODE=true, GraphQL is paused — banner stays hidden.
     // This test verifies the retry button is clickable without throwing.
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     // Banner should either hide (real backend) or remain clean (dev mode)
     const finalBannerText = await page.getByTestId('offline-banner').textContent().catch(() => null);
     if (finalBannerText !== null) {

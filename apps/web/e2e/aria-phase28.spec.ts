@@ -247,7 +247,7 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
       .first();
     await intermediateBtn.waitFor({ timeout: 10_000 });
     await intermediateBtn.click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(intermediateBtn).toHaveAttribute('aria-pressed', 'true');
 

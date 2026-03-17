@@ -175,7 +175,7 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     await goOffline(page);
 
     await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
-    await page.waitForTimeout(300); // let Zustand hydrate from localStorage
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('offline-banner-pending-sync-3.png', {
       clip: BANNER_CLIP,
@@ -193,7 +193,7 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     await goOffline(page);
 
     await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('offline-banner-pending-sync-10.png', {
       clip: BANNER_CLIP,
@@ -267,7 +267,7 @@ test.describe('OfflineBanner — component-level screenshots', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await goOffline(page);
 
-    await page.waitForTimeout(300); // let Zustand hydrate
+    await page.waitForLoadState('domcontentloaded');
 
     const banner = page.getByTestId('offline-banner');
     await expect(banner).toBeVisible({ timeout: 5_000 });

@@ -428,7 +428,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
     test(`"${sqlPattern}" never appears in page content`, async ({ page }) => {
       await page.goto(`/courses/${MOCK_COURSE_ID}`);
       await page.waitForLoadState('load');
-      await page.waitForTimeout(1_000); // allow any async error state to settle
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       await expect(
         page.getByText(sqlPattern, { exact: false })
@@ -463,7 +463,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
   }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('load');
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Stack trace indicators
     await expect(page.getByText(/at Object\.\<anonymous\>/i)).not.toBeVisible({

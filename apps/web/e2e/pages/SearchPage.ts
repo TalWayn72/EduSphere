@@ -80,7 +80,7 @@ export class SearchPage {
    */
   async searchFor(query: string, waitMs = 600): Promise<void> {
     await this.searchInput.fill(query);
-    await this.page.waitForTimeout(waitMs);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   /**
@@ -88,7 +88,7 @@ export class SearchPage {
    */
   async clearSearch(): Promise<void> {
     await this.searchInput.fill('');
-    await this.page.waitForTimeout(400);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   /**
@@ -114,7 +114,7 @@ export class SearchPage {
     const chip = this.page.getByRole('button', { name: label });
     await chip.click();
     // Chip fills the input, debounce fires after delay
-    await this.page.waitForTimeout(600);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
   /**

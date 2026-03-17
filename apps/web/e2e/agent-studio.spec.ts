@@ -98,7 +98,7 @@ async function dropNodeOnCanvas(
     );
   }, nodeType);
   // Allow React state update to propagate
-  await page.waitForTimeout(300);
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ── Test setup ────────────────────────────────────────────────────────────────

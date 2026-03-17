@@ -182,7 +182,7 @@ test.describe('Content Import — @visual', () => {
 
   test('visual regression — import page initial state', async ({ page }) => {
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await expect(page).toHaveScreenshot('content-import-initial.png', {
       fullPage: false,
       maxDiffPixels: 200,
@@ -193,7 +193,7 @@ test.describe('Content Import — @visual', () => {
   test('visual regression — import page with YouTube source selected', async ({ page }) => {
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
     await page.getByText('YouTube Playlist').click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveScreenshot('content-import-youtube-selected.png', {
       fullPage: false,
       maxDiffPixels: 200,

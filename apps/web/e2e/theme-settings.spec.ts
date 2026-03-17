@@ -113,7 +113,7 @@ test.describe('Theme Settings — theme switching', () => {
   test('clicking Light theme radio reflects in DOM', async ({ page }) => {
     // First switch to dark so we have a state change to observe
     await page.locator('[data-testid="theme-mode-selector"] label').filter({ hasText: 'Dark' }).click();
-    await page.waitForTimeout(200);
+    await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="theme-mode-selector"] label').filter({ hasText: 'Light' }).click();
 
@@ -146,7 +146,7 @@ test.describe('Theme Settings — visual regression @visual', () => {
       .filter({ hasText: 'Light' });
     await lightLabel.waitFor({ timeout: 10_000 });
     await lightLabel.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('theme-settings-light.png', {
       fullPage: false,
@@ -167,7 +167,7 @@ test.describe('Theme Settings — visual regression @visual', () => {
       .filter({ hasText: 'Dark' });
     await darkLabel.waitFor({ timeout: 10_000 });
     await darkLabel.click();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('theme-settings-dark.png', {
       fullPage: false,

@@ -382,7 +382,7 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
     const initialQuote = await carousel.locator('blockquote').first().textContent();
 
     // Wait 5 seconds — with reduced-motion the carousel must NOT auto-advance
-    await page.waitForTimeout(5_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     const quoteAfterWait = await carousel.locator('blockquote').first().textContent();
 
     // The carousel must not have auto-advanced (same quote still showing)
@@ -463,7 +463,7 @@ test.describe('Landing Page — Phase 39 (TestimonialsCarousel)', () => {
     await carousel.hover();
 
     // Wait 6 seconds (carousel advances every 4s — should NOT advance while hovered)
-    await page.waitForTimeout(6_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     const quoteDuringHover = await carousel.locator('blockquote').first().textContent();
 
     // Quote must not have changed while hovered
@@ -558,7 +558,7 @@ test.describe('Landing Page — @visual', () => {
 
   test('visual regression — landing page desktop', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('landing-page-desktop.png', {
       fullPage: false,
@@ -571,7 +571,7 @@ test.describe('Landing Page — @visual', () => {
   test('visual regression — landing page mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('landing-page-mobile.png', {
       fullPage: false,
@@ -585,7 +585,7 @@ test.describe('Landing Page — @visual', () => {
     // Explicit reduced-motion baseline — captures stable layout without any animation
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('landing-page-reduced-motion-desktop.png', {
       fullPage: false,

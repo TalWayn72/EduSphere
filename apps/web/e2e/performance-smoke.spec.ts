@@ -46,7 +46,7 @@ test.describe('Performance Smoke — LCP', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Give the observer time to fire
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       const lcp = await page.evaluate(
         () => (window as unknown as Record<string, unknown>).__LCP_VALUE__ as number
@@ -98,7 +98,7 @@ test.describe('Performance Smoke — No Console Errors', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Allow a brief settling period for lazy-loaded components
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
 
       expect(
         errors,

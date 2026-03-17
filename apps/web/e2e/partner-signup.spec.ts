@@ -93,7 +93,7 @@ async function fillValidPartnerForm(page: Page): Promise<void> {
   const trainingOption = page.getByRole('option', { name: 'Training Company' });
   await trainingOption.waitFor({ timeout: 3_000 });
   await trainingOption.click();                    // select Training Company → fires onValueChange
-  await page.waitForTimeout(300);                  // allow setValue + re-validation to propagate
+  await page.waitForLoadState('domcontentloaded');
 }
 
 // ─── Suite 1: Page renders correctly ─────────────────────────────────────────

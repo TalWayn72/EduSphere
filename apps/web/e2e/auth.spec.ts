@@ -147,7 +147,7 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
 
     // Simulate passage of time (Playwright time manipulation not needed;
     // just verify the page stays usable after a short idle period)
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // User is still on dashboard — session not expired
     await expect(

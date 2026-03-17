@@ -119,7 +119,7 @@ test.describe('Landing Page — WCAG 2.2 AA axe-core Audit', () => {
   test('full landing page passes axe audit (0 critical/serious violations)', async ({ page }) => {
     // Scroll through the page to allow lazy sections to render
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
     await page.evaluate(() => window.scrollTo(0, 0));
 
     const { violations } = await runAxe(page, 'main');

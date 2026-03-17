@@ -37,7 +37,7 @@ async function waitForQuizPageReady(
   await page.goto(`${BASE}/quiz/${contentId}`, {
     waitUntil: 'domcontentloaded',
   });
-  await page.waitForTimeout(2_000);
+  await page.waitForLoadState('networkidle').catch(() => {});
 
   if (await page.locator('[data-testid="quiz-progress-fill"]').isVisible())
     return 'player';
@@ -62,7 +62,7 @@ test.describe('Quiz — Page load', () => {
     await page.goto(`${BASE}/quiz/demo-quiz-id`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(1_500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Must not show a generic crash overlay
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible();
@@ -74,7 +74,7 @@ test.describe('Quiz — Page load', () => {
     await page.goto(`${BASE}/quiz/demo-quiz-id`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(1_500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // The Layout wrapper renders a <nav> element (sidebar/topbar)
     const nav = page.locator('nav');
@@ -215,7 +215,7 @@ test.describe('Quiz — Fill-in-the-blank interaction', () => {
     await page.goto(`${BASE}/quiz/demo-fill-blank`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // FillBlankQuestion renders <input aria-label="Fill in the blank"> or
     // <input aria-label="Your answer"> depending on whether {{blank}} is used
@@ -241,7 +241,7 @@ test.describe('Quiz — Fill-in-the-blank interaction', () => {
     await page.goto(`${BASE}/quiz/demo-fill-blank`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const input = page
       .locator('input[placeholder*="answer"], input[placeholder*="blank"]')
@@ -264,7 +264,7 @@ test.describe('Quiz — Likert scale interaction', () => {
     await page.goto(`${BASE}/quiz/demo-likert`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // LikertQuestion renders a div[role="radiogroup"]
     const radiogroup = page.locator('[role="radiogroup"]').first();
@@ -280,7 +280,7 @@ test.describe('Quiz — Likert scale interaction', () => {
     await page.goto(`${BASE}/quiz/demo-likert`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const radios = page.locator('input[type="radio"]');
     const count = await radios.count();
@@ -348,7 +348,7 @@ test.describe('Quiz — Submit and result view', () => {
 
     // QuizResultView renders the score as "XX%" in a font-mono element
     // gradeQuiz may fail without backend; check for score OR error state
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
     const scoreEl = page
       .locator('.font-mono.font-bold')
       .filter({ hasText: /%/ })
@@ -382,7 +382,7 @@ test.describe('Quiz — Submit and result view', () => {
       return;
     }
     await submitBtn.click();
-    await page.waitForTimeout(3_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const tryAgain = page.getByRole('button', { name: /Try Again/i });
     if (!(await tryAgain.isVisible().catch(() => false))) {
@@ -490,7 +490,7 @@ test.describe('Quiz — Visual regression @visual', () => {
       return;
     }
     await submitBtn.click();
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('quiz-result.png', {
       maxDiffPixels: 200,
@@ -506,7 +506,7 @@ test.describe('Quiz — Visual regression @visual', () => {
     await page.goto(`${BASE}/quiz/not-a-quiz-content-id`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.waitForTimeout(2_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('quiz-page-fallback.png', {
       maxDiffPixels: 200,

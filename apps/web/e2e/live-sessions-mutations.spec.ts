@@ -298,7 +298,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
     const pastTab = page.locator('[data-testid="tab-past"]');
     if (await pastTab.count() > 0) {
       await pastTab.click();
-      await page.waitForTimeout(400);
+      await page.waitForLoadState('domcontentloaded');
 
       // Ended sessions should not have a session-action-btn
       const actionBtn = page.locator('[data-testid="session-action-btn"]');
@@ -503,7 +503,7 @@ test.describe('Live Sessions — Error and Empty States', () => {
 
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1_000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const body = (await page.locator('body').textContent()) ?? '';
 
@@ -528,7 +528,7 @@ test.describe('Live Sessions — Error and Empty States', () => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
     await page.waitForLoadState('domcontentloaded');
 
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Either empty state or sessions grid (with no items) should appear
     const emptyEl = page.locator('[data-testid="sessions-empty"]');
@@ -557,7 +557,7 @@ test.describe('Live Sessions — Visual Regression', () => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot(
       'live-session-instructor-actions.png',
@@ -577,7 +577,7 @@ test.describe('Live Sessions — Visual Regression', () => {
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
     await page.waitForLoadState('domcontentloaded');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('live-session-student-actions.png', {
       fullPage: false,
@@ -591,7 +591,7 @@ test.describe('Live Sessions — Visual Regression', () => {
     await mockGraphQL(page, []);
     await page.goto(`${BASE_URL}${SESSIONS_ROUTE}`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(800);
+    await page.waitForLoadState('networkidle').catch(() => {});
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
     await expect(page).toHaveScreenshot('live-session-empty-state.png', {

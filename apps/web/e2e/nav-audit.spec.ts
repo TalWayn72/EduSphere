@@ -619,7 +619,7 @@ test.describe('Nav Audit — SQL-free page verification across all routes', () =
     test(`No SQL appears on ${route}`, async ({ page }) => {
       await page.goto(route);
       await page.waitForLoadState('domcontentloaded');
-      await page.waitForTimeout(800); // allow async error states to settle
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       await assertNoSqlOnPage(page);
       await assertNoCrash(page);
