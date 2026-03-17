@@ -17,6 +17,7 @@ import {
   StringCodec,
   type NatsConnection,
 } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -52,9 +53,10 @@ export class PeerReviewService implements OnModuleInit, OnModuleDestroy {
   private readonly sc = StringCodec();
   private natsConn: NatsConnection | null = null;
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   async onModuleInit(): Promise<void> {
     try {
-      this.natsConn = await connect({ servers: process.env['NATS_URL'] ?? 'nats://localhost:4222' });
+      this.natsConn = await connect(buildNatsOptions());
       this.logger.log('PeerReviewService NATS connected');
     } catch (err) {
       this.logger.warn({ err }, 'PeerReviewService NATS connect failed — running without events');

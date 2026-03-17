@@ -20,6 +20,7 @@ import {
 import type { Database, TenantContext } from '@edusphere/db';
 import { connect } from 'nats';
 import type { NatsConnection } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 
 const YAU_ALERT_SUBJECT = 'EDUSPHERE.billing.yau_limit_approached';
 const YAU_LIMIT_THRESHOLD_PCT = 0.9;
@@ -46,9 +47,9 @@ export class YauCounterService implements OnModuleDestroy {
     );
   }
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   private async initNats(): Promise<void> {
-    const natsUrl = process.env['NATS_URL'] ?? 'nats://localhost:4222';
-    this.nats = await connect({ servers: natsUrl });
+    this.nats = await connect(buildNatsOptions());
   }
 
   async onModuleDestroy(): Promise<void> {

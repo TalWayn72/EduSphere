@@ -10,6 +10,7 @@ import {
   type NatsConnection,
   type Subscription,
 } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 import { generateText, type LanguageModel } from 'ai';
@@ -58,10 +59,10 @@ export class AltTextGeneratorService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   async onModuleInit(): Promise<void> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
     try {
-      this.nc = await connect({ servers: natsUrl });
+      this.nc = await connect(buildNatsOptions());
       this.subscription = this.nc.subscribe(ALT_TEXT_SUBJECT);
       this.logger.log(`Subscribed to ${ALT_TEXT_SUBJECT}`);
       void this.consumeMessages();

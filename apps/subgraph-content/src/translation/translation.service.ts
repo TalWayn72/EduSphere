@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import { connect, StringCodec } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   createDatabaseConnection,
   schema,
@@ -109,10 +110,10 @@ export class TranslationService implements OnModuleDestroy {
     targetLocale: string;
     translationId: string;
   }): Promise<void> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
+    // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
     let nc;
     try {
-      nc = await connect({ servers: natsUrl });
+      nc = await connect(buildNatsOptions());
       nc.publish(
         'content.translate.requested',
         sc.encode(JSON.stringify(payload))

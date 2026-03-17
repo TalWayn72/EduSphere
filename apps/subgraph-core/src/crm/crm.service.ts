@@ -20,7 +20,7 @@ import {
   desc,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
-import { isCourseCompletedEvent } from '@edusphere/nats-client';
+import { isCourseCompletedEvent, buildNatsOptions } from '@edusphere/nats-client';
 import { SalesforceClient } from './salesforce.client.js';
 import { CrmEncryptionService } from './crm-encryption.service.js';
 import type { CrmConnection, CrmSyncLog } from '@edusphere/db';
@@ -43,10 +43,10 @@ export class CrmService implements OnModuleInit, OnModuleDestroy {
     this.db = createDatabaseConnection();
   }
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   async onModuleInit(): Promise<void> {
-    const natsUrl = process.env['NATS_URL'] ?? 'nats://localhost:4222';
     try {
-      this.nats = await connect({ servers: natsUrl });
+      this.nats = await connect(buildNatsOptions());
       this.subscription = this.nats.subscribe(NATS_SUBJECT);
       void this.consumeCompletions();
       this.logger.log('CrmService subscribed to EDUSPHERE.course.completed');

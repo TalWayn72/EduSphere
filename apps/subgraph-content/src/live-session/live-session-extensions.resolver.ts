@@ -8,6 +8,7 @@ import {
   Int,
 } from '@nestjs/graphql';
 import { connect, StringCodec, type NatsConnection } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   BreakoutService,
   type CreateBreakoutRoomInput,
@@ -151,9 +152,9 @@ export class LiveSessionExtensionsResolver {
       payload.pollId === variables.pollId,
   })
   async *pollUpdated(@Args('pollId') _pollId: string): AsyncGenerator<unknown> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
+    // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
     if (!this.natsConn) {
-      this.natsConn = await connect({ servers: natsUrl });
+      this.natsConn = await connect(buildNatsOptions());
     }
     const sub = this.natsConn.subscribe(NATS_POLL_VOTED);
     for await (const msg of sub) {

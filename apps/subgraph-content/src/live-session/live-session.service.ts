@@ -13,6 +13,7 @@ import {
   type NatsConnection,
   type Subscription,
 } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -103,9 +104,9 @@ export class LiveSessionService implements OnModuleDestroy {
 
   private async publishNatsEvent(subject: string, payload: object): Promise<void> {
     try {
+      // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
       if (!this.natsConn) {
-        const url = process.env.NATS_URL ?? 'nats://localhost:4222';
-        this.natsConn = await connect({ servers: url });
+        this.natsConn = await connect(buildNatsOptions());
       }
       this.natsConn.publish(subject, this.sc.encode(JSON.stringify(payload)));
       this.logger.debug(`[LiveSessionService] Published ${subject}`);

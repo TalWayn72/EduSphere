@@ -5,6 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { connect, NatsConnection, StringCodec, JetStreamManager } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import { CypherService } from '../graph/cypher.service';
 import type { ExtractedConcept } from './nats.types';
 
@@ -27,11 +28,11 @@ export class NatsConsumer implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly cypherService: CypherService) {}
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   async onModuleInit(): Promise<void> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
     try {
-      this.connection = await connect({ servers: natsUrl });
-      this.logger.log(`Connected to NATS at ${natsUrl}`);
+      this.connection = await connect(buildNatsOptions());
+      this.logger.log('Connected to NATS');
       await this.ensureStream();
       await this.startConsuming();
     } catch (err) {

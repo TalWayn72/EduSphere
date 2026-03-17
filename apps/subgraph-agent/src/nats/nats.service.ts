@@ -9,6 +9,7 @@ import type { AgentSessionPayload } from '@edusphere/nats-client';
 import {
   validateAgentSessionEvent,
   EventValidationError,
+  buildNatsOptions,
 } from '@edusphere/nats-client';
 
 /**
@@ -30,11 +31,12 @@ export class NatsService implements OnModuleDestroy {
   // ── Connection ─────────────────────────────────────────────────────────────
 
   /** Returns the active NATS connection, establishing it lazily if needed. */
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   private async getConnection(): Promise<NatsConnection> {
     if (this.connection) return this.connection;
-    const url = process.env['NATS_URL'] ?? 'nats://localhost:4222';
-    this.connection = await connect({ servers: url });
-    this.logger.log(`Connected to NATS at ${url}`);
+    const opts = buildNatsOptions();
+    this.connection = await connect(opts);
+    this.logger.log(`Connected to NATS at ${opts.servers}`);
     return this.connection;
   }
 

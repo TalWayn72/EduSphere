@@ -10,8 +10,8 @@ import {
   connect,
   StringCodec,
   type NatsConnection,
-  type ConnectionOptions,
 } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -62,26 +62,12 @@ export class LiveSessionsService implements OnModuleDestroy {
 
   // ── NATS ──────────────────────────────────────────────────────────────────
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   private async getNatsConnection(): Promise<NatsConnection> {
     if (this.natsConn) return this.natsConn;
-    const url = process.env['NATS_URL'] ?? 'nats://localhost:4222';
-
-    // SI-7: use TLS + credentials when env vars are present (production).
-    // Falls back to plain connection in local dev (no env vars set).
-    const opts: ConnectionOptions = { servers: url };
-    const natsUser = process.env['NATS_USERNAME'];
-    const natsPass = process.env['NATS_PASSWORD'];
-    const natsTlsCa = process.env['NATS_TLS_CA_FILE'];
-    if (natsUser && natsPass) {
-      opts.user = natsUser;
-      opts.pass = natsPass;
-    }
-    if (natsTlsCa) {
-      opts.tls = { caFile: natsTlsCa };
-    }
 
     try {
-      this.natsConn = await connect(opts);
+      this.natsConn = await connect(buildNatsOptions());
       this.logger.log('[LiveSessionsService] Connected to NATS');
     } catch (err) {
       this.logger.warn(

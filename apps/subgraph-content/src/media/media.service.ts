@@ -14,6 +14,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import { and, eq, isNotNull } from 'drizzle-orm';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import { minioConfig } from '@edusphere/config';
@@ -395,10 +396,10 @@ export class MediaService implements OnModuleDestroy {
     fileName: string;
     contentType: string;
   }): Promise<void> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
+    // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
     let nc;
     try {
-      nc = await connect({ servers: natsUrl });
+      nc = await connect(buildNatsOptions());
       nc.publish(
         'EDUSPHERE.media.uploaded',
         this.sc.encode(JSON.stringify(payload))

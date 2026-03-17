@@ -6,6 +6,7 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import { connect, StringCodec, type NatsConnection } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -54,10 +55,10 @@ export class PollService implements OnModuleDestroy {
     await closeAllPools();
   }
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   private async getNats(): Promise<NatsConnection> {
     if (!this.natsConn) {
-      const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
-      this.natsConn = await connect({ servers: natsUrl });
+      this.natsConn = await connect(buildNatsOptions());
     }
     return this.natsConn;
   }

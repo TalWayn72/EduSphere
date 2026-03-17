@@ -17,6 +17,7 @@ import {
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import { TIME } from '@edusphere/config';
 import { computeRiskScore } from './risk-scorer.js';
 import type { LearnerMetrics } from './risk-scorer.js';
@@ -289,9 +290,9 @@ export class AtRiskService implements OnModuleDestroy {
     riskScore: number
   ): Promise<void> {
     try {
+      // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
       if (!this.nc) {
-        const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
-        this.nc = await connect({ servers: natsUrl });
+        this.nc = await connect(buildNatsOptions());
       }
       const payload = JSON.stringify({
         learnerId,

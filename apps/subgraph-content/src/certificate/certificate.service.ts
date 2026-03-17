@@ -19,6 +19,7 @@ import {
   type NatsConnection,
   type Subscription,
 } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import { CertificatePdfService } from './certificate-pdf.service.js';
 
 interface CourseCompletedEvent {
@@ -59,10 +60,10 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('CertificateService destroyed — connections closed');
   }
 
+  // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
   private async subscribeToCompletionEvents(): Promise<void> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
     try {
-      this.nc = await connect({ servers: natsUrl });
+      this.nc = await connect(buildNatsOptions());
       this.sub = this.nc.subscribe('EDUSPHERE.course.completed');
       this.logger.log('Subscribed to EDUSPHERE.course.completed');
       void this.processMessages();
