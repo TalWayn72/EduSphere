@@ -34,6 +34,36 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((col, val) => ({ col, val })),
   withTenantContext: vi.fn(async (_db, _ctx, callback) => callback(mockTx)),
+  // Keyset pagination helpers — use real implementations
+  encodeCursor: (createdAt: string | Date, id: string) => {
+    const iso = createdAt instanceof Date ? createdAt.toISOString() : createdAt;
+    return Buffer.from(JSON.stringify({ createdAt: iso, id })).toString('base64');
+  },
+  buildRelayConnection: (
+    rows: { id: string; createdAt?: string }[],
+    first: number,
+    totalCount: number,
+    afterCursor: string | null | undefined
+  ) => {
+    const hasNextPage = rows.length > first;
+    const trimmed = hasNextPage ? rows.slice(0, first) : rows;
+    const edges = trimmed.map((node) => ({
+      cursor: Buffer.from(JSON.stringify({ createdAt: node.createdAt ?? '', id: node.id })).toString('base64'),
+      node,
+    }));
+    return {
+      edges,
+      nodes: trimmed,
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage: afterCursor != null,
+        startCursor: edges[0]?.cursor ?? null,
+        endCursor: edges[edges.length - 1]?.cursor ?? null,
+      },
+      totalCount,
+    };
+  },
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { withTenantContext } from '@edusphere/db';

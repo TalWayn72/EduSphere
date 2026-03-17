@@ -6,8 +6,10 @@ import {
   sql,
   withTenantContext,
   closeAllPools,
+  buildRelayConnection,
+  encodeCursor,
 } from '@edusphere/db';
-import type { Database, TenantContext } from '@edusphere/db';
+import type { Database, TenantContext, RelayConnection } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import { keycloakConfig } from '@edusphere/config';
 import { parsePreferences } from './user-preferences.service';
@@ -305,43 +307,26 @@ export class UserService implements OnModuleDestroy {
   }
 
   async listUsers(
-    opts: { page?: number; limit?: number; search?: string; role?: string },
+    opts: { page?: number; limit?: number; search?: string; role?: string; after?: string | null },
     authContext: AuthContext
-  ): Promise<{
-    edges: { cursor: string; node: NonNullable<MappedUser> }[];
-    nodes: NonNullable<MappedUser>[];
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor: string | null;
-      endCursor: string | null;
-    };
-    totalCount: number;
-  }> {
+  ): Promise<RelayConnection<NonNullable<MappedUser>>> {
     const limit = opts.limit ?? 20;
+    // Backward compat: support legacy page-based offset when no cursor given
     const page = opts.page ?? 0;
-    const offset = page * limit;
+    const offset = opts.after ? 0 : page * limit;
     const result = await this.adminUsers(
       { limit: limit + 1, offset, search: opts.search, role: opts.role },
       authContext
     );
-    const hasNextPage = result.users.length > limit;
-    const pageUsers = hasNextPage ? result.users.slice(0, limit) : result.users;
-    const edges = pageUsers.map((node, i) => ({
-      cursor: Buffer.from(String(offset + i)).toString('base64'),
-      node,
-    }));
-    return {
-      edges,
-      nodes: pageUsers,
-      pageInfo: {
-        hasNextPage,
-        hasPreviousPage: offset > 0,
-        startCursor: edges[0]?.cursor ?? null,
-        endCursor: edges[edges.length - 1]?.cursor ?? null,
-      },
-      totalCount: result.total,
-    };
+    // Use `after` cursor if provided; otherwise signal hasPreviousPage via
+    // a synthetic non-null value when page > 0 (backward compat)
+    const cursorSignal = opts.after ?? (offset > 0 ? '__page__' : null);
+    return buildRelayConnection(
+      result.users as (NonNullable<MappedUser> & { id: string; createdAt?: string })[],
+      limit,
+      result.total,
+      cursorSignal
+    );
   }
 
   async suspendUser(

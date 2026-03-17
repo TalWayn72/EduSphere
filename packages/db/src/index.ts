@@ -109,3 +109,16 @@ export {
   decryptFieldNullable,
   deriveTenantKey,
 } from './helpers/encryption.js';
+
+// Export keyset pagination helpers (Relay cursor connections)
+export {
+  encodeCursor,
+  decodeCursor,
+  buildRelayConnection,
+} from './helpers/keyset-pagination.js';
+export type {
+  KeysetCursor,
+  PageInfo,
+  Edge,
+  RelayConnection,
+} from './helpers/keyset-pagination.js';

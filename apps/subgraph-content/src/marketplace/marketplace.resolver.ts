@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
+import { buildRelayConnection } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { MarketplaceService } from './marketplace.service.js';
 import { InstructorPayoutService } from './instructor-payout.service.js';
@@ -46,20 +47,12 @@ export class MarketplaceResolver {
       offset,
       filters
     );
-    return {
-      nodes: listings,
-      edges: listings.map((node, i) => ({
-        node,
-        cursor: Buffer.from(String(i)).toString('base64'),
-      })),
-      pageInfo: {
-        hasNextPage: false,
-        hasPreviousPage: false,
-        startCursor: null,
-        endCursor: null,
-      },
-      totalCount: listings.length,
-    };
+    return buildRelayConnection(
+      listings as (typeof listings[number] & { id: string; createdAt?: string })[],
+      limit ?? listings.length,
+      listings.length,
+      null
+    );
   }
 
   @Query('myPurchases')
