@@ -1,0 +1,43 @@
+import {
+  pgTable,
+  text,
+  uuid,
+  jsonb,
+  boolean,
+  timestamp,
+} from 'drizzle-orm/pg-core';
+import { pk, tenantId } from './_shared';
+import { tenants } from './tenants';
+import { users } from './core';
+
+// ─── Lesson Pipeline Templates ──────────────────────────────────────────────
+
+export const lesson_pipeline_templates = pgTable(
+  'lesson_pipeline_templates',
+  {
+    id: pk(),
+    tenant_id: tenantId().references(() => tenants.id, {
+      onDelete: 'cascade',
+    }),
+    name: text('name').notNull(),
+    description: text('description'),
+    nodes: jsonb('nodes').notNull().default([]),
+    config: jsonb('config').notNull().default({}),
+    is_system: boolean('is_system').notNull().default(false),
+    created_by: uuid('created_by').references(() => users.id),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+);
+
+// ─── Type Exports ─────────────────────────────────────────────────────────
+
+export type LessonPipelineTemplate =
+  typeof lesson_pipeline_templates.$inferSelect;
+export type NewLessonPipelineTemplate =
+  typeof lesson_pipeline_templates.$inferInsert;

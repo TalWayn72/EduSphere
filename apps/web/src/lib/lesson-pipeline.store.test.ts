@@ -10,6 +10,11 @@ beforeEach(() => {
       nodes: [],
       isDirty: false,
       selectedNodeId: null,
+      moduleStatuses: {},
+      undoStack: [],
+      redoStack: [],
+      canUndo: false,
+      canRedo: false,
     });
   });
 });
@@ -180,5 +185,225 @@ describe('useLessonPipelineStore', () => {
     expect(nodes).toHaveLength(1);
     expect(nodes[0].moduleType).toBe('QA_GATE');
     expect(isDirty).toBe(true);
+  });
+});
+
+// ── Phase 65: moduleStatuses tests ────────────────────────────────────────────
+
+describe('useLessonPipelineStore — moduleStatuses', () => {
+  it('moduleStatuses initial state is empty object', () => {
+    const { moduleStatuses } = useLessonPipelineStore.getState();
+    expect(moduleStatuses).toEqual({});
+  });
+
+  it('setModuleStatus() updates status for a module', () => {
+    act(() => useLessonPipelineStore.getState().setModuleStatus('ASR', 'running'));
+    expect(useLessonPipelineStore.getState().moduleStatuses).toEqual({ ASR: 'running' });
+  });
+
+  it('setModuleStatus() can update multiple modules independently', () => {
+    act(() => {
+      useLessonPipelineStore.getState().setModuleStatus('ASR', 'done');
+      useLessonPipelineStore.getState().setModuleStatus('QA_GATE', 'failed');
+    });
+    const { moduleStatuses } = useLessonPipelineStore.getState();
+    expect(moduleStatuses).toEqual({ ASR: 'done', QA_GATE: 'failed' });
+  });
+
+  it('setModuleStatus() overwrites previous status for same module', () => {
+    act(() => {
+      useLessonPipelineStore.getState().setModuleStatus('ASR', 'running');
+      useLessonPipelineStore.getState().setModuleStatus('ASR', 'done');
+    });
+    expect(useLessonPipelineStore.getState().moduleStatuses.ASR).toBe('done');
+  });
+
+  it('resetModuleStatuses() clears all statuses', () => {
+    act(() => {
+      useLessonPipelineStore.getState().setModuleStatus('ASR', 'done');
+      useLessonPipelineStore.getState().setModuleStatus('QA_GATE', 'running');
+      useLessonPipelineStore.getState().resetModuleStatuses();
+    });
+    expect(useLessonPipelineStore.getState().moduleStatuses).toEqual({});
+  });
+});
+
+// ── Phase 65: undo/redo tests ─────────────────────────────────────────────────
+
+describe('useLessonPipelineStore — undo/redo', () => {
+  it('undo() restores previous state after addNode', () => {
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(1);
+
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(0);
+  });
+
+  it('redo() re-applies undone change', () => {
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(0);
+
+    act(() => useLessonPipelineStore.getState().redo());
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(1);
+    expect(useLessonPipelineStore.getState().nodes[0].moduleType).toBe('INGESTION');
+  });
+
+  it('undo() is a no-op when undoStack is empty', () => {
+    const before = useLessonPipelineStore.getState().nodes;
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().nodes).toEqual(before);
+  });
+
+  it('redo() is a no-op when redoStack is empty', () => {
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    const before = useLessonPipelineStore.getState().nodes;
+    act(() => useLessonPipelineStore.getState().redo());
+    expect(useLessonPipelineStore.getState().nodes).toEqual(before);
+  });
+
+  it('canUndo is true after addNode, false after undo', () => {
+    expect(useLessonPipelineStore.getState().canUndo).toBe(false);
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    expect(useLessonPipelineStore.getState().canUndo).toBe(true);
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().canUndo).toBe(false);
+  });
+
+  it('canRedo is true after undo, false after redo', () => {
+    expect(useLessonPipelineStore.getState().canRedo).toBe(false);
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().canRedo).toBe(true);
+    act(() => useLessonPipelineStore.getState().redo());
+    expect(useLessonPipelineStore.getState().canRedo).toBe(false);
+  });
+
+  it('new action after undo clears redo stack', () => {
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().canRedo).toBe(true);
+
+    act(() => useLessonPipelineStore.getState().addNode('ASR'));
+    expect(useLessonPipelineStore.getState().canRedo).toBe(false);
+    expect(useLessonPipelineStore.getState().redoStack).toHaveLength(0);
+  });
+
+  it('undo stack max 50 entries — overflow evicts oldest', () => {
+    // Push 55 operations
+    for (let i = 0; i < 55; i++) {
+      act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    }
+    expect(useLessonPipelineStore.getState().undoStack.length).toBeLessThanOrEqual(50);
+  });
+
+  it('undo restores selectedNodeId', () => {
+    act(() => useLessonPipelineStore.getState().setSelectedNode('node-old'));
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    // addNode pushes snapshot that includes selectedNodeId='node-old'
+    act(() => useLessonPipelineStore.getState().setSelectedNode('node-new'));
+
+    act(() => useLessonPipelineStore.getState().undo());
+    // After undo, selectedNodeId should be restored from snapshot
+    expect(useLessonPipelineStore.getState().selectedNodeId).toBe('node-old');
+  });
+
+  it('multiple undo steps work correctly', () => {
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    act(() => useLessonPipelineStore.getState().addNode('ASR'));
+    act(() => useLessonPipelineStore.getState().addNode('QA_GATE'));
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(3);
+
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(2);
+
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(1);
+
+    act(() => useLessonPipelineStore.getState().undo());
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(0);
+  });
+});
+
+// ── Phase 65: loadServerTemplate tests ────────────────────────────────────────
+
+describe('useLessonPipelineStore — loadServerTemplate', () => {
+  it('loadServerTemplate loads template nodes from server data', () => {
+    act(() =>
+      useLessonPipelineStore.getState().loadServerTemplate([
+        { moduleType: 'INGESTION', id: 'srv-1' },
+        { moduleType: 'ASR', id: 'srv-2' },
+        { moduleType: 'QA_GATE', id: 'srv-3' },
+      ])
+    );
+
+    const { nodes } = useLessonPipelineStore.getState();
+    expect(nodes).toHaveLength(3);
+    expect(nodes[0].moduleType).toBe('INGESTION');
+    expect(nodes[1].moduleType).toBe('ASR');
+    expect(nodes[2].moduleType).toBe('QA_GATE');
+  });
+
+  it('loadServerTemplate assigns correct order values', () => {
+    act(() =>
+      useLessonPipelineStore.getState().loadServerTemplate([
+        { moduleType: 'INGESTION' },
+        { moduleType: 'SUMMARIZATION' },
+      ])
+    );
+
+    const { nodes } = useLessonPipelineStore.getState();
+    expect(nodes[0].order).toBe(0);
+    expect(nodes[1].order).toBe(1);
+  });
+
+  it('loadServerTemplate sets isDirty to true', () => {
+    act(() =>
+      useLessonPipelineStore.getState().loadServerTemplate([
+        { moduleType: 'INGESTION' },
+      ])
+    );
+    expect(useLessonPipelineStore.getState().isDirty).toBe(true);
+  });
+
+  it('loadServerTemplate filters out unknown module types', () => {
+    act(() =>
+      useLessonPipelineStore.getState().loadServerTemplate([
+        { moduleType: 'INGESTION' },
+        { moduleType: 'UNKNOWN_MODULE' },
+        { moduleType: 'QA_GATE' },
+      ])
+    );
+
+    const { nodes } = useLessonPipelineStore.getState();
+    expect(nodes).toHaveLength(2);
+    expect(nodes.every((n) => n.moduleType !== 'UNKNOWN_MODULE')).toBe(true);
+  });
+
+  it('loadServerTemplate uses MODULE_LABELS for label/labelHe', () => {
+    act(() =>
+      useLessonPipelineStore.getState().loadServerTemplate([
+        { moduleType: 'SUMMARIZATION' },
+      ])
+    );
+
+    const node = useLessonPipelineStore.getState().nodes[0];
+    expect(node.label).toBe('Summarization');
+    expect(node.labelHe).toBe('סיכום');
+  });
+
+  it('loadServerTemplate pushes to undo stack', () => {
+    act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
+    act(() =>
+      useLessonPipelineStore.getState().loadServerTemplate([
+        { moduleType: 'QA_GATE' },
+      ])
+    );
+
+    expect(useLessonPipelineStore.getState().canUndo).toBe(true);
+    act(() => useLessonPipelineStore.getState().undo());
+    // After undo, should restore the single INGESTION node
+    expect(useLessonPipelineStore.getState().nodes).toHaveLength(1);
+    expect(useLessonPipelineStore.getState().nodes[0].moduleType).toBe('INGESTION');
   });
 });

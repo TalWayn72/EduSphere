@@ -199,6 +199,19 @@ export const UPDATE_COURSE_MUTATION = gql`
   }
 `;
 
+export const COURSE_READINESS_QUERY = gql`
+  query CourseReadiness($courseId: ID!) {
+    courseReadiness(courseId: $courseId) {
+      ready
+      checks {
+        name
+        passed
+        message
+      }
+    }
+  }
+`;
+
 export const PUBLISH_COURSE_MUTATION = gql`
   mutation PublishCourse($id: ID!) {
     publishCourse(id: $id) {

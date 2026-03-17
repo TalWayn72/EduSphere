@@ -2,6 +2,7 @@ import {
   Resolver,
   Query,
   Mutation,
+  Subscription,
   Args,
   Context,
   ResolveField,
@@ -16,6 +17,7 @@ import { LessonAssetService } from './lesson-asset.service';
 import type { AddLessonAssetInput } from './lesson-asset.service';
 import { LessonPipelineService } from './lesson-pipeline.service';
 import type { SaveLessonPipelineInput } from './lesson-pipeline.service';
+import { LessonPipelineSubscriptionService } from './lesson-pipeline-subscription.service';
 
 interface GqlContext {
   authContext?: AuthContext;
@@ -43,7 +45,8 @@ export class LessonResolver {
   constructor(
     private readonly lessonService: LessonService,
     private readonly assetService: LessonAssetService,
-    private readonly pipelineService: LessonPipelineService
+    private readonly pipelineService: LessonPipelineService,
+    private readonly subscriptionService: LessonPipelineSubscriptionService
   ) {}
 
   @Query('lesson')
@@ -135,10 +138,54 @@ export class LessonResolver {
     return this.pipelineService.cancelRun(runId, tenantCtx);
   }
 
+  @Mutation('retryPipelineModule')
+  async retryPipelineModule(
+    @Args('runId') runId: string,
+    @Args('moduleType') moduleType: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.pipelineService.retryModule(runId, moduleType, tenantCtx);
+  }
+
+  @Query('lessonPipelineRuns')
+  async getLessonPipelineRuns(
+    @Args('lessonId') lessonId: string,
+    @Args('limit') limit: number | undefined,
+    @Context() ctx: GqlContext
+  ) {
+    requireAuth(ctx);
+    return this.pipelineService.findRunHistory(lessonId, limit ?? 10);
+  }
+
+  @Mutation('restoreRun')
+  async restoreRun(@Args('runId') runId: string, @Context() ctx: GqlContext) {
+    const tenantCtx = requireAuth(ctx);
+    return this.pipelineService.restoreRun(runId, tenantCtx);
+  }
+
   @Mutation('publishLesson')
   async publishLesson(@Args('id') id: string, @Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
     return this.lessonService.publish(id, tenantCtx);
+  }
+
+  // ── Subscriptions ────────────────────────────────────────────
+
+  @Subscription('lessonPipelineProgress', {
+    filter: (
+      payload: { lessonPipelineProgress: { id: string } },
+      variables: { runId: string }
+    ) => payload.lessonPipelineProgress.id === variables.runId,
+    resolve: (payload: { lessonPipelineProgress: unknown }) =>
+      payload.lessonPipelineProgress,
+  })
+  async lessonPipelineProgress(
+    @Args('runId') runId: string,
+    @Context() ctx: GqlContext
+  ) {
+    requireAuth(ctx);
+    return this.subscriptionService.iteratorForRun(runId);
   }
 
   // ── Field Resolvers ──────────────────────────────────────────

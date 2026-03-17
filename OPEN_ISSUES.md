@@ -50,6 +50,90 @@
 | ORCH-4 | Discovery wave checklist incomplete | ✅ Fixed | `b360fcc` |
 | DOC-2 | CHANGELOG missing 20+ versions | ✅ Fixed | (Wave 6 commit) |
 | DOC-4 | docs/INDEX.md frozen at Session 27 | ✅ Fixed | (Wave 6 commit) |
+| BUG-074 | Polling anti-pattern on Pipeline page | ✅ Fixed | Phase 65 R1 |
+| BUG-075 | PUBLISH_SHARE module is a stub | ✅ Fixed | Phase 65 R2 |
+| BUG-076 | NER entities never reach Knowledge Graph | ✅ Fixed | Phase 65 R3 |
+| BUG-077 | Course publish lacks validation | ✅ Fixed | Phase 65 R4 |
+| BUG-078 | Missing aria-live on pipeline status | ✅ Fixed | Phase 65 R5 |
+| BUG-079 | Breadcrumb missing lesson link | ✅ Fixed | Phase 65 R5 |
+| BUG-080 | Mobile layout broken on pipeline page | ✅ Fixed | Phase 65 R5 |
+
+---
+
+## BUG-074 — Polling anti-pattern (setTimeout 3s) on Pipeline page (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🔴 Critical (P0)
+**Root Cause:** `LessonPipelinePage.tsx:76` used `setTimeout` to refetch every 3s instead of WebSocket subscription
+**Solution:** Replaced with `useSubscription` via NatsPubSub -> GraphQL WS bridge (P0-1). Feature flag `ENABLE_PIPELINE_SUBSCRIPTIONS` for rollback.
+**Anti-Recurrence:** `lesson-pipeline-subscription.service.spec.ts` tests subscription bridge
+**Discovery List:** 1 file (only pipeline page had this pattern for lesson progress)
+
+---
+
+## BUG-075 — PUBLISH_SHARE module is a stub (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🔴 Critical (P0)
+**Root Cause:** `lesson-pipeline-orchestrator.service.ts:353` returned hardcoded `{ publishReady: true }`
+**Solution:** Created `LessonPublishService` with real publish logic: sets status, links `published_run_id`, emits NATS event
+**Anti-Recurrence:** `lesson-publish.service.spec.ts` + `pipeline-orchestrator.integration.spec.ts`
+**Discovery List:** 1 location (orchestrator line 353)
+
+---
+
+## BUG-076 — NER entities never reach Knowledge Graph (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🔴 Critical (P0)
+**Root Cause:** NER_SOURCE_LINKING module extracted entities but no NATS consumer existed in subgraph-knowledge
+**Solution:** Created `LessonNERConsumer` in knowledge subgraph with batch Cypher MERGE, DLQ after 3 failures, tenant validation
+**Anti-Recurrence:** `lesson-ner.consumer.spec.ts` + `ner-to-graph.integration.spec.ts`
+**Discovery List:** orchestrator line 244, no consumer in subgraph-knowledge
+
+---
+
+## BUG-077 — Course publish lacks validation (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🟡 Medium (P1)
+**Root Cause:** `course.service.ts:setPublished()` was a simple boolean toggle without readiness checks
+**Solution:** Added `checkCourseReadiness()` with 5 validation checks, `@requiresScopes(["course:publish"])` on mutation
+**Anti-Recurrence:** `course.service.spec.ts` tests readiness validation
+**Discovery List:** 1 service (course.service.ts)
+
+---
+
+## BUG-078 — Missing aria-live on pipeline status (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🟡 Medium (P2)
+**Root Cause:** `PipelineRunStatus.tsx` used static elements without `aria-live` for dynamic status updates
+**Solution:** Created `PipelineStepper` with `aria-live="polite"`, `aria-current="step"`, `prefers-reduced-motion` support
+**Anti-Recurrence:** `PipelineStepper.test.tsx` tests accessibility attributes
+**Discovery List:** PipelineRunStatus.tsx, CountdownTimer.tsx, TestimonialsCarousel.tsx (similar patterns noted in Wave 2)
+
+---
+
+## BUG-079 — Breadcrumb missing lesson link (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🟡 Medium (P2)
+**Root Cause:** `LessonPipelinePage.tsx:154-158` had only 3 breadcrumb segments, missing the lesson link
+**Solution:** Added 4th breadcrumb segment with lesson title and link
+**Anti-Recurrence:** `lesson-pipeline-page.spec.ts` breadcrumb assertion
+**Discovery List:** 1 location (LessonPipelinePage.tsx)
+
+---
+
+## BUG-080 — Mobile layout broken on pipeline page (17 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🟢 Low (P3)
+**Root Cause:** Fixed desktop-only layout with side-by-side panels, no responsive breakpoints
+**Solution:** Responsive layout with `lg:flex-row`, mobile bottom sheet for palette, stacked config panel
+**Anti-Recurrence:** `PipelineModulePalette.test.tsx` tests mobile/desktop rendering
+**Discovery List:** LessonPipelinePage.tsx
 
 ---
 

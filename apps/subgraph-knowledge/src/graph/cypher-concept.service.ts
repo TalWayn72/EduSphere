@@ -103,6 +103,85 @@ export class CypherConceptService {
     return result[0] || null;
   }
 
+  /**
+   * Batch upsert concepts from NER extraction.
+   * Uses a single connection for all operations (batch approach).
+   * Concept is created if it doesn't exist; confidence is updated if higher.
+   * Returns count of upserted concepts.
+   */
+  async upsertConceptsFromNER(
+    entities: Array<{
+      name: string;
+      type: string;
+      confidence: number;
+      sourceText?: string;
+    }>,
+    tenantId: string
+  ): Promise<number> {
+    let upserted = 0;
+    for (const entity of entities) {
+      try {
+        const existing = await this.findConceptByNameCaseInsensitive(
+          entity.name,
+          tenantId
+        );
+        if (existing) {
+          // Update confidence if new value is higher
+          await executeCypher(
+            db,
+            GRAPH_NAME,
+            `MATCH (c:Concept {tenant_id: $tenantId})
+             WHERE toLower(c.name) = toLower($name)
+             SET c.confidence = CASE
+               WHEN $confidence > coalesce(c.confidence, 0)
+               THEN $confidence ELSE c.confidence END,
+               c.ner_type = $nerType,
+               c.updated_at = timestamp()
+             RETURN c`,
+            {
+              tenantId,
+              name: entity.name,
+              confidence: entity.confidence,
+              nerType: entity.type,
+            },
+            tenantId
+          );
+        } else {
+          await this.createConcept({
+            tenant_id: tenantId,
+            name: entity.name,
+            definition: entity.sourceText ?? entity.name,
+            source_ids: [],
+          });
+          // Set NER-specific properties after creation
+          await executeCypher(
+            db,
+            GRAPH_NAME,
+            `MATCH (c:Concept {tenant_id: $tenantId})
+             WHERE toLower(c.name) = toLower($name)
+             SET c.confidence = $confidence,
+                 c.ner_type = $nerType
+             RETURN c`,
+            {
+              tenantId,
+              name: entity.name,
+              confidence: entity.confidence,
+              nerType: entity.type,
+            },
+            tenantId
+          );
+        }
+        upserted++;
+      } catch (err) {
+        this.logger.error(
+          { err, entityName: entity.name, tenantId },
+          'Failed to upsert NER concept'
+        );
+      }
+    }
+    return upserted;
+  }
+
   async deleteConcept(id: string, tenantId: string): Promise<boolean> {
     try {
       await executeCypher(

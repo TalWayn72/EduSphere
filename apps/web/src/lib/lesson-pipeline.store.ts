@@ -76,10 +76,24 @@ const SEQUENTIAL_TEMPLATE: PipelineModuleType[] = [
   'PUBLISH_SHARE',
 ];
 
+export type ModuleStatusValue = 'pending' | 'running' | 'done' | 'failed';
+
+const MAX_UNDO_STACK = 50;
+
+interface UndoSnapshot {
+  nodes: PipelineNode[];
+  selectedNodeId: string | null;
+}
+
 interface LessonPipelineState {
   nodes: PipelineNode[];
   isDirty: boolean;
   selectedNodeId: string | null;
+  moduleStatuses: Record<string, ModuleStatusValue>;
+  undoStack: UndoSnapshot[];
+  redoStack: UndoSnapshot[];
+  canUndo: boolean;
+  canRedo: boolean;
   setNodes: (nodes: PipelineNode[]) => void;
   addNode: (moduleType: PipelineModuleType) => void;
   removeNode: (id: string) => void;
@@ -88,8 +102,22 @@ interface LessonPipelineState {
   updateNodeConfig: (id: string, config: Record<string, unknown>) => void;
   clearNodes: () => void;
   loadTemplate: (templateName: 'THEMATIC' | 'SEQUENTIAL' | 'CUSTOM') => void;
+  loadServerTemplate: (nodes: Array<{ moduleType: string; [key: string]: unknown }>) => void;
   setSelectedNode: (id: string | null) => void;
   resetDirty: () => void;
+  setModuleStatus: (moduleType: string, status: ModuleStatusValue) => void;
+  resetModuleStatuses: () => void;
+  undo: () => void;
+  redo: () => void;
+}
+
+function pushSnapshot(state: LessonPipelineState): Pick<LessonPipelineState, 'undoStack' | 'redoStack' | 'canUndo' | 'canRedo'> {
+  const snapshot: UndoSnapshot = {
+    nodes: state.nodes.map((n) => ({ ...n })),
+    selectedNodeId: state.selectedNodeId,
+  };
+  const newStack = [...state.undoStack, snapshot].slice(-MAX_UNDO_STACK);
+  return { undoStack: newStack, redoStack: [], canUndo: true, canRedo: false };
 }
 
 export const useLessonPipelineStore = create<LessonPipelineState>()(
@@ -97,59 +125,82 @@ export const useLessonPipelineStore = create<LessonPipelineState>()(
     nodes: [],
     isDirty: false,
     selectedNodeId: null,
+    moduleStatuses: {},
+    undoStack: [],
+    redoStack: [],
+    canUndo: false,
+    canRedo: false,
 
     setNodes: (nodes) => set({ nodes, isDirty: true }),
 
     addNode: (moduleType) => {
-      const nodes = get().nodes;
+      const state = get();
+      const snap = pushSnapshot(state);
       set({
-        nodes: [...nodes, makeNode(moduleType, nodes.length)],
+        nodes: [...state.nodes, makeNode(moduleType, state.nodes.length)],
         isDirty: true,
+        ...snap,
       });
     },
 
     removeNode: (id) => {
+      const state = get();
+      const snap = pushSnapshot(state);
       set({
-        nodes: get()
-          .nodes.filter((n) => n.id !== id)
+        nodes: state.nodes
+          .filter((n) => n.id !== id)
           .map((n, i) => ({ ...n, order: i })),
         isDirty: true,
+        ...snap,
       });
     },
 
     reorderNodes: (fromIdx, toIdx) => {
-      const nodes = [...get().nodes];
+      const state = get();
+      const snap = pushSnapshot(state);
+      const nodes = [...state.nodes];
       const [moved] = nodes.splice(fromIdx, 1) as [PipelineNode];
       nodes.splice(toIdx, 0, moved);
       set({
         nodes: nodes.map((n, i) => ({ ...n, order: i })),
         isDirty: true,
+        ...snap,
       });
     },
 
     toggleNode: (id) => {
+      const state = get();
+      const snap = pushSnapshot(state);
       set({
-        nodes: get().nodes.map((n) =>
+        nodes: state.nodes.map((n) =>
           n.id === id ? { ...n, enabled: !n.enabled } : n
         ),
         isDirty: true,
+        ...snap,
       });
     },
 
     updateNodeConfig: (id, config) => {
+      const state = get();
+      const snap = pushSnapshot(state);
       set({
-        nodes: get().nodes.map((n) => (n.id === id ? { ...n, config } : n)),
+        nodes: state.nodes.map((n) => (n.id === id ? { ...n, config } : n)),
         isDirty: true,
+        ...snap,
       });
     },
 
     clearNodes: () => {
-      set({ nodes: [], isDirty: false, selectedNodeId: null });
+      const state = get();
+      const snap = pushSnapshot(state);
+      set({ nodes: [], isDirty: false, selectedNodeId: null, ...snap });
     },
 
     loadTemplate: (templateName) => {
+      const state = get();
+      const snap = pushSnapshot(state);
       if (templateName === 'CUSTOM') {
-        set({ nodes: [], isDirty: false, selectedNodeId: null });
+        set({ nodes: [], isDirty: false, selectedNodeId: null, ...snap });
         return;
       }
       const modules =
@@ -157,11 +208,70 @@ export const useLessonPipelineStore = create<LessonPipelineState>()(
       set({
         nodes: modules.map((m, i) => makeNode(m, i)),
         isDirty: false,
+        ...snap,
       });
+    },
+
+    loadServerTemplate: (serverNodes) => {
+      const state = get();
+      const snap = pushSnapshot(state);
+      const nodes = serverNodes
+        .filter((n) => n.moduleType in MODULE_LABELS)
+        .map((n, i) => makeNode(n.moduleType as PipelineModuleType, i));
+      set({ nodes, isDirty: true, ...snap });
     },
 
     setSelectedNode: (id) => set({ selectedNodeId: id }),
 
     resetDirty: () => set({ isDirty: false }),
+
+    setModuleStatus: (moduleType, status) =>
+      set((state) => ({
+        moduleStatuses: { ...state.moduleStatuses, [moduleType]: status },
+      })),
+
+    resetModuleStatuses: () => set({ moduleStatuses: {} }),
+
+    undo: () => {
+      const state = get();
+      if (state.undoStack.length === 0) return;
+      const prev = state.undoStack[state.undoStack.length - 1]!;
+      const currentSnapshot: UndoSnapshot = {
+        nodes: state.nodes.map((n) => ({ ...n })),
+        selectedNodeId: state.selectedNodeId,
+      };
+      const newUndo = state.undoStack.slice(0, -1);
+      const newRedo = [...state.redoStack, currentSnapshot].slice(-MAX_UNDO_STACK);
+      set({
+        nodes: prev.nodes,
+        selectedNodeId: prev.selectedNodeId,
+        isDirty: true,
+        undoStack: newUndo,
+        redoStack: newRedo,
+        canUndo: newUndo.length > 0,
+        canRedo: true,
+      });
+    },
+
+    redo: () => {
+      const state = get();
+      if (state.redoStack.length === 0) return;
+      const next = state.redoStack[state.redoStack.length - 1]!;
+      const currentSnapshot: UndoSnapshot = {
+        nodes: state.nodes.map((n) => ({ ...n })),
+        selectedNodeId: state.selectedNodeId,
+      };
+      const newRedo = state.redoStack.slice(0, -1);
+      const newUndo = [...state.undoStack, currentSnapshot].slice(-MAX_UNDO_STACK);
+      set({
+        nodes: next.nodes,
+        selectedNodeId: next.selectedNodeId,
+        isDirty: true,
+        undoStack: newUndo,
+        redoStack: newRedo,
+        canUndo: true,
+        canRedo: newRedo.length > 0,
+      });
+    },
   })
 );

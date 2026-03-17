@@ -1,7 +1,7 @@
 /**
  * CourseHeaderCard — course thumbnail, title (editable), metadata, enroll/fork buttons.
  */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,12 @@ import {
   Pencil,
   GitFork,
   Loader2,
+  Send,
 } from 'lucide-react';
 import type { CourseDetailData } from './types';
+import { EDITOR_ROLES } from './types';
+import { CoursePublishSheet } from '@/components/course/CoursePublishSheet';
+import { useAuthRole } from '@/hooks/useAuthRole';
 
 interface Props {
   course: CourseDetailData;
@@ -38,6 +42,7 @@ interface Props {
 
 export const CourseHeaderCard = React.memo(function CourseHeaderCard({
   course,
+  courseId,
   canEdit,
   isEnrolled,
   optimisticEnrolled,
@@ -56,6 +61,13 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
   onDismissForkError,
 }: Props) {
   const { t } = useTranslation('courses');
+  const role = useAuthRole();
+  const [publishOpen, setPublishOpen] = useState(false);
+  const canPublish = canEdit && !course.isPublished && EDITOR_ROLES.has(role ?? '');
+  const handlePublished = useCallback(() => {
+    // Force parent to re-fetch course data after publish
+    window.location.reload();
+  }, []);
   const progressBarStyle = useMemo(
     () => progress ? { width: `${progress.percentComplete}%` } : undefined,
     [progress],
@@ -192,6 +204,17 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                   {t('forkCourse', 'Fork Course')}
                 </Button>
               )}
+              {canPublish && (
+                <Button
+                  size="sm"
+                  className="gap-2"
+                  data-testid="publish-course-btn"
+                  onClick={() => setPublishOpen(true)}
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  {t('publishCourse', 'פרסם קורס')}
+                </Button>
+              )}
               <Button
                 variant={optimisticEnrolled ? 'secondary' : 'default'}
                 className="gap-2"
@@ -235,6 +258,15 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
           </CardContent>
         )}
       </Card>
+
+      {canPublish && (
+        <CoursePublishSheet
+          courseId={courseId}
+          open={publishOpen}
+          onOpenChange={setPublishOpen}
+          onPublished={handlePublished}
+        />
+      )}
     </>
   );
 });

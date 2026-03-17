@@ -192,6 +192,15 @@ export function LessonDetailPage() {
             variant="outline"
             className="flex-1"
             onClick={() =>
+              navigate(`/courses/${courseId}/lessons/${lessonId}/preview`)
+            }
+          >
+            👁 תצוגה מקדימה
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() =>
               navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)
             }
           >

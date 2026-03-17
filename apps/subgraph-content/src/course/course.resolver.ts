@@ -120,6 +120,15 @@ export class CourseResolver {
     return this.courseService.update(id, validated);
   }
 
+  @Query('courseReadiness')
+  async courseReadiness(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
+    requireAuth(ctx);
+    return this.courseService.checkCourseReadiness(courseId);
+  }
+
   @Mutation('publishCourse')
   async publishCourse(@Args('id') id: string, @Context() ctx: GqlContext) {
     requireAuth(ctx);

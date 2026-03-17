@@ -143,6 +143,9 @@ export * from './knowledge-sources';
 // Lesson Pipeline Builder (AI-powered lesson processing)
 export * from './lesson';
 
+// Phase 65: Pipeline Templates (versioned runs + reusable templates)
+export * from './lesson-templates';
+
 // Saved Searches (Track A2 — user-scoped search persistence)
 export * from './saved-searches';
 

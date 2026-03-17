@@ -76,6 +76,11 @@ const ComplianceLibraryPage = lazy(() =>
     default: m.ComplianceLibraryPage,
   }))
 );
+const LessonPreviewPage = lazy(() =>
+  import('@/pages/LessonPreviewPage').then((m) => ({
+    default: m.LessonPreviewPage,
+  }))
+);
 
 /**
  * Course & lesson routes — discovery, CRUD, analytics, lessons, quizzes.
@@ -98,6 +103,7 @@ export const courseRoutes: RouteObject[] = [
   { path: '/courses/:courseId/lessons/new', element: guarded(<CreateLessonPage />) },
   { path: '/courses/:courseId/lessons/:lessonId/pipeline', element: guarded(<LessonPipelinePage />) },
   { path: '/courses/:courseId/lessons/:lessonId/results', element: guarded(<LessonResultsPage />) },
+  { path: '/courses/:courseId/lessons/:lessonId/preview', element: guarded(<LessonPreviewPage />) },
   { path: '/courses/:courseId/lessons/:lessonId', element: guarded(<LessonDetailPage />) },
   { path: '/courses/:courseId', element: guarded(<CourseDetailPage />) },
   // Content import — bulk import lessons

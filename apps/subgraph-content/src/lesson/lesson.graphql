@@ -96,6 +96,9 @@ type LessonPipeline {
 type LessonPipelineRun {
   id: ID!
   pipelineId: ID!
+  lessonId: ID
+  runNumber: Int!
+  triggeredBy: String!
   startedAt: String
   completedAt: String
   status: RunStatus!
@@ -162,6 +165,7 @@ extend type Query {
   lesson(id: ID!): Lesson @authenticated
   lessonsByCourse(courseId: ID!, limit: Int = 20, offset: Int = 0): [Lesson!]! @authenticated
   lessonPipelineRun(runId: ID!): LessonPipelineRun @authenticated
+  lessonPipelineRuns(lessonId: ID!, limit: Int): [LessonPipelineRun!]! @authenticated
 }
 
 extend type Mutation {
@@ -186,6 +190,12 @@ extend type Mutation {
   cancelLessonPipelineRun(runId: ID!): LessonPipelineRun!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
+  retryPipelineModule(runId: ID!, moduleType: PipelineModuleType!): LessonPipelineRun!
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  restoreRun(runId: ID!): LessonPipelineRun!
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
   publishLesson(id: ID!): Lesson!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
@@ -193,6 +203,51 @@ extend type Mutation {
 
 extend type Subscription {
   lessonPipelineProgress(runId: ID!): LessonPipelineRun! @authenticated
+}
+
+# ─── Pipeline Templates (Phase 65 — reusable pipeline configs) ──────────────
+
+type LessonPipelineTemplate {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String
+  nodes: JSON!
+  config: JSON!
+  isSystem: Boolean!
+  createdBy: ID
+  createdAt: String!
+  updatedAt: String!
+}
+
+input CreatePipelineTemplateInput {
+  name: String!
+  description: String
+  nodes: JSON!
+  config: JSON
+}
+
+input UpdatePipelineTemplateInput {
+  name: String
+  description: String
+  nodes: JSON
+  config: JSON
+}
+
+extend type Query {
+  pipelineTemplates: [LessonPipelineTemplate!]! @authenticated
+}
+
+extend type Mutation {
+  createPipelineTemplate(input: CreatePipelineTemplateInput!): LessonPipelineTemplate!
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  updatePipelineTemplate(id: ID!, input: UpdatePipelineTemplateInput!): LessonPipelineTemplate!
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  deletePipelineTemplate(id: ID!): Boolean!
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 }
 
 # ─── Course Lesson Builder (WYSIWYG authoring — Phase 36) ─────────────────────

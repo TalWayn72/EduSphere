@@ -53,6 +53,38 @@ export function isLessonEvent(e: unknown): e is LessonPayload {
   );
 }
 
+// ─── NER Entity Extraction Payload ──────────────────────────────────────────
+
+export interface NEREntityItem {
+  readonly name: string;
+  readonly type: 'Concept' | 'Person' | 'Term' | 'Source' | 'TopicCluster';
+  readonly confidence: number;
+  readonly sourceText?: string;
+}
+
+export interface LessonNEREntitiesPayload {
+  readonly type: 'lesson.ner.extracted';
+  readonly tenantId: string;
+  readonly lessonId: string;
+  readonly runId: string;
+  readonly entities: NEREntityItem[];
+  readonly timestamp: string; // ISO 8601
+}
+
+export function isLessonNEREntitiesEvent(
+  e: unknown
+): e is LessonNEREntitiesPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    obj['type'] === 'lesson.ner.extracted' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['lessonId'] === 'string' &&
+    typeof obj['runId'] === 'string' &&
+    Array.isArray(obj['entities'])
+  );
+}
+
 export function isLessonPipelineModuleCompletedEvent(
   e: unknown
 ): e is LessonPipelineModuleCompletedPayload {

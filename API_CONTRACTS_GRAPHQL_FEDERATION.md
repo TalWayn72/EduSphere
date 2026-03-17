@@ -5901,3 +5901,186 @@ input DriveImportInput {
 - Max 500 rows enforced via `evictOldStatements()` after every `enqueueStatement()`
 - `useXapiTracking` hook exposes `track(verb, activityId, name)` + `flush()` (called explicitly)
 - Flush POSTs to `/xapi/statements` REST endpoint with Bearer token
+
+---
+
+## Section 30 — Phase 65: Lesson Pipeline Production Hardening (March 2026)
+
+### New Type: CourseReadiness (subgraph-content)
+
+```graphql
+type CourseReadiness {
+  ready: Boolean!
+  checks: [ReadinessCheck!]!
+}
+
+type ReadinessCheck {
+  name: String!          # e.g. "has_published_lessons", "has_description", "has_thumbnail", "has_modules", "has_learning_objectives"
+  passed: Boolean!
+  message: String        # human-readable explanation if failed
+}
+```
+
+### New Query: courseReadiness
+
+```graphql
+extend type Query {
+  courseReadiness(courseId: ID!): CourseReadiness! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+```
+
+Returns a structured readiness report with 5 validation checks. Used by the `publishCourse` mutation as a pre-flight gate.
+
+### New Scope: course:publish
+
+Added `course:publish` scope to `publishCourse` mutation:
+```graphql
+extend type Mutation {
+  publishCourse(courseId: ID!): Course! @authenticated @requiresScopes(scopes: ["course:publish"])
+}
+```
+
+### New Query: lessonPipelineRuns
+
+```graphql
+extend type Query {
+  lessonPipelineRuns(lessonId: ID!, limit: Int = 10): [PipelineRun!]! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+type PipelineRun {
+  id: ID!
+  lessonId: ID!
+  status: PipelineRunStatus!     # RUNNING | COMPLETED | FAILED | CANCELLED
+  modules: [PipelineModuleRun!]!
+  startedAt: DateTime!
+  completedAt: DateTime
+  createdBy: ID!
+}
+
+type PipelineModuleRun {
+  moduleType: String!            # e.g. TRANSCRIPTION, NER_SOURCE_LINKING, QUIZ_GEN, PUBLISH_SHARE
+  status: PipelineModuleStatus!  # PENDING | RUNNING | COMPLETED | FAILED | RETRYING
+  startedAt: DateTime
+  completedAt: DateTime
+  error: String                  # error message if FAILED
+  retryCount: Int!
+}
+
+enum PipelineRunStatus { RUNNING COMPLETED FAILED CANCELLED }
+enum PipelineModuleStatus { PENDING RUNNING COMPLETED FAILED RETRYING }
+```
+
+### New Mutation: retryPipelineModule
+
+```graphql
+extend type Mutation {
+  retryPipelineModule(runId: ID!, moduleType: String!): PipelineRun! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+```
+
+Retries a single failed module within a pipeline run. Uses exponential backoff (1s, 2s, 4s). Max 3 retries before permanent failure.
+
+### New Mutation: restoreRun
+
+```graphql
+extend type Mutation {
+  restoreRun(runId: ID!): PipelineRun! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+```
+
+Restores a previous pipeline run as the active/published run for a lesson. Sets `published_run_id` on the lesson record.
+
+### New Subscription: lessonPipelineProgress
+
+```graphql
+extend type Subscription {
+  lessonPipelineProgress(lessonId: ID!): PipelineProgressEvent! @authenticated
+}
+
+type PipelineProgressEvent {
+  runId: ID!
+  lessonId: ID!
+  moduleType: String!
+  status: PipelineModuleStatus!
+  progressPct: Float             # 0.0 - 1.0 for in-progress modules
+  error: String
+  timestamp: DateTime!
+}
+```
+
+Real-time pipeline progress delivered via NATS PubSub bridge to GraphQL WebSocket. Replaces the previous setTimeout polling pattern. Controlled by feature flag `ENABLE_PIPELINE_SUBSCRIPTIONS`.
+
+### New Type: LessonPipelineTemplate (subgraph-content)
+
+```graphql
+type LessonPipelineTemplate {
+  id: ID!
+  name: String!
+  description: String
+  modules: [PipelineTemplateModule!]!
+  isDefault: Boolean!
+  createdBy: ID!
+  tenantId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PipelineTemplateModule {
+  moduleType: String!
+  stepOrder: Int!
+  config: JSON
+  enabled: Boolean!
+}
+```
+
+### New Query: pipelineTemplates
+
+```graphql
+extend type Query {
+  pipelineTemplates(courseId: ID): [LessonPipelineTemplate!]! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+```
+
+Returns all pipeline templates for the current tenant. Optional `courseId` filter for course-specific templates.
+
+### New Mutations: Pipeline Template CRUD
+
+```graphql
+extend type Mutation {
+  createPipelineTemplate(input: CreatePipelineTemplateInput!): LessonPipelineTemplate! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  updatePipelineTemplate(id: ID!, input: UpdatePipelineTemplateInput!): LessonPipelineTemplate! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  deletePipelineTemplate(id: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+input CreatePipelineTemplateInput {
+  name: String!
+  description: String
+  modules: [PipelineTemplateModuleInput!]!
+}
+
+input UpdatePipelineTemplateInput {
+  name: String
+  description: String
+  modules: [PipelineTemplateModuleInput!]
+}
+
+input PipelineTemplateModuleInput {
+  moduleType: String!
+  stepOrder: Int!
+  config: JSON
+  enabled: Boolean!
+}
+```
+
+### NATS Subjects (Phase 65)
+
+| Subject | Publisher | Consumer | Payload |
+|---------|-----------|----------|---------|
+| `EDUSPHERE.pipeline.progress.<lessonId>` | Pipeline Orchestrator | Gateway (PubSub bridge) | `PipelineProgressEvent` |
+| `EDUSPHERE.pipeline.ner.completed` | Pipeline Orchestrator | subgraph-knowledge `LessonNERConsumer` | `{ tenantId, lessonId, entities: NerEntity[] }` |
+| `EDUSPHERE.lesson.published` | `LessonPublishService` | (downstream consumers) | `{ tenantId, lessonId, runId }` |
+
+---
+
+*Section 30 reflects Phase 65 Lesson Pipeline Production Hardening (2026-03-17).*
+*All mutations require `@authenticated`. Scope and role guards as specified per resolver above.*

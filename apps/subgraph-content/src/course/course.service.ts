@@ -12,9 +12,23 @@ import {
   desc,
   ilike,
   or,
+  and,
+  isNull,
+  count,
   closeAllPools,
   withReadReplica,
 } from '@edusphere/db';
+
+interface CourseReadinessCheck {
+  name: string;
+  passed: boolean;
+  message: string | null;
+}
+
+export interface CourseReadiness {
+  ready: boolean;
+  checks: CourseReadinessCheck[];
+}
 
 interface CreateCourseInput {
   tenantId?: string;
@@ -156,7 +170,97 @@ export class CourseService implements OnModuleDestroy {
     }
   }
 
+  async checkCourseReadiness(courseId: string): Promise<CourseReadiness> {
+    const checks: CourseReadinessCheck[] = [];
+
+    const course = await this.findById(courseId);
+    if (!course) throw new NotFoundException(`Course ${courseId} not found`);
+    const src = course as Record<string, unknown>;
+
+    // Check: course has title and description
+    const hasTitle = !!src['title'] && String(src['title']).trim().length > 0;
+    const hasDesc = !!src['description'] && String(src['description']).trim().length > 0;
+    checks.push({
+      name: 'has_title',
+      passed: hasTitle,
+      message: hasTitle ? null : 'Course must have a title',
+    });
+    checks.push({
+      name: 'has_description',
+      passed: hasDesc,
+      message: hasDesc ? null : 'Course must have a description',
+    });
+
+    // Check: course has at least 1 lesson
+    const lessons = await withReadReplica((db) =>
+      db.select().from(schema.lessons).where(
+        and(eq(schema.lessons.course_id, courseId), isNull(schema.lessons.deleted_at))
+      )
+    );
+    const hasLessons = lessons.length > 0;
+    checks.push({
+      name: 'has_lessons',
+      passed: hasLessons,
+      message: hasLessons ? null : 'Course must have at least one lesson',
+    });
+
+    // Check: all lessons have status READY or PUBLISHED
+    const allReady = hasLessons && lessons.every((l) => {
+      const s = (l as Record<string, unknown>)['status'] as string;
+      return s === 'READY' || s === 'PUBLISHED';
+    });
+    checks.push({
+      name: 'lessons_ready',
+      passed: allReady,
+      message: allReady ? null : 'All lessons must have status READY or PUBLISHED',
+    });
+
+    // Check: at least one lesson has pipeline results
+    let hasPipelineResults = false;
+    if (hasLessons) {
+      const lessonIds = lessons.map((l) => (l as Record<string, unknown>)['id'] as string);
+      for (const lid of lessonIds) {
+        const [result] = await withReadReplica((db) =>
+          db.select({ cnt: count() })
+            .from(schema.lesson_pipeline_runs)
+            .where(eq(schema.lesson_pipeline_runs.lesson_id, lid))
+            .limit(1)
+        );
+        if (result && Number(result.cnt) > 0) {
+          hasPipelineResults = true;
+          break;
+        }
+      }
+    }
+    checks.push({
+      name: 'has_pipeline_results',
+      passed: hasPipelineResults,
+      message: hasPipelineResults ? null : 'At least one lesson must have pipeline results',
+    });
+
+    const ready = checks.every((c) => c.passed);
+    this.logger.log(
+      `[CourseService] readiness check for ${courseId}: ready=${ready}, checks=${JSON.stringify(checks.map((c) => c.name + ':' + c.passed))}`
+    );
+    return { ready, checks };
+  }
+
   async setPublished(id: string, isPublished: boolean) {
+    if (isPublished) {
+      const readiness = await this.checkCourseReadiness(id);
+      if (!readiness.ready) {
+        const failing = readiness.checks
+          .filter((c) => !c.passed)
+          .map((c) => c.message)
+          .join('; ');
+        this.logger.warn(
+          `[CourseService] Publish blocked for course ${id}: ${failing}`
+        );
+        throw new BadRequestException(
+          `Course is not ready to publish: ${failing}`
+        );
+      }
+    }
     try {
       const [course] = await this.db
         .update(schema.courses)

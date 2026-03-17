@@ -24,6 +24,7 @@
     "@edusphere/langgraph-workflows": "workspace:*",
     "@edusphere/metrics": "workspace:*",
     "@edusphere/nats-client": "workspace:*",
+    "@edusphere/nats-pubsub": "workspace:*",
     "@edusphere/telemetry": "workspace:*",
     "@graphql-yoga/nestjs-federation": "^3.19.0",
     "@nestjs/common": "^11.1.14",

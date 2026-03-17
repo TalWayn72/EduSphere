@@ -2225,6 +2225,60 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 
 ---
 
+## Phase 65 — Lesson Pipeline Production Hardening (BUG-074..080) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-17
+
+### What Was Built
+
+**Round 1 (P0 — Critical Infrastructure):**
+- Real-time pipeline progress via GraphQL subscriptions replacing setTimeout polling (BUG-074)
+- `LessonPublishService` with real publish logic replacing hardcoded stub (BUG-075)
+- `LessonNERConsumer` in subgraph-knowledge for NER-to-Knowledge-Graph pipeline (BUG-076)
+- Pipeline run history with `lessonPipelineRuns` query and `restoreRun` mutation
+- Module retry with `retryPipelineModule` mutation and exponential backoff
+
+**Round 2 (P1 — Validation & Templates):**
+- `checkCourseReadiness()` with 5 validation checks + `course:publish` scope (BUG-077)
+- `CourseReadiness` GraphQL type with `courseReadiness(courseId)` query
+- `LessonPipelineTemplate` CRUD with `pipelineTemplates` query
+
+**Round 3 (P2/P3 — Accessibility & Mobile):**
+- `PipelineStepper` with `aria-live="polite"`, `aria-current="step"` (BUG-078)
+- Breadcrumb 4th segment with lesson title link (BUG-079)
+- Responsive mobile layout with bottom sheet palette (BUG-080)
+
+**Round 4 (Subscription Implementation):**
+- `lessonPipelineProgress` GraphQL subscription (NATS → PubSub bridge)
+- Feature flag `ENABLE_PIPELINE_SUBSCRIPTIONS` for safe rollback
+
+**Acceptance Criteria:**
+
+```bash
+# All pipeline tests pass
+pnpm turbo test --filter='@edusphere/subgraph-content' --filter='@edusphere/subgraph-knowledge' --filter='@edusphere/web'  # all green
+
+# TypeScript strict compilation
+pnpm turbo typecheck  # 0 errors
+
+# Subscription bridge functional
+# lessonPipelineProgress subscription delivers real-time module status updates
+
+# Course readiness validation
+# courseReadiness query returns { ready, checks[] } with 5 validation items
+
+# NER-to-graph pipeline
+# NATS consumer in subgraph-knowledge processes NER events into Apache AGE graph
+
+# Pipeline templates CRUD
+# pipelineTemplates query returns saved templates; create/update/delete mutations work
+
+# Responsive layout
+# Pipeline page renders correctly on mobile (< 768px) and desktop (>= 1024px)
+```
+
+---
+
 > **CRITICAL REMINDER FOR CLAUDE CODE**:
 >
 > - **Never skip phases.** Each phase builds on the previous one.

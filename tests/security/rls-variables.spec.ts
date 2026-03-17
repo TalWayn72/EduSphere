@@ -16,7 +16,7 @@
  * No database connection is required; this reads committed source files.
  */
 
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
@@ -101,5 +101,74 @@ describe('RLS tenant-isolation variable (SI-1)', () => {
         /current_setting\(\s*['"`]app\.current_tenant['"`]/
       );
     });
+  });
+});
+
+// ─── Phase 65: lesson_pipeline_templates RLS ─────────────────────────────────
+
+describe('RLS: lesson_pipeline_templates table (Phase 65)', () => {
+  const TEMPLATES_FILE = resolve(
+    join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')
+  );
+
+  it('lesson-templates.ts schema file exists', () => {
+    expect(existsSync(TEMPLATES_FILE)).toBe(true);
+  });
+
+  it('lesson_pipeline_templates table is defined with tenant_id column', () => {
+    const content = readFileSync(TEMPLATES_FILE, 'utf-8');
+    expect(content).toContain('lesson_pipeline_templates');
+    expect(content).toContain('tenant_id');
+  });
+
+  it('lesson_pipeline_templates has is_system flag for system templates', () => {
+    const content = readFileSync(TEMPLATES_FILE, 'utf-8');
+    expect(content).toContain('is_system');
+  });
+
+  it('lesson_pipeline_templates tenant_id references tenants table', () => {
+    const content = readFileSync(TEMPLATES_FILE, 'utf-8');
+    // tenant_id should reference the tenants table for RLS enforcement
+    expect(content).toContain('tenants.id');
+  });
+
+  it('lesson_pipeline_templates has cascade delete on tenant', () => {
+    const content = readFileSync(TEMPLATES_FILE, 'utf-8');
+    expect(content).toContain("onDelete: 'cascade'");
+  });
+});
+
+describe('RLS policy expectations: lesson_pipeline_templates access control', () => {
+  // These tests validate the expected RLS behavior for pipeline templates.
+  // System templates (is_system=true) should be readable cross-tenant.
+  // Non-system templates should be scoped to tenant.
+  // System template modification should be blocked for non-SUPER_ADMIN.
+
+  it('schema defines is_system boolean field with default false', () => {
+    const content = readFileSync(
+      resolve(join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')),
+      'utf-8',
+    );
+    // is_system should default to false — user-created templates are NOT system templates
+    expect(content).toContain("boolean('is_system')");
+    expect(content).toContain('.default(false)');
+  });
+
+  it('schema defines created_by uuid field for ownership tracking', () => {
+    const content = readFileSync(
+      resolve(join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')),
+      'utf-8',
+    );
+    expect(content).toContain("uuid('created_by')");
+    expect(content).toContain('users.id');
+  });
+
+  it('template table uses tenantId helper for consistent RLS column naming', () => {
+    const content = readFileSync(
+      resolve(join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')),
+      'utf-8',
+    );
+    // Should use the shared tenantId() helper, not a raw column definition
+    expect(content).toContain('tenantId()');
   });
 });

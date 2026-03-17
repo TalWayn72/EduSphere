@@ -80,6 +80,8 @@ export const NatsSubjects = {
     'EDUSPHERE.lesson.pipeline.module.completed',
   LESSON_PIPELINE_COMPLETED: 'EDUSPHERE.lesson.pipeline.completed',
   LESSON_PUBLISHED: 'EDUSPHERE.lesson.published',
+  // Phase 65 — NER → Knowledge Graph bridge
+  LESSON_NER_EXTRACTED: 'EDUSPHERE.content.*.ner.extracted',
   // Phase 45 — Social Learning
   PEER_REVIEW_ASSIGNED: 'EDUSPHERE.peer.review.assigned',
   PEER_REVIEW_COMPLETED: 'EDUSPHERE.peer.review.completed',

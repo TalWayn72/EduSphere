@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated", "@requiresScopes"])
 
 type Course @key(fields: "id") {
   id: ID!
@@ -29,6 +29,17 @@ type ComplianceCourse {
 
 type User @key(fields: "id") {
   id: ID!
+}
+
+type CourseReadinessCheck {
+  name: String!
+  passed: Boolean!
+  message: String
+}
+
+type CourseReadiness {
+  ready: Boolean!
+  checks: [CourseReadinessCheck!]!
 }
 
 type UserCourse {
@@ -68,13 +79,14 @@ extend type Query {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   complianceCourses: [ComplianceCourse!]! @authenticated
+  courseReadiness(courseId: ID!): CourseReadiness! @authenticated
 }
 
 extend type Mutation {
   createCourse(input: CreateCourseInput!): Course! @authenticated
   updateCourse(id: ID!, input: UpdateCourseInput!): Course! @authenticated
   deleteCourse(id: ID!): Boolean! @authenticated
-  publishCourse(id: ID!): Course! @authenticated
+  publishCourse(id: ID!): Course! @authenticated @requiresScopes(scopes: [["course:publish"]])
   unpublishCourse(id: ID!): Course! @authenticated
   enrollCourse(courseId: ID!): UserCourse! @authenticated
   unenrollCourse(courseId: ID!): Boolean! @authenticated

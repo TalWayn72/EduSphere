@@ -27,6 +27,14 @@ vi.mock('urql', () => ({
   useMutation: vi.fn(),
 }));
 
+vi.mock('@/lib/constants', () => ({
+  REFETCH_DELAY_MS: 3000,
+}));
+
+vi.mock('sonner', () => ({
+  toast: { info: vi.fn(), success: vi.fn(), error: vi.fn() },
+}));
+
 vi.mock('@/components/Layout', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Layout: ({ children }: any) => children,
@@ -46,6 +54,108 @@ vi.mock('@/components/pipeline/PipelineConfigPanel', () => ({
   ),
 }));
 
+vi.mock('@/components/pipeline/PipelineSortableCanvas', () => ({
+  PipelineSortableCanvas: ({ nodes, selectedNodeId, customMode, onSelect, onRemove }: {
+    nodes: Array<{ id: string; moduleType: string; labelHe: string; label: string; enabled: boolean }>;
+    selectedNodeId: string | null;
+    customMode: boolean;
+    onSelect: (id: string | null) => void;
+    onRemove: (id: string) => void;
+  }) => {
+    if (nodes.length === 0) {
+      return (
+        <div data-testid="empty-canvas">
+          {customMode ? (
+            <>
+              <p>מצב בנייה חופשית</p>
+              <p>גרור מודולים מהחלונית השמאלית לכאן</p>
+            </>
+          ) : (
+            <>
+              <p>גרור מודולים לכאן</p>
+              <p>בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל</p>
+            </>
+          )}
+        </div>
+      );
+    }
+    return (
+      <div>
+        {nodes.map((node) => (
+          <div key={node.id} data-testid={`pipeline-node-${node.moduleType}`}>
+            <button aria-label={`גרור ${node.labelHe}`}>drag</button>
+            <button aria-label={`הגדרות ${node.labelHe}`} onClick={() => onSelect(selectedNodeId === node.id ? null : node.id)}>
+              {node.labelHe}
+            </button>
+            <button aria-label={`הסר ${node.labelHe}`} onClick={() => onRemove(node.id)}>remove</button>
+          </div>
+        ))}
+      </div>
+    );
+  },
+}));
+
+vi.mock('@/components/pipeline/PipelineModulePalette', () => {
+  const labels: Record<string, { he: string; en: string }> = {
+    INGESTION: { he: 'איסוף חומרים', en: 'Ingestion' },
+    ASR: { he: 'תמלול', en: 'Transcription (ASR)' },
+    NER_SOURCE_LINKING: { he: 'זיהוי ישויות ומקורות', en: 'NER + Source Linking' },
+    CONTENT_CLEANING: { he: 'ניקוי תוכן', en: 'Content Cleaning' },
+    SUMMARIZATION: { he: 'סיכום', en: 'Summarization' },
+    STRUCTURED_NOTES: { he: 'תיעוד מובנה', en: 'Structured Notes' },
+    DIAGRAM_GENERATOR: { he: 'יצירת תרשימים', en: 'Diagram Generator' },
+    CITATION_VERIFIER: { he: 'אימות ציטוטים', en: 'Citation Verifier' },
+    QA_GATE: { he: 'בקרת איכות', en: 'QA Gate' },
+    PUBLISH_SHARE: { he: 'יצוא והפצה', en: 'Publish & Share' },
+  };
+  return {
+    PipelineModulePalette: ({ onAddModule }: { onAddModule: (m: string) => void }) => (
+      <div data-testid="module-palette">
+        {Object.entries(labels).map(([m, lbl]) => (
+          <button key={m} data-testid={`palette-module-${m}`} onClick={() => onAddModule(m)}>
+            <span>{lbl.he}</span>
+            <span>{lbl.en}</span>
+          </button>
+        ))}
+      </div>
+    ),
+  };
+});
+
+vi.mock('@/components/pipeline/PipelineToolbar', () => ({
+  PipelineToolbar: (props: {
+    lessonTitle: string; isDirty: boolean; saving: boolean; isRunning: boolean;
+    onSave: () => void; onRun: () => void;
+    onTemplateChange: (val: string) => void;
+    hasResults?: boolean;
+  }) => (
+    <div data-testid="pipeline-toolbar">
+      <h1>Lesson Pipeline</h1>
+      <select
+        data-testid="template-picker"
+        defaultValue=""
+        onChange={(e) => { if (e.target.value) props.onTemplateChange(e.target.value); (e.target as HTMLSelectElement).value = ''; }}
+      >
+        <option value="">טעינת תבנית...</option>
+        <option value="THEMATIC">תמטי (8 מודולים)</option>
+        <option value="SEQUENTIAL">סדרתי (9 מודולים)</option>
+        <option value="CUSTOM">בנה ידנית (מאפס)</option>
+      </select>
+      <button data-testid="save-btn" disabled={!props.isDirty || props.saving} onClick={props.onSave}>
+        {props.saving ? 'שומר...' : 'שמור'}
+      </button>
+      <button data-testid="run-btn" disabled={props.isRunning} onClick={props.onRun}>
+        {props.isRunning ? '▶ מריץ...' : '▶ הפעל Pipeline'}
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock('@/components/pipeline/PipelinePrintStyles', () => ({
+  PipelineExportButton: () => <button data-testid="export-pdf-btn">ייצוא PDF</button>,
+  PipelinePrintStylesheet: () => null,
+}));
+
 vi.mock('@/components/pipeline/PipelineRunStatus', () => ({
   PipelineRunStatus: ({ run, onCancel }: { run: { status: string }; onCancel: () => void }) => (
     <div data-testid="pipeline-run-status">
@@ -60,12 +170,19 @@ vi.mock('@/lib/graphql/lesson.queries', () => ({
   SAVE_LESSON_PIPELINE_MUTATION: 'SAVE_LESSON_PIPELINE_MUTATION',
   START_PIPELINE_RUN_MUTATION: 'START_PIPELINE_RUN_MUTATION',
   CANCEL_PIPELINE_RUN_MUTATION: 'CANCEL_PIPELINE_RUN_MUTATION',
+  PIPELINE_TEMPLATES_QUERY: 'PIPELINE_TEMPLATES_QUERY',
+  CREATE_PIPELINE_TEMPLATE_MUTATION: 'CREATE_PIPELINE_TEMPLATE_MUTATION',
 }));
 
 const mockStore = {
   nodes: [] as import('@/lib/lesson-pipeline.store').PipelineNode[],
   isDirty: false,
   selectedNodeId: null as string | null,
+  moduleStatuses: {} as Record<string, string>,
+  undoStack: [],
+  redoStack: [],
+  canUndo: false,
+  canRedo: false,
   setNodes: vi.fn(),
   addNode: vi.fn(),
   removeNode: vi.fn(),
@@ -74,8 +191,13 @@ const mockStore = {
   updateNodeConfig: vi.fn(),
   clearNodes: vi.fn(),
   loadTemplate: vi.fn(),
+  loadServerTemplate: vi.fn(),
   setSelectedNode: vi.fn(),
   resetDirty: vi.fn(),
+  setModuleStatus: vi.fn(),
+  resetModuleStatuses: vi.fn(),
+  undo: vi.fn(),
+  redo: vi.fn(),
 };
 
 vi.mock('@/lib/lesson-pipeline.store', () => ({
@@ -115,6 +237,16 @@ function makeQuery(overrides: Record<string, unknown> = {}) {
   return [{ data: { lesson: MOCK_LESSON }, fetching: false, error: undefined, ...overrides }, vi.fn()] as never;
 }
 
+const EMPTY_TEMPLATES_RESULT = [{ data: { pipelineTemplates: [] }, fetching: false, error: undefined }, vi.fn()] as never;
+
+/** Mock useQuery: returns lesson data for LESSON_QUERY, empty templates for PIPELINE_TEMPLATES_QUERY */
+function mockUseQueryPair(lessonOverrides: Record<string, unknown> = {}) {
+  vi.mocked(urql.useQuery).mockImplementation((opts: { query: unknown }) => {
+    if (opts?.query === 'PIPELINE_TEMPLATES_QUERY') return EMPTY_TEMPLATES_RESULT;
+    return makeQuery(lessonOverrides);
+  });
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('LessonPipelinePage', () => {
@@ -123,7 +255,7 @@ describe('LessonPipelinePage', () => {
     mockStore.nodes = [];
     mockStore.isDirty = false;
     mockStore.selectedNodeId = null;
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery());
+    mockUseQueryPair();
     vi.mocked(urql.useMutation).mockReturnValue(NOOP_MUTATION);
     vi.mocked(RRD.useBlocker).mockReturnValue({
       state: 'unblocked',
@@ -227,7 +359,9 @@ describe('LessonPipelinePage', () => {
     mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
     mockStore.selectedNodeId = 'n1';
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getByTestId('config-panel')).toBeInTheDocument();
+    // Both desktop (hidden lg:block) and mobile (lg:hidden) panels render in JSDOM
+    const panels = screen.getAllByTestId('config-panel');
+    expect(panels.length).toBeGreaterThanOrEqual(1);
   });
 
   it('config panel is hidden when no node selected', () => {
@@ -237,14 +371,14 @@ describe('LessonPipelinePage', () => {
   });
 
   it('shows run status panel when currentRun exists', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({
+    mockUseQueryPair({
       data: {
         lesson: {
           ...MOCK_LESSON,
           pipeline: { id: 'p1', nodes: [], status: 'RUNNING', currentRun: { id: 'r1', status: 'RUNNING', results: [] } },
         },
       },
-    }));
+    });
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
     expect(screen.getByTestId('pipeline-run-status')).toBeInTheDocument();
     expect(screen.getByTestId('run-status-label')).toHaveTextContent('RUNNING');
@@ -268,22 +402,20 @@ describe('LessonPipelinePage', () => {
   it('remove button calls removeNode', async () => {
     mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    const removeBtn = screen.getByLabelText('הסר מודול');
+    const removeBtn = screen.getByLabelText('הסר איסוף חומרים');
     fireEvent.click(removeBtn);
     expect(mockStore.removeNode).toHaveBeenCalledWith('n1');
   });
 
-  it('move-up button calls reorderNodes', async () => {
+  it('pipeline nodes have drag handles for reordering', () => {
     mockStore.nodes = [
       { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
       { id: 'n2', moduleType: 'ASR', label: 'Transcription (ASR)', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
     ];
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    const upBtns = screen.getAllByLabelText('הזז למעלה');
-    expect(upBtns.length).toBeGreaterThanOrEqual(2);
-    // Second node (idx=1) has enabled up button (first node's up is disabled)
-    fireEvent.click(upBtns[1] as HTMLElement);
-    expect(mockStore.reorderNodes).toHaveBeenCalledWith(1, 0);
+    // Each node has a drag handle with aria-label
+    expect(screen.getByLabelText('גרור איסוף חומרים')).toBeInTheDocument();
+    expect(screen.getByLabelText('גרור תמלול')).toBeInTheDocument();
   });
 
   it('shows "שומר..." while save mutation is fetching', () => {
@@ -339,7 +471,6 @@ describe('LessonPipelinePage', () => {
     // The custom mode message should appear (since nodes is empty in mockStore)
     await waitFor(() => expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument());
     expect(screen.getByText(/גרור מודולים מהחלונית השמאלית לכאן/)).toBeInTheDocument();
-    expect(screen.getByText(/Pipeline מותאם אישית/)).toBeInTheDocument();
   });
 
   it('CUSTOM mode empty canvas does NOT show default drag prompt', async () => {
@@ -443,21 +574,22 @@ describe('LessonPipelinePage', () => {
 
   it('loads existing pipeline nodes from query data', () => {
     const savedNodes = [{ id: 'saved-1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({
+    mockUseQueryPair({
       data: { lesson: { ...MOCK_LESSON, pipeline: { id: 'p1', nodes: savedNodes, status: 'DRAFT' } } },
-    }));
+    });
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
     expect(mockStore.setNodes).toHaveBeenCalledWith(savedNodes);
   });
 
   it('assets are passed from query data (for future config panel)', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({
+    mockUseQueryPair({
       data: { lesson: MOCK_LESSON_WITH_ASSETS },
-    }));
+    });
     mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
     mockStore.selectedNodeId = 'n1';
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    // Config panel should be shown (mocked)
-    expect(screen.getByTestId('config-panel')).toBeInTheDocument();
+    // Config panel rendered in both desktop + mobile responsive wrappers
+    const panels = screen.getAllByTestId('config-panel');
+    expect(panels.length).toBeGreaterThanOrEqual(1);
   });
 });

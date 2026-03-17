@@ -75,6 +75,22 @@ export class CypherService {
     return this.concept.updateConcept(id, tenantId, updates);
   }
 
+  /**
+   * Batch upsert NER entities as Concept nodes in Apache AGE.
+   * Delegates to CypherConceptService.upsertConceptsFromNER().
+   */
+  upsertConceptsFromNER(
+    entities: Array<{
+      name: string;
+      type: string;
+      confidence: number;
+      sourceText?: string;
+    }>,
+    tenantId: string
+  ): Promise<number> {
+    return this.concept.upsertConceptsFromNER(entities, tenantId);
+  }
+
   deleteConcept(id: string, tenantId: string) {
     return this.concept.deleteConcept(id, tenantId);
   }

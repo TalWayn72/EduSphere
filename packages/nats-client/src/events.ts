@@ -38,7 +38,7 @@ import type {
   ContentTranslationPayload,
 } from './content-events.js';
 import type { KnowledgeConceptPayload, KnowledgeConceptDeletedPayload } from './knowledge-events.js';
-import type { LessonPayload, LessonPipelineModuleCompletedPayload } from './lesson-events.js';
+import type { LessonPayload, LessonPipelineModuleCompletedPayload, LessonNEREntitiesPayload } from './lesson-events.js';
 import type {
   SocialFeedItemPayload,
   PeerReviewAssignedPayload,
@@ -63,6 +63,7 @@ export type NatsEvent =
   | PollVotePayload
   | LessonPayload
   | LessonPipelineModuleCompletedPayload
+  | LessonNEREntitiesPayload
   | SocialFeedItemPayload
   | PeerReviewAssignedPayload
   | PeerReviewCompletedPayload

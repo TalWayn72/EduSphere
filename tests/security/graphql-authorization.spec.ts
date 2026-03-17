@@ -732,3 +732,130 @@ describe('G-15: marketplace.graphql (Phase 38) -- courseListings and mutations h
     expect(b).not.toContain('@requiresRole');
   });
 });
+
+// ─── Phase 65: Course Publish authorization ─────────────────────────────────
+
+describe('G-15: course.graphql (Phase 65) -- publishCourse requires course:publish scope', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/course/course.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('publishCourse mutation is present', () => {
+    expect(schema).toContain('publishCourse');
+  });
+
+  it('publishCourse has @authenticated directive', () => {
+    const start = schema.indexOf('publishCourse');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('publishCourse requires @requiresScopes with course:publish', () => {
+    const start = schema.indexOf('publishCourse');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('course:publish');
+  });
+
+  it('unpublishCourse has @authenticated directive', () => {
+    const start = schema.indexOf('unpublishCourse');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+});
+
+// ─── Phase 65: Pipeline mutations and subscriptions authorization ────────────
+
+describe('G-15: lesson.graphql (Phase 65) -- pipeline operations require correct auth', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/lesson/lesson.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('lessonPipelineProgress subscription is present', () => {
+    expect(schema).toContain('lessonPipelineProgress');
+  });
+
+  it('lessonPipelineProgress subscription requires @authenticated', () => {
+    const start = schema.indexOf('lessonPipelineProgress(runId:');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('retryPipelineModule mutation is present', () => {
+    expect(schema).toContain('retryPipelineModule');
+  });
+
+  it('retryPipelineModule requires @authenticated directive', () => {
+    const start = schema.indexOf('retryPipelineModule');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('retryPipelineModule requires @requiresScopes with course:write', () => {
+    const start = schema.indexOf('retryPipelineModule');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('course:write');
+  });
+
+  it('restoreRun mutation is present', () => {
+    expect(schema).toContain('restoreRun');
+  });
+
+  it('restoreRun requires @authenticated directive', () => {
+    const start = schema.indexOf('restoreRun(runId:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('restoreRun requires @requiresScopes with course:write', () => {
+    const start = schema.indexOf('restoreRun(runId:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('course:write');
+  });
+
+  it('lessonPipelineRuns query is present', () => {
+    expect(schema).toContain('lessonPipelineRuns');
+  });
+
+  it('lessonPipelineRuns requires @authenticated directive', () => {
+    const start = schema.indexOf('lessonPipelineRuns');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('STUDENT should NOT have course:write scope access (implicit from scopes model)', () => {
+    // Verify the mutation uses scopes (not roles) — scopes are granted per Keycloak client,
+    // and STUDENT role does not have course:write scope assigned
+    const start = schema.indexOf('retryPipelineModule');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresScopes');
+    // STUDENT should not appear in any roles list near these mutations
+    expect(b).not.toContain('STUDENT');
+  });
+
+  it('startLessonPipelineRun requires course:write scope', () => {
+    const start = schema.indexOf('startLessonPipelineRun');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('course:write');
+  });
+
+  it('cancelLessonPipelineRun requires course:write scope', () => {
+    const start = schema.indexOf('cancelLessonPipelineRun');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('course:write');
+  });
+});

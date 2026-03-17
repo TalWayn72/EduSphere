@@ -1,0 +1,31 @@
+{
+  "name": "@edusphere/nats-pubsub",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage"
+  },
+  "dependencies": {
+    "graphql-subscriptions": "^3.0.0",
+    "nats": "^2.29.3"
+  },
+  "devDependencies": {
+    "@edusphere/tsconfig": "workspace:*",
+    "@types/node": "^22.10.7",
+    "typescript": "^6.0.3",
+    "vitest": "^4.0.18"
+  }
+}

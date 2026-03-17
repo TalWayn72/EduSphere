@@ -6,6 +6,43 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.66.0] — 2026-03-17 — Phase 65: Lesson Pipeline Production Hardening
+
+### Added
+- **Real-time pipeline progress** — `lessonPipelineProgress` GraphQL subscription via NATS PubSub bridge, replacing setTimeout 3s polling (BUG-074)
+- **Lesson publish service** — `LessonPublishService` with real publish logic, status update, `published_run_id` linkage, NATS event (BUG-075)
+- **NER-to-Knowledge-Graph pipeline** — `LessonNERConsumer` in subgraph-knowledge with batch Cypher MERGE, DLQ after 3 failures (BUG-076)
+- **Course readiness validation** — `CourseReadiness` type + `courseReadiness` query with 5 pre-publish checks, `course:publish` scope (BUG-077)
+- **Pipeline run history** — `lessonPipelineRuns` query + `restoreRun` mutation for run rollback
+- **Module retry** — `retryPipelineModule` mutation with exponential backoff (max 3 retries)
+- **Pipeline templates** — `LessonPipelineTemplate` CRUD + `pipelineTemplates` query
+- **PipelineStepper** — accessible stepper with `aria-live="polite"`, `aria-current="step"`, reduced motion support (BUG-078)
+- **Pipeline breadcrumb** — 4th breadcrumb segment with lesson title and link (BUG-079)
+- **Responsive pipeline layout** — mobile bottom sheet palette, stacked config panel (BUG-080)
+- **Feature flag** — `ENABLE_PIPELINE_SUBSCRIPTIONS` for safe subscription rollback
+
+### Fixed
+- BUG-074: Polling anti-pattern (setTimeout 3s) on Pipeline page
+- BUG-075: PUBLISH_SHARE module returned hardcoded stub
+- BUG-076: NER entities extracted but never reached Knowledge Graph
+- BUG-077: Course publish was a simple boolean toggle without validation
+- BUG-078: Missing aria-live on dynamic pipeline status updates
+- BUG-079: Breadcrumb missing lesson link (only 3 segments instead of 4)
+- BUG-080: Desktop-only layout broken on mobile viewports
+
+### Tests
+- `lesson-pipeline-subscription.service.spec.ts` — subscription bridge tests
+- `lesson-publish.service.spec.ts` — publish logic tests
+- `pipeline-orchestrator.integration.spec.ts` — orchestrator integration
+- `lesson-ner.consumer.spec.ts` — NER consumer tests
+- `ner-to-graph.integration.spec.ts` — NER-to-graph pipeline
+- `course.service.spec.ts` — readiness validation tests
+- `PipelineStepper.test.tsx` — accessibility attribute tests
+- `PipelineModulePalette.test.tsx` — mobile/desktop rendering tests
+- `lesson-pipeline-page.spec.ts` — breadcrumb regression test
+
+---
+
 ## [0.65.0] — 2026-03-17 — Enterprise Audit: 110 Recommendations (Waves 1-5)
 
 ### Security Hardening (Wave 1)

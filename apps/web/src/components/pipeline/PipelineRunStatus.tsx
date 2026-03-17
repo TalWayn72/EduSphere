@@ -1,6 +1,16 @@
 /**
  * PipelineRunStatus — bottom panel showing active/completed run status and results.
+ * Uses PipelineStepper for in-progress runs, summary view for completed runs.
  */
+import { useState } from 'react';
+import { PipelineStepper } from './PipelineStepper';
+import { PipelineStepperSkeleton } from './PipelineStepperSkeleton';
+import { PipelineResultDetail } from './PipelineResultDetail';
+import {
+  useLessonPipelineStore,
+  type PipelineModuleType,
+  type ModuleStatusValue,
+} from '@/lib/lesson-pipeline.store';
 
 interface PipelineResult {
   id: string;
@@ -21,6 +31,9 @@ interface RunData {
 interface Props {
   run: RunData;
   onCancel: () => void;
+  onRetryModule?: (moduleType: PipelineModuleType) => void;
+  onSkipModule?: (moduleType: PipelineModuleType) => void;
+  isLoading?: boolean;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -37,15 +50,31 @@ const STATUS_COLOR: Record<string, string> = {
   CANCELLED: 'bg-muted border-border text-muted-foreground',
 };
 
-export function PipelineRunStatus({ run, onCancel }: Props) {
+export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, isLoading }: Props) {
   const colorClass =
     STATUS_COLOR[run.status] ?? 'bg-muted border-border text-muted-foreground';
   const statusLabel = STATUS_LABEL[run.status] ?? run.status;
+  const moduleStatuses = useLessonPipelineStore((s) => s.moduleStatuses);
+  const nodes = useLessonPipelineStore((s) => s.nodes);
+  const [selectedResult, setSelectedResult] = useState<PipelineResult | null>(null);
 
   const summary = extractOutput(run.results, 'SUMMARIZATION', 'shortSummary') as string | null;
   const notes = extractOutput(run.results, 'STRUCTURED_NOTES', 'outputMarkdown') as string | null;
   const qaScore = extractOutput(run.results, 'QA_GATE', 'qaScore') as number | null;
   const transcript = extractOutput(run.results, 'ASR', 'transcript') as string | null;
+
+  // Build stepper steps from store nodes + moduleStatuses
+  const stepperSteps = nodes
+    .filter((n) => n.enabled)
+    .map((n) => ({
+      moduleType: n.moduleType,
+      status: (moduleStatuses[n.moduleType] ?? 'pending') as ModuleStatusValue,
+      errorMessage: extractOutput(run.results, n.moduleType, 'errorMessage') as string | null,
+      output: extractOutput(run.results, n.moduleType, 'outputSummary') as string | null,
+    }));
+
+  const isRunning = run.status === 'RUNNING' || run.status === 'FAILED';
+  const showStepper = isRunning && stepperSteps.length > 0;
 
   return (
     <div
@@ -79,19 +108,39 @@ export function PipelineRunStatus({ run, onCancel }: Props) {
         </div>
       </div>
 
-      {/* Module results pills */}
-      {run.results.length > 0 && (
+      {/* Vertical stepper for in-progress/failed runs */}
+      {showStepper && !isLoading && (
+        <div className="mb-3">
+          <PipelineStepper steps={stepperSteps} onRetry={onRetryModule} onSkip={onSkipModule} />
+        </div>
+      )}
+      {showStepper && isLoading && (
+        <div className="mb-3">
+          <PipelineStepperSkeleton />
+        </div>
+      )}
+
+      {/* Module results pills for completed runs — clickable to open detail */}
+      {!showStepper && run.results.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {run.results.map((r) => (
-            <span
+            <button
               key={r.id}
-              className="text-xs px-2 py-0.5 rounded-full bg-card border"
+              className="text-xs px-2 py-0.5 rounded-full bg-card border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors"
+              onClick={() => setSelectedResult(r)}
+              data-testid={`result-pill-${r.moduleName}`}
             >
-              ✓ {r.moduleName}
-            </span>
+              {'\u2713'} {r.moduleName}
+            </button>
           ))}
         </div>
       )}
+
+      <PipelineResultDetail
+        result={selectedResult}
+        open={selectedResult !== null}
+        onClose={() => setSelectedResult(null)}
+      />
 
       {/* Key outputs */}
       {run.status === 'COMPLETED' && (

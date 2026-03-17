@@ -144,6 +144,75 @@ export const PUBLISH_LESSON_MUTATION = gql`
   }
 `;
 
+export const LESSON_PIPELINE_RUNS_QUERY = gql`
+  query LessonPipelineRunHistory($lessonId: ID!, $limit: Int) {
+    lessonPipelineRuns(lessonId: $lessonId, limit: $limit) {
+      id
+      runNumber
+      status
+      triggeredBy
+      completedAt
+      results {
+        id
+        moduleName
+        outputType
+      }
+    }
+  }
+`;
+
+// ─── Pipeline Templates ────────────────────────────────────────────────────
+
+export const PIPELINE_TEMPLATES_QUERY = gql`
+  query PipelineTemplates {
+    pipelineTemplates {
+      id
+      tenantId
+      name
+      description
+      nodes
+      config
+      isSystem
+      createdBy
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_PIPELINE_TEMPLATE_MUTATION = gql`
+  mutation CreatePipelineTemplate($input: CreatePipelineTemplateInput!) {
+    createPipelineTemplate(input: $input) {
+      id
+      name
+      description
+      nodes
+      config
+      isSystem
+      createdAt
+    }
+  }
+`;
+
+export const UPDATE_PIPELINE_TEMPLATE_MUTATION = gql`
+  mutation UpdatePipelineTemplate($id: ID!, $input: UpdatePipelineTemplateInput!) {
+    updatePipelineTemplate(id: $id, input: $input) {
+      id
+      name
+      description
+      nodes
+      config
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_PIPELINE_TEMPLATE_MUTATION = gql`
+  mutation DeletePipelineTemplate($id: ID!) {
+    deletePipelineTemplate(id: $id)
+  }
+`;
+
 export const LESSON_PIPELINE_PROGRESS_SUBSCRIPTION = gql`
   subscription LessonPipelineProgress($runId: ID!) {
     lessonPipelineProgress(runId: $runId) {

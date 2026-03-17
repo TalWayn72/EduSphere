@@ -10,6 +10,7 @@ import {
   eq,
   and,
   desc,
+  sql,
   closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
@@ -76,6 +77,9 @@ export class LessonPipelineService implements OnModuleDestroy {
     return {
       id: row['id'],
       pipelineId: row['pipeline_id'] ?? row['pipelineId'],
+      lessonId: row['lesson_id'] ?? row['lessonId'] ?? null,
+      runNumber: row['run_number'] ?? row['runNumber'] ?? 1,
+      triggeredBy: row['triggered_by'] ?? row['triggeredBy'] ?? 'MANUAL',
       startedAt: row['started_at'] ? String(row['started_at']) : null,
       completedAt: row['completed_at'] ? String(row['completed_at']) : null,
       status: row['status'],
@@ -126,6 +130,72 @@ export class LessonPipelineService implements OnModuleDestroy {
       fileUrl: r.file_url ?? null,
       createdAt: String(r.created_at),
     }));
+  }
+
+  async getNextRunNumber(lessonId: string): Promise<number> {
+    const [result] = await this.db
+      .select({
+        maxRun: sql<number>`COALESCE(MAX(${schema.lesson_pipeline_runs.run_number}), 0)`,
+      })
+      .from(schema.lesson_pipeline_runs)
+      .where(eq(schema.lesson_pipeline_runs.lesson_id, lessonId));
+    return (Number(result?.maxRun) || 0) + 1;
+  }
+
+  async findRunHistory(lessonId: string, limit = 10) {
+    const rows = await this.db
+      .select()
+      .from(schema.lesson_pipeline_runs)
+      .where(eq(schema.lesson_pipeline_runs.lesson_id, lessonId))
+      .orderBy(desc(schema.lesson_pipeline_runs.run_number))
+      .limit(limit);
+    return rows.map((r) => this.mapRun(r as Record<string, unknown>));
+  }
+
+  async restoreRun(runId: string, tenantCtx: TenantContext) {
+    const sourceRun = await this.findRunById(runId);
+    if (!sourceRun) {
+      throw new BadRequestException(`Run "${runId}" not found`);
+    }
+    const pipelineId = String(sourceRun.pipelineId);
+    const lessonId = String(sourceRun.lessonId ?? '');
+
+    const sourceResults = await this.findResultsByRunId(runId);
+    const nextRun = lessonId
+      ? await this.getNextRunNumber(lessonId)
+      : 1;
+
+    const [newRow] = await this.db
+      .insert(schema.lesson_pipeline_runs)
+      .values({
+        pipeline_id: pipelineId,
+        lesson_id: lessonId || null,
+        run_number: nextRun,
+        triggered_by: 'RESTORE',
+        started_at: new Date(),
+        completed_at: new Date(),
+        status: 'COMPLETED',
+      })
+      .returning();
+
+    const newRunId = String((newRow as Record<string, unknown>)['id']);
+
+    if (sourceResults.length > 0) {
+      await this.db.insert(schema.lesson_pipeline_results).values(
+        sourceResults.map((r) => ({
+          run_id: newRunId,
+          module_name: r.moduleName,
+          output_type: r.outputType,
+          output_data: r.outputData ?? {},
+          file_url: r.fileUrl ?? null,
+        }))
+      );
+    }
+
+    this.logger.log(
+      `Run ${runId} restored as ${newRunId} by ${tenantCtx.userId}`
+    );
+    return this.mapRun(newRow as Record<string, unknown>);
   }
 
   async savePipeline(
@@ -195,12 +265,28 @@ export class LessonPipelineService implements OnModuleDestroy {
     }
     if (existing) return this.mapRun(existing);
 
+    // Look up lesson_id from the pipeline for run_number tracking
+    const [pipelineRow] = await this.db
+      .select({ lesson_id: schema.lesson_pipelines.lesson_id })
+      .from(schema.lesson_pipelines)
+      .where(eq(schema.lesson_pipelines.id, pipelineId))
+      .limit(1);
+    const lessonIdForRun = pipelineRow
+      ? String(pipelineRow['lesson_id'])
+      : null;
+    const runNumber = lessonIdForRun
+      ? await this.getNextRunNumber(lessonIdForRun)
+      : 1;
+
     let row: Record<string, unknown>;
     try {
       [row] = await this.db
         .insert(schema.lesson_pipeline_runs)
         .values({
           pipeline_id: pipelineId,
+          lesson_id: lessonIdForRun,
+          run_number: runNumber,
+          triggered_by: 'MANUAL',
           started_at: new Date(),
           status: 'RUNNING',
         })
@@ -217,24 +303,18 @@ export class LessonPipelineService implements OnModuleDestroy {
     const run = this.mapRun(row as Record<string, unknown>);
     const runId = String(row?.['id']);
 
-    // Get lesson info for NATS event
-    const [pipeline] = await this.db
-      .select({ lesson_id: schema.lesson_pipelines.lesson_id })
-      .from(schema.lesson_pipelines)
-      .where(eq(schema.lesson_pipelines.id, pipelineId))
-      .limit(1);
-
-    const [lessonRow] = pipeline
+    // Get lesson info for NATS event (reuse pipelineRow from above)
+    const [lessonRow] = lessonIdForRun
       ? await this.db
           .select({ course_id: schema.lessons.course_id })
           .from(schema.lessons)
-          .where(eq(schema.lessons.id, String(pipeline['lesson_id'])))
+          .where(eq(schema.lessons.id, lessonIdForRun))
           .limit(1)
       : [];
 
     const payload: LessonPayload = {
       type: 'lesson.pipeline.started',
-      lessonId: String(pipeline?.['lesson_id'] ?? ''),
+      lessonId: lessonIdForRun ?? '',
       courseId: String(lessonRow?.['course_id'] ?? ''),
       tenantId: tenantCtx.tenantId,
       timestamp: new Date().toISOString(),
@@ -273,5 +353,88 @@ export class LessonPipelineService implements OnModuleDestroy {
       .returning();
     this.logger.log(`Run ${runId} cancelled by ${tenantCtx.userId}`);
     return this.mapRun(row as Record<string, unknown>);
+  }
+
+  async retryModule(
+    runId: string,
+    moduleType: string,
+    tenantCtx: TenantContext
+  ) {
+    const [runRow] = await this.db
+      .select()
+      .from(schema.lesson_pipeline_runs)
+      .where(eq(schema.lesson_pipeline_runs.id, runId))
+      .limit(1);
+
+    if (!runRow) {
+      throw new BadRequestException(`Run ${runId} not found`);
+    }
+
+    if (runRow.status !== 'FAILED' && runRow.status !== 'COMPLETED') {
+      throw new BadRequestException(
+        `Run ${runId} is in ${runRow.status} state. Only FAILED or COMPLETED runs support module retry.`
+      );
+    }
+
+    const pipelineId = String(runRow.pipeline_id);
+    const [pipeline] = await this.db
+      .select()
+      .from(schema.lesson_pipelines)
+      .where(eq(schema.lesson_pipelines.id, pipelineId))
+      .limit(1);
+
+    if (!pipeline) {
+      throw new BadRequestException(`Pipeline ${pipelineId} not found`);
+    }
+
+    const nodes = pipeline.nodes as Array<{ moduleType: string }>;
+    const targetNode = nodes.find((n) => n.moduleType === moduleType);
+    if (!targetNode) {
+      throw new BadRequestException(
+        `Module type ${moduleType} not found in pipeline`
+      );
+    }
+
+    const [updatedRun] = await this.db
+      .update(schema.lesson_pipeline_runs)
+      .set({ status: 'RUNNING', completed_at: null })
+      .where(eq(schema.lesson_pipeline_runs.id, runId))
+      .returning();
+
+    this.logger.log({
+      msg: 'Retrying pipeline module',
+      runId,
+      moduleType,
+      tenantId: tenantCtx.tenantId,
+      userId: tenantCtx.userId,
+    });
+
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    const timeoutPromise = new Promise<void>((_, reject) =>
+      setTimeout(
+        () => reject(new Error('Module retry timed out')),
+        FIVE_MINUTES
+      )
+    );
+    Promise.race([
+      this.orchestrator.executeSingleModule(
+        runId,
+        pipelineId,
+        moduleType,
+        tenantCtx
+      ),
+      timeoutPromise,
+    ]).catch((err: unknown) => {
+      this.logger.error(
+        `Module retry ${moduleType} on run ${runId} failed: ${String(err)}`
+      );
+      this.db
+        .update(schema.lesson_pipeline_runs)
+        .set({ status: 'FAILED', completed_at: new Date() })
+        .where(eq(schema.lesson_pipeline_runs.id, runId))
+        .catch(() => undefined);
+    });
+
+    return this.mapRun(updatedRun as Record<string, unknown>);
   }
 }

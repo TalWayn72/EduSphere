@@ -4,6 +4,7 @@ import {
   uuid,
   jsonb,
   numeric,
+  integer,
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
@@ -40,6 +41,7 @@ export const lessons = pgTable('lessons', {
   })
     .notNull()
     .default('DRAFT'),
+  published_run_id: uuid('published_run_id'),
   ...timestamps,
   ...softDelete,
 });
@@ -88,6 +90,11 @@ export const lesson_pipeline_runs = pgTable('lesson_pipeline_runs', {
   pipeline_id: uuid('pipeline_id')
     .notNull()
     .references(() => lesson_pipelines.id, { onDelete: 'cascade' }),
+  lesson_id: uuid('lesson_id').references(() => lessons.id, {
+    onDelete: 'cascade',
+  }),
+  run_number: integer('run_number').notNull().default(1),
+  triggered_by: text('triggered_by').default('MANUAL'),
   started_at: timestamp('started_at', { withTimezone: true }),
   completed_at: timestamp('completed_at', { withTimezone: true }),
   status: text('status', {

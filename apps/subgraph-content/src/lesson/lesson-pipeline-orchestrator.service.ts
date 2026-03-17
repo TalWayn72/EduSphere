@@ -8,7 +8,10 @@ import {
 import type { TenantContext } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions, NatsSubjects } from '@edusphere/nats-client';
-import type { LessonPipelineModuleCompletedPayload } from '@edusphere/nats-client';
+import type {
+  LessonPipelineModuleCompletedPayload,
+  NEREntityItem,
+} from '@edusphere/nats-client';
 import {
   createLessonIngestionWorkflow,
   createHebrewNERWorkflow,
@@ -19,6 +22,7 @@ import {
   createCitationVerifierWorkflow,
   createQAWorkflow,
 } from '@edusphere/langgraph-workflows';
+import { LessonPublishService } from './lesson-publish.service';
 
 interface PipelineNode {
   id: string;
@@ -36,6 +40,8 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
   private nc: NatsConnection | null = null;
   private readonly activeControllers = new Set<AbortController>();
   private readonly runControllers = new Map<string, AbortController>();
+
+  constructor(private readonly publishService: LessonPublishService) {}
 
   async onModuleDestroy(): Promise<void> {
     for (const ctrl of this.activeControllers) {
@@ -66,6 +72,34 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
         )
       )
       .catch(() => undefined);
+  }
+
+  private publishNEREntities(
+    tenantId: string,
+    lessonId: string,
+    runId: string,
+    entities: NEREntityItem[]
+  ): void {
+    if (!entities.length) return;
+    const subject = `EDUSPHERE.content.${tenantId}.ner.extracted`;
+    const payload = {
+      type: 'lesson.ner.extracted' as const,
+      tenantId,
+      lessonId,
+      runId,
+      entities,
+      timestamp: new Date().toISOString(),
+    };
+    this.getNats()
+      .then((nc) =>
+        nc.publish(subject, this.sc.encode(JSON.stringify(payload)))
+      )
+      .catch((err) =>
+        this.logger.error(
+          { err, tenantId, lessonId, runId },
+          'Failed to publish NER entities to NATS'
+        )
+      );
   }
 
   cancelRun(runId: string): void {
@@ -112,6 +146,7 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
 
       let sharedContext: Record<string, unknown> = {
         lessonId,
+        runId,
         tenantId: tenantCtx.tenantId,
         videoUrl: videoAsset?.source_url ?? videoAsset?.file_url ?? undefined,
         audioFileKey: audioAsset?.file_url ?? undefined,
@@ -154,6 +189,26 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
             tenantId: tenantCtx.tenantId,
             timestamp: new Date().toISOString(),
           });
+
+          // BUG-076: Bridge NER entities to Knowledge Graph via NATS
+          if (node.moduleType === 'NER_SOURCE_LINKING' && output['entities']) {
+            const rawEntities = output['entities'] as Array<{
+              text: string;
+              type: string;
+            }>;
+            const nerEntities: NEREntityItem[] = rawEntities.map((e) => ({
+              name: e.text,
+              type: (e.type as NEREntityItem['type']) || 'Concept',
+              confidence: 1.0,
+              sourceText: e.text,
+            }));
+            this.publishNEREntities(
+              tenantCtx.tenantId,
+              lessonId,
+              runId,
+              nerEntities
+            );
+          }
         } catch (moduleErr: unknown) {
           this.logger.error(
             `[Run ${runId}] Module ${node.moduleType} failed: ${String(moduleErr)}`
@@ -350,12 +405,131 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
         );
         return { asrDelegated: true };
 
-      case 'PUBLISH_SHARE':
-        return { publishReady: true };
+      case 'PUBLISH_SHARE': {
+        const lessonId = context['lessonId'] as string;
+        const currentRunId = context['runId'] as string;
+        const result = await this.publishService.publishLesson(
+          lessonId,
+          currentRunId,
+          _tenantCtx
+        );
+        return {
+          publishReady: true,
+          publishUrl: result.publishUrl,
+          publishedAt: result.publishedAt,
+          publishedRunId: result.publishedRunId,
+        };
+      }
 
       default:
         this.logger.warn(`Unknown module type: ${node.moduleType}`);
         return {};
+    }
+  }
+
+  async executeSingleModule(
+    runId: string,
+    pipelineId: string,
+    moduleType: string,
+    tenantCtx: TenantContext
+  ): Promise<void> {
+    const [pipelineRow] = await this.db
+      .select()
+      .from(schema.lesson_pipelines)
+      .where(eq(schema.lesson_pipelines.id, pipelineId))
+      .limit(1);
+
+    if (!pipelineRow) {
+      throw new NotFoundException(`Pipeline ${pipelineId} not found`);
+    }
+
+    const nodes = (pipelineRow.nodes as PipelineNode[]).filter(
+      (n) => n.enabled !== false
+    );
+    const targetNode = nodes.find((n) => n.moduleType === moduleType);
+    if (!targetNode) {
+      throw new NotFoundException(
+        `Module ${moduleType} not found in pipeline`
+      );
+    }
+
+    const lessonId = String(pipelineRow.lesson_id);
+
+    // Build shared context from existing pipeline results
+    const existingResults = await this.db
+      .select()
+      .from(schema.lesson_pipeline_results)
+      .where(eq(schema.lesson_pipeline_results.run_id, runId));
+
+    let sharedContext: Record<string, unknown> = {
+      lessonId,
+      runId,
+      tenantId: tenantCtx.tenantId,
+    };
+    for (const result of existingResults) {
+      const data = result.output_data as Record<string, unknown>;
+      sharedContext = { ...sharedContext, ...data };
+    }
+
+    this.logger.log(
+      `[Run ${runId}] Retrying module: ${moduleType}`
+    );
+    const startedAt = Date.now();
+
+    try {
+      const output = await this.executeModule(
+        targetNode,
+        sharedContext,
+        tenantCtx
+      );
+
+      await this.db.insert(schema.lesson_pipeline_results).values({
+        run_id: runId,
+        module_name: moduleType,
+        output_type: moduleType.toLowerCase(),
+        output_data: output as Record<string, unknown>,
+      });
+
+      const elapsed = Date.now() - startedAt;
+      this.logger.log(
+        `[Run ${runId}] Module ${moduleType} retry completed in ${elapsed}ms`
+      );
+
+      this.publishModuleEvent({
+        type: 'lesson.pipeline.module.completed',
+        lessonId,
+        runId,
+        moduleType,
+        moduleName: moduleType,
+        status: 'COMPLETED',
+        tenantId: tenantCtx.tenantId,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Mark run as COMPLETED after successful retry
+      await this.db
+        .update(schema.lesson_pipeline_runs)
+        .set({ status: 'COMPLETED', completed_at: new Date() })
+        .where(eq(schema.lesson_pipeline_runs.id, runId));
+    } catch (err: unknown) {
+      this.logger.error(
+        `[Run ${runId}] Module ${moduleType} retry failed: ${String(err)}`
+      );
+      this.publishModuleEvent({
+        type: 'lesson.pipeline.module.completed',
+        lessonId,
+        runId,
+        moduleType,
+        moduleName: moduleType,
+        status: 'FAILED',
+        tenantId: tenantCtx.tenantId,
+        timestamp: new Date().toISOString(),
+      });
+
+      await this.db
+        .update(schema.lesson_pipeline_runs)
+        .set({ status: 'FAILED', completed_at: new Date() })
+        .where(eq(schema.lesson_pipeline_runs.id, runId));
     }
   }
 }
