@@ -10,7 +10,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "bash ../../scripts/pre-e2e-gate.sh && playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "storybook:build": "storybook build -o storybook-static",

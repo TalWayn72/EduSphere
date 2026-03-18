@@ -62,6 +62,7 @@
 | BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | a3995e5, ffd4438 |
 | FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | 8115644 |
 | PROC-001 | Services left down after agent operations — ERR_CONNECTION_REFUSED | ✅ Fixed | (process fix) |
+| BUG-083 | Iron Rule enforcement gaps — Docker daemon check missing, no git hooks | ✅ Fixed | (pending commit) |
 | TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
 | FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit — frontend consent gate addendum) |
 
@@ -84,6 +85,36 @@
   - `docs/reference/BUG_FIX_PROTOCOL.md` — Iron Rule #11 + Round Gate additions
   - `CLAUDE.md` — Iron Rules section + Session Completion Gate
   - Memory: `feedback_service_restoration.md`
+
+## BUG-083 — Iron Rule Enforcement Gaps: Docker Daemon Check + Git Hooks (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** P1 (High) — users encounter ERR_CONNECTION_REFUSED with no auto-recovery
+- **Domain:** Infrastructure / DevOps / Process
+- **Symptom:** User opens browser to `localhost:5173` and sees ERR_CONNECTION_REFUSED. Docker Desktop process is running but Linux engine pipe is not initialized. No automated mechanism detects or recovers from this state.
+- **Root Cause:** 5 enforcement gaps in the Iron Rule "ALWAYS restore services after ANY disruption":
+  1. `health-check.sh` assumes Docker daemon is reachable — no check before `docker inspect`
+  2. `verify-services.sh` assumes Docker daemon is reachable — auto-restore fails silently
+  3. No post-commit/post-merge git hooks call service verification
+  4. No pre-E2E gate — Playwright tests can start when services are down
+  5. `health-monitor.sh` has Docker check but is not auto-scheduled
+- **Discovery Waves:**
+  - **Wave 1 (exact match):** `docker ps` usage without pre-check — found in health-check.sh, verify-services.sh
+  - **Wave 2 (similarity):** All .husky/ hooks — only Git LFS, no service checks
+  - **Wave 3 (class of bug):** All scripts assuming Docker availability — pre-e2e, compose, startup
+- **Fix (5 changes):**
+  1. `scripts/health-check.sh` — Added Docker daemon check as step 0 (exit code 2 = Docker unreachable)
+  2. `scripts/verify-services.sh` — Added Docker daemon check before endpoint checks
+  3. `.husky/post-commit` — Added service verification call (background, feat/fix/refactor only)
+  4. `.husky/post-merge` — Added service verification call (background)
+  5. `scripts/ensure-docker.sh` — NEW: Attempts to start Docker Desktop and waits up to 90s
+  6. `scripts/pre-e2e-gate.sh` — NEW: Pre-E2E gate (Docker + container health + endpoints)
+  7. `apps/web/package.json` — `test:e2e` now calls `pre-e2e-gate.sh` before Playwright
+  8. `package.json` — Added `pre-e2e`, `health`, `verify-services` convenience scripts
+- **Tests Added:**
+  - `tests/infrastructure/service-restoration.spec.ts` — 27 regression tests verifying all enforcement mechanisms
+- **Anti-recurrence:** Regression tests verify script content; post-commit hook auto-runs on every feat/fix commit
+- **E2E:** `apps/web/e2e/health-check.spec.ts` (pre-existing) covers service connectivity
 
 ## TS-001 — TypeScript Errors in Phase 65 Services (18 Mar 2026)
 

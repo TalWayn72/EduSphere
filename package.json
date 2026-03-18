@@ -26,7 +26,10 @@
     "compose": "pnpm --filter @edusphere/gateway compose",
     "codegen": "graphql-codegen --config codegen.ts",
     "prepare": "husky",
-    "changelog": "bash scripts/generate-changelog.sh"
+    "changelog": "bash scripts/generate-changelog.sh",
+    "pre-e2e": "bash scripts/pre-e2e-gate.sh",
+    "health": "bash scripts/health-check.sh",
+    "verify-services": "bash scripts/verify-services.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",

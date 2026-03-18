@@ -17,6 +17,19 @@ NC='\033[0m'
 
 FAILED=0
 
+# ── 0. Docker daemon reachability (MUST be first check) ──────────────────────
+echo -n "Checking Docker daemon... "
+if ! docker ps > /dev/null 2>&1; then
+  echo -e "${RED}✗ UNREACHABLE${NC}"
+  echo -e "${RED}  FATAL: Docker daemon not responding.${NC}"
+  echo -e "${RED}  Docker Desktop may be starting — wait 30s and retry, or start Docker Desktop manually.${NC}"
+  echo -e "${RED}  Context: $(docker context show 2>/dev/null || echo 'unknown')${NC}"
+  echo ""
+  echo -e "${RED}Cannot proceed — all services depend on Docker.${NC}"
+  exit 2  # exit code 2 = Docker unreachable (vs 1 = services down)
+fi
+echo -e "${GREEN}✓${NC}"
+
 check_service() {
   local SERVICE=$1
   local CHECK_CMD=$2
