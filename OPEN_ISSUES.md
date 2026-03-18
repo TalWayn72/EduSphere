@@ -68,7 +68,7 @@
 | BUG-084 | Dashboard mastery overview flash/disappear — empty array fallback | ✅ Fixed | (pending commit) |
 | BUG-085 | Consent link missing in AI Course Creator modal — stale container build | ✅ Fixed | (pending commit) |
 | BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
-| BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | (pending commit) |
+| BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | `66a0b79` |
 
 ---
 
@@ -113,9 +113,18 @@ Added global `<TooltipProvider>` to `App.tsx` wrapping the entire app tree (insi
 - `apps/web/src/pages/SettingsPage.test.tsx`: "REGRESSION BUG-087: Something went wrong is never shown on settings page"
 - `apps/web/e2e/consent-requirement-link.spec.ts`: "REGRESSION BUG-087: /settings?highlight=ai-consent does not crash"
 
+### Container Deployment & Visual Verification
+- **Local frontend rebuild:** `npx vite build` → new hashed chunks in `apps/web/dist/`
+- **Docker volume mount:** `./apps/web/dist:/app/apps/web/dist:ro` in `docker-compose.yml` picks up the rebuild
+- **Container restart:** `docker restart edusphere-all-in-one` loads updated assets
+- **Visual proof (local dev):** `docs/screenshots/bug087-visual-proof.png` — Settings page renders with Privacy & AI card, AI Processing toggle, no crash
+- **Visual proof (Docker):** `docs/screenshots/bug087-docker-verified.png` — Full authenticated Settings page via Keycloak OIDC, Privacy & AI card visible, no ErrorBoundary crash
+- **Verification scripts:** `apps/web/scripts/bug087-verify2.cjs` (local dev), `apps/web/scripts/bug087-docker-verify2.cjs` (Docker + Keycloak auth)
+
 ### Anti-Recurrence
 - Global `TooltipProvider` in `App.tsx` prevents any future tooltip from crashing due to missing provider
 - Regression tests guard against both the crash UI appearing AND the specific highlight URL scenario
+- Visual verification iron rule established: UI bugs must ALWAYS have browser-level proof before declaring fixed
 
 ---
 
