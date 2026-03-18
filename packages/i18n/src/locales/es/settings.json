@@ -47,6 +47,19 @@
     "used": "usado",
     "limitOf": "límite"
   },
+  "privacy": {
+    "title": "Privacidad e IA",
+    "description": "Gestiona cómo se usan tus datos para las funciones de IA",
+    "aiProcessing": "Procesamiento de IA",
+    "aiProcessingDesc": "Permitir que EduSphere use IA para aprendizaje personalizado, generación de cursos y debates Chavruta",
+    "thirdPartyLlm": "Proveedores de IA externos",
+    "thirdPartyLlmDesc": "Permitir el envío de datos de aprendizaje a proveedores de IA externos (OpenAI, Anthropic) para procesamiento",
+    "saved": "Preferencia de privacidad guardada",
+    "error": "Error al guardar. Inténtalo de nuevo.",
+    "tooltip": "Activa esto para desbloquear funciones de IA como generación de cursos, debates Chavruta y agentes de IA",
+    "syncError": "Error al guardar el consentimiento. Inténtalo de nuevo."
+  },
+  "backToPage": "Volver",
   "downloads": {
     "wifiOnlyTitle": "Descargas solo por WiFi",
     "wifiOnlyDescription": "Descarga cursos solo cuando estés conectado a WiFi para ahorrar datos móviles",

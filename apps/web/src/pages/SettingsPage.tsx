@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { HardDrive } from 'lucide-react';
+import { ArrowLeft, HardDrive } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import {
@@ -30,6 +31,9 @@ function formatBytes(bytes: number): string {
 
 export function SettingsPage() {
   const { t } = useTranslation('settings');
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
   const highlight = useSettingsHighlight();
   const { locale, setLocale, isSaving, availableLocales } =
     useUserPreferences();
@@ -67,7 +71,17 @@ export function SettingsPage() {
   return (
     <Layout>
       <PageShell size="sm">
-        <div>
+        <div className="flex items-center gap-3">
+          {returnTo && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(returnTo)}
+              aria-label={t('backToPage')}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
           <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
         </div>
 

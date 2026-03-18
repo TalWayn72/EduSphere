@@ -21,6 +21,7 @@ import { BillingModule } from './billing/billing.module.js';
 import { HrisModule } from './integrations/hris/hris.module.js';
 import { PartnerModule } from './partners/partner.module.js';
 import { ChallengesModule } from './challenges/challenges.module';
+import { ConsentModule } from './consent/consent.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
 
 @Module({
@@ -57,6 +58,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
     HrisModule,
     PartnerModule,
     ChallengesModule,
+    ConsentModule,
     WhatsAppModule,
   ],
 })

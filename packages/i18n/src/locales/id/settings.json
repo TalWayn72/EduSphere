@@ -47,6 +47,19 @@
     "used": "digunakan",
     "limitOf": "batas"
   },
+  "privacy": {
+    "title": "Privasi & AI",
+    "description": "Kelola bagaimana data Anda digunakan untuk fitur bertenaga AI",
+    "aiProcessing": "Pemrosesan AI",
+    "aiProcessingDesc": "Izinkan EduSphere menggunakan AI untuk pembelajaran personal, pembuatan kursus, dan debat Chavruta",
+    "thirdPartyLlm": "Penyedia AI Pihak Ketiga",
+    "thirdPartyLlmDesc": "Izinkan pengiriman data pembelajaran ke penyedia AI eksternal (OpenAI, Anthropic) untuk diproses",
+    "saved": "Preferensi privasi disimpan",
+    "error": "Gagal menyimpan. Silakan coba lagi.",
+    "tooltip": "Aktifkan ini untuk membuka fitur AI seperti pembuatan kursus, debat Chavruta, dan agen AI",
+    "syncError": "Gagal menyimpan persetujuan. Silakan coba lagi."
+  },
+  "backToPage": "Kembali",
   "downloads": {
     "wifiOnlyTitle": "Unduhan Hanya WiFi",
     "wifiOnlyDescription": "Unduh kursus hanya saat terhubung ke WiFi untuk menghemat data seluler",

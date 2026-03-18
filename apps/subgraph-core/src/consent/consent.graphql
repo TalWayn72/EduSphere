@@ -1,0 +1,16 @@
+extend type Mutation {
+  updateConsent(input: UpdateConsentInput!): Boolean! @authenticated
+}
+
+input UpdateConsentInput {
+  consentType: ConsentType!
+  given: Boolean!
+}
+
+enum ConsentType {
+  AI_PROCESSING
+  THIRD_PARTY_LLM
+  ANALYTICS
+  MARKETING
+  RESEARCH
+}

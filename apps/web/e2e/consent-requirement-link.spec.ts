@@ -162,4 +162,54 @@ test.describe('Consent Requirement Link', () => {
     const url = page.url();
     expect(url).not.toContain('highlight=');
   });
+
+  // BUG-088 REGRESSION: consent toggle must persist (not just localStorage)
+  test('REGRESSION BUG-088: settings consent toggle is interactive and saves', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    // AI consent toggle must exist and be interactive
+    const toggle = page.locator('#setting-ai-consent [role="switch"]');
+    await expect(toggle).toBeVisible({ timeout: 10_000 });
+
+    // Get initial state
+    const initialChecked = await toggle.getAttribute('aria-checked');
+
+    // Click to toggle
+    await toggle.click();
+
+    // Verify state changed
+    const newChecked = await toggle.getAttribute('aria-checked');
+    expect(newChecked).not.toBe(initialChecked);
+
+    // Verify localStorage was updated
+    const stored = await page.evaluate(
+      () => localStorage.getItem('edusphere_consent_AI_PROCESSING'),
+    );
+    expect(stored).toBe(newChecked === 'true' ? 'true' : 'false');
+  });
+
+  // BUG-088 REGRESSION: back button appears when returnTo param is present
+  test('REGRESSION BUG-088: back button shown with returnTo param', async ({ page }) => {
+    await page.goto('/settings?highlight=ai-consent&returnTo=%2Fcourses%2Fnew');
+    await page.waitForLoadState('networkidle');
+
+    // Back button must be visible
+    const backBtn = page.locator('button[aria-label]').filter({ hasText: /←|back|חזרה/i }).first();
+    // Alternative: look for ArrowLeft icon button
+    const arrowBtn = page.locator('button:has(svg.lucide-arrow-left)');
+    const hasBackButton = await backBtn.isVisible().catch(() => false) ||
+      await arrowBtn.isVisible().catch(() => false);
+    expect(hasBackButton).toBe(true);
+  });
+
+  // BUG-088 REGRESSION: no back button on plain settings page
+  test('REGRESSION BUG-088: no back button without returnTo param', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    // Back button must NOT be visible
+    const arrowBtn = page.locator('button:has(svg.lucide-arrow-left)');
+    await expect(arrowBtn).not.toBeVisible({ timeout: 3_000 });
+  });
 });

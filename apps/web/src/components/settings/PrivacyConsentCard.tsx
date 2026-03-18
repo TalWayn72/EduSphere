@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMutation } from 'urql';
 import { toast } from 'sonner';
 import { Shield } from 'lucide-react';
+import { UPDATE_CONSENT_MUTATION } from '@/lib/graphql/consent.queries';
 import {
   Card,
   CardHeader,
@@ -23,6 +25,7 @@ const THIRD_PARTY_LLM_KEY = 'edusphere_consent_THIRD_PARTY_LLM';
 interface ConsentToggle {
   id: string;
   storageKey: string;
+  consentType: string;
   labelKey: string;
   descKey: string;
 }
@@ -31,12 +34,14 @@ const TOGGLES: ConsentToggle[] = [
   {
     id: 'setting-ai-consent',
     storageKey: AI_PROCESSING_KEY,
+    consentType: 'AI_PROCESSING',
     labelKey: 'privacy.aiProcessing',
     descKey: 'privacy.aiProcessingDesc',
   },
   {
     id: 'setting-third-party-llm',
     storageKey: THIRD_PARTY_LLM_KEY,
+    consentType: 'THIRD_PARTY_LLM',
     labelKey: 'privacy.thirdPartyLlm',
     descKey: 'privacy.thirdPartyLlmDesc',
   },
@@ -48,6 +53,7 @@ export interface PrivacyConsentCardProps {
 
 export function PrivacyConsentCard({ highlight }: PrivacyConsentCardProps) {
   const { t } = useTranslation('settings');
+  const [, updateConsentMutation] = useMutation(UPDATE_CONSENT_MUTATION);
   const [consents, setConsents] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -59,10 +65,23 @@ export function PrivacyConsentCard({ highlight }: PrivacyConsentCardProps) {
     setConsents(initial);
   }, []);
 
-  const handleToggle = (storageKey: string, checked: boolean) => {
-    localStorage.setItem(storageKey, String(checked));
-    setConsents((prev) => ({ ...prev, [storageKey]: checked }));
-    toast.success(t('privacy.saved'));
+  const handleToggle = async (toggle: ConsentToggle, checked: boolean) => {
+    // Optimistic: update localStorage + state immediately
+    localStorage.setItem(toggle.storageKey, String(checked));
+    setConsents((prev) => ({ ...prev, [toggle.storageKey]: checked }));
+
+    // Sync to backend DB (GDPR Art.7 proof of consent)
+    const { error } = await updateConsentMutation({
+      input: { consentType: toggle.consentType, given: checked },
+    });
+    if (error) {
+      // Revert on failure
+      localStorage.setItem(toggle.storageKey, String(!checked));
+      setConsents((prev) => ({ ...prev, [toggle.storageKey]: !checked }));
+      toast.error(t('privacy.syncError'));
+    } else {
+      toast.success(t('privacy.saved'));
+    }
   };
 
   return (
@@ -100,7 +119,7 @@ export function PrivacyConsentCard({ highlight }: PrivacyConsentCardProps) {
               <Switch
                 id={`switch-${toggle.id}`}
                 checked={consents[toggle.storageKey] ?? false}
-                onCheckedChange={(v) => handleToggle(toggle.storageKey, v)}
+                onCheckedChange={(v) => handleToggle(toggle, v)}
               />
             </div>
           );

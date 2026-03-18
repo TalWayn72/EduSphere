@@ -56,8 +56,10 @@
     "thirdPartyLlmDesc": "Allow sending learning data to external AI providers (OpenAI, Anthropic) for processing",
     "saved": "Privacy preference saved",
     "error": "Failed to save. Please try again.",
-    "tooltip": "Enable this to unlock AI features like course generation, Chavruta debates, and AI agents"
+    "tooltip": "Enable this to unlock AI features like course generation, Chavruta debates, and AI agents",
+    "syncError": "Failed to save consent to server. Please try again."
   },
+  "backToPage": "Back",
   "downloads": {
     "wifiOnlyTitle": "WiFi-Only Downloads",
     "wifiOnlyDescription": "Only download courses when connected to WiFi to save mobile data",

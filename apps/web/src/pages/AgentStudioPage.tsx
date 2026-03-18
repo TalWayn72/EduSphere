@@ -176,7 +176,7 @@ export function AgentStudioPage() {
       toast.error('AI features require your consent.', {
         action: {
           label: 'Enable in Settings',
-          onClick: () => agentNavigate('/settings?highlight=ai-consent'),
+          onClick: () => agentNavigate('/settings?highlight=ai-consent&returnTo=/agents/studio'),
         },
       });
       setTimeout(() => setSaveStatus('idle'), TOAST_AUTO_DISMISS_MS);
@@ -197,7 +197,7 @@ export function AgentStudioPage() {
           toast.error('AI features require your consent.', {
             action: {
               label: 'Enable in Settings',
-              onClick: () => agentNavigate('/settings?highlight=ai-consent'),
+              onClick: () => agentNavigate('/settings?highlight=ai-consent&returnTo=/agents/studio'),
             },
           });
         } else {

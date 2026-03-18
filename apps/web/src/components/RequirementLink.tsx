@@ -14,6 +14,8 @@ export interface RequirementLinkProps {
   highlight?: string;
   /** 'alert' = destructive box, 'inline' = inline text link */
   variant?: 'inline' | 'alert';
+  /** Path to return to after adjusting settings */
+  returnTo?: string;
 }
 
 export function RequirementLink({
@@ -22,9 +24,10 @@ export function RequirementLink({
   to = '/settings',
   highlight = 'ai-consent',
   variant = 'alert',
+  returnTo,
 }: RequirementLinkProps) {
   const { t } = useTranslation('common');
-  const href = highlight ? `${to}?highlight=${highlight}` : to;
+  const href = highlight ? `${to}?highlight=${highlight}${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ''}` : to;
 
   if (variant === 'inline') {
     return (

@@ -267,7 +267,7 @@ export function AiCourseCreatorModal({
                 />
               </div>
             </div>
-            {(needsConsent || isConsentError) && <RequirementLink variant="alert" />}
+            {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo="/courses/new" />}
             {errorMsg && !isConsentError && !needsConsent && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -281,7 +281,7 @@ export function AiCourseCreatorModal({
               </Button>
               <Button
                 onClick={handleGenerate}
-                disabled={generating || !prompt.trim()}
+                disabled={generating || !prompt.trim() || needsConsent || isConsentError}
               >
                 {generating ? (
                   <>
@@ -330,7 +330,7 @@ export function AiCourseCreatorModal({
                 </div>
               ))}
             </div>
-            {(needsConsent || isConsentError) && <RequirementLink variant="alert" />}
+            {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo="/courses/new" />}
             {errorMsg && !isConsentError && !needsConsent && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />

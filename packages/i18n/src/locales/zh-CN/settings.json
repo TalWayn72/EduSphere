@@ -47,6 +47,19 @@
     "used": "已使用",
     "limitOf": "限制"
   },
+  "privacy": {
+    "title": "隐私与 AI",
+    "description": "管理您的数据如何用于 AI 功能",
+    "aiProcessing": "AI 处理",
+    "aiProcessingDesc": "允许 EduSphere 使用 AI 进行个性化学习、课程生成和 Chavruta 辩论",
+    "thirdPartyLlm": "第三方 AI 提供商",
+    "thirdPartyLlmDesc": "允许将学习数据发送给外部 AI 提供商（OpenAI、Anthropic）进行处理",
+    "saved": "隐私偏好已保存",
+    "error": "保存失败。请重试。",
+    "tooltip": "启用此项以解锁 AI 功能，如课程生成、Chavruta 辩论和 AI 助手",
+    "syncError": "保存同意设置失败。请重试。"
+  },
+  "backToPage": "返回",
   "downloads": {
     "wifiOnlyTitle": "仅 WiFi 下载",
     "wifiOnlyDescription": "仅在连接 WiFi 时下载课程，以节省移动数据",

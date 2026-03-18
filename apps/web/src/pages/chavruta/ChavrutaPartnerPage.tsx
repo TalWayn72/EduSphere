@@ -47,7 +47,7 @@ export function ChavrutaPartnerPage() {
       toast.error('AI features require your consent.', {
         action: {
           label: 'Enable in Settings',
-          onClick: () => navigate('/settings?highlight=ai-consent'),
+          onClick: () => navigate('/settings?highlight=ai-consent&returnTo=/chavruta/partner'),
         },
       });
       return;
@@ -66,7 +66,7 @@ export function ChavrutaPartnerPage() {
         toast.error('AI features require your consent.', {
           action: {
             label: 'Enable in Settings',
-            onClick: () => navigate('/settings?highlight=ai-consent'),
+            onClick: () => navigate('/settings?highlight=ai-consent&returnTo=/chavruta/partner'),
           },
         });
       } else {

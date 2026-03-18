@@ -69,6 +69,77 @@
 | BUG-085 | Consent link missing in AI Course Creator modal — stale container build | ✅ Fixed | (pending commit) |
 | BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
 | BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | `66a0b79` |
+| BUG-088 | Consent toggle saves to localStorage only — backend DB never synced; no return navigation | ✅ Fixed | (pending commit) |
+
+---
+
+## BUG-088 — Consent Flow Broken: Toggle Not Synced to Backend + No Return Navigation (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (consent toggle is non-functional — backend always rejects with CONSENT_REQUIRED)
+- **Reporter:** User (screenshots of settings page + AI Course Creator modal)
+
+### Problem
+1. **Consent not persisted to DB:** PrivacyConsentCard saves consent to localStorage only. Backend LlmConsentGuard checks `user_consents` DB table → always empty → CONSENT_REQUIRED error persists after toggling.
+2. **No return navigation:** RequirementLink sends user to `/settings?highlight=ai-consent` but there's no way back to the feature that needed consent.
+3. **Generate button not disabled:** Users can click "Generate Course" even when the consent warning is visible.
+
+### Root Cause
+- `ConsentService.updateConsent()` existed in backend but had **no GraphQL mutation** exposing it — no resolver, no module registration, no SDL.
+- Frontend saved consent to `localStorage` only (optimistic), never called backend.
+- `RequirementLink` used a simple `<Link to="/settings?highlight=...">` with no `returnTo` parameter.
+
+### Discovery Waves
+- **Wave 1:** PrivacyConsentCard.tsx → localStorage only, no mutation call. LlmConsentGuard → queries DB.
+- **Wave 2:** 5 AI entry points checked: AiCourseCreatorModal, AIChatPanel, useAgentChat, useChavrutaDebate, AgentStudioPage, ChavrutaPartnerPage. All use localStorage for frontend gate + backend CONSENT_REQUIRED fallback.
+- **Wave 3:** ConsentService exists with `updateConsent()` but not registered in any NestJS module. No GraphQL SDL for consent mutations anywhere in the codebase.
+
+### Solution
+**Backend (core subgraph):**
+- Created `consent.graphql` SDL with `updateConsent(input: UpdateConsentInput!): Boolean! @authenticated`
+- Created `consent.resolver.ts` — delegates to existing `ConsentService.updateConsent()`
+- Created `consent.module.ts` — registers resolver + service
+- Registered `ConsentModule` in `app.module.ts`
+
+**Frontend:**
+- Created `consent.queries.ts` with `UPDATE_CONSENT_MUTATION`
+- Updated `PrivacyConsentCard.tsx` — now calls mutation on toggle (optimistic update + revert on error)
+- Updated `RequirementLink.tsx` — added `returnTo` prop for return navigation
+- Updated `SettingsPage.tsx` — shows back button when `returnTo` query param present
+- Updated `AiCourseCreatorModal.tsx` — passes `returnTo="/courses/new"` + disables Generate when consent missing
+- Updated `ChatMessage.tsx` — passes `returnTo={location.pathname}` to inline RequirementLink
+- Updated `ChavrutaPartnerPage.tsx` + `AgentStudioPage.tsx` — added `returnTo` to settings navigation
+- Added `syncError` + `backToPage` i18n keys to all 10 locales
+
+### Files Changed
+- `apps/subgraph-core/src/consent/consent.graphql` (new)
+- `apps/subgraph-core/src/consent/consent.resolver.ts` (new)
+- `apps/subgraph-core/src/consent/consent.module.ts` (new)
+- `apps/subgraph-core/src/app.module.ts` (added ConsentModule)
+- `apps/web/src/lib/graphql/consent.queries.ts` (new)
+- `apps/web/src/components/settings/PrivacyConsentCard.tsx` (mutation sync)
+- `apps/web/src/components/RequirementLink.tsx` (returnTo prop)
+- `apps/web/src/pages/SettingsPage.tsx` (back button)
+- `apps/web/src/components/AiCourseCreatorModal.tsx` (returnTo + disable Generate)
+- `apps/web/src/components/ChatMessage.tsx` (returnTo)
+- `apps/web/src/pages/chavruta/ChavrutaPartnerPage.tsx` (returnTo)
+- `apps/web/src/pages/AgentStudioPage.tsx` (returnTo)
+- `packages/i18n/src/locales/*/settings.json` (10 locales — syncError + backToPage keys)
+
+### Tests Added
+- `apps/web/src/pages/SettingsPage.test.tsx`: 4 BUG-088 regression tests (mutation call, localStorage save, back button present/absent)
+- `apps/subgraph-core/src/consent/consent.resolver.spec.ts`: 3 tests (correct params, unauthenticated, withdrawal)
+- `apps/web/e2e/consent-requirement-link.spec.ts`: 3 BUG-088 E2E tests (toggle interactive, back button with/without returnTo)
+
+### Visual Verification
+- `docs/screenshots/bug088-settings-returnto.png` — Settings page with back arrow + Privacy & AI card + both toggles
+- `docs/screenshots/bug088-toggle-clicked.png` — Toggle click triggers mutation → error toast (no backend in dev) → correct revert behavior
+
+### Anti-Recurrence
+- Backend `updateConsent` mutation ensures consent is always persisted to DB (GDPR Art.7 proof)
+- Frontend optimistic update + revert pattern ensures UI stays consistent with backend
+- `returnTo` parameter on all consent navigation paths ensures users can return to their workflow
+- Generate button disabled when consent is missing — prevents futile API calls
 
 ---
 

@@ -11,6 +11,19 @@ vi.mock('@/components/Layout', () => ({
   ),
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
+}));
+
+// Mock urql useMutation (PrivacyConsentCard calls updateConsent mutation)
+const mockMutate = vi.fn().mockResolvedValue({ data: { updateConsent: true } });
+vi.mock('urql', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('urql');
+  return { ...actual, useMutation: () => [{ fetching: false }, mockMutate] };
+});
+
 // useStorageManager mock — controlled per-test via mockStorageStats
 const mockClearLocalStorage = vi.fn().mockReturnValue(0);
 let mockStorageStats: {
@@ -95,6 +108,7 @@ const renderPage = (initialEntries: string[] = ['/settings']) =>
 describe('SettingsPage', () => {
   beforeEach(() => {
     mockSetLocale.mockReset();
+    mockMutate.mockReset().mockResolvedValue({ data: { updateConsent: true } });
     mockToastSuccess.mockClear();
     mockToastError.mockClear();
     mockClearLocalStorage.mockReset().mockReturnValue(0);
@@ -102,6 +116,7 @@ describe('SettingsPage', () => {
     mockLocale = 'en';
     mockStorageStats = null;
     mockStorageLoading = false;
+    localStorage.clear();
   });
 
   it('renders the page heading "Settings"', () => {
@@ -302,6 +317,34 @@ describe('SettingsPage', () => {
   it('REGRESSION BUG-087: "Something went wrong" is never shown on settings page', () => {
     renderPage(['/settings']);
     expect(screen.queryByText(/something went wrong/i)).not.toBeInTheDocument();
+  });
+
+  // BUG-088 REGRESSION: consent toggle must call updateConsent mutation
+  it('REGRESSION BUG-088: toggling AI consent calls GraphQL mutation', async () => {
+    renderPage();
+    const toggle = screen.getAllByRole('switch')[0]; // first switch = AI Processing
+    fireEvent.click(toggle);
+    await waitFor(() => expect(mockMutate).toHaveBeenCalled());
+    const callArgs = mockMutate.mock.calls[0][0];
+    expect(callArgs).toEqual({ input: { consentType: 'AI_PROCESSING', given: true } });
+  });
+
+  it('REGRESSION BUG-088: consent toggle saves to localStorage', () => {
+    renderPage();
+    const toggle = screen.getAllByRole('switch')[0];
+    fireEvent.click(toggle);
+    expect(localStorage.getItem('edusphere_consent_AI_PROCESSING')).toBe('true');
+  });
+
+  it('REGRESSION BUG-088: back button shown when returnTo param present', () => {
+    renderPage(['/settings?highlight=ai-consent&returnTo=%2Fcourses%2Fnew']);
+    const backBtn = screen.getByRole('button', { name: /back/i });
+    expect(backBtn).toBeInTheDocument();
+  });
+
+  it('REGRESSION BUG-088: no back button without returnTo param', () => {
+    renderPage(['/settings']);
+    expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument();
   });
 
   it('calls clearLocalStorage and shows success toast on clear cache click', () => {

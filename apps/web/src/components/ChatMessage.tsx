@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Bot, User } from 'lucide-react';
 import type { Message } from '@/types/chat';
@@ -89,6 +90,7 @@ export function ChatMessage({
   message,
   agentName = 'AI Agent',
 }: ChatMessageProps) {
+  const location = useLocation();
   const isAgent = message.role === 'agent';
   const isConsentRequired =
     message.type === 'consent-required' || message.content === 'consent-required';
@@ -128,7 +130,7 @@ export function ChatMessage({
         </div>
         <div className="text-sm text-foreground space-y-2">
           {isConsentRequired ? (
-            <RequirementLink variant="inline" />
+            <RequirementLink variant="inline" returnTo={location.pathname} />
           ) : (
             <>
               {paragraphs.map((paragraph, idx) => (
