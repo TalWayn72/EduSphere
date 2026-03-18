@@ -66,6 +66,7 @@
 | TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
 | FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit — frontend consent gate addendum) |
 | BUG-084 | Dashboard mastery overview flash/disappear — empty array fallback | ✅ Fixed | (pending commit) |
+| BUG-085 | Consent link missing in AI Course Creator modal — stale container build | ✅ Fixed | (pending commit) |
 
 ---
 
@@ -118,6 +119,39 @@
   - `docs/reference/BUG_FIX_PROTOCOL.md` — Iron Rule #11 + Round Gate additions
   - `CLAUDE.md` — Iron Rules section + Session Completion Gate
   - Memory: `feedback_service_restoration.md`
+
+## BUG-085 — Consent Link Missing in AI Course Creator Modal (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium — consent warning shows as plain text without actionable navigation
+- **Domain:** Frontend / AI Course Creator / Consent (FEAT-066 / SI-10)
+- **Symptom:** On `/courses/new`, the AI Course Creator modal shows the consent warning text "תכונות AI דורשות את הסכמתך" but WITHOUT a clickable link to navigate to privacy settings. Users cannot enable AI consent from the modal — they must manually navigate to `/settings`.
+- **Root Cause:** The Docker container was built on 2026-03-17 (image pinned `FROM ubuntu:22.04`). FEAT-066 (RequirementLink component with clickable "לחץ כאן לאישור" link) was committed on 2026-03-18. The container's `vite preview` served the stale March 17 frontend dist that did not include `RequirementLink.tsx`. The `docker-compose.yml` bind-mounts `./apps/web/dist:/app/apps/web/dist:ro` from the host, so the fix was rebuilding locally — the container immediately picks up new files.
+- **Discovery Waves:**
+  - **Wave 1:** Exact pattern — `RequirementLink` used in 5 AI entry points: `AiCourseCreatorModal.tsx` (2 locations), `AiChatPanel.tsx`, `AgentStudioPage.tsx`, `Agents.tsx`
+  - **Wave 2:** All 5 entry points already have `<RequirementLink variant="alert" />` — the component exists in source, just missing from container build
+  - **Wave 3:** Searched all `needsConsent` / `isConsentError` patterns — all correctly gate on RequirementLink
+- **Fix:**
+  - Rebuilt frontend locally: `pnpm --filter @edusphere/web build`
+  - Container bind-mount immediately served new dist (no image rebuild needed)
+  - Restarted `web-frontend` supervisor service inside container
+- **Files Modified:** None (build artifact issue, not source code bug)
+- **Tests Added:**
+  - `apps/web/e2e/consent-link-regression.spec.ts` — 8 E2E tests:
+    1. RequirementLink component is visible in the modal
+    2. Consent warning contains a clickable link (not plain text) with correct href
+    3. Link text is present and readable
+    4. Clicking navigates to `/settings?highlight=ai-consent`
+    5. RequirementLink has `role="alert"` (accessibility)
+    6. No raw technical error strings in the consent area
+    7. Visual screenshot regression: consent link visible in AI modal
+    8. RequirementLink hidden when consent already granted
+- **Visual Test:** `consent-link-visual-verification` — PASSED
+  - Screenshot: `docs/screenshots/visual-test-CONSENT-LINK-PASS.png`
+  - Confirmed: link text "לחץ כאן לאישור", href `/settings?highlight=ai-consent`, navigation works
+- **Anti-recurrence:** E2E regression test at `consent-link-regression.spec.ts` asserts `[data-testid="requirement-link"] a` element exists with correct href. Unit tests at `RequirementLink.test.tsx` verify link generation. Bind-mount in `docker-compose.yml` ensures local builds are always served.
+
+---
 
 ## BUG-083 — Iron Rule Enforcement Gaps: Docker Daemon Check + Git Hooks (18 Mar 2026)
 
