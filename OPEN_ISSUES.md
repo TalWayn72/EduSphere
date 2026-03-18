@@ -70,47 +70,67 @@
 | BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
 | BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | `66a0b79` |
 | BUG-088 | Consent toggle saves to localStorage only — backend DB never synced; no return navigation | ✅ Fixed | (pending commit) |
-| BUG-089 | AI course generation fails — agent_id UUID vs string mismatch + missing DB column | ✅ Fixed | (pending commit) |
+| BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback | ✅ Fixed | (pending commit) |
 
 ---
 
-## BUG-089 — AI Course Generation Fails: agent_id UUID vs String + Missing DB Column (18 Mar 2026)
+## BUG-089 — AI Course Generation Fails: Multiple Root Causes (18 Mar 2026)
 
-- **Status:** ✅ Fixed
-- **Severity:** 🔴 Critical (course generation completely broken — "יצירת מתווה הקורס נכשלה. נסה שוב.")
-- **Reporter:** User (screenshot showing error in AI Course Creator modal)
+- **Status:** ✅ Fixed (Round 2)
+- **Severity:** 🔴 Critical (course generation completely broken — spinner hangs forever on "מייצר...")
+- **Reporter:** User (screenshot showing infinite spinner in AI Course Creator modal)
 
-### Root Cause (2 issues)
+### Root Cause (4 issues across 2 rounds)
 
+**Round 1:**
 1. **`agent_id` type mismatch:** `CourseGeneratorService.generateCourse()` inserted `agent_id: 'course-generator'` (a string name) into `agent_executions`, but the column is `uuid NOT NULL` with FK to `agent_definitions.id`. PostgreSQL rejected the INSERT.
+2. **Missing `rag_config` column:** The Drizzle schema for `agent_definitions` defines a `rag_config` jsonb column, but the actual database table never had this column (migration was never applied).
 
-2. **Missing `rag_config` column:** The Drizzle schema for `agent_definitions` defines a `rag_config` jsonb column, but the actual database table never had this column (migration was never applied). When the fix for issue #1 tried to INSERT into `agent_definitions`, the query included `rag_config` which doesn't exist.
+**Round 2:**
+3. **`ollama-ai-provider` v1 spec incompatible with AI SDK v5:** The `ollama-ai-provider` package (v1.2.0) returns models implementing spec v1, but AI SDK v5's `generateObject()` requires spec v2. Error: `"Unsupported model version v1 for provider 'ollama.chat'"`. This caused the LangGraph workflow to fail immediately.
+4. **No PubSub publication on status change:** `CourseGeneratorService.markFailed()` and the COMPLETED update only wrote to the DB — they never published a PubSub event to `executionStatus_${executionId}`. The frontend subscription never fired, so the spinner hung forever.
+5. **No polling fallback:** If the WebSocket subscription failed, there was no fallback mechanism to detect status changes.
 
 ### Solution
 
-1. **Service fix:** Changed `CourseGeneratorService` to use find-or-create pattern — `ensureAgentDefinition()` looks up (or creates) an `agent_definitions` record with `name='course-generator'` and `template='CUSTOM'`, then uses its UUID as `agent_id`.
+**Round 1:**
+1. Changed `CourseGeneratorService` to use find-or-create pattern via `ensureAgentDefinition()`.
+2. Added the missing `rag_config` column via `ALTER TABLE`.
 
-2. **DB schema fix:** Added the missing `rag_config` column to the database:
-   ```sql
-   ALTER TABLE agent_definitions ADD COLUMN IF NOT EXISTS rag_config jsonb NOT NULL DEFAULT '{"vectorWeight": 0.5, "graphWeight": 0.5}';
-   ```
+**Round 2:**
+3. **Replaced `ollama-ai-provider` with `@ai-sdk/openai`:** Ollama exposes an OpenAI-compatible API at `/v1`. Using `createOpenAI({ baseURL: '${ollamaUrl}/v1', apiKey: 'ollama' })` produces spec v2 models compatible with AI SDK v5.
+4. **Added PubSub to CourseGeneratorService:** Extracted `executionPubSub` into a shared NestJS provider (`execution-pubsub.provider.ts`), injected into both `AgentResolver` and `CourseGeneratorService`. Both `markFailed()` and COMPLETED updates now publish events.
+5. **Added polling fallback on frontend:** `AiCourseCreatorModal` now polls `agentExecution(id)` every 3s as a fallback when subscription/WebSocket is unavailable. 5-minute timeout with user-friendly error.
 
 ### Files Changed
 
-- `apps/subgraph-agent/src/ai/course-generator.service.ts`: Added `ensureAgentDefinition()` method, replaced hardcoded string with UUID lookup
-- `apps/web/e2e/ai-course-generation-flow.spec.ts`: New E2E test (2 tests — UI flow + mutation interception)
+- `apps/subgraph-agent/src/ai/course-generator.workflow.ts`: Replaced `ollama-ai-provider` with `@ai-sdk/openai` for Ollama compat
+- `apps/subgraph-agent/src/ai/course-generator.service.ts`: Injected PubSub, publish on COMPLETED/FAILED
+- `apps/subgraph-agent/src/agent/execution-pubsub.provider.ts`: New shared PubSub provider
+- `apps/subgraph-agent/src/agent/agent.resolver.ts`: Use shared PubSub via DI
+- `apps/subgraph-agent/src/agent/agent.module.ts`: Register PubSub provider
+- `apps/web/src/components/AiCourseCreatorModal.tsx`: Polling fallback + handleExecutionResult refactor
+- `apps/web/src/lib/graphql/agent-course-gen.queries.ts`: Added AGENT_EXECUTION_QUERY
+- `apps/web/e2e/ai-course-generation-flow.spec.ts`: 3 E2E tests (updated)
+- `apps/subgraph-agent/src/agent/agent.resolver.spec.ts`: Updated for new constructor
+- `apps/subgraph-agent/src/ai/course-generator.service.spec.ts`: Updated for new constructor + schema mocks
 
 ### Tests Added
 
-- `apps/web/e2e/ai-course-generation-flow.spec.ts`: 2 BUG-089 E2E tests:
-  1. Full flow: consent ON → navigate to /courses/new → Launch AI Builder → fill prompt → Generate Course → verify NO error message
-  2. Mutation interception: verifies `generateCourseFromPrompt` returns valid `executionId` + `status` (not a DB error)
+- `apps/web/e2e/ai-course-generation-flow.spec.ts`: 3 BUG-089 E2E tests:
+  1. Full flow: consent ON → generate course → spinner stops within 90s → outline or user-friendly error shown
+  2. Mutation interception: verifies `generateCourseFromPrompt` returns valid `executionId` + `status`
+  3. Failure handling: mock polling returns FAILED → spinner stops → error alert visible (no infinite hang)
+- `apps/subgraph-agent/src/agent/agent.resolver.spec.ts`: 15 tests (updated for shared PubSub)
+- `apps/subgraph-agent/src/ai/course-generator.service.spec.ts`: 5 tests (updated for PubSub + ensureAgentDefinition)
 
 ### Anti-Recurrence
 
-- E2E test `ai-course-generation-flow.spec.ts` guards against regression
-- `ensureAgentDefinition()` caches the agent UUID after first lookup — no repeated DB queries
-- Any future agent template should follow the same find-or-create pattern (never hardcode string IDs for UUID FK columns)
+- E2E test asserts spinner stops within 90s — catches infinite hang regression
+- E2E test 3 specifically tests failure path with mocked FAILED response
+- PubSub now shared via DI — any new service that updates execution status can inject the same provider
+- Polling fallback ensures frontend never hangs even if WebSocket/subscription infrastructure fails
+- `@ai-sdk/openai` with Ollama `/v1` endpoint uses spec v2 — no version mismatch
 
 ---
 

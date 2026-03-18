@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useSubscription } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import {
-  Loader2,
   Sparkles,
   X,
   CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
+import { ProgressStatus } from '@/components/ProgressStatus';
+import { AI_COURSE_GENERATION_MESSAGES } from '@/lib/progress-messages';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -284,10 +285,12 @@ export function AiCourseCreatorModal({
                 disabled={generating || !prompt.trim() || needsConsent || isConsentError}
               >
                 {generating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5 animate-spin" />
-                    {t('aiCreator.generating')}
-                  </>
+                  <ProgressStatus
+                    messages={AI_COURSE_GENERATION_MESSAGES}
+                    active={generating}
+                    variant="inline"
+                    interval={3000}
+                  />
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" />
@@ -296,6 +299,15 @@ export function AiCourseCreatorModal({
                 )}
               </Button>
             </div>
+            {generating && (
+              <ProgressStatus
+                messages={AI_COURSE_GENERATION_MESSAGES}
+                active={generating}
+                variant="block"
+                interval={3000}
+                className="mt-4"
+              />
+            )}
           </div>
         )}
 

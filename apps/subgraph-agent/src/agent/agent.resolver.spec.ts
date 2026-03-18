@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AgentResolver } from './agent.resolver';
+import { executionPubSub } from './execution-pubsub.provider';
 
 // ── AgentService mock ─────────────────────────────────────────────────────────
 const mockAgentService = {
@@ -27,7 +28,7 @@ describe('AgentResolver', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver = new AgentResolver(mockAgentService as any);
+    resolver = new AgentResolver(mockAgentService as any, executionPubSub);
   });
 
   // ── getAgentExecution ────────────────────────────────────────────────────

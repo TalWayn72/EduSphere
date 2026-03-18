@@ -5,7 +5,7 @@
  * Memory safety: implements OnModuleDestroy and closes the DB pool.
  */
 
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -15,6 +15,10 @@ import {
 } from '@edusphere/db';
 import { LlmConsentGuard } from './llm-consent.guard.js';
 import { createCourseGeneratorWorkflow } from './course-generator.workflow.js';
+import {
+  EXECUTION_PUBSUB,
+  executionPubSub,
+} from '../agent/execution-pubsub.provider.js';
 
 export interface GenerateCourseOptions {
   prompt: string;
@@ -45,7 +49,10 @@ export class CourseGeneratorService implements OnModuleDestroy {
   private readonly db = createDatabaseConnection();
   private courseGeneratorAgentId: string | null = null;
 
-  constructor(private readonly consentGuard: LlmConsentGuard) {}
+  constructor(
+    private readonly consentGuard: LlmConsentGuard,
+    @Inject(EXECUTION_PUBSUB) private readonly pubSub: typeof executionPubSub,
+  ) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
@@ -191,20 +198,27 @@ export class CourseGeneratorService implements OnModuleDestroy {
         return;
       }
 
+      const completedOutput = {
+        courseTitle: outline.title,
+        courseDescription: outline.description,
+        modules: outline.modules,
+        conceptNames: result.conceptNames,
+      };
       await this.db
         .update(schema.agent_executions)
         .set({
           status: 'COMPLETED',
-          output: {
-            courseTitle: outline.title,
-            courseDescription: outline.description,
-            modules: outline.modules,
-            conceptNames: result.conceptNames,
-          },
+          output: completedOutput,
           completed_at: new Date(),
         })
         .where(eq(schema.agent_executions.id, executionId));
-
+      this.pubSub.publish(`executionStatus_${executionId}`, {
+        executionStatusChanged: {
+          id: executionId,
+          status: 'COMPLETED',
+          output: completedOutput,
+        },
+      });
       this.logger.log({ executionId }, 'Course generation completed');
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -217,6 +231,13 @@ export class CourseGeneratorService implements OnModuleDestroy {
       .update(schema.agent_executions)
       .set({ status: 'FAILED', output: { error }, completed_at: new Date() })
       .where(eq(schema.agent_executions.id, executionId));
+    this.pubSub.publish(`executionStatus_${executionId}`, {
+      executionStatusChanged: {
+        id: executionId,
+        status: 'FAILED',
+        output: { error },
+      },
+    });
     this.logger.error({ executionId, error }, 'Course generation failed');
   }
 

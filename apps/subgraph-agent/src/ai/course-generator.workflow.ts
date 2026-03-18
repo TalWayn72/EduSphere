@@ -13,8 +13,7 @@
 
 import { StateGraph, Annotation } from '@langchain/langgraph';
 import { generateObject } from 'ai';
-import { openai } from '@ai-sdk/openai';
-import { createOllama } from 'ollama-ai-provider';
+import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
 import type { LanguageModel } from 'ai';
 import { ollamaConfig } from '@edusphere/config';
@@ -56,12 +55,16 @@ type CourseGenStateType = typeof CourseGenState.State;
 
 function buildModel(): LanguageModel {
   if (process.env.OPENAI_API_KEY) {
+    const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
     return openai('gpt-4o-mini') as unknown as LanguageModel;
   }
-  const ollama = createOllama({
-    baseURL: `${ollamaConfig.url}/api`,
+  // Use Ollama's OpenAI-compatible API (/v1) — the dedicated ollama-ai-provider
+  // only supports AI SDK spec v1, but AI SDK v5 requires spec v2.
+  const ollamaProvider = createOpenAI({
+    baseURL: `${ollamaConfig.url}/v1`,
+    apiKey: 'ollama', // Ollama ignores API key but field is required
   });
-  return ollama(
+  return ollamaProvider(
     process.env.OLLAMA_MODEL ?? 'llama3.2'
   ) as unknown as LanguageModel;
 }

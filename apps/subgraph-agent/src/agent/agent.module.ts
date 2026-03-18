@@ -9,9 +9,11 @@ import { CourseGeneratorResolver } from './course-generator.resolver.js';
 import { CourseGeneratorService } from '../ai/course-generator.service.js';
 import { LlmConsentGuard } from '../ai/llm-consent.guard.js';
 import { LessonPipelineResolver } from './lesson-pipeline.resolver.js';
+import { ExecutionPubSubProvider } from './execution-pubsub.provider.js';
 
 @Module({
   providers: [
+    ExecutionPubSubProvider,
     AgentResolver,
     AgentService,
     AIService,

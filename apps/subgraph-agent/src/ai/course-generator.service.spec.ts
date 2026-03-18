@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CourseGeneratorService } from './course-generator.service.js';
+import { executionPubSub } from '../agent/execution-pubsub.provider.js';
 import { GraphQLError } from 'graphql';
 
 // ── DB mock ───────────────────────────────────────────────────────────────────
@@ -27,8 +28,14 @@ vi.mock('@edusphere/db', () => ({
       user_id: 'user_id',
       status: 'status',
     },
+    agent_definitions: {
+      id: 'id',
+      name: 'name',
+      tenant_id: 'tenant_id',
+    },
   },
   eq: vi.fn((col, val) => ({ col, val })),
+  and: vi.fn((...args: unknown[]) => args),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -84,7 +91,13 @@ describe('CourseGeneratorService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new CourseGeneratorService(mockConsentGuard as never);
+    service = new CourseGeneratorService(mockConsentGuard as never, executionPubSub);
+
+    // Default DB mock chain: select().from().where().limit() for ensureAgentDefinition
+    const mockLimit = vi.fn().mockResolvedValue([{ id: 'agent-def-1' }]);
+    const mockSelectWhere = vi.fn().mockReturnValue({ limit: mockLimit });
+    const mockFrom = vi.fn().mockReturnValue({ where: mockSelectWhere });
+    mockSelect.mockReturnValue({ from: mockFrom });
 
     // Default DB mock chain: insert().values().returning()
     mockReturning.mockResolvedValue([MOCK_EXECUTION]);

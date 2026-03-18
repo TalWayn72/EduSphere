@@ -30,3 +30,15 @@ export const EXECUTION_STATUS_SUBSCRIPTION = gql`
     }
   }
 `;
+
+/** Polling fallback — used when subscription/WebSocket is unavailable. */
+export const AGENT_EXECUTION_QUERY = gql`
+  query AgentExecution($id: ID!) {
+    agentExecution(id: $id) {
+      id
+      status
+      output
+      completedAt
+    }
+  }
+`;
