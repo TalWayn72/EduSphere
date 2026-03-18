@@ -92,18 +92,15 @@ export class NotificationDeliveriesService implements OnModuleDestroy {
     const totalCount = totalRows[0]?.value ?? 0;
 
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
-      const q = tx.select().from(schema.notificationDeliveries)
-        .where(eq(schema.notificationDeliveries.userId, userId))
-        .orderBy(desc(schema.notificationDeliveries.createdAt))
-        .limit(limit + 1);
+      const conditions = [eq(schema.notificationDeliveries.userId, userId)];
       if (after) {
         const cursor = Buffer.from(after, 'base64').toString('utf-8');
-        return q.where(and(
-          eq(schema.notificationDeliveries.userId, userId),
-          lte(schema.notificationDeliveries.createdAt, new Date(cursor))
-        ));
+        conditions.push(lte(schema.notificationDeliveries.createdAt, new Date(cursor)));
       }
-      return q;
+      return tx.select().from(schema.notificationDeliveries)
+        .where(and(...conditions))
+        .orderBy(desc(schema.notificationDeliveries.createdAt))
+        .limit(limit + 1);
     });
 
     const hasNextPage = rows.length > limit;

@@ -88,12 +88,15 @@ Document containment action in OPEN_ISSUES.md.
 
 ### Round Gate (MANDATORY after EVERY round)
 ```
+□ docker ps — all containers healthy (if any went down during round, restore NOW)
+□ ./scripts/health-check.sh — ALL services responding
 □ pnpm turbo test — 100% pass
 □ pnpm turbo typecheck — 0 errors
 □ pnpm turbo lint — 0 errors
 □ Regression test written: proves bad state is GONE (not just fix is present)
 □ Pino logging added: [ServiceName] + tenantId + userId context
 □ grep bug pattern — matches decreasing toward zero
+□ ALL endpoints verified: Keycloak(8080), Gateway(4000), Frontend(5173), Postgres(5432)
 ```
 
 **A round is NOT done until ALL boxes are checked.**
@@ -275,3 +278,4 @@ Rollback plan: ✅ documented
 8. **Never close without logging** — Pino structured logging must be in place
 9. **Never skip 5-user auth** — all 5 users must login successfully
 10. **Never skip rollback plan** — document before deploying (P0/P1 mandatory)
+11. **ALWAYS restore services after ANY disruption** — If ANY operation (code change, container rebuild, config edit, service restart, Docker compose change) causes a service to go down, you MUST restore ALL services before ending that operation. Run `./scripts/health-check.sh` after every disruptive action. If any service is down: `docker-compose up -d` → wait → verify ALL endpoints respond (Keycloak 8080, Gateway 4000, Frontend 5173, Postgres 5432, NATS 8222). **The user must NEVER encounter ERR_CONNECTION_REFUSED.** This rule applies after EVERY code change, not just at "session end".

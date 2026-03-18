@@ -13,7 +13,7 @@ import {
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
-interface SocialLinksDto {
+export interface SocialLinksDto {
   id: string;
   linkedinUrl: string | null;
   facebookUrl: string | null;

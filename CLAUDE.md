@@ -899,6 +899,7 @@ A round is **not complete** until health-check passes AND all 5 users can authen
 - **Every Pino/console.error logging MUST include structured context:** `[ServiceName]` or `[ComponentName]` prefix + `tenantId` + `userId` where applicable. A bug that cannot be observed in logs is NOT fixed.
 - **Never report completion after fixing only the file that was reported.** Always complete all 3 discovery waves first.
 - **Round Completion Gate is mandatory after EVERY round** — never skip health-check.sh or 5-user verification.
+- **ALWAYS restore services after ANY disruption** — If ANY operation (code change, container rebuild, config edit, service restart) causes a service to go down, RESTORE ALL services before ending that operation. Run `./scripts/health-check.sh` after every disruptive action. If any service is down: `docker-compose up -d` → wait → verify ALL endpoints (Keycloak 8080, Gateway 4000, Frontend 5173, Postgres 5432, NATS 8222). The user must NEVER encounter ERR_CONNECTION_REFUSED. This applies after EVERY code change, not just at "session end".
 
 ## Parallel Execution (Agents)
 
@@ -1170,6 +1171,7 @@ Then proceed autonomously without waiting for user approval.
 - **EVERY** visual UI change requires `toHaveScreenshot()` visual regression test
 - **Agent work is not done** until the Orchestrator has reviewed all agent outputs and confirmed the table above
 - If any row fails: fix → re-run ALL downstream checks — never partial sign-off
+- **ALWAYS restore services after ANY disruption** — If Docker/services went down during the session, bring them ALL back before running the gate. The user must NEVER open their browser and see ERR_CONNECTION_REFUSED.
 
 ### Parallel Agents — Completion Protocol
 

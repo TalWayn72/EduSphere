@@ -14,7 +14,7 @@ import {
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
-interface PreferenceDto {
+export interface PreferenceDto {
   id: string;
   notificationType: string;
   channel: string;

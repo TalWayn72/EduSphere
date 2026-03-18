@@ -61,8 +61,49 @@
 | BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | c4bb7ca |
 | BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | a3995e5, ffd4438 |
 | FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | 8115644 |
+| PROC-001 | Services left down after agent operations — ERR_CONNECTION_REFUSED | ✅ Fixed | (process fix) |
+| TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
 
 ---
+
+## PROC-001 — Service Restoration Protocol Gap (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** P1 (High) — blocks all manual testing
+- **Domain:** Process / Infrastructure
+- **Root Cause:** No mandatory "restore services" step existed in the Bug Fix Protocol or Round Completion Gate. Agents would modify code, rebuild containers, or restart services and leave them down. The user would then encounter ERR_CONNECTION_REFUSED on Keycloak (8080), Gateway (4000), or Frontend (5173).
+- **Why Missed:** The protocol assumed services would stay up after modifications. No explicit check-and-restore step was defined per-round.
+- **Fix:**
+  - Added Iron Rule #11 to `docs/reference/BUG_FIX_PROTOCOL.md`: "ALWAYS restore services after ANY disruption"
+  - Added service restoration checks to Round Gate (docker ps + health-check.sh + endpoint verification)
+  - Added rule to CLAUDE.md Iron Rules section and Session Completion Gate
+  - Created memory file `feedback_service_restoration.md` for cross-session enforcement
+- **Prevention:** Iron Rule #11 in BUG_FIX_PROTOCOL + Round Gate now includes `docker ps` and endpoint checks as first items
+- **Files Modified:**
+  - `docs/reference/BUG_FIX_PROTOCOL.md` — Iron Rule #11 + Round Gate additions
+  - `CLAUDE.md` — Iron Rules section + Session Completion Gate
+  - Memory: `feedback_service_restoration.md`
+
+## TS-001 — TypeScript Errors in Phase 65 Services (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** P2 (Medium)
+- **Domain:** Backend / TypeScript
+- **Root Cause:** Three issues in subgraph-core Phase 65 code:
+  1. `notification-deliveries.service.ts:101` — Calling `.where()` on a Drizzle query that already went through `.where().orderBy().limit()` chain, losing the type
+  2. `tenant-social-links.resolver.ts:30,39` — `SocialLinksDto` interface not exported from service file, causing TS4053
+  3. `notification-preferences.resolver.ts:26,35` — `PreferenceDto` interface not exported from service file, causing TS4053
+- **Fix:**
+  - Refactored `getHistory()` to build conditions array first, then single `.where(and(...conditions))` call
+  - Exported `SocialLinksDto` and `PreferenceDto` interfaces
+  - Added explicit return type annotations to resolver methods
+- **Files Modified:**
+  - `apps/subgraph-core/src/notifications/notification-deliveries.service.ts`
+  - `apps/subgraph-core/src/admin/tenant-social-links.service.ts`
+  - `apps/subgraph-core/src/admin/tenant-social-links.resolver.ts`
+  - `apps/subgraph-core/src/notifications/notification-preferences.service.ts`
+  - `apps/subgraph-core/src/notifications/notification-preferences.resolver.ts`
+
 
 ## FEAT-065 — Social & Notification Integration (18 Mar 2026)
 
