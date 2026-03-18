@@ -58,9 +58,9 @@
 | BUG-078 | Missing aria-live on pipeline status | ✅ Fixed | Phase 65 R5 |
 | BUG-079 | Breadcrumb missing lesson link | ✅ Fixed | Phase 65 R5 |
 | BUG-080 | Mobile layout broken on pipeline page | ✅ Fixed | Phase 65 R5 |
-| BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | (pending commit) |
-| BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | (pending commit) |
-| FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | (pending commit) |
+| BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | c4bb7ca |
+| BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | a3995e5, ffd4438 |
+| FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | 8115644 |
 
 ---
 

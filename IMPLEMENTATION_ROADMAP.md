@@ -2279,6 +2279,70 @@ pnpm turbo typecheck  # 0 errors
 
 ---
 
+## Phase 66 — Social & Notification Integration (Email + WhatsApp + Social Sharing) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-18 | **Commit:** 8115644
+
+### What Was Built
+
+**Wave A — Notification Infrastructure:**
+- `notification_deliveries` schema — persistent delivery log with status tracking (pending/sent/delivered/failed/bounced)
+- `notification_preferences` + `tenant_notification_defaults` schemas — per-user, per-type, per-channel opt-in/out
+- `NotificationDispatcherService` — central orchestrator routing to 5 channels (in_app, push_web, push_mobile, email, whatsapp)
+- Fire-and-forget dispatch with MAX_PENDING=500 eviction + 5s drain on destroy
+- `NotificationPreferencesService` + `NotificationDeliveriesService` — CRUD + query history
+
+**Wave B — Email Channel:**
+- Provider-agnostic `EmailChannel` with `EmailProvider` interface
+- `ResendEmailProvider` (default) + `SmtpEmailProvider` (air-gapped fallback via Nodemailer)
+- `NotificationRetryWorker` — exponential backoff (1m/5m/30m), max 3 retries
+
+**Wave C — Social Sharing + Social Links:**
+- `SocialShareButton`, `SocialShareMenu`, `ShareBadgeDialog` — client-side URL generation for LinkedIn/Facebook/X/WhatsApp
+- `SocialLinksBar` — 7-platform icon row (LinkedIn, Facebook, Twitter, YouTube, Instagram, WhatsApp, GitHub)
+- `tenant_social_links` schema — per-tenant social media URLs
+- `LandingFooter` updated with social icons row
+- `NotificationPreferencesPage`, `AdminNotificationAnalyticsPage` — frontend pages
+
+**Wave D — WhatsApp Channel:**
+- `user_whatsapp_contacts` schema — encrypted phone (SI-3), consent tracking
+- `WhatsAppChannel` + `MetaCloudApiProvider` — Meta Cloud API integration
+- `WhatsAppRegistrationService` + resolver — OTP verification flow
+- `AdminAlertsService` — WhatsApp alerts for ORG_ADMIN on critical events
+- `WhatsAppSetupPage` — phone registration + consent UI
+
+**Wave E — Testing + Security:**
+- 24 RLS security tests for all 4 new schema files (`notification-rls.spec.ts`)
+- NATS notification events tests (`notification-events.test.ts`)
+- Component tests for SocialLinksBar, SocialShareMenu, ShareBadgeDialog
+- Page tests for NotificationPreferencesPage, WhatsAppSetupPage, AdminNotificationAnalyticsPage
+- PII manifest updated with `notification_deliveries` + `user_whatsapp_contacts`
+- All 1677 security tests pass, 0 TypeScript errors
+
+**Files:** 56 files changed, 3,981 insertions(+), 29 deletions(-)
+
+**Acceptance Criteria:**
+
+```bash
+# Security tests pass (including notification RLS)
+pnpm test:security  # 1677/1677 pass
+
+# TypeScript strict compilation
+pnpm turbo typecheck  # 0 errors
+
+# All 4 new DB schemas have RLS policies
+# notification_deliveries, notification_preferences, tenant_notification_defaults, user_whatsapp_contacts, tenant_social_links
+
+# PII manifest complete — pii-manifest-completeness.spec.ts passes
+# notification_deliveries + user_whatsapp_contacts entries present
+
+# Social components render correctly
+# SocialLinksBar shows icons for all 7 platforms
+# SocialShareMenu opens with LinkedIn/Facebook/X/WhatsApp/Copy Link options
+```
+
+---
+
 > **CRITICAL REMINDER FOR CLAUDE CODE**:
 >
 > - **Never skip phases.** Each phase builds on the previous one.
