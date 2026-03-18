@@ -770,7 +770,8 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   deactivateUser(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
   suspendUser(userId: ID!, suspended: Boolean!) : User! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
   resetUserPassword(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
-  bulkImportUsers(csvData: String!) : BulkImportResult! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
+  bulkImportUsers(csvData: String!) : BulkImportResult! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]])
+  updateConsent(input: UpdateConsentInput!) : Boolean! @join__field(graph: CORE)  @authenticated
   createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
@@ -3630,6 +3631,19 @@ input UpdateUserPreferencesInput @join__type(graph: CORE)  {
   theme: String
   emailNotifications: Boolean
   pushNotifications: Boolean
+}
+
+input UpdateConsentInput @join__type(graph: CORE)  {
+  consentType: ConsentType!
+  given: Boolean!
+}
+
+enum ConsentType @join__type(graph: CORE)  {
+  AI_PROCESSING @join__enumValue(graph: CORE)
+  THIRD_PARTY_LLM @join__enumValue(graph: CORE)
+  ANALYTICS @join__enumValue(graph: CORE)
+  MARKETING @join__enumValue(graph: CORE)
+  RESEARCH @join__enumValue(graph: CORE)
 }
 
 input CreateEmbeddingInput @join__type(graph: KNOWLEDGE)  {

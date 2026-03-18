@@ -84,24 +84,31 @@
 2. **No return navigation:** RequirementLink sends user to `/settings?highlight=ai-consent` but there's no way back to the feature that needed consent.
 3. **Generate button not disabled:** Users can click "Generate Course" even when the consent warning is visible.
 
-### Root Cause
+### Root Cause (Round 1 — incomplete fix, 18 Mar 2026)
 - `ConsentService.updateConsent()` existed in backend but had **no GraphQL mutation** exposing it — no resolver, no module registration, no SDL.
 - Frontend saved consent to `localStorage` only (optimistic), never called backend.
 - `RequirementLink` used a simple `<Link to="/settings?highlight=...">` with no `returnTo` parameter.
 
+### Root Cause (Round 2 — actual fix, 18 Mar 2026)
+Round 1 created the SDL, resolver, module, and frontend mutation — but **the mutation still failed at runtime** because:
+1. **`supergraph.graphql` was never recomposed** after adding `consent.graphql` — the gateway didn't know about `updateConsent`, so it returned an error to the frontend.
+2. **Docker container's `dist/` was stale** — `consent.module.js` and `consent.resolver.js` were never compiled into `dist/consent/`, so even after adding to supergraph the subgraph wouldn't find the resolver.
+3. Round 1 visual test saw the error toast "שמירת ההסכמה לשרת נכשלה" but **incorrectly classified it as "expected in dev env"** instead of investigating the failure.
+
 ### Discovery Waves
 - **Wave 1:** PrivacyConsentCard.tsx → localStorage only, no mutation call. LlmConsentGuard → queries DB.
 - **Wave 2:** 5 AI entry points checked: AiCourseCreatorModal, AIChatPanel, useAgentChat, useChavrutaDebate, AgentStudioPage, ChavrutaPartnerPage. All use localStorage for frontend gate + backend CONSENT_REQUIRED fallback.
-- **Wave 3:** ConsentService exists with `updateConsent()` but not registered in any NestJS module. No GraphQL SDL for consent mutations anywhere in the codebase.
+- **Wave 3 (Round 1):** ConsentService exists with `updateConsent()` but not registered in any NestJS module. No GraphQL SDL for consent mutations anywhere in the codebase.
+- **Wave 3 (Round 2):** `updateConsent` missing from `apps/gateway/supergraph.graphql` — gateway can't route the mutation. 53 SDL files across 4 subgraphs lack federation preamble (non-blocking; subgraph-level merge handles it).
 
 ### Solution
-**Backend (core subgraph):**
+**Round 1 — Backend (core subgraph):**
 - Created `consent.graphql` SDL with `updateConsent(input: UpdateConsentInput!): Boolean! @authenticated`
 - Created `consent.resolver.ts` — delegates to existing `ConsentService.updateConsent()`
 - Created `consent.module.ts` — registers resolver + service
 - Registered `ConsentModule` in `app.module.ts`
 
-**Frontend:**
+**Round 1 — Frontend:**
 - Created `consent.queries.ts` with `UPDATE_CONSENT_MUTATION`
 - Updated `PrivacyConsentCard.tsx` — now calls mutation on toggle (optimistic update + revert on error)
 - Updated `RequirementLink.tsx` — added `returnTo` prop for return navigation
@@ -111,11 +118,19 @@
 - Updated `ChavrutaPartnerPage.tsx` + `AgentStudioPage.tsx` — added `returnTo` to settings navigation
 - Added `syncError` + `backToPage` i18n keys to all 10 locales
 
-### Files Changed
-- `apps/subgraph-core/src/consent/consent.graphql` (new)
+**Round 2 — Gateway + Docker (the actual fix):**
+- Added `extend schema @link(...)` federation preamble to `consent.graphql`
+- Added `updateConsent` mutation, `UpdateConsentInput` input, `ConsentType` enum to `apps/gateway/supergraph.graphql`
+- Rebuilt subgraph-core inside Docker: `npx nest build` → `dist/consent/` now has resolver + module + graphql
+- Restarted subgraph-core + gateway via `supervisorctl restart`
+- Verified mutation succeeds: `curl -X POST /graphql -d '{"query":"mutation { updateConsent(...) }"}' → {"data":{"updateConsent":true}}`
+
+### Files Changed (Round 1 + Round 2)
+- `apps/subgraph-core/src/consent/consent.graphql` (new; Round 2: added federation preamble)
 - `apps/subgraph-core/src/consent/consent.resolver.ts` (new)
 - `apps/subgraph-core/src/consent/consent.module.ts` (new)
 - `apps/subgraph-core/src/app.module.ts` (added ConsentModule)
+- `apps/gateway/supergraph.graphql` (Round 2: added updateConsent mutation, UpdateConsentInput, ConsentType enum)
 - `apps/web/src/lib/graphql/consent.queries.ts` (new)
 - `apps/web/src/components/settings/PrivacyConsentCard.tsx` (mutation sync)
 - `apps/web/src/components/RequirementLink.tsx` (returnTo prop)
@@ -129,16 +144,19 @@
 ### Tests Added
 - `apps/web/src/pages/SettingsPage.test.tsx`: 4 BUG-088 regression tests (mutation call, localStorage save, back button present/absent)
 - `apps/subgraph-core/src/consent/consent.resolver.spec.ts`: 3 tests (correct params, unauthenticated, withdrawal)
-- `apps/web/e2e/consent-requirement-link.spec.ts`: 3 BUG-088 E2E tests (toggle interactive, back button with/without returnTo)
+- `apps/web/e2e/consent-requirement-link.spec.ts`: 4 BUG-088 E2E tests (toggle interactive, back button with/without returnTo, **Round 2: mutation succeeds through gateway**)
 
 ### Visual Verification
-- `docs/screenshots/bug088-settings-returnto.png` — Settings page with back arrow + Privacy & AI card + both toggles
-- `docs/screenshots/bug088-toggle-clicked.png` — Toggle click triggers mutation → error toast (no backend in dev) → correct revert behavior
+- Round 1: `docs/screenshots/bug088-settings-returnto.png` — Settings page with back arrow (but toggle mutation failed — was incorrectly classified as "expected")
+- **Round 2 (actual proof):** `docs/screenshots/bug088-r2-after-toggle.png` — Toggle clicked → **"Privacy preference saved" success toast** → mutation returned `{"data":{"updateConsent":true}}`
+- **Round 2 API proof:** `curl -X POST /graphql -H "Authorization: Bearer $TOKEN" -d '{"query":"mutation { updateConsent(...) }"}' → {"data":{"updateConsent":true}}`
 
 ### Anti-Recurrence
 - Backend `updateConsent` mutation ensures consent is always persisted to DB (GDPR Art.7 proof)
 - Frontend optimistic update + revert pattern ensures UI stays consistent with backend
 - `returnTo` parameter on all consent navigation paths ensures users can return to their workflow
+- **Round 2:** `supergraph.graphql` must be recomposed (`pnpm --filter @edusphere/gateway compose`) after adding ANY new SDL file. E2E test `consent toggle mutation succeeds through gateway` verifies the full flow end-to-end (not just localStorage)
+- **Lesson learned:** Visual verification must INVESTIGATE error toasts, not classify them as "expected". An error toast = the fix is broken.
 - Generate button disabled when consent is missing — prevents futile API calls
 
 ---

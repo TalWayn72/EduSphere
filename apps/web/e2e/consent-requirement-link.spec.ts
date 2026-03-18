@@ -212,4 +212,62 @@ test.describe('Consent Requirement Link', () => {
     const arrowBtn = page.locator('button:has(svg.lucide-arrow-left)');
     await expect(arrowBtn).not.toBeVisible({ timeout: 3_000 });
   });
+
+  // BUG-088 REGRESSION (Round 2): consent toggle GraphQL mutation must succeed
+  // This test verifies the ACTUAL mutation reaches the gateway and returns success,
+  // not just that localStorage is updated. The original bug was that the mutation
+  // didn't exist in the supergraph — gateway returned an error.
+  test('REGRESSION BUG-088: consent toggle mutation succeeds through gateway', async ({ page }) => {
+    let mutationSucceeded = false;
+    let mutationPayload: Record<string, unknown> | null = null;
+
+    // Intercept GraphQL requests to observe the mutation response
+    page.on('response', async (response) => {
+      if (response.url().includes('/graphql')) {
+        try {
+          const body = await response.json();
+          if (body?.data?.updateConsent === true) {
+            mutationSucceeded = true;
+          }
+        } catch {
+          // Not JSON or not our mutation — ignore
+        }
+      }
+    });
+
+    page.on('request', (request) => {
+      if (request.url().includes('/graphql')) {
+        try {
+          const postData = request.postDataJSON();
+          if (postData?.query?.includes('updateConsent')) {
+            mutationPayload = postData;
+          }
+        } catch {
+          // ignore
+        }
+      }
+    });
+
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    // Toggle AI consent
+    const toggle = page.locator('#setting-ai-consent [role="switch"]');
+    await expect(toggle).toBeVisible({ timeout: 10_000 });
+    await toggle.click();
+
+    // Wait for the mutation response
+    await page.waitForTimeout(3000);
+
+    // Verify the mutation was sent
+    expect(mutationPayload).not.toBeNull();
+
+    // Verify the mutation succeeded (no error toast, data returned true)
+    // If mutation fails, the PrivacyConsentCard shows an error toast
+    const errorToast = page.locator('text=/נכשלה|Failed to save/i');
+    await expect(errorToast).not.toBeVisible({ timeout: 2_000 });
+
+    // The mutation should have returned { data: { updateConsent: true } }
+    expect(mutationSucceeded).toBe(true);
+  });
 });
