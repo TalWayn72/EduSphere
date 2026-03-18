@@ -94,10 +94,11 @@ export class LessonAssetService implements OnModuleDestroy {
         .returning()) as unknown as [Record<string, unknown>];
     } catch (err) {
       this.logger.error(
-        `Failed to add asset to lesson "${lessonId}": ${String(err)}`
+        `[LessonAssetService] Failed to add asset to lesson "${lessonId}" ` +
+          `(type: ${input.assetType}, tenant: ${tenantCtx.tenantId}): ${String(err)}`
       );
       throw new BadRequestException(
-        'Failed to add asset. Ensure the lesson exists.'
+        'שגיאה בהוספת קובץ לשיעור. ודא שהשיעור קיים.'
       );
     }
 

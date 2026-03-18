@@ -15,6 +15,7 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
+import { withTenantContext } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions, NatsSubjects } from '@edusphere/nats-client';
 import type { LessonPayload } from '@edusphere/nats-client';
@@ -88,18 +89,20 @@ export class LessonService implements OnModuleDestroy {
   }
 
   async findById(id: string, tenantCtx: TenantContext) {
-    const [row] = await this.db
-      .select()
-      .from(schema.lessons)
-      .where(
-        and(
-          eq(schema.lessons.id, id),
-          eq(schema.lessons.tenant_id, tenantCtx.tenantId),
-          isNull(schema.lessons.deleted_at)
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      const [row] = await db
+        .select()
+        .from(schema.lessons)
+        .where(
+          and(
+            eq(schema.lessons.id, id),
+            eq(schema.lessons.tenant_id, tenantCtx.tenantId),
+            isNull(schema.lessons.deleted_at)
+          )
         )
-      )
-      .limit(1);
-    return this.mapLesson(row as Record<string, unknown>);
+        .limit(1);
+      return this.mapLesson(row as Record<string, unknown>);
+    });
   }
 
   async findByCourse(
@@ -108,71 +111,154 @@ export class LessonService implements OnModuleDestroy {
     limit: number,
     offset: number
   ) {
-    const rows = await this.db
-      .select()
-      .from(schema.lessons)
-      .where(
-        and(
-          eq(schema.lessons.course_id, courseId),
-          eq(schema.lessons.tenant_id, tenantCtx.tenantId),
-          isNull(schema.lessons.deleted_at)
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.lessons)
+        .where(
+          and(
+            eq(schema.lessons.course_id, courseId),
+            eq(schema.lessons.tenant_id, tenantCtx.tenantId),
+            isNull(schema.lessons.deleted_at)
+          )
         )
-      )
-      .orderBy(desc(schema.lessons.created_at))
-      .limit(limit)
-      .offset(offset);
-    return rows.map((r) => this.mapLesson(r as Record<string, unknown>));
+        .orderBy(desc(schema.lessons.created_at))
+        .limit(limit)
+        .offset(offset);
+      return rows.map((r) => this.mapLesson(r as Record<string, unknown>));
+    });
   }
 
   async create(input: CreateLessonInput, tenantCtx: TenantContext) {
     if (!UUID_REGEX.test(input.courseId)) {
       this.logger.warn(
-        `createLesson rejected: courseId "${input.courseId}" is not a valid UUID`
+        `[LessonService] createLesson rejected: courseId "${input.courseId}" is not a valid UUID`
       );
       throw new BadRequestException(
-        `Invalid courseId "${input.courseId}". The course must exist in the database.`
+        'מזהה הקורס אינו תקין. ודא שהקורס קיים במערכת.'
       );
     }
 
-    let row: Record<string, unknown> | undefined;
-    try {
-      [row] = (await this.db
-        .insert(schema.lessons)
-        .values({
-          tenant_id: tenantCtx.tenantId,
-          course_id: input.courseId,
-          module_id: input.moduleId ?? null,
-          title: input.title,
-          type: input.type,
-          series: input.series ?? null,
-          lesson_date: input.lessonDate ? new Date(input.lessonDate) : null,
-          instructor_id: input.instructorId,
-          status: 'DRAFT',
-        })
-        .returning()) as unknown as [Record<string, unknown>];
-    } catch (err) {
+    if (!tenantCtx.tenantId) {
       this.logger.error(
-        `Failed to create lesson for course "${input.courseId}" ` +
-          `(tenant: ${tenantCtx.tenantId}): ${String(err)}`
+        '[LessonService] createLesson rejected: tenantId is missing from auth context'
       );
       throw new BadRequestException(
-        'Failed to create lesson. Ensure the course exists and you have access to it.'
+        'שגיאת אימות: חסר מזהה ארגון. נסה להתחבר מחדש.'
       );
     }
 
-    const lesson = this.mapLesson(row);
-    this.logger.log(`Lesson created: ${String(row?.['id'])} - "${input.title}"`);
+    // Pre-validate: course exists and belongs to this tenant
+    const [course] = await this.db
+      .select({ id: schema.courses.id, tenant_id: schema.courses.tenant_id })
+      .from(schema.courses)
+      .where(
+        and(
+          eq(schema.courses.id, input.courseId),
+          isNull(schema.courses.deleted_at)
+        )
+      )
+      .limit(1);
 
-    const payload: LessonPayload = {
-      type: 'lesson.created',
-      lessonId: String(row?.['id']),
-      courseId: input.courseId,
-      tenantId: tenantCtx.tenantId,
-      timestamp: new Date().toISOString(),
-    };
-    this.publishEvent(NatsSubjects.LESSON_CREATED, payload);
+    if (!course) {
+      this.logger.warn(
+        `[LessonService] createLesson rejected: course "${input.courseId}" not found in DB`
+      );
+      throw new NotFoundException(
+        'הקורס לא נמצא. ייתכן שנמחק או שהמזהה שגוי.'
+      );
+    }
 
-    return lesson;
+    if (course.tenant_id !== tenantCtx.tenantId) {
+      this.logger.warn(
+        `[LessonService] createLesson rejected: course "${input.courseId}" belongs to tenant ` +
+          `"${course.tenant_id}" but request is from tenant "${tenantCtx.tenantId}"`
+      );
+      throw new BadRequestException(
+        'אין לך הרשאה ליצור שיעור בקורס זה.'
+      );
+    }
+
+    // Pre-validate: instructor (user) exists in users table
+    const [instructor] = await this.db
+      .select({ id: schema.users.id })
+      .from(schema.users)
+      .where(eq(schema.users.id, input.instructorId))
+      .limit(1);
+
+    if (!instructor) {
+      this.logger.warn(
+        `[LessonService] createLesson rejected: instructorId "${input.instructorId}" not found in users table. ` +
+          `This often happens when the Keycloak user ID (JWT sub) does not match any row in the users table. ` +
+          `Ensure user provisioning syncs Keycloak users to the DB.`
+      );
+      throw new BadRequestException(
+        'המשתמש לא נמצא במערכת. ייתכן שיש בעיית סנכרון עם מערכת ההזדהות.'
+      );
+    }
+
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      let row: Record<string, unknown> | undefined;
+      try {
+        [row] = (await db
+          .insert(schema.lessons)
+          .values({
+            tenant_id: tenantCtx.tenantId,
+            course_id: input.courseId,
+            module_id: input.moduleId ?? null,
+            title: input.title,
+            type: input.type,
+            series: input.series ?? null,
+            lesson_date: input.lessonDate ? new Date(input.lessonDate) : null,
+            instructor_id: input.instructorId,
+            status: 'DRAFT',
+          })
+          .returning()) as unknown as [Record<string, unknown>];
+      } catch (err) {
+        const errMsg = String(err);
+        this.logger.error(
+          `[LessonService] Failed to create lesson for course "${input.courseId}" ` +
+            `(tenant: ${tenantCtx.tenantId}, instructor: ${input.instructorId}): ${errMsg}`
+        );
+
+        // Parse specific DB constraint violations for actionable messages
+        if (errMsg.includes('foreign key') && errMsg.includes('course_id')) {
+          throw new BadRequestException(
+            'הקורס לא נמצא במסד הנתונים.'
+          );
+        }
+        if (errMsg.includes('foreign key') && errMsg.includes('instructor_id')) {
+          throw new BadRequestException(
+            'המרצה לא נמצא במערכת. בדוק את סנכרון המשתמשים.'
+          );
+        }
+        if (errMsg.includes('foreign key') && errMsg.includes('tenant_id')) {
+          throw new BadRequestException(
+            'הארגון לא נמצא. נסה להתחבר מחדש.'
+          );
+        }
+        throw new BadRequestException(
+          'שגיאה ביצירת שיעור. נסה שוב או פנה לתמיכה.'
+        );
+      }
+
+      const lesson = this.mapLesson(row);
+      this.logger.log(
+        `[LessonService] Lesson created: ${String(row?.['id'])} - "${input.title}" ` +
+          `(course: ${input.courseId}, tenant: ${tenantCtx.tenantId})`
+      );
+
+      const payload: LessonPayload = {
+        type: 'lesson.created',
+        lessonId: String(row?.['id']),
+        courseId: input.courseId,
+        tenantId: tenantCtx.tenantId,
+        timestamp: new Date().toISOString(),
+      };
+      this.publishEvent(NatsSubjects.LESSON_CREATED, payload);
+
+      return lesson;
+    });
   }
 
   async update(id: string, input: UpdateLessonInput, tenantCtx: TenantContext) {
@@ -186,72 +272,84 @@ export class LessonService implements OnModuleDestroy {
         : null;
     if (input.status !== undefined) updateData['status'] = input.status;
 
-    try {
-      const [row] = await this.db
-        .update(schema.lessons)
-        .set(updateData)
-        .where(
-          and(
-            eq(schema.lessons.id, id),
-            eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      try {
+        const [row] = await db
+          .update(schema.lessons)
+          .set(updateData)
+          .where(
+            and(
+              eq(schema.lessons.id, id),
+              eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+            )
           )
-        )
-        .returning();
-      return this.mapLesson(row as Record<string, unknown>);
-    } catch (err) {
-      this.logger.error(`Failed to update lesson "${id}": ${String(err)}`);
-      throw new BadRequestException('Failed to update lesson.');
-    }
+          .returning();
+        return this.mapLesson(row as Record<string, unknown>);
+      } catch (err) {
+        this.logger.error(
+          `[LessonService] Failed to update lesson "${id}": ${String(err)}`
+        );
+        throw new BadRequestException('שגיאה בעדכון השיעור.');
+      }
+    });
   }
 
   async delete(id: string, tenantCtx: TenantContext): Promise<boolean> {
-    try {
-      await this.db
-        .update(schema.lessons)
-        .set({ deleted_at: new Date() })
-        .where(
-          and(
-            eq(schema.lessons.id, id),
-            eq(schema.lessons.tenant_id, tenantCtx.tenantId)
-          )
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      try {
+        await db
+          .update(schema.lessons)
+          .set({ deleted_at: new Date() })
+          .where(
+            and(
+              eq(schema.lessons.id, id),
+              eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+            )
+          );
+        return true;
+      } catch (err) {
+        this.logger.error(
+          `[LessonService] Failed to delete lesson "${id}": ${String(err)}`
         );
-      return true;
-    } catch (err) {
-      this.logger.error(`Failed to delete lesson "${id}": ${String(err)}`);
-      throw new BadRequestException('Failed to delete lesson.');
-    }
+        throw new BadRequestException('שגיאה במחיקת השיעור.');
+      }
+    });
   }
 
   async publish(id: string, tenantCtx: TenantContext) {
     const lesson = await this.findById(id, tenantCtx);
     if (!lesson) throw new NotFoundException(`Lesson ${id} not found`);
 
-    try {
-      const [row] = await this.db
-        .update(schema.lessons)
-        .set({ status: 'PUBLISHED' })
-        .where(
-          and(
-            eq(schema.lessons.id, id),
-            eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      try {
+        const [row] = await db
+          .update(schema.lessons)
+          .set({ status: 'PUBLISHED' })
+          .where(
+            and(
+              eq(schema.lessons.id, id),
+              eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+            )
           )
-        )
-        .returning();
+          .returning();
 
-      const published = this.mapLesson(row as Record<string, unknown>);
-      const payload: LessonPayload = {
-        type: 'lesson.published',
-        lessonId: id,
-        courseId: String(lesson.courseId),
-        tenantId: tenantCtx.tenantId,
-        timestamp: new Date().toISOString(),
-      };
-      this.publishEvent(NatsSubjects.LESSON_PUBLISHED, payload);
+        const published = this.mapLesson(row as Record<string, unknown>);
+        const payload: LessonPayload = {
+          type: 'lesson.published',
+          lessonId: id,
+          courseId: String(lesson.courseId),
+          tenantId: tenantCtx.tenantId,
+          timestamp: new Date().toISOString(),
+        };
+        this.publishEvent(NatsSubjects.LESSON_PUBLISHED, payload);
 
-      return published;
-    } catch (err) {
-      this.logger.error(`Failed to publish lesson "${id}": ${String(err)}`);
-      throw new BadRequestException('Failed to publish lesson.');
-    }
+        return published;
+      } catch (err) {
+        this.logger.error(
+          `[LessonService] Failed to publish lesson "${id}": ${String(err)}`
+        );
+        throw new BadRequestException('שגיאה בפרסום השיעור.');
+      }
+    });
   }
 }

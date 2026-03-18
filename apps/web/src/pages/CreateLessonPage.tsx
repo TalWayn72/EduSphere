@@ -77,8 +77,13 @@ export function CreateLessonPage() {
     if (mutError) {
       const gqlMsg = mutError.graphQLErrors?.[0]?.message;
       const networkMsg = mutError.networkError?.message;
-      const msg = gqlMsg ?? networkMsg ?? mutError.message;
-      console.error('[CreateLessonPage] createLesson failed:', msg, mutError);
+      const rawMsg = gqlMsg ?? networkMsg ?? mutError.message;
+      // Map raw backend/network errors to user-friendly Hebrew messages
+      const isNetworkErr = !gqlMsg && (networkMsg || rawMsg?.includes('fetch'));
+      const msg = isNetworkErr
+        ? 'שגיאת רשת: לא ניתן להתחבר לשרת. נסה שוב.'
+        : rawMsg;
+      console.error('[CreateLessonPage] createLesson failed:', rawMsg, mutError);
       setError(msg);
       return;
     }
@@ -174,13 +179,20 @@ export function CreateLessonPage() {
               </div>
             </div>
             {error && (
-              <p
-                className="text-red-500 text-sm mb-4"
+              <div
+                className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4"
                 data-testid="create-lesson-error"
                 role="alert"
               >
-                {error}
-              </p>
+                <p className="text-red-700 text-sm">{error}</p>
+                <button
+                  type="button"
+                  className="text-red-600 text-xs underline mt-1"
+                  onClick={() => setError(null)}
+                >
+                  סגור
+                </button>
+              </div>
             )}
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setStep(2)}>

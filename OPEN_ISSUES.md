@@ -30,6 +30,7 @@
 | BUG-071 | AI Course consent error | ✅ Fixed | `fed522a` |
 | BUG-072 | APQ gateway error cascade | ✅ Fixed | `390a623` |
 | BUG-073 | Media upload failure | ✅ Fixed | `256655c` |
+| BUG-074 | CreateLesson generic error + SI-9 violation | ✅ Fixed | (pending commit) |
 | ARCH-6 | CRDT compaction no automated trigger | ✅ Fixed | `cf60f20` |
 | ARCH-5 | Connection budget undocumented | ✅ Fixed | `c5edcb4` |
 | ARCH-4 | Content subgraph 38 domains (ADR) | ✅ Documented | `26d01d0` |
@@ -57,6 +58,39 @@
 | BUG-078 | Missing aria-live on pipeline status | ✅ Fixed | Phase 65 R5 |
 | BUG-079 | Breadcrumb missing lesson link | ✅ Fixed | Phase 65 R5 |
 | BUG-080 | Mobile layout broken on pipeline page | ✅ Fixed | Phase 65 R5 |
+| BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | (pending commit) |
+
+---
+
+## BUG-081 — PDF Source Upload Fails — "pdfParse is not a function" (18 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🔴 Critical (P0) — PDF upload completely broken for all users
+**Root Cause:** `pdf-parse` v2.4.5 changed its API from a callable default export to a class-based named export (`PDFParse`). The code in `document-parser.service.ts:52-72` used the v1 pattern `pdfParse(buffer)` which fails at runtime with `pdfParse is not a function`.
+
+**Discovery Waves:**
+- **Wave 1 (exact match):** `pdf-parse` import found only in `document-parser.service.ts` — single location
+- **Wave 2 (similarity):** No other files use pdf-parse; DOCX (mammoth) and YouTube parsers use different libraries
+- **Wave 3 (class of bug):** All dynamic imports in document-parser.service.ts checked — mammoth uses same defensive pattern but works because its export shape didn't change
+
+**Solution:**
+- Changed `parsePdf()` to use `new PDFParse({ data: buffer })` → `parser.getText()` → `parser.destroy()` (v2 class API)
+- `result.total` replaces `data.numpages` for page count
+
+**Files Changed:**
+| File | Change |
+|------|--------|
+| `apps/subgraph-knowledge/src/sources/document-parser.service.ts` | Fix `parsePdf()` to use pdf-parse v2 class API |
+| `apps/subgraph-knowledge/src/sources/document-parser.service.pdf-youtube.spec.ts` | Update mock from callable to `PDFParse` class |
+| `apps/web/e2e/knowledge-sources.spec.ts` | Add Suite 7 — BUG-081 regression (2 tests) |
+
+**Secondary issue found:** `subgraph-knowledge` crashed 5× on startup with `Query.socialRecommendations defined in resolvers, but not in schema` — resolved on final restart (stale build artifact).
+
+**Tests Added:**
+- `document-parser.service.pdf-youtube.spec.ts` — 9 tests (2 for parsePdf with v2 mock)
+- `apps/web/e2e/knowledge-sources.spec.ts` Suite 7 — 2 BUG-081 regression tests
+
+**Anti-recurrence:** E2E Suite 7 in `knowledge-sources.spec.ts` injects a FAILED source with `pdfParse is not a function` errorMessage and asserts it never reaches the UI.
 
 ---
 
@@ -284,6 +318,58 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 - `scripts/test-presign.mjs` — end-to-end presigned URL test
 - `scripts/decode-jwt.mjs` — JWT claim inspector
 - `scripts/reproduce-upload-bug.mjs` — Playwright reproduction (incomplete)
+
+---
+
+## BUG-074 — CreateLesson Generic Error Message + SI-9 withTenantContext Violation (17 Mar 2026)
+
+**סטטוס:** ✅ Fixed (2026-03-17)
+**חומרה:** 🟡 Medium
+**נמצא ע"י:** User report — error "Failed to create lesson. Ensure the course exists and you have access to it." on `/courses/:courseId/lessons/new`
+
+### Root Cause Chain
+
+1. **Primary:** `LessonService.create()` had a generic catch block that swallowed ALL DB errors with one unhelpful English message, regardless of whether the cause was FK violation (instructor_id, course_id), null tenant_id, or RLS failure.
+2. **SI-9 Violation:** `LessonService` used `this.db` directly without `withTenantContext()`, bypassing RLS session variable setup. Other services in the same module (e.g., `LessonPlanService`) correctly used `withTenantContext()`.
+3. **Frontend:** `CreateLessonPage` displayed raw GraphQL/network error messages to users without mapping them to Hebrew UX-friendly messages.
+
+### Discovery Waves
+
+**Wave 1 — Exact match:** Found the generic catch block in `lesson.service.ts:create()` with `"Failed to create lesson..."` string.
+
+**Wave 2 — Similarity search:** Found 44 files across 6 subgraphs using `createDatabaseConnection` without `withTenantContext()`. Most are in:
+- `apps/subgraph-content/src/lesson/lesson-asset.service.ts`
+- `apps/subgraph-content/src/lesson/lesson-pipeline.service.ts`
+- `apps/subgraph-content/src/lesson/lesson-pipeline-orchestrator.service.ts`
+- Various services in subgraph-core, subgraph-annotation, subgraph-collaboration, subgraph-agent, subgraph-knowledge
+
+**Wave 3 — Class of bug:** Generic catch blocks that swallow DB errors with unhelpful messages — same anti-pattern in multiple services.
+
+### Fix Rounds
+
+**Round 1 — LessonService rewrite:**
+- Added `withTenantContext()` to ALL methods: `findById`, `findByCourse`, `create`, `update`, `delete`, `publish`
+- Added pre-validation in `create()`: UUID format check on courseId, tenantId non-empty, course exists + tenant match, instructor exists in users table
+- All error messages in Hebrew with structured `[LessonService]` prefix logging
+- FK violation errors now return user-friendly Hebrew messages (no raw SQL leak)
+
+**Round 2 — Frontend error handling:**
+- `CreateLessonPage`: network errors mapped to Hebrew message `"שגיאת רשת: לא ניתן להתחבר לשרת. נסה שוב."`
+- Error display upgraded to styled alert with dismiss button, `role="alert"`, `data-testid="create-lesson-error"`
+- Console.error logging added with `[CreateLessonPage]` prefix
+
+**Files modified:**
+- `apps/subgraph-content/src/lesson/lesson.service.ts` — complete rewrite with withTenantContext + pre-validation
+- `apps/web/src/pages/CreateLessonPage.tsx` — error handling + Hebrew messages + styled alert
+- `apps/subgraph-content/src/lesson/lesson-asset.service.ts` — structured logging improvement
+
+**Tests added:**
+- `apps/subgraph-content/src/lesson/lesson.service.spec.ts` — 21 tests (complete rewrite): withTenantContext compliance, pre-validation (course UUID, tenant empty, course not found, tenant mismatch, instructor not found), Hebrew error messages, no raw SQL in error regression guard
+- `apps/web/src/pages/CreateLessonPage.test.tsx` — 3 new tests: error dismiss button, network error Hebrew message, updated error display test (20 total passing)
+
+**Anti-recurrence:** `lesson.service.spec.ts` tests guard all pre-validation paths; `CreateLessonPage.test.tsx` guards network error mapping and dismiss UX. The `withTenantContext` mock in spec validates SI-9 compliance on every test run.
+
+**Broader anti-pattern (44 files):** Documented for future cleanup — tracked as separate work item, not part of this bug fix scope.
 
 ---
 

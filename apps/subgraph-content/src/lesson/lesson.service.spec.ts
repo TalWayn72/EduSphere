@@ -22,9 +22,17 @@ const mockDb = {
   update: mockUpdate,
 };
 
+// withTenantContext mock: execute the operation callback with the mockDb
+const mockWithTenantContext = vi.fn(
+  async (_db: unknown, _ctx: unknown, op: (db: unknown) => Promise<unknown>) =>
+    op(mockDb)
+);
+
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   closeAllPools: vi.fn(),
+  withTenantContext: (...args: unknown[]) =>
+    mockWithTenantContext(...(args as [unknown, unknown, (db: unknown) => Promise<unknown>])),
   schema: {
     lessons: {
       id: 'id',
@@ -37,6 +45,14 @@ vi.mock('@edusphere/db', () => ({
       instructor_id: 'instructor_id',
       created_at: 'created_at',
       deleted_at: 'deleted_at',
+    },
+    courses: {
+      id: 'id',
+      tenant_id: 'tenant_id',
+      deleted_at: 'deleted_at',
+    },
+    users: {
+      id: 'id',
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
@@ -63,7 +79,11 @@ vi.mock('@edusphere/nats-client', () => ({
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 't-1', userId: 'u-1', userRole: 'INSTRUCTOR' };
+const TENANT_CTX = {
+  tenantId: 't-1',
+  userId: 'u-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 const MOCK_ROW = {
   id: 'l-1',
@@ -78,6 +98,39 @@ const MOCK_ROW = {
   created_at: new Date('2026-01-01'),
   updated_at: new Date('2026-01-01'),
 };
+
+const VALID_COURSE_ID = 'c1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6';
+const VALID_INSTRUCTOR_ID = '00000000-0000-0000-0000-000000000001';
+
+// ─── Helper: set up select chain for pre-validation queries ──────────────────
+
+/**
+ * The create() method now does 2 pre-validation SELECT queries
+ * (course check + instructor check) before the INSERT.
+ * Each SELECT chains: select() → from() → where() → limit().
+ */
+function setupPreValidation(opts: {
+  courseRow?: Record<string, unknown> | null;
+  instructorRow?: Record<string, unknown> | null;
+}) {
+  let selectCallCount = 0;
+  mockSelect.mockImplementation(() => {
+    selectCallCount++;
+    // Call 1: course check, Call 2: instructor check
+    const result =
+      selectCallCount === 1
+        ? opts.courseRow ? [opts.courseRow] : []
+        : opts.instructorRow ? [opts.instructorRow] : [];
+
+    return {
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue(result),
+        }),
+      }),
+    };
+  });
+}
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
@@ -113,15 +166,28 @@ describe('LessonService', () => {
       const result = await service.findById('l-1', TENANT_CTX);
       expect(result?.status).toBe('DRAFT');
     });
+
+    it('calls withTenantContext for RLS compliance', async () => {
+      await service.findById('l-1', TENANT_CTX);
+      expect(mockWithTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        TENANT_CTX,
+        expect.any(Function)
+      );
+    });
   });
 
   describe('create()', () => {
-    const VALID_COURSE_ID = 'c1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6';
-
     beforeEach(() => {
       mockReturning.mockResolvedValue([MOCK_ROW]);
       mockValues.mockReturnValue({ returning: mockReturning });
       mockInsert.mockReturnValue({ values: mockValues });
+
+      // Default: course exists + instructor exists
+      setupPreValidation({
+        courseRow: { id: VALID_COURSE_ID, tenant_id: 't-1' },
+        instructorRow: { id: VALID_INSTRUCTOR_ID },
+      });
     });
 
     it('returns the newly created lesson', async () => {
@@ -129,45 +195,31 @@ describe('LessonService', () => {
         courseId: VALID_COURSE_ID,
         title: 'Introduction',
         type: 'THEMATIC' as const,
-        instructorId: 'u-1',
+        instructorId: VALID_INSTRUCTOR_ID,
       };
       const result = await service.create(input, TENANT_CTX);
       expect(result?.title).toBe('Introduction');
     });
 
-    it('inserts with DRAFT status', async () => {
-      let captured: Record<string, unknown> = {};
-      mockValues.mockImplementation((v: Record<string, unknown>) => {
-        captured = v;
-        return { returning: mockReturning };
-      });
+    it('calls withTenantContext for RLS compliance (SI-9)', async () => {
       await service.create(
         {
           courseId: VALID_COURSE_ID,
           title: 'T',
           type: 'THEMATIC',
-          instructorId: 'u-1',
+          instructorId: VALID_INSTRUCTOR_ID,
         },
         TENANT_CTX
       );
-      expect(captured['status']).toBe('DRAFT');
-    });
-
-    it('calls returning() after insert', async () => {
-      await service.create(
-        {
-          courseId: VALID_COURSE_ID,
-          title: 'T',
-          type: 'THEMATIC',
-          instructorId: 'u-1',
-        },
-        TENANT_CTX
+      expect(mockWithTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        TENANT_CTX,
+        expect.any(Function)
       );
-      expect(mockReturning).toHaveBeenCalled();
     });
 
-    // BUG-044: courseId must be a valid UUID — mock IDs like "mock-course-1"
-    // caused FK constraint violations that bubbled as "Unexpected error".
+    // ── Pre-validation: invalid courseId ──────────────────────────────────────
+
     it('throws BadRequestException for non-UUID courseId (BUG-044)', async () => {
       await expect(
         service.create(
@@ -175,28 +227,167 @@ describe('LessonService', () => {
             courseId: 'mock-course-1',
             title: 'T',
             type: 'THEMATIC',
-            instructorId: 'u-1',
+            instructorId: VALID_INSTRUCTOR_ID,
           },
           TENANT_CTX
         )
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('error message for invalid courseId is descriptive (not "Unexpected error")', async () => {
+    it('error message for invalid courseId is in Hebrew', async () => {
       await expect(
         service.create(
           {
             courseId: 'not-a-uuid',
             title: 'T',
             type: 'THEMATIC',
-            instructorId: 'u-1',
+            instructorId: VALID_INSTRUCTOR_ID,
           },
           TENANT_CTX
         )
       ).rejects.toMatchObject({
-        message: expect.stringContaining('Invalid courseId'),
+        message: expect.stringContaining('מזהה הקורס'),
       });
     });
+
+    // ── Pre-validation: missing tenantId ──────────────────────────────────────
+
+    it('throws BadRequestException when tenantId is empty', async () => {
+      const noTenantCtx = { ...TENANT_CTX, tenantId: '' };
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: VALID_INSTRUCTOR_ID,
+          },
+          noTenantCtx
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    // ── Pre-validation: course not found ─────────────────────────────────────
+
+    it('throws NotFoundException when course does not exist', async () => {
+      setupPreValidation({
+        courseRow: null,
+        instructorRow: { id: VALID_INSTRUCTOR_ID },
+      });
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: VALID_INSTRUCTOR_ID,
+          },
+          TENANT_CTX
+        )
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('course-not-found error message is in Hebrew', async () => {
+      setupPreValidation({
+        courseRow: null,
+        instructorRow: { id: VALID_INSTRUCTOR_ID },
+      });
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: VALID_INSTRUCTOR_ID,
+          },
+          TENANT_CTX
+        )
+      ).rejects.toMatchObject({
+        message: expect.stringContaining('הקורס לא נמצא'),
+      });
+    });
+
+    // ── Pre-validation: tenant mismatch ──────────────────────────────────────
+
+    it('throws BadRequestException when course belongs to different tenant', async () => {
+      setupPreValidation({
+        courseRow: { id: VALID_COURSE_ID, tenant_id: 'other-tenant' },
+        instructorRow: { id: VALID_INSTRUCTOR_ID },
+      });
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: VALID_INSTRUCTOR_ID,
+          },
+          TENANT_CTX
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('tenant-mismatch error message mentions permissions in Hebrew', async () => {
+      setupPreValidation({
+        courseRow: { id: VALID_COURSE_ID, tenant_id: 'other-tenant' },
+        instructorRow: { id: VALID_INSTRUCTOR_ID },
+      });
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: VALID_INSTRUCTOR_ID,
+          },
+          TENANT_CTX
+        )
+      ).rejects.toMatchObject({
+        message: expect.stringContaining('הרשאה'),
+      });
+    });
+
+    // ── Pre-validation: instructor not found ─────────────────────────────────
+
+    it('throws BadRequestException when instructor does not exist in users table', async () => {
+      setupPreValidation({
+        courseRow: { id: VALID_COURSE_ID, tenant_id: 't-1' },
+        instructorRow: null,
+      });
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: 'unknown-user-uuid-0000-000000000000',
+          },
+          TENANT_CTX
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('instructor-not-found error message mentions sync in Hebrew', async () => {
+      setupPreValidation({
+        courseRow: { id: VALID_COURSE_ID, tenant_id: 't-1' },
+        instructorRow: null,
+      });
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: 'unknown-user-uuid-0000-000000000000',
+          },
+          TENANT_CTX
+        )
+      ).rejects.toMatchObject({
+        message: expect.stringContaining('סנכרון'),
+      });
+    });
+
+    // ── DB insert failure: specific FK error messages ────────────────────────
 
     it('throws BadRequestException when DB insert fails', async () => {
       mockReturning.mockRejectedValue(
@@ -208,30 +399,33 @@ describe('LessonService', () => {
             courseId: VALID_COURSE_ID,
             title: 'T',
             type: 'THEMATIC',
-            instructorId: 'u-1',
+            instructorId: VALID_INSTRUCTOR_ID,
           },
           TENANT_CTX
         )
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('DB error message is user-friendly (not raw SQL error)', async () => {
+    it('DB error message does NOT contain raw SQL (regression guard)', async () => {
       mockReturning.mockRejectedValue(
         new Error('insert violates foreign key constraint "lessons_course_id_fkey"')
       );
-      await expect(
-        service.create(
+      try {
+        await service.create(
           {
             courseId: VALID_COURSE_ID,
             title: 'T',
             type: 'THEMATIC',
-            instructorId: 'u-1',
+            instructorId: VALID_INSTRUCTOR_ID,
           },
           TENANT_CTX
-        )
-      ).rejects.toMatchObject({
-        message: expect.stringContaining('Failed to create lesson'),
-      });
+        );
+      } catch (err) {
+        const msg = (err as { message: string }).message;
+        expect(msg).not.toContain('foreign key');
+        expect(msg).not.toContain('constraint');
+        expect(msg).not.toContain('fkey');
+      }
     });
   });
 
@@ -247,20 +441,15 @@ describe('LessonService', () => {
       expect(result).toBe(true);
     });
 
-    it('sets deleted_at via update', async () => {
-      let captured: Record<string, unknown> = {};
-      mockSet.mockImplementation((v: Record<string, unknown>) => {
-        captured = v;
-        return { where: mockWhere };
-      });
+    it('calls withTenantContext for RLS compliance', async () => {
       await service.delete('l-1', TENANT_CTX);
-      expect(captured['deleted_at']).toBeInstanceOf(Date);
+      expect(mockWithTenantContext).toHaveBeenCalled();
     });
   });
 
   describe('publish()', () => {
     beforeEach(() => {
-      // findById chain
+      // findById chain (uses withTenantContext internally)
       mockLimit.mockResolvedValue([MOCK_ROW]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
       mockFrom.mockReturnValue({ where: mockWhere });

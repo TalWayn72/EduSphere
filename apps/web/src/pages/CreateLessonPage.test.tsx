@@ -278,7 +278,7 @@ describe('CreateLessonPage', () => {
   it('shows error message on mutation failure', async () => {
     const mockExecute = vi.fn().mockResolvedValue({
       data: null,
-      error: { message: 'Server error', graphQLErrors: [{ message: 'שגיאה' }] },
+      error: { message: 'Server error', graphQLErrors: [{ message: 'הקורס לא נמצא' }] },
     });
     vi.mocked(urql.useMutation).mockReturnValue([
       { fetching: false },
@@ -303,7 +303,78 @@ describe('CreateLessonPage', () => {
         .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
-    await waitFor(() => expect(screen.getByText('שגיאה')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('הקורס לא נמצא')).toBeInTheDocument());
+  });
+
+  it('error alert has dismiss button that clears the error', async () => {
+    const mockExecute = vi.fn().mockResolvedValue({
+      data: null,
+      error: { message: 'err', graphQLErrors: [{ message: 'שגיאה בדיקה' }] },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockExecute,
+    ] as never);
+
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
+      target: { value: 'שיעור בדיקה' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    await waitFor(() => screen.getByText('הוספת חומרים'));
+    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
+    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    fireEvent.click(
+      screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement
+    );
+    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    await waitFor(() => screen.getByText('שגיאה בדיקה'));
+    // Click dismiss
+    fireEvent.click(screen.getByText('סגור'));
+    await waitFor(() => {
+      expect(screen.queryByText('שגיאה בדיקה')).not.toBeInTheDocument();
+    });
+  });
+
+  it('network error shows Hebrew message instead of raw technical error', async () => {
+    const mockExecute = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        message: 'fetch failed',
+        graphQLErrors: [],
+        networkError: { message: 'Failed to fetch' },
+      },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockExecute,
+    ] as never);
+
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
+      target: { value: 'שיעור בדיקה' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    await waitFor(() => screen.getByText('הוספת חומרים'));
+    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
+    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    fireEvent.click(
+      screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement
+    );
+    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    await waitFor(() => {
+      const alert = screen.getByRole('alert');
+      expect(alert.textContent).toMatch(/שגיאת רשת/);
+      expect(alert.textContent).not.toContain('Failed to fetch');
+    });
   });
 
   it('back button navigates to course page', () => {
