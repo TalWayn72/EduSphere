@@ -42,6 +42,16 @@ export function ChavrutaPartnerPage() {
   );
 
   const handleRequestPartner = async (partnerId: string, topic: string) => {
+    // SI-10: Frontend consent gate — check localStorage before calling backend.
+    if (localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true') {
+      toast.error('AI features require your consent.', {
+        action: {
+          label: 'Enable in Settings',
+          onClick: () => navigate('/settings?highlight=ai-consent'),
+        },
+      });
+      return;
+    }
     setSelectedPartnerId(partnerId);
     const result = await createSession({ input: { partnerId, courseId, topic } });
     if (result.error) {

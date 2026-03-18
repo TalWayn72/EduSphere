@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useSubscription } from 'urql';
 import { useNavigate } from 'react-router-dom';
@@ -80,6 +80,16 @@ export function AiCourseCreatorModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isConsentError, setIsConsentError] = useState(false);
   const [pauseSubscription, setPauseSubscription] = useState(true);
+
+  // SI-10: Frontend consent gate — show RequirementLink immediately if AI
+  // consent is not granted in localStorage. This works even when the backend
+  // (gateway) is unavailable, unlike the graphQLErrors check alone.
+  const needsConsent = useMemo(
+    () => localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true',
+    // Re-check when modal opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [open],
+  );
 
   useEffect(() => {
     return () => {
@@ -257,8 +267,8 @@ export function AiCourseCreatorModal({
                 />
               </div>
             </div>
-            {isConsentError && <RequirementLink variant="alert" />}
-            {errorMsg && !isConsentError && (
+            {(needsConsent || isConsentError) && <RequirementLink variant="alert" />}
+            {errorMsg && !isConsentError && !needsConsent && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
                 {errorMsg}
@@ -320,8 +330,8 @@ export function AiCourseCreatorModal({
                 </div>
               ))}
             </div>
-            {isConsentError && <RequirementLink variant="alert" />}
-            {errorMsg && !isConsentError && (
+            {(needsConsent || isConsentError) && <RequirementLink variant="alert" />}
+            {errorMsg && !isConsentError && !needsConsent && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
                 {errorMsg}

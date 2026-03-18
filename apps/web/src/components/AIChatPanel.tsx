@@ -120,6 +120,29 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isStreaming) return;
 
+    // SI-10: Frontend consent gate — check localStorage before calling backend.
+    // Works even when the gateway is unavailable (DEV_MODE without backend).
+    if (localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true') {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg-${Date.now()}`,
+          role: 'user' as const,
+          content: inputValue.trim(),
+          timestamp: new Date(),
+        },
+        {
+          id: `consent-${Date.now()}`,
+          role: 'agent' as const,
+          content: '',
+          timestamp: new Date(),
+          type: 'consent-required' as const,
+        },
+      ]);
+      setInputValue('');
+      return;
+    }
+
     const userMsg: Message = {
       id: `msg-${Date.now()}`,
       role: 'user',

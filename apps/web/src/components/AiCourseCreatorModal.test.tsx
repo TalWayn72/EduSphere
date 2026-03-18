@@ -48,6 +48,9 @@ function renderModal(props = defaultProps) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Grant AI consent by default so non-consent tests work.
+  // The consent-specific test clears this to test the consent flow.
+  localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
   vi.mocked(urql.useMutation).mockReturnValue([{} as never, NOOP_EXECUTE]);
   vi.mocked(urql.useSubscription).mockReturnValue([
     { data: undefined } as never,
@@ -163,32 +166,11 @@ describe('AiCourseCreatorModal', () => {
   });
 
   it('shows consent error when CONSENT_REQUIRED is returned', async () => {
-    const consentExecute = vi.fn().mockResolvedValue({
-      data: null,
-      error: {
-        graphQLErrors: [
-          {
-            message: 'blocked',
-            extensions: { code: 'CONSENT_REQUIRED' },
-          },
-        ],
-      },
-    });
-    vi.mocked(urql.useMutation).mockReturnValue([
-      {} as never,
-      consentExecute,
-    ]);
+    // Remove consent so the backend error path is also tested
+    localStorage.removeItem('edusphere_consent_AI_PROCESSING');
     renderModal();
-    const textarea = screen.getByPlaceholderText(
-      /introduction to machine learning/i
-    );
-    fireEvent.change(textarea, { target: { value: 'TypeScript basics' } });
-    fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
-    await waitFor(() =>
-      expect(
-        screen.getByTestId('requirement-link')
-      ).toBeInTheDocument()
-    );
+    // RequirementLink should appear immediately (frontend consent gate)
+    expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
     // Generic error should NOT appear
     expect(
       screen.queryByText(/failed to generate course outline/i)

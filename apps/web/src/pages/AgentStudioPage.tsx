@@ -170,6 +170,18 @@ export function AgentStudioPage() {
   // ── Save / Deploy ─────────────────────────────────────────────────────────
 
   const handleSave = async () => {
+    // SI-10: Frontend consent gate — check localStorage before calling backend.
+    if (localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true') {
+      setSaveStatus('error');
+      toast.error('AI features require your consent.', {
+        action: {
+          label: 'Enable in Settings',
+          onClick: () => agentNavigate('/settings?highlight=ai-consent'),
+        },
+      });
+      setTimeout(() => setSaveStatus('idle'), TOAST_AUTO_DISMISS_MS);
+      return;
+    }
     setSaveStatus('saving');
     if (!DEV_MODE) {
       const res = await execCreate({

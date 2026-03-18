@@ -180,6 +180,17 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     const trimmed = chatInput.trim();
     if (!trimmed) return;
 
+    // SI-10: Frontend consent gate — check localStorage before calling backend.
+    if (localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true') {
+      setChatInput('');
+      setConfirmedMessages((prev) => [
+        ...prev,
+        { id: `temp-${Date.now()}`, role: 'user', content: trimmed },
+        { id: `consent-${Date.now()}`, role: 'agent', content: 'consent-required' },
+      ]);
+      return;
+    }
+
     const userMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',

@@ -63,7 +63,7 @@
 | FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | 8115644 |
 | PROC-001 | Services left down after agent operations — ERR_CONNECTION_REFUSED | ✅ Fixed | (process fix) |
 | TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
-| FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit) |
+| FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit — frontend consent gate addendum) |
 
 ---
 
@@ -9429,3 +9429,22 @@ Commit: `ae622ce`
 2. `consent-requirement-link.spec.ts` E2E verifies the full flow: error → link → navigate → highlight → toggle
 3. `PrivacyConsentCard.test.tsx` ensures localStorage sync works
 4. Pattern is reusable for future requirements (email verification, profile completion, etc.)
+
+### Bug Fix Addendum — Frontend Consent Gate (18 Mar 2026)
+
+**Problem:** Despite FEAT-066 implementation, the RequirementLink was invisible when the GraphQL gateway was down. The consent check relied solely on backend `graphQLErrors` with `code: 'CONSENT_REQUIRED'`. When the gateway is unreachable, urql returns a network error (no `graphQLErrors`), so the consent detection never triggers.
+
+**Root Cause:** Backend-only consent detection — no frontend localStorage check.
+
+**Fix:** Added frontend `localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true'` checks to all 5 AI feature entry points, so RequirementLink shows immediately without needing a backend round-trip:
+
+| File | Change |
+|------|--------|
+| `AiCourseCreatorModal.tsx` | `useMemo` consent gate + conditional RequirementLink rendering |
+| `AIChatPanel.tsx` | Early return with `consent-required` message type |
+| `useAgentChat.ts` | Early return with consent-required marker |
+| `AgentStudioPage.tsx` | Early return + toast.error with navigate action |
+| `ChavrutaPartnerPage.tsx` | Early return + toast.error with navigate action |
+| `AiCourseCreatorModal.test.tsx` | Updated: localStorage consent in beforeEach + consent-specific test |
+
+**Visual Verification:** Screenshot at `docs/screenshots/feat066-modal-consent-link.png` confirms RequirementLink is visible with clickable link to `/settings?highlight=ai-consent`.
