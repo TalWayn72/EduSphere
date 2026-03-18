@@ -195,3 +195,13 @@ export * from './billing';
 
 // Phase 52: B2B2C Partner Portal (partners + partner_revenue)
 export * from './partners';
+
+// Phase 65: Notification Deliveries + Preferences (multi-channel dispatch)
+export * from './notification-deliveries';
+export * from './notification-preferences';
+
+// Phase 65: WhatsApp Contacts (opt-in + encrypted phone)
+export * from './whatsapp-contacts';
+
+// Phase 65: Tenant Social Links (footer/header social media)
+export * from './tenant-social-links';

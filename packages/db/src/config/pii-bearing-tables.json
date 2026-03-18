@@ -104,6 +104,18 @@
       "schemaFile": "auditLog.ts",
       "piiColumns": ["ip_address", "user_agent", "metadata"],
       "note": "Audit trail — IP addresses and browser fingerprints"
+    },
+    {
+      "name": "notification_deliveries",
+      "schemaFile": "notification-deliveries.ts",
+      "piiColumns": ["title", "body", "payload"],
+      "note": "Notification content may include user names and personal context"
+    },
+    {
+      "name": "user_whatsapp_contacts",
+      "schemaFile": "whatsapp-contacts.ts",
+      "piiColumns": ["phone_number", "otp_hash"],
+      "note": "Encrypted phone numbers (SI-3) and OTP verification hashes"
     }
   ]
 }

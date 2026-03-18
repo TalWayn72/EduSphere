@@ -16,6 +16,7 @@
  *   social-events.ts     — Social feed, peer review, discussion, follow events
  *   course-events.ts     — Course enrollment, completion, badge events
  *   gateway-events.ts    — Gateway pub/sub, submission, poll events, NatsSubjects
+ *   notification-events.ts — Notification dispatch, delivery status, admin alerts
  */
 
 export * from './agent-events.js';
@@ -26,6 +27,7 @@ export * from './lesson-events.js';
 export * from './social-events.js';
 export * from './course-events.js';
 export * from './gateway-events.js';
+export * from './notification-events.js';
 
 // ─── Discriminated Union ─────────────────────────────────────────────────────
 
@@ -47,6 +49,11 @@ import type {
   UserFollowedPayload,
 } from './social-events.js';
 import type { GatewayPubSubPayload, PollVotePayload } from './gateway-events.js';
+import type {
+  NotificationDispatchPayload,
+  DeliveryStatusPayload,
+  AdminAlertPayload,
+} from './notification-events.js';
 
 export type NatsEvent =
   | AgentSessionPayload
@@ -67,4 +74,7 @@ export type NatsEvent =
   | SocialFeedItemPayload
   | PeerReviewAssignedPayload
   | PeerReviewCompletedPayload
-  | DiscussionReplyPayload;
+  | DiscussionReplyPayload
+  | NotificationDispatchPayload
+  | DeliveryStatusPayload
+  | AdminAlertPayload;

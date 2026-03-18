@@ -60,6 +60,40 @@
 | BUG-080 | Mobile layout broken on pipeline page | ✅ Fixed | Phase 65 R5 |
 | BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | (pending commit) |
 | BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | (pending commit) |
+| FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | (pending commit) |
+
+---
+
+## FEAT-065 — Social & Notification Integration (18 Mar 2026)
+
+**Status:** ✅ Implemented
+**Scope:** Multi-channel notification dispatch (Email + WhatsApp), social sharing, social links, notification preferences
+
+### Architecture
+- **NotificationDispatcher** — Central orchestrator routing to 5 channels (in-app, push_web, push_mobile, email, whatsapp)
+- **Email Channel** — Provider-agnostic (Resend + SMTP fallback) with retry worker
+- **WhatsApp Channel** — Meta Cloud API with OTP verification and admin alerts
+- **Notification Preferences** — Per-user, per-type, per-channel opt-in/out with tenant defaults
+- **Delivery Tracking** — Persistent notification_deliveries table with status tracking
+
+### Files Created (45+)
+**DB Schemas (4):** notification-deliveries.ts, notification-preferences.ts, whatsapp-contacts.ts, tenant-social-links.ts
+**Backend Services (12):** dispatcher, preferences, deliveries, email channel, resend provider, smtp provider, whatsapp channel, meta provider, retry worker, admin alerts, whatsapp registration (service + resolver)
+**Frontend Components (8):** SocialShareButton, SocialShareMenu, ShareBadgeDialog, SocialLinksBar + tests
+**Frontend Pages (3):** NotificationPreferencesPage, WhatsAppSetupPage, AdminNotificationAnalyticsPage + tests
+**GraphQL (3):** notifications.graphql (extended), tenant-social-links.graphql, queries files
+**NATS (2):** notification-events.ts, gateway-events.ts (extended)
+**Tests (5):** notification-rls.spec.ts, notification-events.test.ts, memory safety specs, component tests
+
+### Security
+- All 5 new tables have RLS with correct SI-1 variable names (24 security tests pass)
+- Phone numbers encrypted per SI-3
+- WhatsApp consent tracked per GDPR
+- Rate limiting on email (100/hr/tenant) and WhatsApp (1000/day/WABA)
+
+### Anti-recurrence
+- `tests/security/notification-rls.spec.ts` guards RLS on all 4 new schema files
+- Memory safety test validates OnModuleDestroy on dispatcher and retry worker
 
 ---
 

@@ -13,6 +13,8 @@ import { NotificationTemplatesResolver } from './notification-templates.resolver
 import { NotificationTemplatesService } from './notification-templates.service';
 import { AtRiskThresholdsResolver } from './at-risk-thresholds.resolver';
 import { AtRiskThresholdsService } from './at-risk-thresholds.service';
+import { TenantSocialLinksResolver } from './tenant-social-links.resolver';
+import { TenantSocialLinksService } from './tenant-social-links.service';
 
 @Module({
   providers: [
@@ -30,7 +32,9 @@ import { AtRiskThresholdsService } from './at-risk-thresholds.service';
     NotificationTemplatesService,
     AtRiskThresholdsResolver,
     AtRiskThresholdsService,
+    TenantSocialLinksResolver,
+    TenantSocialLinksService,
   ],
-  exports: [AdminOverviewService, AtRiskThresholdsService],
+  exports: [AdminOverviewService, AtRiskThresholdsService, TenantSocialLinksService],
 })
 export class AdminModule {}

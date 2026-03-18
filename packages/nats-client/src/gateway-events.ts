@@ -87,4 +87,12 @@ export const NatsSubjects = {
   PEER_REVIEW_COMPLETED: 'EDUSPHERE.peer.review.completed',
   DISCUSSION_REPLY: 'EDUSPHERE.discussion.reply',
   SOCIAL_ACTIVITY_DIGEST: 'EDUSPHERE.social.activity.digest',
+  // Phase 65 — Notification Dispatch + Delivery Status
+  NOTIFICATION_DISPATCH: 'EDUSPHERE.notification.dispatch',
+  NOTIFICATION_DELIVERY_STATUS: 'EDUSPHERE.notification.delivery.status',
+  // Phase 65 — Admin Alerts (WhatsApp/Email to ORG_ADMIN)
+  ADMIN_ALERT: 'EDUSPHERE.admin.alert',
+  ADMIN_ENROLLMENT_SPIKE: 'EDUSPHERE.admin.enrollment.spike',
+  ADMIN_SYSTEM_HEALTH: 'EDUSPHERE.admin.system.health',
+  ADMIN_COMPLIANCE_DEADLINE: 'EDUSPHERE.admin.compliance.deadline',
 } as const;

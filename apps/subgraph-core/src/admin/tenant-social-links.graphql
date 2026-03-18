@@ -1,0 +1,30 @@
+type TenantSocialLinks {
+  id: ID!
+  linkedinUrl: String
+  facebookUrl: String
+  twitterUrl: String
+  youtubeUrl: String
+  instagramUrl: String
+  whatsappUrl: String
+  githubUrl: String
+}
+
+input UpdateTenantSocialLinksInput {
+  linkedinUrl: String
+  facebookUrl: String
+  twitterUrl: String
+  youtubeUrl: String
+  instagramUrl: String
+  whatsappUrl: String
+  githubUrl: String
+}
+
+extend type Query {
+  tenantSocialLinks: TenantSocialLinks @authenticated
+}
+
+extend type Mutation {
+  updateTenantSocialLinks(
+    input: UpdateTenantSocialLinksInput!
+  ): TenantSocialLinks! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

@@ -63,3 +63,119 @@ extend type Mutation {
 
   unregisterPushToken(platform: PushPlatform!): Boolean! @authenticated
 }
+
+# ─── Phase 65: Multi-Channel Notification Dispatch ─────────────────────────
+
+enum NotificationChannel {
+  PUSH_WEB
+  PUSH_MOBILE
+  EMAIL
+  WHATSAPP
+  IN_APP
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  BOUNCED
+}
+
+type NotificationPreference {
+  id: ID!
+  notificationType: NotificationType!
+  channel: NotificationChannel!
+  enabled: Boolean!
+}
+
+type NotificationDelivery {
+  id: ID!
+  notificationType: String!
+  channel: NotificationChannel!
+  title: String!
+  body: String!
+  status: DeliveryStatus!
+  sentAt: DateTime
+  deliveredAt: DateTime
+  readAt: DateTime
+  createdAt: DateTime!
+}
+
+type NotificationDeliveryEdge {
+  cursor: String!
+  node: NotificationDelivery!
+}
+
+type NotificationDeliveryConnection {
+  edges: [NotificationDeliveryEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ChannelAnalytics {
+  channel: NotificationChannel!
+  sent: Int!
+  delivered: Int!
+  failed: Int!
+}
+
+type TypeAnalytics {
+  notificationType: String!
+  sent: Int!
+  delivered: Int!
+  failed: Int!
+}
+
+type NotificationAnalytics {
+  totalSent: Int!
+  totalDelivered: Int!
+  totalFailed: Int!
+  byChannel: [ChannelAnalytics!]!
+  byType: [TypeAnalytics!]!
+}
+
+input UpdateNotificationPreferenceInput {
+  notificationType: NotificationType!
+  channel: NotificationChannel!
+  enabled: Boolean!
+}
+
+type WhatsAppRegistration {
+  success: Boolean!
+  message: String!
+}
+
+type WhatsAppVerification {
+  verified: Boolean!
+  message: String!
+}
+
+extend type Query {
+  myNotificationPreferences: [NotificationPreference!]! @authenticated
+  myNotificationHistory(
+    first: Int
+    after: String
+    types: [NotificationType!]
+    channels: [NotificationChannel!]
+  ): NotificationDeliveryConnection! @authenticated
+  notificationDeliveryAnalytics(
+    startDate: DateTime!
+    endDate: DateTime!
+  ): NotificationAnalytics!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  updateNotificationPreference(
+    input: UpdateNotificationPreferenceInput!
+  ): NotificationPreference! @authenticated
+  registerWhatsApp(
+    phoneNumber: String!
+    countryCode: String!
+  ): WhatsAppRegistration! @authenticated
+  verifyWhatsApp(code: String!): WhatsAppVerification! @authenticated
+  markNotificationDeliveryRead(id: ID!): NotificationDelivery! @authenticated
+  markAllNotificationDeliveriesRead: Int! @authenticated
+}

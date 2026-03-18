@@ -13,6 +13,7 @@ import {
 import { buildNatsOptions } from '@edusphere/nats-client';
 import type { NotificationPubSub } from './notifications.pubsub';
 import { PushDispatchService } from './push-dispatch.service';
+import { NotificationDispatcherService } from './notification-dispatcher.service';
 
 export type NotificationType =
   | 'BADGE_ISSUED'
@@ -151,7 +152,8 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly pubSub: NotificationPubSub,
-    private readonly pushDispatch: PushDispatchService
+    private readonly pushDispatch: PushDispatchService,
+    private readonly dispatcher: NotificationDispatcherService
   ) {}
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -237,23 +239,20 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
           notificationReceived: notification,
         });
 
-        // Fire-and-forget push dispatch — never blocks WebSocket pipeline.
+        // Phase 65: Multi-channel dispatch (email, WhatsApp, push)
+        // via NotificationDispatcherService — fire-and-forget.
         const tenantId = String(raw['tenantId'] ?? '');
         if (tenantId) {
-          void this.pushDispatch
-            .dispatchToUser(
-              userId,
-              tenantId,
-              notification.title,
-              notification.body,
-              notification.payload ?? undefined
-            )
-            .catch((err: unknown) => {
-              this.logger.error(
-                `[NatsNotificationBridge] Push dispatch error — userId=${userId}`,
-                err
-              );
-            });
+          this.dispatcher.dispatch({
+            userId,
+            tenantId,
+            notificationType: mapping.type,
+            title: notification.title,
+            body: notification.body,
+            payload: notification.payload ?? undefined,
+            email: raw['userEmail'] ? String(raw['userEmail']) : undefined,
+            phone: raw['userPhone'] ? String(raw['userPhone']) : undefined,
+          });
         }
 
         this.logger.debug(
