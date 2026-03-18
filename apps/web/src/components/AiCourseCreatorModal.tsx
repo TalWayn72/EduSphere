@@ -23,6 +23,7 @@ import {
   EXECUTION_STATUS_SUBSCRIPTION,
 } from '@/lib/graphql/agent-course-gen.queries';
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
+import { RequirementLink } from '@/components/RequirementLink';
 
 interface GeneratedModule {
   title: string;
@@ -77,6 +78,7 @@ export function AiCourseCreatorModal({
     modules: GeneratedModule[];
   } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isConsentError, setIsConsentError] = useState(false);
   const [pauseSubscription, setPauseSubscription] = useState(true);
 
   useEffect(() => {
@@ -94,6 +96,7 @@ export function AiCourseCreatorModal({
       setGenerating(false);
       setOutline(null);
       setErrorMsg(null);
+      setIsConsentError(false);
       setPauseSubscription(true);
     }
   }, [open]);
@@ -133,6 +136,7 @@ export function AiCourseCreatorModal({
     if (!prompt.trim()) return;
     setGenerating(true);
     setErrorMsg(null);
+    setIsConsentError(false);
     setOutline(null);
     const { data, error } = await generateCourse({
       input: {
@@ -148,7 +152,7 @@ export function AiCourseCreatorModal({
         (e) => e.extensions?.code === 'CONSENT_REQUIRED'
       );
       if (consentErr) {
-        setErrorMsg(t('aiCreator.consentRequired'));
+        setIsConsentError(true);
       } else {
         // Map all other server/network errors to a user-friendly message.
         // Never expose raw GraphQL messages (e.g. "Cannot return null for
@@ -253,7 +257,8 @@ export function AiCourseCreatorModal({
                 />
               </div>
             </div>
-            {errorMsg && (
+            {isConsentError && <RequirementLink variant="alert" />}
+            {errorMsg && !isConsentError && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
                 {errorMsg}
@@ -315,7 +320,8 @@ export function AiCourseCreatorModal({
                 </div>
               ))}
             </div>
-            {errorMsg && (
+            {isConsentError && <RequirementLink variant="alert" />}
+            {errorMsg && !isConsentError && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
                 {errorMsg}

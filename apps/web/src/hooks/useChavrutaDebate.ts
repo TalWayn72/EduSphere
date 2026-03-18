@@ -163,7 +163,7 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
           (e) => e.extensions?.code === 'CONSENT_REQUIRED'
         );
         if (consentErr) {
-          setError('AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.');
+          setError('consent-required');
           setNeedsConsent(true);
         } else {
           console.error('[useChavrutaDebate] Failed to send argument:', err);

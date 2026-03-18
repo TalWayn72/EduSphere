@@ -63,6 +63,7 @@
 | FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | 8115644 |
 | PROC-001 | Services left down after agent operations — ERR_CONNECTION_REFUSED | ✅ Fixed | (process fix) |
 | TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
+| FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit) |
 
 ---
 
@@ -9373,3 +9374,58 @@ Commit: `ae622ce`
 ### Anti-Recurrence
 - tests/security/feature-wiring-security.spec.ts guards all 10 security areas
 - Frontend tests verify real query wiring (no more MOCK_ constants)
+
+---
+
+## FEAT-066 — Smart Requirement Links (Actionable Consent Navigation)
+
+**Status:** ✅ Implemented | **Severity:** 🟡 Medium (UX) | **Date:** 18 March 2026
+
+### Problem
+8 locations across the codebase showed CONSENT_REQUIRED errors as plain text ("AI features require your consent. Please enable AI processing in Settings → Privacy.") with **no clickable link, no Privacy section in Settings, and no navigation guidance**. Users were stuck with no way to resolve the issue.
+
+### Root Cause
+- No Privacy & AI consent section existed in SettingsPage
+- Error messages were hardcoded English strings (not i18n)
+- No reusable pattern for requirement-link navigation
+
+### Solution
+**3 new reusable components + 8 location fixes:**
+
+1. **`RequirementLink`** — Reusable warning component with clickable `<Link>` to `/settings?highlight=<id>`
+2. **`useSettingsHighlight`** — Hook that reads `?highlight` param, auto-scrolls, and animates target element
+3. **`PrivacyConsentCard`** — New Settings card with AI Processing + Third-Party LLM consent toggles
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/RequirementLink.tsx` | **NEW** — reusable requirement link component |
+| `apps/web/src/hooks/useSettingsHighlight.ts` | **NEW** — scroll-to + highlight hook |
+| `apps/web/src/components/settings/PrivacyConsentCard.tsx` | **NEW** — Privacy consent toggles card |
+| `apps/web/src/pages/SettingsPage.tsx` | Added PrivacyConsentCard |
+| `apps/web/src/components/AiCourseCreatorModal.tsx` | RequirementLink replaces plain errorMsg |
+| `apps/web/src/components/AIChatPanel.tsx` | consent-required message type |
+| `apps/web/src/components/ChatMessage.tsx` | Renders RequirementLink for consent messages |
+| `apps/web/src/types/chat.ts` | Added `type` field to Message interface |
+| `apps/web/src/hooks/useAgentChat.ts` | consent-required marker |
+| `apps/web/src/hooks/useChavrutaDebate.ts` | consent-required marker |
+| `apps/web/src/pages/chavruta/ChavrutaPartnerPage.tsx` | toast.error with navigate action |
+| `apps/web/src/pages/AgentStudioPage.tsx` | toast.error with navigate action |
+| `apps/web/src/styles/globals.css` | settings-highlight keyframe animation |
+| `packages/i18n/src/locales/en/settings.json` | privacy.* keys |
+| `packages/i18n/src/locales/he/settings.json` | privacy.* keys (Hebrew) |
+| `packages/i18n/src/locales/en/common.json` | consentRequired.* keys |
+| `packages/i18n/src/locales/he/common.json` | consentRequired.* keys (Hebrew) |
+
+### Tests Added
+- `apps/web/src/components/RequirementLink.test.tsx` — 5 unit tests
+- `apps/web/src/hooks/useSettingsHighlight.test.ts` — 5 unit tests
+- `apps/web/src/components/settings/PrivacyConsentCard.test.tsx` — 7 unit tests
+- `apps/web/e2e/consent-requirement-link.spec.ts` — 5 E2E tests
+
+### Anti-Recurrence
+1. `RequirementLink.test.tsx` guards against rendering plain text warnings
+2. `consent-requirement-link.spec.ts` E2E verifies the full flow: error → link → navigate → highlight → toggle
+3. `PrivacyConsentCard.test.tsx` ensures localStorage sync works
+4. Pattern is reusable for future requirements (email verification, profile completion, etc.)

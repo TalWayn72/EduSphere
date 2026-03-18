@@ -338,6 +338,19 @@
   }
 }
 
+/* ── Settings — highlight pulse for scroll-to-setting navigation ────────── */
+@keyframes settings-highlight {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+}
+.animate-settings-highlight {
+  animation: settings-highlight 1s ease-in-out 3;
+  border-radius: var(--radius);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-settings-highlight { animation: none; }
+}
+
 /* ── CollaborativeEditor — mention chip ─────────────────────────────────── */
 .mention {
   background-color: hsl(var(--primary) / 0.1);

@@ -19,6 +19,7 @@ export interface Message {
   content: string;
   timestamp: Date;
   isStreaming?: boolean;
+  type?: 'text' | 'consent-required';
 }
 
 export const AGENT_TYPES: Record<AgentType, AgentInfo> = {

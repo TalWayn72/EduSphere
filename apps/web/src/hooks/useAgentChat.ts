@@ -212,7 +212,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
               {
                 id: `consent-${Date.now()}`,
                 role: 'agent' as const,
-                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+                content: 'consent-required',
               },
             ]);
             setIsStreaming(false);
@@ -238,7 +238,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
               {
                 id: `consent-${Date.now()}`,
                 role: 'agent' as const,
-                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+                content: 'consent-required',
               },
             ]);
             setIsStreaming(false);

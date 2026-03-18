@@ -13,6 +13,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { PageHeader } from '@/components/PageHeader';
@@ -98,6 +100,7 @@ function PaletteItem({ type }: { type: NodeType }) {
 
 export function AgentStudioPage() {
   const { t } = useTranslation('agents');
+  const agentNavigate = useNavigate();
   const [workflowName, setWorkflowName] = useState('My Agent Workflow');
   const [nodes, setNodes] = useState<WorkflowNode[]>([]);
   const [edges, setEdges] = useState<WorkflowEdge[]>([]);
@@ -179,7 +182,12 @@ export function AgentStudioPage() {
         if (consentErr) {
           console.error('[AgentStudioPage] Consent required for AI workflow save');
           setSaveStatus('error');
-          // TODO: surface consent prompt via toast/modal
+          toast.error('AI features require your consent.', {
+            action: {
+              label: 'Enable in Settings',
+              onClick: () => agentNavigate('/settings?highlight=ai-consent'),
+            },
+          });
         } else {
           console.error('[AgentStudioPage] Save failed:', res.error.message);
           setSaveStatus('error');

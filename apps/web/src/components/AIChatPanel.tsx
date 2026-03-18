@@ -170,8 +170,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               {
                 id: `err-${Date.now()}`,
                 role: 'agent' as const,
-                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+                content: '',
                 timestamp: new Date(),
+                type: 'consent-required' as const,
               },
             ]);
             setIsStreaming(false);
@@ -195,8 +196,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               {
                 id: `err-${Date.now()}`,
                 role: 'agent' as const,
-                content: 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.',
+                content: '',
                 timestamp: new Date(),
+                type: 'consent-required' as const,
               },
             ]);
             setIsStreaming(false);

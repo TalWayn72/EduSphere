@@ -50,6 +50,10 @@
     "errorLoading": "Failed to load certificates. Please try again later.",
     "empty": "No certificates yet — complete a course to earn one!"
   },
+  "consentRequired": {
+    "message": "AI features require your consent.",
+    "linkText": "Enable in Privacy Settings"
+  },
   "profilePage": {
     "accountDetails": "Account Details",
     "permissions": "Permissions",

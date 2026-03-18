@@ -14,8 +14,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { PrivacyConsentCard } from '@/components/settings/PrivacyConsentCard';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useStorageManager } from '@/hooks/useStorageManager';
+import { useSettingsHighlight } from '@/hooks/useSettingsHighlight';
 import type { SupportedLocale } from '@edusphere/i18n';
 
 function formatBytes(bytes: number): string {
@@ -28,6 +30,7 @@ function formatBytes(bytes: number): string {
 
 export function SettingsPage() {
   const { t } = useTranslation('settings');
+  const highlight = useSettingsHighlight();
   const { locale, setLocale, isSaving, availableLocales } =
     useUserPreferences();
   const {
@@ -87,6 +90,9 @@ export function SettingsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Privacy & AI Consent Card */}
+        <PrivacyConsentCard highlight={highlight} />
 
         {/* Offline Storage Card */}
         {!stats?.isUnsupported && (

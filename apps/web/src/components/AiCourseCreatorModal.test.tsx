@@ -186,7 +186,7 @@ describe('AiCourseCreatorModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
     await waitFor(() =>
       expect(
-        screen.getByText(/AI features require your consent/i)
+        screen.getByTestId('requirement-link')
       ).toBeInTheDocument()
     );
     // Generic error should NOT appear
@@ -222,9 +222,9 @@ describe('AiCourseCreatorModal', () => {
         screen.getByText(/failed to generate course outline/i)
       ).toBeInTheDocument()
     );
-    // Consent error should NOT appear
+    // Consent error link should NOT appear
     expect(
-      screen.queryByText(/AI features require your consent/i)
+      screen.queryByTestId('requirement-link')
     ).not.toBeInTheDocument();
   });
 

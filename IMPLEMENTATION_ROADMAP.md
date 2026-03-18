@@ -2319,6 +2319,38 @@ pnpm turbo typecheck  # 0 errors
 - PII manifest updated with `notification_deliveries` + `user_whatsapp_contacts`
 - All 1677 security tests pass, 0 TypeScript errors
 
+---
+
+## Phase 67 — Smart Requirement Links (Actionable Consent Navigation) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-18 | **Commit:** (pending)
+
+### What Was Built
+
+**Problem:** 8 locations showed plain-text "AI consent required" warnings with no navigation — users had no idea where to go to enable AI features.
+
+**3 new reusable components:**
+- `RequirementLink` — renders warning with clickable `<Link to="/settings?highlight=ai-consent">`
+- `useSettingsHighlight` — reads `?highlight` param, auto-scrolls, applies 3× pulse animation + tooltip
+- `PrivacyConsentCard` — new Settings card with AI Processing + Third-Party LLM consent toggles
+
+**8 consent warning locations fixed:**
+- `AiCourseCreatorModal` — `<RequirementLink variant="alert">`
+- `AIChatPanel` (×2) — consent-required message type in chat
+- `ChatMessage` — renders `<RequirementLink variant="inline">` for consent messages
+- `useAgentChat` (×2) — consent-required message marker
+- `useChavrutaDebate` — consent-required error flag
+- `ChavrutaPartnerPage` — `toast.error()` with navigate action
+- `AgentStudioPage` — `toast.error()` with navigate action
+
+**i18n:** Full EN + HE translations for all new UI strings
+
+### Tests
+- 5 unit tests: `RequirementLink.test.tsx`
+- 5 unit tests: `useSettingsHighlight.test.ts`
+- 7 unit tests: `PrivacyConsentCard.test.tsx`
+- 5 E2E tests: `consent-requirement-link.spec.ts`
+
 **Files:** 56 files changed, 3,981 insertions(+), 29 deletions(-)
 
 **Acceptance Criteria:**

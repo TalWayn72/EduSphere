@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +22,7 @@ interface ChavrutaMatch {
 }
 
 export function ChavrutaPartnerPage() {
+  const navigate = useNavigate();
   const [courseId, setCourseId] = useState('');
   const [mounted, setMounted] = useState(false);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
@@ -50,8 +53,12 @@ export function ChavrutaPartnerPage() {
           '[ChavrutaPartnerPage] AI features require consent:',
           consentErr.message,
         );
-        // TODO: surface consent banner to user
-        alert('AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.');
+        toast.error('AI features require your consent.', {
+          action: {
+            label: 'Enable in Settings',
+            onClick: () => navigate('/settings?highlight=ai-consent'),
+          },
+        });
       } else {
         console.error(
           '[ChavrutaPartnerPage] Failed to create session:',

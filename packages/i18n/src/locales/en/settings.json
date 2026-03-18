@@ -47,6 +47,17 @@
     "used": "used",
     "limitOf": "limit"
   },
+  "privacy": {
+    "title": "Privacy & AI",
+    "description": "Manage how your data is used for AI-powered features",
+    "aiProcessing": "AI Processing",
+    "aiProcessingDesc": "Allow EduSphere to use AI for personalized learning, course generation, and Chavruta debates",
+    "thirdPartyLlm": "Third-Party AI Providers",
+    "thirdPartyLlmDesc": "Allow sending learning data to external AI providers (OpenAI, Anthropic) for processing",
+    "saved": "Privacy preference saved",
+    "error": "Failed to save. Please try again.",
+    "tooltip": "Enable this to unlock AI features like course generation, Chavruta debates, and AI agents"
+  },
   "downloads": {
     "wifiOnlyTitle": "WiFi-Only Downloads",
     "wifiOnlyDescription": "Only download courses when connected to WiFi to save mobile data",

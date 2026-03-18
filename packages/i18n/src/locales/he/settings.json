@@ -47,6 +47,17 @@
     "used": "בשימוש",
     "limitOf": "מגבלה"
   },
+  "privacy": {
+    "title": "פרטיות ו-AI",
+    "description": "ניהול השימוש בנתונים שלך עבור תכונות מבוססות AI",
+    "aiProcessing": "עיבוד AI",
+    "aiProcessingDesc": "אפשר ל-EduSphere להשתמש ב-AI ללמידה מותאמת, יצירת קורסים ודיונים בחברותא",
+    "thirdPartyLlm": "ספקי AI חיצוניים",
+    "thirdPartyLlmDesc": "אפשר שליחת נתוני למידה לספקי AI חיצוניים (OpenAI, Anthropic) לעיבוד",
+    "saved": "העדפת הפרטיות נשמרה",
+    "error": "השמירה נכשלה. נסה שוב.",
+    "tooltip": "הפעל כדי לשחרר תכונות AI כמו יצירת קורסים, דיוני חברותא וסוכני AI"
+  },
   "downloads": {
     "wifiOnlyTitle": "הורדות דרך WiFi בלבד",
     "wifiOnlyDescription": "הורד קורסים רק כאשר מחובר ל-WiFi כדי לחסוך בנתונים סלולריים",

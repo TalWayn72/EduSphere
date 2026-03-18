@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Bot, User } from 'lucide-react';
 import type { Message } from '@/types/chat';
 import { AITransparencyBadge } from '@/components/ai/AITransparencyBadge';
+import { RequirementLink } from '@/components/RequirementLink';
 
 interface ChatMessageProps {
   message: Message;
@@ -89,9 +90,11 @@ export function ChatMessage({
   agentName = 'AI Agent',
 }: ChatMessageProps) {
   const isAgent = message.role === 'agent';
+  const isConsentRequired =
+    message.type === 'consent-required' || message.content === 'consent-required';
 
   // Split by paragraphs for better formatting
-  const paragraphs = message.content.split('\n\n');
+  const paragraphs = isConsentRequired ? [] : message.content.split('\n\n');
 
   return (
     <div
@@ -124,13 +127,19 @@ export function ChatMessage({
           {isAgent && <AITransparencyBadge type="chat" />}
         </div>
         <div className="text-sm text-foreground space-y-2">
-          {paragraphs.map((paragraph, idx) => (
-            <p key={idx} className="leading-relaxed">
-              {renderMarkdown(paragraph)}
-            </p>
-          ))}
-          {message.isStreaming && (
-            <span className="inline-block w-2 h-4 ml-1 bg-primary animate-pulse rounded" />
+          {isConsentRequired ? (
+            <RequirementLink variant="inline" />
+          ) : (
+            <>
+              {paragraphs.map((paragraph, idx) => (
+                <p key={idx} className="leading-relaxed">
+                  {renderMarkdown(paragraph)}
+                </p>
+              ))}
+              {message.isStreaming && (
+                <span className="inline-block w-2 h-4 ml-1 bg-primary animate-pulse rounded" />
+              )}
+            </>
           )}
         </div>
       </div>
