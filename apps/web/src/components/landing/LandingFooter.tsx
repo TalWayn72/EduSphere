@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Brain } from 'lucide-react';
 import { SocialLinksBar, DEFAULT_SOCIAL_LINKS } from '@/components/social';
 
@@ -49,6 +49,22 @@ const COLUMNS = [
 ];
 
 export function LandingFooter() {
+  const navigate = useNavigate();
+
+  const handleHashLink = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const hash = href.split('#')[1] ?? '';
+    if (!hash) return;
+    if (window.location.pathname === '/' || window.location.pathname === '/landing') {
+      document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/', { replace: false });
+      setTimeout(() => {
+        document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
+  };
+
   return (
     <footer data-testid="landing-footer" className="bg-slate-900 text-slate-400 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,12 +82,22 @@ export function LandingFooter() {
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.href}
-                      className="text-sm text-slate-400 hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.href.includes('#') && link.href.startsWith('/') && link.href.split('#')[0] === '/' ? (
+                      <a
+                        href={link.href}
+                        onClick={(e) => handleHashLink(e, link.href)}
+                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
