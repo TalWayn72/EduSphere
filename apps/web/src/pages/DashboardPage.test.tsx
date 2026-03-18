@@ -51,6 +51,12 @@ vi.mock('@/contexts/ThemeContext', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
+}));
+
 vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));

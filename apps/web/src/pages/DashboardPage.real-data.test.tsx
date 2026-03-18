@@ -52,6 +52,12 @@ vi.mock('@/contexts/ThemeContext', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
+}));
+
 vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
@@ -262,5 +268,123 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
     renderDashboard();
     const widget = screen.getByTestId('streak-widget');
     expect(widget).toHaveTextContent('7');
+  });
+});
+
+// ── BUG-084 Regression: empty array fallback ─────────────────────────────────
+// Root cause: empty array [] is truthy — .map() over [] renders nothing.
+// Fix: check .length before using real data, so empty arrays fall back to mock.
+describe('BUG-084 — empty array from query must fall back to mock data', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(urql.useQuery).mockReturnValue(NOOP_QUERY);
+  });
+
+  it('mastery section shows mock topics when query returns empty array', () => {
+    vi.mocked(urql.useQuery).mockImplementation((opts) => {
+      const doc = String((opts as { query: unknown }).query);
+      if (doc.includes('myTopMasteryTopics')) {
+        return [{
+          fetching: false,
+          data: { myTopMasteryTopics: [] },
+          error: undefined,
+          stale: false,
+          hasNext: false,
+        }, vi.fn()] as never;
+      }
+      return NOOP_QUERY;
+    });
+
+    renderDashboard();
+    // Mock mastery items must render — section must NOT be empty
+    expect(screen.getByText('Talmudic Reasoning')).toBeInTheDocument();
+    expect(screen.getByText('Chavruta Study')).toBeInTheDocument();
+    expect(screen.getByTestId('mastery-badge-mastered')).toBeInTheDocument();
+  });
+
+  it('in-progress section shows mock courses when query returns empty array', () => {
+    vi.mocked(urql.useQuery).mockImplementation((opts) => {
+      const doc = String((opts as { query: unknown }).query);
+      if (doc.includes('myInProgressCourses')) {
+        return [{
+          fetching: false,
+          data: { myInProgressCourses: [] },
+          error: undefined,
+          stale: false,
+          hasNext: false,
+        }, vi.fn()] as never;
+      }
+      return NOOP_QUERY;
+    });
+
+    renderDashboard();
+    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+  });
+
+  it('recommended section shows mock courses when query returns empty array', () => {
+    vi.mocked(urql.useQuery).mockImplementation((opts) => {
+      const doc = String((opts as { query: unknown }).query);
+      if (doc.includes('myRecommendedCourses')) {
+        return [{
+          fetching: false,
+          data: { myRecommendedCourses: [] },
+          error: undefined,
+          stale: false,
+          hasNext: false,
+        }, vi.fn()] as never;
+      }
+      return NOOP_QUERY;
+    });
+
+    renderDashboard();
+    expect(screen.getByText('Mishnah: Laws of Damages')).toBeInTheDocument();
+  });
+
+  it('activity section shows mock activity when query returns empty array', () => {
+    vi.mocked(urql.useQuery).mockImplementation((opts) => {
+      const doc = String((opts as { query: unknown }).query);
+      if (doc.includes('myActivityFeed')) {
+        return [{
+          fetching: false,
+          data: { myActivityFeed: [] },
+          error: undefined,
+          stale: false,
+          hasNext: false,
+        }, vi.fn()] as never;
+      }
+      return NOOP_QUERY;
+    });
+
+    renderDashboard();
+    expect(screen.getByText(/Tractate Bava Metzia/)).toBeInTheDocument();
+  });
+
+  it('all sections show mock data when ALL queries return empty arrays simultaneously', () => {
+    vi.mocked(urql.useQuery).mockReturnValue([{
+      fetching: false,
+      data: {
+        myInProgressCourses: [],
+        myRecommendedCourses: [],
+        myActivityFeed: [],
+        myTopMasteryTopics: [],
+        myEnrollments: [],
+        myStats: null,
+        myOnboardingState: null,
+      },
+      error: undefined,
+      stale: false,
+      hasNext: false,
+    }, vi.fn()] as never);
+
+    renderDashboard();
+    // All mock fallbacks must render — no empty/white sections
+    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(screen.getByText('Mishnah: Laws of Damages')).toBeInTheDocument();
+    expect(screen.getByText('Talmudic Reasoning')).toBeInTheDocument();
+    expect(screen.getByText(/Tractate Bava Metzia/)).toBeInTheDocument();
+    expect(screen.getByTestId('mastery-overview')).toBeInTheDocument();
+    expect(screen.getByTestId('continue-learning-section')).toBeInTheDocument();
+    expect(screen.getByTestId('recent-activity')).toBeInTheDocument();
+    expect(screen.getByTestId('recommendations')).toBeInTheDocument();
   });
 });

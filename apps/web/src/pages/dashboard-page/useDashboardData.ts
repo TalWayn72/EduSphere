@@ -94,9 +94,12 @@ export function useDashboardData() {
       (e: { status: string }) => e.status === 'COMPLETED'
     ).length ?? MOCK_COMPLETED;
 
-  // Derive display data — real data when available, mock fallback otherwise
-  const inProgressCourses: MockCourse[] = inProgressResult.data?.myInProgressCourses
-    ? inProgressResult.data.myInProgressCourses.map(
+  // Derive display data — real data when available, mock fallback otherwise.
+  // IMPORTANT: check .length, not just truthiness — an empty array [] is truthy
+  // and would skip the fallback, rendering nothing (BUG-084).
+  const rawInProgress = inProgressResult.data?.myInProgressCourses;
+  const inProgressCourses: MockCourse[] = rawInProgress?.length
+    ? rawInProgress.map(
         (c: { id: string; courseId: string; title: string; progress: number; lastAccessedAt: string | null; instructorName: string }) => ({
           id: c.id,
           title: c.title,
@@ -107,8 +110,9 @@ export function useDashboardData() {
       )
     : MOCK_IN_PROGRESS;
 
-  const recommendedCourses: MockCourse[] = recommendedResult.data?.myRecommendedCourses
-    ? recommendedResult.data.myRecommendedCourses.map(
+  const rawRecommended = recommendedResult.data?.myRecommendedCourses;
+  const recommendedCourses: MockCourse[] = rawRecommended?.length
+    ? rawRecommended.map(
         (c: { courseId: string; title: string; instructorName: string; reason: string }) => ({
           id: c.courseId,
           title: c.title,
@@ -119,8 +123,9 @@ export function useDashboardData() {
       )
     : MOCK_RECOMMENDED;
 
-  const activity: MockActivity[] = activityResult.data?.myActivityFeed
-    ? activityResult.data.myActivityFeed.map(
+  const rawActivity = activityResult.data?.myActivityFeed;
+  const activity: MockActivity[] = rawActivity?.length
+    ? rawActivity.map(
         (a: { id: string; eventType: string; description: string; occurredAt: string }) => ({
           id: a.id,
           icon: a.eventType,
@@ -134,8 +139,9 @@ export function useDashboardData() {
   const xp = statsResult.data?.myStats?.totalXp ?? 0;
   const level = statsResult.data?.myStats?.level ?? 1;
 
-  const masteryTopics: MockMasteryItem[] = masteryResult.data?.myTopMasteryTopics
-    ? masteryResult.data.myTopMasteryTopics.map(
+  const rawMastery = masteryResult.data?.myTopMasteryTopics;
+  const masteryTopics: MockMasteryItem[] = rawMastery?.length
+    ? rawMastery.map(
         (t: { topicName: string; level: MockMasteryItem['level'] }) => ({
           topic: t.topicName,
           level: t.level,

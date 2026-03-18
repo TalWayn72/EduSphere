@@ -65,8 +65,41 @@
 | BUG-083 | Iron Rule enforcement gaps — Docker daemon check missing, no git hooks | ✅ Fixed | (pending commit) |
 | TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
 | FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit — frontend consent gate addendum) |
+| BUG-084 | Dashboard mastery overview flash/disappear — empty array fallback | ✅ Fixed | (pending commit) |
 
 ---
+
+## BUG-084 — Dashboard Mastery Overview Flash/Disappear (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium — UI section briefly shows then becomes blank white
+- **Domain:** Frontend / Dashboard
+- **Symptom:** "סקירת שליטה" (Mastery Overview) section on `/dashboard` renders mock data briefly, then disappears and becomes empty/white after GraphQL query resolves.
+- **Root Cause:** `useDashboardData.ts` fallback conditions used truthiness checks on query result arrays. An empty array `[]` is truthy in JavaScript, so `masteryResult.data?.myTopMasteryTopics ? .map(...) : MOCK_MASTERY` would evaluate the truthy empty array and `.map([])` renders zero items → section appears blank. Same bug existed in all 4 dashboard array fallbacks (inProgress, recommended, activity, mastery).
+- **Discovery Waves:**
+  - **Wave 1:** Exact pattern found in `useDashboardData.ts` lines 98, 110, 122, 137 — all 4 ternary fallbacks
+  - **Wave 2:** Searched all pages/, hooks/, components/, mobile/ — rest of codebase already uses safe `?? []` pattern
+  - **Wave 3:** Searched all `useQuery` + ternary fallback patterns — no other instances found
+- **Fix:**
+  - Changed all 4 fallbacks from `data?.field ? data.field.map(...)` to `data?.field?.length ? data.field.map(...)` — so empty arrays correctly fall back to mock data
+  - Added `BUG-084` comment explaining the pattern
+- **Files Modified:**
+  - `apps/web/src/pages/dashboard-page/useDashboardData.ts` — 4 fallback conditions fixed (lines 100-150)
+- **Tests Added:**
+  - `apps/web/src/pages/DashboardPage.real-data.test.tsx` — 5 new regression tests in `BUG-084` describe block:
+    - mastery section shows mock when query returns `[]`
+    - in-progress section shows mock when query returns `[]`
+    - recommended section shows mock when query returns `[]`
+    - activity section shows mock when query returns `[]`
+    - all sections show mock when ALL queries return `[]` simultaneously
+  - `apps/web/e2e/dashboard-mastery-fallback.spec.ts` — 6 Playwright E2E tests:
+    - mastery overview never becomes empty after query settles
+    - continue learning persists content
+    - recent activity persists content
+    - recommendations persist content
+    - intercepted empty GraphQL response still shows mock content
+    - visual snapshot confirming populated sections
+- **Anti-recurrence:** Regression tests at `DashboardPage.real-data.test.tsx:BUG-084` explicitly mock empty-array query responses and assert mock fallback data renders. E2E test intercepts GraphQL to simulate exact scenario.
 
 ## PROC-001 — Service Restoration Protocol Gap (18 Mar 2026)
 
