@@ -48,26 +48,25 @@ export class DocumentParserService {
     };
   }
 
-  /** Parse a PDF buffer → plaintext (uses pdf-parse) */
+  /** Parse a PDF buffer → plaintext (uses pdf-parse v2 class-based API) */
   async parsePdf(buffer: Buffer): Promise<ParseResult> {
-    // Dynamic import avoids pdf-parse's test-runner auto-execution at require time.
-    // Cast to callable: pdf-parse@2.4.5 changed its CJS export shape and TypeScript
-    // infers the module object rather than the callable default export.
-    type PdfParseFn = (
-      buf: Buffer
-    ) => Promise<{ text: string; numpages: number }>;
-    const pdfParseModule = await import('pdf-parse');
-    const pdfParse = (pdfParseModule.default ??
-      pdfParseModule) as unknown as PdfParseFn;
-    const data = await pdfParse(buffer);
-    const text = data.text
+    // pdf-parse v2.4.5 exports `PDFParse` class (not a callable default).
+    // Constructor accepts { data: Buffer } for in-memory PDFs.
+    const { PDFParse } = await import('pdf-parse') as { PDFParse: new (opts: { data: Buffer }) => {
+      getText(): Promise<{ text: string; total: number }>;
+      destroy(): Promise<void>;
+    }};
+    const parser = new PDFParse({ data: buffer });
+    const result = await parser.getText();
+    await parser.destroy();
+    const text = result.text
       .replace(/\r\n/g, '\n')
       .replace(/\s{3,}/g, '\n')
       .trim();
     return {
       text,
       wordCount: text.split(/\s+/).filter(Boolean).length,
-      metadata: { source_type: 'FILE_PDF', pages: data.numpages },
+      metadata: { source_type: 'FILE_PDF', pages: result.total },
     };
   }
 

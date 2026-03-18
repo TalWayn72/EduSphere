@@ -597,3 +597,77 @@ test.describe('Knowledge Sources — BUG-056 (subscription auth warning rate-lim
     }
   });
 });
+
+// ─── Suite 7: BUG-081 regression — "pdfParse is not a function" never shown ───
+//
+// pdf-parse v2.4.5 changed its API from a callable function to a PDFParse class.
+// The backend FAILED with "pdfParse is not a function" which was displayed as a
+// generic error. This test ensures the raw technical error never reaches the UI
+// and that FAILED PDF sources show a friendly message instead.
+
+test.describe('Knowledge Sources — BUG-081 (pdfParse is not a function)', () => {
+  const RAW_PDFPARSE_ERROR = 'pdfParse is not a function';
+
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+
+    await page.route('**/graphql', async (route) => {
+      const request = route.request();
+      const body = request.postDataJSON() as { query?: string } | null;
+      if (body?.query?.includes('courseKnowledgeSources')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              courseKnowledgeSources: [
+                {
+                  id: 'failed-pdf-081',
+                  title: 'הנחיות לפורים פו.pdf',
+                  sourceType: 'FILE_PDF',
+                  origin: 'הנחיות לפורים פו.pdf',
+                  preview: null,
+                  status: 'FAILED',
+                  chunkCount: 0,
+                  errorMessage: RAW_PDFPARSE_ERROR,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.getByTestId('toggle-sources').click();
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
+  });
+
+  test('BUG-081: raw "pdfParse is not a function" error is NOT visible', async ({
+    page,
+  }) => {
+    const bodyText = await page.evaluate(() => document.body.textContent ?? '');
+    expect(bodyText).not.toContain('pdfParse is not a function');
+    expect(bodyText).not.toContain('is not a function');
+  });
+
+  test('BUG-081: FAILED PDF source shows friendly error, not raw technical string', async ({
+    page,
+  }) => {
+    // Source title should be visible
+    await expect(
+      page.getByText('הנחיות לפורים פו.pdf').first()
+    ).toBeVisible({ timeout: UI_TIMEOUT });
+    // Error status should show friendly message
+    await expect(
+      page.getByText(/שגיאה|Error|failed/i).first()
+    ).toBeVisible({ timeout: UI_TIMEOUT });
+    // But raw technical error must NOT be in the DOM
+    await expect(page.getByText(RAW_PDFPARSE_ERROR)).not.toBeVisible();
+  });
+});

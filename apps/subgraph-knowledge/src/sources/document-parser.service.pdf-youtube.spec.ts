@@ -8,10 +8,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('pdf-parse', () => ({
-  default: vi.fn().mockResolvedValue({
-    text: 'Extracted PDF content\nPage two text',
-    numpages: 2,
-  }),
+  PDFParse: class MockPDFParse {
+    private opts: { data: Buffer };
+    constructor(opts: { data: Buffer }) { this.opts = opts; }
+    async getText() {
+      return { text: 'Extracted PDF content\nPage two text', total: 2 };
+    }
+    async destroy() { /* noop */ }
+  },
 }));
 
 vi.mock('youtube-transcript', () => ({
