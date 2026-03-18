@@ -70,6 +70,47 @@
 | BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
 | BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | `66a0b79` |
 | BUG-088 | Consent toggle saves to localStorage only — backend DB never synced; no return navigation | ✅ Fixed | (pending commit) |
+| BUG-089 | AI course generation fails — agent_id UUID vs string mismatch + missing DB column | ✅ Fixed | (pending commit) |
+
+---
+
+## BUG-089 — AI Course Generation Fails: agent_id UUID vs String + Missing DB Column (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (course generation completely broken — "יצירת מתווה הקורס נכשלה. נסה שוב.")
+- **Reporter:** User (screenshot showing error in AI Course Creator modal)
+
+### Root Cause (2 issues)
+
+1. **`agent_id` type mismatch:** `CourseGeneratorService.generateCourse()` inserted `agent_id: 'course-generator'` (a string name) into `agent_executions`, but the column is `uuid NOT NULL` with FK to `agent_definitions.id`. PostgreSQL rejected the INSERT.
+
+2. **Missing `rag_config` column:** The Drizzle schema for `agent_definitions` defines a `rag_config` jsonb column, but the actual database table never had this column (migration was never applied). When the fix for issue #1 tried to INSERT into `agent_definitions`, the query included `rag_config` which doesn't exist.
+
+### Solution
+
+1. **Service fix:** Changed `CourseGeneratorService` to use find-or-create pattern — `ensureAgentDefinition()` looks up (or creates) an `agent_definitions` record with `name='course-generator'` and `template='CUSTOM'`, then uses its UUID as `agent_id`.
+
+2. **DB schema fix:** Added the missing `rag_config` column to the database:
+   ```sql
+   ALTER TABLE agent_definitions ADD COLUMN IF NOT EXISTS rag_config jsonb NOT NULL DEFAULT '{"vectorWeight": 0.5, "graphWeight": 0.5}';
+   ```
+
+### Files Changed
+
+- `apps/subgraph-agent/src/ai/course-generator.service.ts`: Added `ensureAgentDefinition()` method, replaced hardcoded string with UUID lookup
+- `apps/web/e2e/ai-course-generation-flow.spec.ts`: New E2E test (2 tests — UI flow + mutation interception)
+
+### Tests Added
+
+- `apps/web/e2e/ai-course-generation-flow.spec.ts`: 2 BUG-089 E2E tests:
+  1. Full flow: consent ON → navigate to /courses/new → Launch AI Builder → fill prompt → Generate Course → verify NO error message
+  2. Mutation interception: verifies `generateCourseFromPrompt` returns valid `executionId` + `status` (not a DB error)
+
+### Anti-Recurrence
+
+- E2E test `ai-course-generation-flow.spec.ts` guards against regression
+- `ensureAgentDefinition()` caches the agent UUID after first lookup — no repeated DB queries
+- Any future agent template should follow the same find-or-create pattern (never hardcode string IDs for UUID FK columns)
 
 ---
 

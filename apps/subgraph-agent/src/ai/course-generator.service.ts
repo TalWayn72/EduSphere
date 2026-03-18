@@ -11,6 +11,7 @@ import {
   schema,
   closeAllPools,
   eq,
+  and,
 } from '@edusphere/db';
 import { LlmConsentGuard } from './llm-consent.guard.js';
 import { createCourseGeneratorWorkflow } from './course-generator.workflow.js';
@@ -35,15 +36,70 @@ export interface CourseGenerationRecord {
   draftCourseId?: string;
 }
 
+/** Well-known deterministic UUID for the built-in course-generator agent. */
+const COURSE_GENERATOR_AGENT_NAME = 'course-generator';
+
 @Injectable()
 export class CourseGeneratorService implements OnModuleDestroy {
   private readonly logger = new Logger(CourseGeneratorService.name);
   private readonly db = createDatabaseConnection();
+  private courseGeneratorAgentId: string | null = null;
 
   constructor(private readonly consentGuard: LlmConsentGuard) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
+  }
+
+  /**
+   * Ensure a built-in agent_definitions row exists for the course-generator.
+   * Uses find-or-create pattern; caches the UUID after first call.
+   */
+  private async ensureAgentDefinition(
+    userId: string,
+    tenantId: string,
+  ): Promise<string> {
+    if (this.courseGeneratorAgentId) return this.courseGeneratorAgentId;
+
+    const [existing] = await this.db
+      .select({ id: schema.agent_definitions.id })
+      .from(schema.agent_definitions)
+      .where(
+        and(
+          eq(schema.agent_definitions.name, COURSE_GENERATOR_AGENT_NAME),
+          eq(schema.agent_definitions.tenant_id, tenantId),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      this.courseGeneratorAgentId = existing.id;
+      return existing.id;
+    }
+
+    const rows = await this.db
+      .insert(schema.agent_definitions)
+      .values({
+        name: COURSE_GENERATOR_AGENT_NAME,
+        template: 'CUSTOM',
+        tenant_id: tenantId,
+        creator_id: userId,
+        config: { type: 'COURSE_GENERATOR' },
+      })
+      .returning({ id: schema.agent_definitions.id });
+
+    const agentDefId = rows[0]?.id;
+    if (!agentDefId) {
+      throw new InternalServerErrorException(
+        'Failed to create course-generator agent definition',
+      );
+    }
+    this.courseGeneratorAgentId = agentDefId;
+    this.logger.log(
+      { agentId: agentDefId, tenantId },
+      'Created course-generator agent definition',
+    );
+    return agentDefId;
   }
 
   /**
@@ -62,10 +118,12 @@ export class CourseGeneratorService implements OnModuleDestroy {
     );
     await this.consentGuard.assertConsent(userId, isExternal);
 
+    const agentId = await this.ensureAgentDefinition(userId, tenantId);
+
     const [execution] = await this.db
       .insert(schema.agent_executions)
       .values({
-        agent_id: 'course-generator',
+        agent_id: agentId,
         user_id: userId,
         input: {
           prompt: options.prompt,
