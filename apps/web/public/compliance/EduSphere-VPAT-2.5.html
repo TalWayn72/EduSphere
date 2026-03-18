@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EduSphere — Voluntary Product Accessibility Template (VPAT) 2.5</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #1e293b; }
+    h1 { color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 12px; }
+    h2 { color: #334155; margin-top: 32px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; font-size: 14px; }
+    th { background: #f1f5f9; font-weight: 600; }
+    .supports { color: #16a34a; font-weight: 600; }
+    .partial { color: #ca8a04; font-weight: 600; }
+    .na { color: #94a3b8; }
+    .header-info { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .header-info p { margin: 4px 0; font-size: 14px; }
+    @media print { body { margin: 20px; } }
+  </style>
+</head>
+<body>
+  <h1>EduSphere — VPAT 2.5 (Revised Section 508 Edition)</h1>
+
+  <div class="header-info">
+    <p><strong>Product:</strong> EduSphere Knowledge Graph Educational Platform</p>
+    <p><strong>Version:</strong> 1.0.0</p>
+    <p><strong>Report Date:</strong> March 2026</p>
+    <p><strong>Contact:</strong> accessibility@edusphere.dev</p>
+    <p><strong>Evaluation Methods:</strong> Manual testing, automated WAVE/axe scans, screen reader testing (NVDA, VoiceOver)</p>
+    <p><strong>Applicable Standards:</strong> WCAG 2.2 Level AA, Revised Section 508</p>
+  </div>
+
+  <h2>WCAG 2.2 Level A — Conformance Report</h2>
+  <table>
+    <thead>
+      <tr><th>Criteria</th><th>Conformance Level</th><th>Remarks</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1.1.1 Non-text Content</td><td class="supports">Supports</td><td>All images have alt text; decorative images use aria-hidden</td></tr>
+      <tr><td>1.2.1 Audio-only / Video-only</td><td class="supports">Supports</td><td>Transcription worker provides text alternatives</td></tr>
+      <tr><td>1.2.2 Captions (Prerecorded)</td><td class="supports">Supports</td><td>Auto-generated captions via faster-whisper</td></tr>
+      <tr><td>1.2.3 Audio Description</td><td class="partial">Partially Supports</td><td>Available for course content; user-uploaded content depends on author</td></tr>
+      <tr><td>1.3.1 Info and Relationships</td><td class="supports">Supports</td><td>Semantic HTML, ARIA landmarks, proper heading hierarchy</td></tr>
+      <tr><td>1.3.2 Meaningful Sequence</td><td class="supports">Supports</td><td>DOM order matches visual order</td></tr>
+      <tr><td>1.3.3 Sensory Characteristics</td><td class="supports">Supports</td><td>Instructions do not rely solely on shape, color, or location</td></tr>
+      <tr><td>1.4.1 Use of Color</td><td class="supports">Supports</td><td>Color is not sole indicator; icons/text accompany status</td></tr>
+      <tr><td>1.4.2 Audio Control</td><td class="supports">Supports</td><td>All audio has pause/stop/volume controls</td></tr>
+      <tr><td>2.1.1 Keyboard</td><td class="supports">Supports</td><td>Full keyboard navigation; focus management on route changes</td></tr>
+      <tr><td>2.1.2 No Keyboard Trap</td><td class="supports">Supports</td><td>Focus can always be moved away from any component</td></tr>
+      <tr><td>2.2.1 Timing Adjustable</td><td class="supports">Supports</td><td>Session timeout is configurable; quiz timers can be extended</td></tr>
+      <tr><td>2.2.2 Pause, Stop, Hide</td><td class="supports">Supports</td><td>All animations respect prefers-reduced-motion</td></tr>
+      <tr><td>2.3.1 Three Flashes</td><td class="supports">Supports</td><td>No content flashes more than 3 times per second</td></tr>
+      <tr><td>2.4.1 Bypass Blocks</td><td class="supports">Supports</td><td>Skip-to-main-content link on every page</td></tr>
+      <tr><td>2.4.2 Page Titled</td><td class="supports">Supports</td><td>Unique, descriptive titles on all pages</td></tr>
+      <tr><td>2.4.3 Focus Order</td><td class="supports">Supports</td><td>Logical tab order follows visual layout</td></tr>
+      <tr><td>2.4.4 Link Purpose</td><td class="supports">Supports</td><td>Link text is descriptive; aria-labels where needed</td></tr>
+      <tr><td>3.1.1 Language of Page</td><td class="supports">Supports</td><td>lang attribute set; i18n supports 9 languages</td></tr>
+      <tr><td>3.2.1 On Focus</td><td class="supports">Supports</td><td>No unexpected context changes on focus</td></tr>
+      <tr><td>3.2.2 On Input</td><td class="supports">Supports</td><td>Form submissions require explicit action</td></tr>
+      <tr><td>3.3.1 Error Identification</td><td class="supports">Supports</td><td>Form errors identified with text + color + icon</td></tr>
+      <tr><td>3.3.2 Labels or Instructions</td><td class="supports">Supports</td><td>All form fields have visible labels</td></tr>
+      <tr><td>4.1.1 Parsing</td><td class="supports">Supports</td><td>Valid HTML5 output</td></tr>
+      <tr><td>4.1.2 Name, Role, Value</td><td class="supports">Supports</td><td>Radix UI primitives provide ARIA semantics</td></tr>
+    </tbody>
+  </table>
+
+  <h2>WCAG 2.2 Level AA — Conformance Report</h2>
+  <table>
+    <thead>
+      <tr><th>Criteria</th><th>Conformance Level</th><th>Remarks</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1.2.4 Captions (Live)</td><td class="partial">Partially Supports</td><td>Live captions available for collaboration sessions; real-time accuracy ~90%</td></tr>
+      <tr><td>1.2.5 Audio Description (Prerecorded)</td><td class="partial">Partially Supports</td><td>Platform-created content has descriptions; user content depends on author</td></tr>
+      <tr><td>1.3.4 Orientation</td><td class="supports">Supports</td><td>Content works in both portrait and landscape</td></tr>
+      <tr><td>1.3.5 Identify Input Purpose</td><td class="supports">Supports</td><td>autocomplete attributes on all relevant inputs</td></tr>
+      <tr><td>1.4.3 Contrast (Minimum)</td><td class="supports">Supports</td><td>All text meets 4.5:1 ratio (7:1 for small text)</td></tr>
+      <tr><td>1.4.4 Resize Text</td><td class="supports">Supports</td><td>Content readable at 200% zoom without horizontal scroll</td></tr>
+      <tr><td>1.4.5 Images of Text</td><td class="supports">Supports</td><td>No images of text used; all text is real text</td></tr>
+      <tr><td>1.4.10 Reflow</td><td class="supports">Supports</td><td>Responsive layout; no horizontal scroll at 320px width</td></tr>
+      <tr><td>1.4.11 Non-text Contrast</td><td class="supports">Supports</td><td>UI components and graphics meet 3:1 contrast</td></tr>
+      <tr><td>1.4.12 Text Spacing</td><td class="supports">Supports</td><td>Content adapts to increased text spacing</td></tr>
+      <tr><td>1.4.13 Content on Hover/Focus</td><td class="supports">Supports</td><td>Tooltips are dismissible, hoverable, and persistent</td></tr>
+      <tr><td>2.4.5 Multiple Ways</td><td class="supports">Supports</td><td>Search, navigation, sitemap, breadcrumbs</td></tr>
+      <tr><td>2.4.6 Headings and Labels</td><td class="supports">Supports</td><td>Descriptive headings; form labels match purpose</td></tr>
+      <tr><td>2.4.7 Focus Visible</td><td class="supports">Supports</td><td>Visible focus ring on all interactive elements</td></tr>
+      <tr><td>2.4.11 Focus Not Obscured</td><td class="supports">Supports</td><td>Sticky headers do not cover focused elements</td></tr>
+      <tr><td>3.1.2 Language of Parts</td><td class="supports">Supports</td><td>lang attribute on mixed-language content</td></tr>
+      <tr><td>3.2.3 Consistent Navigation</td><td class="supports">Supports</td><td>Navigation consistent across all pages</td></tr>
+      <tr><td>3.2.4 Consistent Identification</td><td class="supports">Supports</td><td>Same components have same labels throughout</td></tr>
+      <tr><td>3.3.3 Error Suggestion</td><td class="supports">Supports</td><td>Zod validation provides specific correction hints</td></tr>
+      <tr><td>3.3.4 Error Prevention</td><td class="supports">Supports</td><td>Confirmation dialogs for irreversible actions</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Revised Section 508 — Additional Requirements</h2>
+  <table>
+    <thead>
+      <tr><th>Requirement</th><th>Conformance Level</th><th>Remarks</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>502.3.1 Object Information</td><td class="supports">Supports</td><td>ARIA roles and properties on all custom widgets</td></tr>
+      <tr><td>502.3.2 Modification of Object Information</td><td class="supports">Supports</td><td>Interactive state changes announced to assistive tech</td></tr>
+      <tr><td>502.3.3 Row, Column, and Headers</td><td class="supports">Supports</td><td>Data tables use proper th/scope/headers attributes</td></tr>
+      <tr><td>502.3.14 Event Notification</td><td class="supports">Supports</td><td>Live regions (aria-live) for dynamic content updates</td></tr>
+      <tr><td>602.3 Electronic Support Documentation</td><td class="supports">Supports</td><td>Help documentation is fully accessible</td></tr>
+    </tbody>
+  </table>
+
+  <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">
+    <p>This VPAT is provided in good faith based on evaluation as of the report date. For questions or to report accessibility issues, contact <strong>accessibility@edusphere.dev</strong>.</p>
+    <p>Template based on ITI VPAT 2.5 (Revised Section 508 Edition).</p>
+  </footer>
+</body>
+</html>

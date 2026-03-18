@@ -67,8 +67,49 @@
 | FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit — frontend consent gate addendum) |
 | BUG-084 | Dashboard mastery overview flash/disappear — empty array fallback | ✅ Fixed | (pending commit) |
 | BUG-085 | Consent link missing in AI Course Creator modal — stale container build | ✅ Fixed | (pending commit) |
+| BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
 
 ---
+
+## BUG-086 — "Download VPAT / HECVAT" Button Navigates Instead of Downloading (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium (UX — procurement teams cannot download compliance docs)
+- **Reporter:** User (visual inspection)
+
+### Problem
+The "Download VPAT / HECVAT" button on the landing page Compliance section uses `<Link to="/compliance">` which navigates to the compliance info page. No downloadable VPAT or HECVAT documents exist. Procurement teams expect to download actual files.
+
+### Root Cause
+The button was implemented as a navigation link to `/compliance` (a general info page) rather than providing actual downloadable compliance documents. No VPAT or HECVAT files were created.
+
+### Discovery Waves
+- **Wave 1 (exact match):** Only 1 instance — `ComplianceBadgesSection.tsx:64`
+- **Wave 2 (similarity):** Checked all 33 files with "download" patterns. 10+ other download buttons use correct patterns (`<a download>`, `window.open()`). No other anti-pattern found.
+- **Wave 3 (class of bug):** No other "fake download" buttons found across pages, components, or mobile app.
+
+### Solution (Round 1)
+1. Created `public/compliance/EduSphere-VPAT-2.5.html` — full VPAT 2.5 document (WCAG 2.2 AA + Section 508)
+2. Created `public/compliance/EduSphere-HECVAT-Lite-2026.html` — HECVAT Lite assessment
+3. Added "Download Compliance Documents" section to `CompliancePage.tsx` with `<a href="..." download>` links
+4. Updated landing page button to link to `/compliance#downloads` (scrolls to download section)
+5. Added "Downloads" pill to CompliancePage navigation
+
+### Files Changed
+- `apps/web/public/compliance/EduSphere-VPAT-2.5.html` (new)
+- `apps/web/public/compliance/EduSphere-HECVAT-Lite-2026.html` (new)
+- `apps/web/src/pages/CompliancePage.tsx` (downloads section + nav pill)
+- `apps/web/src/components/landing/ComplianceBadgesSection.tsx` (href → #downloads)
+- `apps/web/src/pages/CompliancePage.test.tsx` (2 new tests)
+- `apps/web/src/components/landing/ComplianceBadgesSection.test.tsx` (updated href assertion)
+
+### Tests Added
+- `CompliancePage.test.tsx` — "has downloads section with VPAT and HECVAT download links" (verifies `download` attribute + correct href)
+- `CompliancePage.test.tsx` — "has Downloads pill in navigation"
+- `ComplianceBadgesSection.test.tsx` — updated href assertion to `/compliance#downloads`
+
+### Anti-recurrence
+- Tests verify `download` attribute is present on VPAT/HECVAT links — any removal would fail CI
 
 ## BUG-084 — Dashboard Mastery Overview Flash/Disappear (18 Mar 2026)
 

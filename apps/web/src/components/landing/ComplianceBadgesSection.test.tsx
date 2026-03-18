@@ -51,6 +51,6 @@ describe('ComplianceBadgesSection', () => {
   it('renders the VPAT/HECVAT download link with correct href', () => {
     render(<MemoryRouter><ComplianceBadgesSection /></MemoryRouter>);
     const link = screen.getByRole('link', { name: /Download VPAT \/ HECVAT/i });
-    expect(link).toHaveAttribute('href', '/compliance');
+    expect(link).toHaveAttribute('href', '/compliance#downloads');
   });
 });

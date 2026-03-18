@@ -14,6 +14,7 @@ import {
   Globe,
   Wifi,
   Lock,
+  Download,
 } from 'lucide-react';
 import { PublicLayout } from '@/components/PublicLayout';
 import { PageHeader } from '@/components/PageHeader';
@@ -124,6 +125,13 @@ export function CompliancePage() {
               {s.title.split(' ')[0]}
             </a>
           ))}
+          <a
+            href="#downloads"
+            onClick={(e) => { e.preventDefault(); document.getElementById('downloads')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="px-3 py-1.5 rounded-full text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 hover:text-indigo-800 transition-colors"
+          >
+            Downloads
+          </a>
         </div>
       </nav>
 
@@ -171,6 +179,59 @@ export function CompliancePage() {
             </section>
           );
         })}
+
+        {/* Download Documents */}
+        <section
+          id="downloads"
+          className="scroll-mt-20 py-12 border-t border-gray-200 dark:border-slate-700"
+          aria-labelledby="downloads-heading"
+        >
+          <h2
+            id="downloads-heading"
+            className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
+          >
+            Download Compliance Documents
+          </h2>
+          <p className="text-gray-600 dark:text-slate-300 mb-6">
+            Share these with your procurement or IT security team.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a
+              href="/compliance/EduSphere-VPAT-2.5.html"
+              download="EduSphere-VPAT-2.5.html"
+              className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
+            >
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                <Download className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-white block">
+                  VPAT 2.5 (Section 508)
+                </span>
+                <span className="text-sm text-gray-500 dark:text-slate-400">
+                  Voluntary Product Accessibility Template — WCAG 2.2 AA
+                </span>
+              </div>
+            </a>
+            <a
+              href="/compliance/EduSphere-HECVAT-Lite-2026.html"
+              download="EduSphere-HECVAT-Lite-2026.html"
+              className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
+            >
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                <Download className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-white block">
+                  HECVAT Lite
+                </span>
+                <span className="text-sm text-gray-500 dark:text-slate-400">
+                  Higher Education Vendor Assessment — Security &amp; Data
+                </span>
+              </div>
+            </a>
+          </div>
+        </section>
 
         {/* CTA */}
         <div className="text-center py-12 border-t border-gray-200 dark:border-slate-700">

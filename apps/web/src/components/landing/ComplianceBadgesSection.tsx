@@ -61,7 +61,7 @@ export function ComplianceBadgesSection() {
         </div>
         <div className="text-center">
           <Button variant="outline" asChild>
-            <Link to="/compliance" aria-label="Download VPAT and HECVAT compliance documents">
+            <Link to="/compliance#downloads" aria-label="Download VPAT and HECVAT compliance documents">
               Download VPAT / HECVAT
             </Link>
           </Button>

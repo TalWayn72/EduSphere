@@ -77,4 +77,22 @@ describe('CompliancePage', () => {
     const nav = screen.getByRole('navigation', { name: /compliance sections/i });
     expect(nav).toBeInTheDocument();
   });
+
+  it('has downloads section with VPAT and HECVAT download links', () => {
+    const { container } = renderPage();
+    expect(container.querySelector('#downloads')).toBeInTheDocument();
+    expect(screen.getByText('VPAT 2.5 (Section 508)')).toBeInTheDocument();
+    expect(screen.getByText('HECVAT Lite')).toBeInTheDocument();
+    const vpatLink = screen.getByText('VPAT 2.5 (Section 508)').closest('a');
+    expect(vpatLink).toHaveAttribute('download');
+    expect(vpatLink).toHaveAttribute('href', '/compliance/EduSphere-VPAT-2.5.html');
+    const hecvatLink = screen.getByText('HECVAT Lite').closest('a');
+    expect(hecvatLink).toHaveAttribute('download');
+    expect(hecvatLink).toHaveAttribute('href', '/compliance/EduSphere-HECVAT-Lite-2026.html');
+  });
+
+  it('has Downloads pill in navigation', () => {
+    renderPage();
+    expect(screen.getByText('Downloads')).toBeInTheDocument();
+  });
 });
