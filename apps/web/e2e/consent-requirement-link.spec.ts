@@ -122,6 +122,28 @@ test.describe('Consent Requirement Link', () => {
     }
   });
 
+  // BUG-087 REGRESSION: /settings?highlight=ai-consent must NOT crash with "Something went wrong"
+  test('REGRESSION BUG-087: /settings?highlight=ai-consent does not crash', async ({
+    page,
+  }) => {
+    await page.goto('/settings?highlight=ai-consent');
+    await page.waitForLoadState('networkidle');
+
+    // Page must NOT show ErrorBoundary crash UI
+    await expect(page.locator('text=Something went wrong')).not.toBeVisible({
+      timeout: 5_000,
+    });
+
+    // Privacy & AI card must render
+    await expect(page.locator('text=Privacy & AI')).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // AI consent toggle must be interactive
+    const toggle = page.locator('#setting-ai-consent [role="switch"]');
+    await expect(toggle).toBeVisible();
+  });
+
   test('highlight query param is removed after animation completes', async ({
     page,
   }) => {

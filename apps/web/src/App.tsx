@@ -13,6 +13,7 @@ import { GlobalLocaleSync } from '@/components/GlobalLocaleSync';
 import { SessionExpiryDialog } from '@/components/SessionExpiryDialog';
 import { useTokenExpiryWatcher } from '@/hooks/useTokenExpiryWatcher';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { SkipLinks } from '@/components/a11y/SkipLinks';
@@ -132,13 +133,15 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <UrqlProvider value={urqlClient}>
           <BrandingProvider>
-            <GlobalLocaleSync />
-            <StorageWarningBanner />
-            <Toaster />
-            <SessionExpiryDialog open={sessionExpired} onReLogin={handleReLogin} />
-            <ErrorBoundary pageName="App">
-              <RouterProvider router={router} />
-            </ErrorBoundary>
+            <TooltipProvider>
+              <GlobalLocaleSync />
+              <StorageWarningBanner />
+              <Toaster />
+              <SessionExpiryDialog open={sessionExpired} onReLogin={handleReLogin} />
+              <ErrorBoundary pageName="App">
+                <RouterProvider router={router} />
+              </ErrorBoundary>
+            </TooltipProvider>
           </BrandingProvider>
         </UrqlProvider>
       </QueryClientProvider>

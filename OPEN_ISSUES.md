@@ -68,6 +68,54 @@
 | BUG-084 | Dashboard mastery overview flash/disappear — empty array fallback | ✅ Fixed | (pending commit) |
 | BUG-085 | Consent link missing in AI Course Creator modal — stale container build | ✅ Fixed | (pending commit) |
 | BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
+| BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | (pending commit) |
+
+---
+
+## BUG-087 — Settings Page Crashes at /settings?highlight=ai-consent (18 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (page completely unusable — ErrorBoundary catches unhandled crash)
+- **Reporter:** User (screenshot)
+
+### Problem
+Navigating to `/settings?highlight=ai-consent` (the consent flow link from FEAT-066 Smart Requirement Links) shows "Something went wrong" error instead of the Settings page. The page crashes when the highlight animation triggers a Radix UI `Tooltip` render.
+
+### Root Cause
+`PrivacyConsentCard.tsx` renders a Radix UI `<Tooltip defaultOpen>` when `?highlight=ai-consent` is in the URL and the highlight animation is active. Radix UI's `Tooltip` component **requires** a `TooltipProvider` ancestor in the React component tree. No `TooltipProvider` existed anywhere in `App.tsx` or the component hierarchy. When the tooltip tried to access its missing provider context, it threw an error caught by `ErrorBoundary`.
+
+**Root cause chain:**
+1. User clicks RequirementLink → navigates to `/settings?highlight=ai-consent`
+2. `useSettingsHighlight` reads URL param → `highlightId = 'ai-consent'`
+3. After 300ms scroll delay, `setIsHighlighted(true)` fires
+4. `PrivacyConsentCard` renders `<Tooltip defaultOpen>` for the targeted toggle
+5. Radix Tooltip accesses `TooltipProvider` context → **undefined** → crash
+6. `ErrorBoundary` catches → shows "Something went wrong"
+
+### Discovery Waves
+- **Wave 1 (exact match):** 3 files use Radix Tooltip. 2 have local `TooltipProvider` (`AITransparencyBadge`, `PricingSection`). 1 missing (`PrivacyConsentCard`).
+- **Wave 2 (similarity):** `VideoAnnotationLayer.tsx` also uses Tooltip without provider (silent bug — never crashes because tooltip is hover-triggered, not `defaultOpen`). All pages, hooks, components, mobile screens checked.
+- **Wave 3 (class of bug):** Tooltip is the ONLY Radix UI component in this codebase that requires a provider. No other missing providers found.
+
+### Solution
+Added global `<TooltipProvider>` to `App.tsx` wrapping the entire app tree (inside `BrandingProvider`, around `RouterProvider`). This fixes:
+1. The crashing `PrivacyConsentCard` tooltip (BUG-087 root cause)
+2. The silently broken `VideoAnnotationLayer` tooltip (Wave 2 discovery)
+3. All future tooltip usages globally
+
+### Files Changed
+- `apps/web/src/App.tsx` — Added `TooltipProvider` import + wrapper around app tree
+- `apps/web/src/pages/SettingsPage.test.tsx` — 2 BUG-087 regression tests
+- `apps/web/e2e/consent-requirement-link.spec.ts` — 1 BUG-087 E2E regression test
+
+### Tests Added
+- `apps/web/src/pages/SettingsPage.test.tsx`: "REGRESSION BUG-087: renders without crash when ?highlight=ai-consent is in URL"
+- `apps/web/src/pages/SettingsPage.test.tsx`: "REGRESSION BUG-087: Something went wrong is never shown on settings page"
+- `apps/web/e2e/consent-requirement-link.spec.ts`: "REGRESSION BUG-087: /settings?highlight=ai-consent does not crash"
+
+### Anti-Recurrence
+- Global `TooltipProvider` in `App.tsx` prevents any future tooltip from crashing due to missing provider
+- Regression tests guard against both the crash UI appearing AND the specific highlight URL scenario
 
 ---
 

@@ -83,9 +83,9 @@ import { SettingsPage } from './SettingsPage';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-const renderPage = () =>
+const renderPage = (initialEntries: string[] = ['/settings']) =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <SettingsPage />
     </MemoryRouter>
   );
@@ -278,6 +278,30 @@ describe('SettingsPage', () => {
     const bar = screen.getByRole('progressbar');
     const indicator = bar.firstElementChild as HTMLElement;
     expect(indicator.style.transform).toBe('translateX(-50%)');
+  });
+
+  // BUG-087 REGRESSION: settings page with ?highlight=ai-consent must NOT crash
+  it('REGRESSION BUG-087: renders without crash when ?highlight=ai-consent is in URL', () => {
+    mockStorageStats = {
+      usageRatio: 0.1,
+      isApproachingLimit: false,
+      isOverLimit: false,
+      isUnsupported: false,
+      eduSphereUsedBytes: 100,
+      eduSphereQuotaBytes: 1000,
+    };
+    renderPage(['/settings?highlight=ai-consent']);
+    // Page must NOT show ErrorBoundary "Something went wrong"
+    expect(screen.queryByText(/something went wrong/i)).not.toBeInTheDocument();
+    // Privacy & AI card must be visible
+    expect(screen.getByText(/privacy/i)).toBeInTheDocument();
+    // AI consent toggle must be present
+    expect(document.getElementById('setting-ai-consent')).toBeInTheDocument();
+  });
+
+  it('REGRESSION BUG-087: "Something went wrong" is never shown on settings page', () => {
+    renderPage(['/settings']);
+    expect(screen.queryByText(/something went wrong/i)).not.toBeInTheDocument();
   });
 
   it('calls clearLocalStorage and shows success toast on clear cache click', () => {
