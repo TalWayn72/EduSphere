@@ -118,6 +118,7 @@ export function CompliancePage() {
             <a
               key={s.id}
               href={`#${s.id}`}
+              onClick={(e) => { e.preventDefault(); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' }); }}
               className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
             >
               {s.title.split(' ')[0]}

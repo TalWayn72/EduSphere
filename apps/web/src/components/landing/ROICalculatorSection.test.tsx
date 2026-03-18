@@ -1,16 +1,25 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 import { ROICalculatorSection } from './ROICalculatorSection';
 
+function renderSection() {
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <ROICalculatorSection />
+    </MemoryRouter>,
+  );
+}
+
 describe('ROICalculatorSection', () => {
   it('renders the section heading', () => {
-    render(<ROICalculatorSection />);
+    renderSection();
     expect(screen.getByText('Calculate Your ROI')).toBeInTheDocument();
   });
 
   it('displays all four slider labels', () => {
-    render(<ROICalculatorSection />);
+    renderSection();
     expect(screen.getByText('Number of Instructors')).toBeInTheDocument();
     expect(screen.getByText(/Hours\/week/)).toBeInTheDocument();
     expect(screen.getByText('Hourly instructor cost')).toBeInTheDocument();
@@ -18,7 +27,7 @@ describe('ROICalculatorSection', () => {
   });
 
   it('shows calculated output fields', () => {
-    render(<ROICalculatorSection />);
+    renderSection();
     expect(screen.getByText('Instructor hours saved/year')).toBeInTheDocument();
     expect(screen.getByText('Dollar value saved')).toBeInTheDocument();
     expect(screen.getByText('EduSphere annual cost')).toBeInTheDocument();
@@ -26,12 +35,12 @@ describe('ROICalculatorSection', () => {
   });
 
   it('shows default instructor count of 10', () => {
-    render(<ROICalculatorSection />);
+    renderSection();
     expect(screen.getByText('10')).toBeInTheDocument();
   });
 
   it('renders the CTA button', () => {
-    render(<ROICalculatorSection />);
+    renderSection();
     expect(screen.getByRole('link', { name: /Get Your Custom ROI Report/i })).toBeInTheDocument();
   });
 });

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ClipboardList, Clock, Rocket, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -60,7 +61,7 @@ export function HowPilotWorksSection() {
         </div>
         <div className="text-center mt-12">
           <Button size="lg" className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-10" asChild>
-            <a href="#pilot-cta">Start Your Pilot</a>
+            <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>Start Your Pilot</Link>
           </Button>
         </div>
       </div>

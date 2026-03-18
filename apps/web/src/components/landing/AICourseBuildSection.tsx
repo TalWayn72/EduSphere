@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -105,7 +106,7 @@ export function AICourseBuildSection() {
                 className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold w-full lg:w-auto"
                 asChild
               >
-                <a href="#pilot-cta">See AI Course Builder Demo</a>
+                <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>See AI Course Builder Demo</Link>
               </Button>
             </div>
           </div>

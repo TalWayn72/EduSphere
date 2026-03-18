@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -86,7 +87,7 @@ export function ROICalculatorSection() {
               <p className="text-3xl font-extrabold text-green-700">{netROI > 0 ? '+' : ''}{netROI}%</p>
             </div>
             <Button className="bg-indigo-600 hover:bg-indigo-500 text-white w-full" asChild>
-              <a href="#pilot-cta">Get Your Custom ROI Report</a>
+              <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>Get Your Custom ROI Report</Link>
             </Button>
           </div>
         </div>

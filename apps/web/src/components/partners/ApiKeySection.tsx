@@ -2,6 +2,7 @@
  * ApiKeySection — API key display + regenerate with confirmation dialog.
  */
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -61,9 +62,9 @@ export function ApiKeySection({ currentKey, showPlain, onRegenerate, regeneratin
             <a href="/api/v1/partner/usage" className="text-primary underline underline-offset-2">
               /api/v1/partner/usage
             </a>
-            <a href="/docs/partner-api" className="text-primary underline underline-offset-2">
+            <Link to="/docs/partner-api" className="text-primary underline underline-offset-2">
               API Documentation
-            </a>
+            </Link>
           </div>
         </CardContent>
       </Card>

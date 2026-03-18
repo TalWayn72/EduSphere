@@ -91,7 +91,7 @@ export function CrmSettingsPage() {
   const webhookUrl = `${window.location.origin}/crm/salesforce/webhook`;
 
   const handleConnect = () => {
-    window.location.href = '/crm/salesforce/connect';
+    navigate('/crm/salesforce/connect');
   };
 
   const handleDisconnect = async () => {

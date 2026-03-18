@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { AICourseBuildSection } from './AICourseBuildSection';
 
@@ -18,19 +19,27 @@ vi.mock('@/components/ui/button', () => ({
   },
 }));
 
+function renderSection() {
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <AICourseBuildSection />
+    </MemoryRouter>,
+  );
+}
+
 describe('AICourseBuildSection', () => {
   it('renders without crashing', () => {
-    render(<AICourseBuildSection />);
+    renderSection();
     expect(screen.getByTestId('ai-course-build-section')).toBeInTheDocument();
   });
 
   it('has correct section id for anchor navigation', () => {
-    const { container } = render(<AICourseBuildSection />);
+    const { container } = renderSection();
     expect(container.querySelector('#ai-course-builder')).toBeInTheDocument();
   });
 
   it('renders the heading and description', () => {
-    render(<AICourseBuildSection />);
+    renderSection();
     expect(screen.getByText('Build a Complete Course in 10 Minutes')).toBeInTheDocument();
     expect(
       screen.getByText(/AI generates modules, lessons, quizzes, and assessments/),
@@ -38,16 +47,16 @@ describe('AICourseBuildSection', () => {
   });
 
   it('renders all 5 steps', () => {
-    render(<AICourseBuildSection />);
+    renderSection();
     const list = screen.getByRole('list', { name: /AI Course Builder steps/i });
     expect(list.querySelectorAll('li')).toHaveLength(5);
     expect(screen.getByText('Enter a topic or upload a syllabus')).toBeInTheDocument();
     expect(screen.getByText('Review, customize, and publish')).toBeInTheDocument();
   });
 
-  it('renders the demo CTA link pointing to #pilot-cta', () => {
-    render(<AICourseBuildSection />);
+  it('renders the demo CTA link with smooth scroll to #pilot-cta', () => {
+    renderSection();
     const link = screen.getByRole('link', { name: /See AI Course Builder Demo/i });
-    expect(link).toHaveAttribute('href', '#pilot-cta');
+    expect(link).toHaveAttribute('href', '/#pilot-cta');
   });
 });

@@ -3,6 +3,7 @@
  * Shown only for INSTRUCTOR role users with 0 courses.
  */
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,9 +38,9 @@ export function InstructorOnboardingCTA({ courseCount, userRole }: InstructorOnb
           )}
         </p>
         <Button asChild>
-          <a href="/courses/create" data-testid="instructor-cta-button">
+          <Link to="/courses/create" data-testid="instructor-cta-button">
             {t('instructorCta.button', 'Get Started')}
-          </a>
+          </Link>
         </Button>
       </CardContent>
     </Card>

@@ -1,12 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Brain } from 'lucide-react';
+import { SocialLinksBar, DEFAULT_SOCIAL_LINKS } from '@/components/social';
 
 const COLUMNS = [
   {
     heading: 'Product',
     links: [
-      { label: 'Features', href: '#features' },
-      { label: 'Pricing', href: '#pricing' },
+      { label: 'Features', href: '/#features' },
+      { label: 'Pricing', href: '/#pricing' },
       { label: 'AI Course Builder', href: '/features/ai-course-builder' },
       { label: 'Visual Anchoring', href: '/features/visual-anchoring' },
       { label: 'Knowledge Graph', href: '/features/knowledge-graph' },
@@ -64,17 +66,22 @@ export function LandingFooter() {
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
                       className="text-sm text-slate-400 hover:text-white transition-colors"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
+        </div>
+
+        {/* Social Links */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <SocialLinksBar links={DEFAULT_SOCIAL_LINKS} size="md" />
         </div>
 
         {/* Bottom bar */}
@@ -83,11 +90,11 @@ export function LandingFooter() {
             &copy; 2026 EduSphere. Built for institutions that take learning seriously.
           </p>
           <div className="flex items-center gap-4 text-xs text-slate-400">
-            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <span aria-hidden="true">&middot;</span>
-            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
             <span aria-hidden="true">&middot;</span>
-            <a href="/accessibility" className="hover:text-white transition-colors">Accessibility</a>
+            <Link to="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
           </div>
         </div>
       </div>

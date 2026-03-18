@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Shield, Globe, FileCheck, Link2, BookOpen, KeyRound, Lock, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -60,9 +61,9 @@ export function ComplianceBadgesSection() {
         </div>
         <div className="text-center">
           <Button variant="outline" asChild>
-            <a href="/compliance" aria-label="Download VPAT and HECVAT compliance documents">
+            <Link to="/compliance" aria-label="Download VPAT and HECVAT compliance documents">
               Download VPAT / HECVAT
-            </a>
+            </Link>
           </Button>
         </div>
       </div>

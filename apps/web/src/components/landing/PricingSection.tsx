@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -147,7 +148,11 @@ export function PricingSection() {
                   variant={plan.popular || plan.dark ? 'default' : 'outline'}
                   asChild
                 >
-                  <a href={plan.href}>{plan.cta}</a>
+                  {plan.href.startsWith('/') ? (
+                    <Link to={plan.href}>{plan.cta}</Link>
+                  ) : (
+                    <a href={plan.href}>{plan.cta}</a>
+                  )}
                 </Button>
               </div>
             </div>

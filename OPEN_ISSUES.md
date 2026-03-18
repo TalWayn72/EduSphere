@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 17 מרץ 2026
+**תאריך עדכון:** 18 מרץ 2026
 
 ---
 
@@ -59,6 +59,7 @@
 | BUG-079 | Breadcrumb missing lesson link | ✅ Fixed | Phase 65 R5 |
 | BUG-080 | Mobile layout broken on pipeline page | ✅ Fixed | Phase 65 R5 |
 | BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | (pending commit) |
+| BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | (pending commit) |
 
 ---
 
@@ -91,6 +92,55 @@
 - `apps/web/e2e/knowledge-sources.spec.ts` Suite 7 — 2 BUG-081 regression tests
 
 **Anti-recurrence:** E2E Suite 7 in `knowledge-sources.spec.ts` injects a FAILED source with `pdfParse is not a function` errorMessage and asserts it never reaches the UI.
+
+---
+
+## BUG-082 — Footer and Landing Page Links Break SPA Navigation (18 Mar 2026)
+
+**Status:** ✅ Fixed
+**Severity:** 🟡 Medium — UI navigation broken (full page reloads instead of SPA transitions), not data loss
+
+**Root Cause:** `LandingFooter.tsx` and 11 other components used plain HTML `<a href>` tags for internal routes, causing full page reloads instead of SPA navigation. Hash links like `#pricing` didn't work from non-landing pages because they relied on same-page anchor behavior.
+
+**Discovery Waves:**
+- **Wave 1 (exact match):** `<a href="/...">` pattern found in 12 source files across `components/landing/`, `components/`, `pages/`
+- **Wave 2 (similarity):** All 155+ routes scanned — `InstructorOnboardingCTA`, `OnboardingReentryCard`, `ApiKeySection`, `CrmSettingsPage` (`window.location.href`), `PublicNav` (10 anchor links), `CompliancePage` (section pills) all had the same anti-pattern
+- **Wave 3 (class of bug):** All `<a href` usages verified — remaining instances are external URLs, API endpoints, or auth redirects (correctly using `<a>`)
+
+**Solution:**
+- Replaced all internal `<a href>` with React Router `<Link to>` across 12 files
+- Changed hash-only links (`#pricing`) to `/#pricing` format for cross-page navigation
+- Added smooth scroll handlers (`scrollIntoView({ behavior: 'smooth' })`) for same-page anchors
+- Converted `window.location.href` assignments to `useNavigate()` in `CrmSettingsPage`
+- `PricingSection` uses conditional rendering: `<Link>` for internal paths, `<a>` for external URLs
+
+**Files Changed:**
+| File | Change |
+|------|--------|
+| `apps/web/src/components/landing/LandingFooter.tsx` | 22 links + 3 bottom bar: `<a>` → `<Link>` |
+| `apps/web/src/components/InstructorOnboardingCTA.tsx` | `/courses/create`: `<a>` → `<Link>` |
+| `apps/web/src/components/OnboardingReentryCard.tsx` | `/onboarding`: `<a>` → `<Link>` |
+| `apps/web/src/components/landing/ComplianceBadgesSection.tsx` | `/compliance`: `<a>` → `<Link>` |
+| `apps/web/src/components/landing/PricingSection.tsx` | Conditional `<Link>`/`<a>` per href type |
+| `apps/web/src/components/partners/ApiKeySection.tsx` | `/docs/partner-api`: `<a>` → `<Link>` |
+| `apps/web/src/pages/CrmSettingsPage.tsx` | `window.location.href` → `navigate()` |
+| `apps/web/src/components/landing/AICourseBuildSection.tsx` | `<a href="#pilot-cta">` → `<Link to="/#pilot-cta">` + smooth scroll |
+| `apps/web/src/components/landing/HowPilotWorksSection.tsx` | Same hash-link pattern |
+| `apps/web/src/components/landing/ROICalculatorSection.tsx` | Same hash-link pattern |
+| `apps/web/src/components/PublicNav.tsx` | 10 anchor links with smoothScroll handler |
+| `apps/web/src/pages/CompliancePage.tsx` | Section pills with smooth scroll |
+
+**Tests Updated:**
+| Test File | Change |
+|-----------|--------|
+| `LandingFooter.test.tsx` | MemoryRouter wrapper added |
+| `OnboardingReentryCard.test.tsx` | MemoryRouter wrapper added |
+| `ComplianceBadgesSection.test.tsx` | MemoryRouter wrapper added |
+| `PricingSection.test.tsx` | MemoryRouter wrapper added |
+| `AICourseBuildSection.test.tsx` | MemoryRouter wrapper added |
+| `ROICalculatorSection.test.tsx` | MemoryRouter wrapper added |
+
+**Anti-recurrence:** Discovery wave scan of all 155+ routes confirmed no remaining `<a href="/internal-route">` patterns outside of excluded categories (external URLs, API endpoints, auth redirects). Test files now wrap components in `MemoryRouter` which would fail if `<Link>` were reverted to `<a>`.
 
 ---
 

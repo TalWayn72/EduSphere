@@ -3,6 +3,7 @@
  * Dismissible — stores dismissed state in localStorage.
  */
 import React, { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UserCircle, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -65,9 +66,9 @@ export function OnboardingReentryCard({ onboardingSkipped }: OnboardingReentryCa
           )}
         </p>
         <Button asChild variant="outline">
-          <a href="/onboarding">
+          <Link to="/onboarding">
             {t('reentry.button', 'Complete Onboarding')}
-          </a>
+          </Link>
         </Button>
       </CardContent>
     </Card>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,14 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
   const { pathname } = useLocation();
   const isLanding = pathname === '/' || pathname === '/landing';
   const anchor = (hash: string) => isLanding ? hash : `/landing${hash}`;
+  const smoothScroll = (hash: string) => (e: React.MouseEvent) => {
+    const id = hash.replace('#', '');
+    const el = document.getElementById(id);
+    if (el && isLanding) {
+      e.preventDefault();
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <nav
@@ -25,10 +33,10 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
 
         {isFull && (
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600 dark:text-slate-200">
-            <a href={anchor('#features')} className="hover:text-indigo-600 transition-colors">Features</a>
-            <a href={anchor('#pricing')} className="hover:text-indigo-600 transition-colors">Pricing</a>
-            <a href={anchor('#compliance')} className="hover:text-indigo-600 transition-colors">Compliance</a>
-            <a href={anchor('#pilot-cta')} className="hover:text-indigo-600 transition-colors">Pilot</a>
+            <a href={anchor('#features')} onClick={smoothScroll('#features')} className="hover:text-indigo-600 transition-colors">Features</a>
+            <a href={anchor('#pricing')} onClick={smoothScroll('#pricing')} className="hover:text-indigo-600 transition-colors">Pricing</a>
+            <a href={anchor('#compliance')} onClick={smoothScroll('#compliance')} className="hover:text-indigo-600 transition-colors">Compliance</a>
+            <a href={anchor('#pilot-cta')} onClick={smoothScroll('#pilot-cta')} className="hover:text-indigo-600 transition-colors">Pilot</a>
           </div>
         )}
 
@@ -38,7 +46,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
           </Button>
           {isFull && (
             <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white" asChild>
-              <a href={anchor('#pilot-cta')}>Start Free Pilot</a>
+              <a href={anchor('#pilot-cta')} onClick={smoothScroll('#pilot-cta')}>Start Free Pilot</a>
             </Button>
           )}
         </div>
@@ -57,10 +65,10 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
         <div className="md:hidden bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-700 px-4 py-4 flex flex-col gap-4 text-sm font-medium">
           {isFull && (
             <>
-              <a href={anchor('#features')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Features</a>
-              <a href={anchor('#pricing')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Pricing</a>
-              <a href={anchor('#compliance')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Compliance</a>
-              <a href={anchor('#pilot-cta')} onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Pilot</a>
+              <a href={anchor('#features')} onClick={(e) => { smoothScroll('#features')(e); setMenuOpen(false); }} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Features</a>
+              <a href={anchor('#pricing')} onClick={(e) => { smoothScroll('#pricing')(e); setMenuOpen(false); }} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Pricing</a>
+              <a href={anchor('#compliance')} onClick={(e) => { smoothScroll('#compliance')(e); setMenuOpen(false); }} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Compliance</a>
+              <a href={anchor('#pilot-cta')} onClick={(e) => { smoothScroll('#pilot-cta')(e); setMenuOpen(false); }} className="text-gray-700 dark:text-slate-200 hover:text-indigo-600">Pilot</a>
             </>
           )}
           <div className="flex gap-3 pt-2">
@@ -69,7 +77,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
             </Button>
             {isFull && (
               <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white" asChild>
-                <a href={anchor('#pilot-cta')}>Free Pilot</a>
+                <a href={anchor('#pilot-cta')} onClick={smoothScroll('#pilot-cta')}>Free Pilot</a>
               </Button>
             )}
           </div>
