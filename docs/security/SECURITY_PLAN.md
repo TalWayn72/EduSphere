@@ -38,6 +38,28 @@
 | Level 4: Optimized  | Proactive and automated security   | Q4 2026   | Planned     |
 | Level 5: Continuous | Security embedded in culture       | 2027      | Future      |
 
+```mermaid
+gantt
+    title Security Maturity Roadmap
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+
+    section Level 1: Initial
+        Ad-hoc practices: done, l1, 2025-06-01, 2025-09-30
+
+    section Level 2: Managed
+        Basic controls + auth: done, l2, 2025-10-01, 2026-02-28
+
+    section Level 3: Defined
+        Documented processes: active, l3, 2026-03-01, 2026-06-30
+
+    section Level 4: Optimized
+        Proactive + automated: l4, 2026-07-01, 2026-12-31
+
+    section Level 5: Continuous
+        Security culture: l5, 2027-01-01, 2027-06-30
+```
+
 ## 2. Threat Model
 
 ### Assets
@@ -76,6 +98,48 @@
    - Risk Level: Critical
 
 ### Threat Actors
+
+```mermaid
+graph TD
+    subgraph "External Threat Actors"
+        HACKER[Malicious Hackers<br/>Credential stuffing, SQLi]
+        INSIDER[Disgruntled Users<br/>Data exfiltration]
+        BOT[Automated Bots<br/>Scraping, DDoS]
+    end
+
+    subgraph "Attack Vectors"
+        AUTH[Authentication<br/>Bypass]
+        INJECT[Injection<br/>SQL, XSS, Cypher]
+        IDOR[IDOR<br/>Cross-tenant access]
+        DOS[Denial of Service<br/>Query complexity]
+    end
+
+    subgraph "Critical Assets"
+        PII[Student PII<br/>Names, emails, records]
+        CREDS[Credentials<br/>JWT, API keys]
+        CONTENT[Educational Content<br/>Proprietary material]
+        INFRA[Infrastructure<br/>DB, K8s, NATS]
+    end
+
+    HACKER --> AUTH
+    HACKER --> INJECT
+    INSIDER --> IDOR
+    BOT --> DOS
+
+    AUTH --> CREDS
+    INJECT --> PII
+    IDOR --> PII
+    IDOR --> CONTENT
+    DOS --> INFRA
+
+    classDef actor fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef vector fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef asset fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+
+    class HACKER,INSIDER,BOT actor
+    class AUTH,INJECT,IDOR,DOS vector
+    class PII,CREDS,CONTENT,INFRA asset
+```
 
 #### External Threats
 
@@ -201,6 +265,28 @@
 - **Awareness**: Phishing simulations
 - **Policies**: Acceptable use policy
 - **Reporting**: Security incident reporting
+
+```mermaid
+flowchart TD
+    REQ[Incoming Request] --> WAF[WAF / Rate Limiting<br/>Traefik middleware]
+    WAF --> TLS[TLS Termination<br/>Auto-SSL via Let's Encrypt]
+    TLS --> JWT[JWT Validation<br/>Keycloak JWKS]
+    JWT --> DIRECTIVES[@authenticated<br/>@requiresScopes<br/>@requiresRole]
+    DIRECTIVES --> INPUT[Input Validation<br/>Zod schemas on mutations]
+    INPUT --> RLS[Row-Level Security<br/>SET LOCAL app.current_tenant]
+    RLS --> ENCRYPT[Field Encryption<br/>AES-256-GCM for PII]
+    ENCRYPT --> AUDIT[Audit Logging<br/>Pino structured logs]
+
+    classDef network fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef auth fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef data fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef observe fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+
+    class REQ,WAF,TLS network
+    class JWT,DIRECTIVES auth
+    class INPUT,RLS,ENCRYPT data
+    class AUDIT observe
+```
 
 ### Zero-Trust Principles
 
@@ -2194,6 +2280,30 @@ sonar.qualitygate.timeout=300
 - Docker Scout
 
 ## 12. Incident Response
+
+```mermaid
+stateDiagram-v2
+    [*] --> Monitoring: Normal operations
+
+    Monitoring --> Detection: Alert triggered<br/>(Jaeger, logs, user report)
+    Detection --> Triage: Assess severity<br/>(P0-P3)
+
+    Triage --> Containment: P0/P1 confirmed
+    Triage --> Investigation: P2/P3 confirmed
+
+    Containment --> Investigation: Bleeding stopped
+    Investigation --> Eradication: Root cause found
+
+    Eradication --> Recovery: Fix deployed
+    Recovery --> PostMortem: Services restored
+
+    PostMortem --> Monitoring: Lessons documented<br/>+ regression test added
+
+    note right of Containment
+        P0: < 15 min response
+        P1: < 1 hour response
+    end note
+```
 
 ### Detection
 

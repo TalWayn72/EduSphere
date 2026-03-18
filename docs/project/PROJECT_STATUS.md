@@ -19,6 +19,47 @@
 
 ---
 
+## System Architecture Overview
+
+```mermaid
+graph TD
+    subgraph "Clients"
+        WEB["Web App<br/>(React 19 + Vite 6)"]:::client
+        MOB["Mobile<br/>(Expo SDK 54)"]:::client
+    end
+
+    GW["Hive Gateway v2<br/>Port 4000"]:::infra
+
+    subgraph "6 Federation Subgraphs"
+        SC["Core<br/>4001"]:::service
+        SCO["Content<br/>4002"]:::service
+        SA["Annotation<br/>4003"]:::service
+        SL["Collaboration<br/>4004"]:::service
+        SAG["Agent<br/>4005"]:::llm
+        SK["Knowledge<br/>4006"]:::llm
+    end
+
+    subgraph "Data Layer"
+        PG["PostgreSQL 16<br/>+ AGE + pgvector"]:::data
+        NATS["NATS<br/>JetStream"]:::infra
+        KC["Keycloak<br/>OIDC"]:::infra
+        MIO["MinIO<br/>Object store"]:::data
+    end
+
+    WEB & MOB --> GW
+    GW --> SC & SCO & SA & SL & SAG & SK
+    SC & SCO & SA & SL & SAG & SK --> PG
+    SC & SCO & SA & SL & SAG & SK --> NATS
+    GW --> KC
+    SCO --> MIO
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#000
+```
+
 ## Phase Completion Summary
 
 | Phase | Name | Status | Session |

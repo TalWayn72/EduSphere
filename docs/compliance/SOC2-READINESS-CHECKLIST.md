@@ -11,6 +11,36 @@
 
 ---
 
+## SOC2 Readiness Timeline
+
+```mermaid
+gantt
+    title SOC2 Type II Readiness
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+
+    section Security (CC6)
+        Access controls + encryption: done, sec1, 2025-10-01, 2026-02-28
+        Penetration testing: active, sec2, 2026-03-01, 2026-05-31
+
+    section Availability (CC7)
+        HA architecture + DR plan: done, av1, 2025-11-01, 2026-02-28
+        Uptime monitoring (99.9%): active, av2, 2026-03-01, 2026-06-30
+
+    section Confidentiality (CC8)
+        Data classification + encryption: done, conf1, 2026-01-01, 2026-03-15
+        DLP policies: conf2, 2026-04-01, 2026-06-30
+
+    section Processing Integrity (CC9)
+        Input validation + checksums: done, pi1, 2025-12-01, 2026-03-15
+
+    section Privacy (P1-P8)
+        GDPR compliance + DPIA: done, priv1, 2026-01-15, 2026-03-15
+        Privacy impact monitoring: active, priv2, 2026-03-16, 2026-06-30
+```
+
+---
+
 ## Overview
 
 This document provides a gap analysis of EduSphere's compliance with AICPA Trust Services Criteria (2017 with 2022 updates). Each criterion is assessed against the current implementation state, with evidence references to the codebase and documentation.

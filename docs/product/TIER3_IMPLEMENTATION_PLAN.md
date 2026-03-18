@@ -52,6 +52,54 @@ Tier 1 (12) + Tier 2 (12) = 24 features completed (100%). This plan covers the r
 
 ---
 
+## Sprint Dependency Flow
+
+```mermaid
+graph LR
+    subgraph "Sprint A — Quick Wins"
+        A1["F-039<br/>VPAT/HECVAT"]:::service
+        A2["F-029<br/>BI Export"]:::data
+        A3["F-035<br/>Social Follow"]:::service
+        A4["F-027<br/>CPD Credits"]:::data
+    end
+
+    subgraph "Sprint B — Mid"
+        B1["F-028<br/>xAPI/LRS"]:::infra
+        B2["F-032<br/>SCORM Export"]:::infra
+        B3["F-026<br/>Nanodegrees"]:::infra
+        B4["F-034<br/>BBB Rooms"]:::infra
+    end
+
+    subgraph "Sprint C — Dependent"
+        C1["F-036<br/>Social Recs"]:::llm
+        C2["F-030<br/>360 Assess"]:::llm
+        C3["F-033<br/>Salesforce"]:::llm
+    end
+
+    subgraph "Sprint D — Complex"
+        D1["F-025<br/>OpenBadges 3.0"]:::data
+        D2["F-031<br/>Marketplace"]:::data
+    end
+
+    subgraph "Sprint E — Strategic"
+        E1["F-037<br/>Portal Builder"]:::client
+        E2["F-038<br/>Compliance Lib"]:::client
+    end
+
+    A3 -->|"follow graph"| C1
+    B3 -->|"rubric pattern"| C2
+    A1 & A2 & A4 --> B1
+    B1 & B2 & B3 & B4 --> C1 & C2 & C3
+    C1 & C2 & C3 --> D1 & D2
+    D1 & D2 --> E1 & E2
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#000
+```
+
 ## Detailed Feature Specs
 
 ### F-039: VPAT / HECVAT Documentation (S)

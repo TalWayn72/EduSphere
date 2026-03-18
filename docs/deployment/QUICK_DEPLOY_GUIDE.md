@@ -7,6 +7,31 @@
 
 ---
 
+```mermaid
+flowchart LR
+    A["1. Prerequisites<br/>& Env Setup"]
+    B["2. Database<br/>Init + Migrate"]
+    C["3. Docker Compose<br/>or K8s Deploy"]
+    D["4. SSL/TLS<br/>+ DNS"]
+    E["5. Health<br/>Verification"]
+    F["6. Post-Deploy<br/>Checklist"]
+    R["Rollback<br/>Procedure"]
+
+    A --> B --> C --> D --> E --> F
+    C -. "failure" .-> R
+    D -. "failure" .-> R
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef error fill:#ffebee,stroke:#c62828,stroke-width:2px
+
+    class A,D infra
+    class B data
+    class C,E,F service
+    class R error
+```
+
 ## Table of Contents
 
 1. [Prerequisites Checklist](#1-prerequisites-checklist)

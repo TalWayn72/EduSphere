@@ -11,6 +11,44 @@ The knowledge graph is EduSphere's primary differentiator vs competitors (Docebo
 However, it is currently under-marketed and under-surfaced to students. Students interact with
 courses but rarely see the semantic connections between concepts.
 
+## Knowledge Graph — Student Interaction Flow
+
+```mermaid
+graph TD
+    STU["Student"]:::client
+
+    subgraph "Learning Journey"
+        PRE["US-1: Prerequisite<br/>Prompts"]:::service
+        SB["US-2: Concept<br/>Sidebar"]:::service
+        AQ["US-3: Adaptive<br/>Quiz Difficulty"]:::llm
+        LP["US-4: Learning Path<br/>Recommendations"]:::service
+        CMD["US-5: Mastery<br/>Dashboard"]:::data
+        CTX["US-6: Why This<br/>Matters"]:::data
+    end
+
+    subgraph "Data Sources"
+        AGE["Apache AGE<br/>Graph traversal"]:::infra
+        PGV["pgvector<br/>Semantic search"]:::infra
+        MST["Mastery Scores<br/>MASTERED_BY edges"]:::data
+    end
+
+    STU --> PRE & SB & AQ & LP & CMD & CTX
+    PRE -->|"PREREQUISITE_OF"| AGE
+    SB -->|"RELATED_TO"| AGE
+    SB --> PGV
+    AQ --> MST
+    LP -->|"graph traversal"| AGE
+    CMD -->|"BELONGS_TO cluster"| AGE
+    CMD --> MST
+    CTX -->|"cross-course mentions"| AGE
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#000
+```
+
 ## User Stories
 
 ### US-1: Prerequisite Prompts

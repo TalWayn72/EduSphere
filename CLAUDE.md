@@ -1193,6 +1193,22 @@ When running parallel agents:
 | `IMPLEMENTATION_ROADMAP.md`           | Phase acceptance criteria change        | Tasks, acceptance criteria, commands            |
 | `API_CONTRACTS_GRAPHQL_FEDERATION.md` | GraphQL schema change                   | Types, queries, mutations, subscriptions        |
 
+### Mermaid Diagram Rule (MANDATORY)
+
+Every new or updated `.md` file describing architecture, flows, relationships, state machines, or timelines **MUST** include Mermaid diagrams following [docs/reference/MERMAID_STYLE_GUIDE.md](docs/reference/MERMAID_STYLE_GUIDE.md).
+
+| Content Pattern | Required Diagram Type |
+|-----------------|----------------------|
+| Service/component dependencies | `graph TD` |
+| Request/response flows | `sequenceDiagram` |
+| State transitions | `stateDiagram-v2` |
+| Timeline/roadmap | `gantt` |
+| Process/pipeline steps | `flowchart TD/LR` |
+| Data relationships | `erDiagram` |
+| Git workflow | `gitGraph` |
+
+**Skills:** Use `mermaid-graph-writer` for creating diagrams, `mermaid-graph-renderer` for export.
+
 ## VS Code Extensions
 
 **Recommended extensions** are defined in `.vscode/extensions.json` and will be suggested automatically when opening the project in VS Code.

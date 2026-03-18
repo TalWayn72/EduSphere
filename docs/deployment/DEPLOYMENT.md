@@ -500,6 +500,34 @@ curl http://gateway:4000/health
 
 ## 🔄 CI/CD Pipeline
 
+### Pipeline Overview
+
+```mermaid
+flowchart LR
+    PUSH[Git Push] --> LINT[ESLint +<br/>TypeScript Check]
+    LINT --> TEST[Unit +<br/>Integration Tests]
+    TEST --> BUILD[Docker Build<br/>Multi-stage]
+    BUILD --> SCAN[Trivy<br/>Security Scan]
+    SCAN --> STAGE[Deploy to<br/>Staging]
+    STAGE --> E2E[Playwright<br/>E2E Tests]
+    E2E --> GATE{All Pass?}
+    GATE -->|Yes| PROD[Deploy to<br/>Production]
+    GATE -->|No| FIX[Fix & Retry]
+    PROD --> HEALTH[Health Check<br/>+ Monitoring]
+
+    classDef trigger fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef test fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef build fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef deploy fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef decision fill:#fff3e0,stroke:#e65100,stroke-width:2px
+
+    class PUSH trigger
+    class LINT,TEST test
+    class BUILD,SCAN build
+    class STAGE,PROD,HEALTH deploy
+    class GATE,E2E,FIX decision
+```
+
 ### GitHub Actions Example
 
 ```yaml

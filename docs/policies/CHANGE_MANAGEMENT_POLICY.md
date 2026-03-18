@@ -25,6 +25,40 @@ All changes to:
 - CI/CD pipeline configuration (GitHub Actions workflows)
 - Third-party dependencies (npm packages)
 
+## Change Management Flow
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    DEV["Developer<br/>Feature Branch"]:::data
+    PR["Pull Request"]:::data
+    CI["CI/CD Gates"]:::infra
+    REVIEW["Peer Code Review<br/>1 Approver Min"]:::service
+    MERGE["Merge to main"]:::service
+    DEPLOY["Automated Deploy<br/>Kubernetes + Helm"]:::infra
+    SMOKE["Post-Deploy<br/>Smoke Tests"]:::service
+    ROLLBACK["Helm Rollback<br/>if failure"]:::error
+
+    DEV --> PR --> CI
+    CI -->|All pass| REVIEW
+    CI -->|Fail| DEV
+    REVIEW -->|Approved| MERGE --> DEPLOY --> SMOKE
+    SMOKE -->|Fail| ROLLBACK
+
+    subgraph "CI Gates (Blocking)"
+        L["Lint + TypeScript"]:::infra
+        UT["Unit Tests >90%"]:::infra
+        SEC["Security Tests<br/>345+ static"]:::infra
+        FED["Federation<br/>Composition"]:::infra
+        TRIVY["Trivy + SBOM"]:::infra
+    end
+    CI --- L & UT & SEC & FED & TRIVY
+```
+
 ## 3. Change Classification
 
 | Class         | Definition                                             | Approval                             | Deployment                        |

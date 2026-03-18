@@ -11,6 +11,48 @@
 
 ---
 
+## ISMS Scope Boundary
+
+```mermaid
+graph TD
+    subgraph "In Scope — ISMS Boundary"
+        GW[GraphQL Gateway<br/>API entry point]
+        SUBS[6 NestJS Subgraphs<br/>Business logic]
+        PG[(PostgreSQL 16<br/>All tenant data)]
+        KC[Keycloak<br/>Authentication]
+        NATS[NATS JetStream<br/>Event bus]
+        MINIO[(MinIO<br/>Media storage)]
+    end
+
+    subgraph "Out of Scope"
+        CDN[CDN / Edge Cache]
+        THIRD[Third-party LLMs<br/>OpenAI, Anthropic]
+        EMAIL[Email Provider]
+    end
+
+    subgraph "Trust Boundary"
+        TRAEFIK[Traefik Proxy<br/>TLS termination]
+    end
+
+    TRAEFIK --> GW
+    GW --> SUBS
+    SUBS --> PG
+    SUBS --> MINIO
+    SUBS -.-> NATS
+    GW -.-> KC
+    SUBS -.consent check.-> THIRD
+
+    classDef inscope fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef outscope fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef boundary fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class GW,SUBS,PG,KC,NATS,MINIO inscope
+    class CDN,THIRD,EMAIL outscope
+    class TRAEFIK boundary
+```
+
+---
+
 ## 1. Organization Overview (Clause 4.1)
 
 ### 1.1 Organization Identity

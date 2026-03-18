@@ -36,14 +36,22 @@ This document defines the **comprehensive testing strategy** for EduSphere, a pr
 
 EduSphere follows the **inverted pyramid** approach optimized for GraphQL Federation:
 
-```
-         /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\
-        /   E2E Tests    \      ← 10% — Critical user flows only
-       /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\
-      / Integration Tests \     ← 30% — GraphQL + DB + NATS + Redis
-     /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\
-    /     Unit Tests       \    ← 60% — Resolvers, Services, Utilities
-   /________________________\
+```mermaid
+graph TD
+    E2E[E2E Tests<br/>10% — Critical user flows<br/>Playwright + Browser]
+    INT[Integration Tests<br/>30% — GraphQL + DB + NATS<br/>Real services required]
+    UNIT[Unit Tests<br/>60% — Resolvers, Services, Utils<br/>Fast, isolated, mocked deps]
+
+    E2E --> INT
+    INT --> UNIT
+
+    classDef e2e fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef integration fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef unit fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class E2E e2e
+    class INT integration
+    class UNIT unit
 ```
 
 **Rationale:**
@@ -2461,6 +2469,32 @@ fi
 ---
 
 ## CI/CD Integration
+
+### CI/CD Test Pipeline
+
+```mermaid
+flowchart LR
+    PR[Pull Request] --> UNIT[Unit Tests<br/>vitest --run]
+    UNIT --> TYPE[TypeScript<br/>tsc --noEmit]
+    TYPE --> LINT[ESLint<br/>--fix]
+    LINT --> INT[Integration<br/>Docker required]
+    INT --> E2E[Playwright<br/>E2E Suite]
+    E2E --> COV{Coverage<br/>Gate}
+    COV -->|Pass| MERGE[Ready to<br/>Merge]
+    COV -->|Fail| BLOCK[Blocked<br/>Fix coverage]
+
+    classDef trigger fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef fast fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef slow fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef gate fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef result fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+
+    class PR trigger
+    class UNIT,TYPE,LINT fast
+    class INT,E2E slow
+    class COV gate
+    class MERGE,BLOCK result
+```
 
 ### GitHub Actions Workflow
 

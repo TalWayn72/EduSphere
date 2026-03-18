@@ -14,6 +14,30 @@
 
 Establish EduSphere's approach to GDPR compliance, defining legal bases for processing, data subject rights fulfillment, and breach notification obligations.
 
+## GDPR Data Subject Rights Flow
+
+```mermaid
+graph LR
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    DS["Data Subject<br/>Request"]:::data
+
+    DS --> A15["Art.15 Access<br/>/api/gdpr/export<br/>SLA: 30 days"]:::service
+    DS --> A16["Art.16 Rectification<br/>Profile UI Update<br/>SLA: Immediate"]:::service
+    DS --> A17["Art.17 Erasure<br/>UserErasureService<br/>SLA: 30 days"]:::error
+    DS --> A20["Art.20 Portability<br/>JSON Export<br/>SLA: 30 days"]:::service
+    DS --> A21["Art.21 Objection<br/>Consent Withdrawal<br/>SLA: Immediate"]:::infra
+
+    A17 -->|"Cascade delete"| CASCADE["Users + Annotations<br/>+ Agent History<br/>+ Consents + Progress"]:::error
+    A17 -->|"Exception"| AUDIT["Audit Logs<br/>Retained 7 years<br/>Art.17(3)(b)"]:::infra
+
+    A21 --> AI_OFF["AI Features<br/>Disabled"]:::data
+    A21 --> LLM_OFF["Third-Party LLM<br/>Blocked"]:::data
+```
+
 ## 2. Legal Bases for Processing (Art.6)
 
 | Processing Activity                 | Legal Basis                       | Notes                              |

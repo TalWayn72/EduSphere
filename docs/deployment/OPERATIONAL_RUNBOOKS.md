@@ -3,6 +3,51 @@
 > **Purpose:** Step-by-step playbooks for the 6 most common production failure modes.
 > Follow these exactly — do not improvise under pressure.
 
+```mermaid
+flowchart TD
+    A["Alert Fired<br/>(PagerDuty / Grafana)"]
+    B{"Identify<br/>Symptom"}
+    C["DB Connection<br/>Exhaustion"]
+    D["Auth / Keycloak<br/>Failure"]
+    E["NATS JetStream<br/>Failure"]
+    F["MinIO / Storage<br/>Failure"]
+    G["Gateway /<br/>Federation Down"]
+    H["OOM Kill<br/>(Container)"]
+    I["Run Runbook<br/>Steps"]
+    J{"Resolved<br/>< 15 min?"}
+    K["Page Team Lead<br/>+ Diagnosis Output"]
+    L["Post-Incident RCA<br/>in OPEN_ISSUES.md"]
+
+    A --> B
+    B -->|"500 + too many connections"| C
+    B -->|"401 + JWKS fail"| D
+    B -->|"Events stuck"| E
+    B -->|"Upload 403"| F
+    B -->|"GraphQL null/error"| G
+    B -->|"Container restart"| H
+    C --> I
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J
+    J -->|Yes| L
+    J -->|No| K
+    K --> L
+
+    classDef error fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class A error
+    class B infra
+    class C,D,E,F,G,H data
+    class I,J service
+    class K,L infra
+```
+
 ---
 
 ## Runbook 1: Database Connection Exhaustion

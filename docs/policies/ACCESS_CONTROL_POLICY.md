@@ -18,6 +18,39 @@ Define access control requirements to ensure that access to EduSphere systems an
 
 All logical and physical access to EduSphere production systems, development environments, CI/CD pipelines, and customer data.
 
+## Access Control Overview
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    subgraph "Role Hierarchy"
+        SA["SUPER_ADMIN<br/>Cross-tenant"]:::infra
+        OA["ORG_ADMIN<br/>Tenant-wide"]:::service
+        INS["INSTRUCTOR<br/>Course-scoped"]:::service
+        STU["STUDENT<br/>Own data only"]:::data
+        SA --> OA --> INS --> STU
+    end
+
+    subgraph "Access Lifecycle"
+        REQ["Access Request<br/>+ Manager Approval"]:::data
+        PROV["Provisioning<br/>Least Privilege"]:::service
+        REV["Quarterly Review<br/>Privileged Accounts"]:::service
+        REVOKE["Revocation<br/>Immediate on Termination"]:::error
+        REQ --> PROV --> REV --> REVOKE
+    end
+
+    subgraph "Enforcement Layer"
+        KC["Keycloak OIDC<br/>MFA + JWT"]:::infra
+        GQL["GraphQL Directives<br/>@authenticated<br/>@requiresScopes"]:::infra
+        RLS["PostgreSQL RLS<br/>Tenant Isolation"]:::infra
+        KC --> GQL --> RLS
+    end
+```
+
 ## 3. Access Control Principles
 
 ### 3.1 Least Privilege

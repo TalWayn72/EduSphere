@@ -23,6 +23,48 @@ Ensure EduSphere can continue serving 100,000+ concurrent users and recover from
 | **Tier 3 — Standard**   | 8 hours  | 4 hours    | Agent subgraph, Knowledge subgraph, Analytics     |
 | **Tier 4 — Deferrable** | 24 hours | 24 hours   | Transcription worker, Email notifications         |
 
+## Recovery Architecture Overview
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    INCIDENT["Disruption<br/>Detected"]:::error
+
+    subgraph "Tier 1 — Critical (RTO 1h)"
+        KC["Keycloak<br/>Authentication"]:::error
+        GW["Hive Gateway<br/>GraphQL Federation"]:::error
+        CORE["Core Subgraph"]:::error
+    end
+
+    subgraph "Tier 2 — Important (RTO 4h)"
+        CONT["Content Subgraph"]:::data
+        ANNOT["Annotation Subgraph"]:::data
+        COLLAB["Collaboration Subgraph"]:::data
+    end
+
+    subgraph "Tier 3 — Standard (RTO 8h)"
+        AGENT["Agent Subgraph"]:::service
+        KNOW["Knowledge Subgraph"]:::service
+    end
+
+    subgraph "Recovery Mechanisms"
+        DBFAIL["DB Failover<br/>Promote Replica (5 min)"]:::infra
+        REGION["Regional Failover<br/>Route53 DNS (<60s)"]:::infra
+        BACKUP["Daily Full Backup<br/>+ Continuous WAL"]:::infra
+    end
+
+    INCIDENT --> KC & GW & CORE
+    INCIDENT --> CONT & ANNOT & COLLAB
+    INCIDENT --> AGENT & KNOW
+    DBFAIL --> KC & GW & CORE
+    REGION --> CONT & ANNOT & COLLAB
+    BACKUP --> AGENT & KNOW
+```
+
 ## 3. Business Impact Analysis
 
 ### Critical Dependencies

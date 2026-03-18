@@ -24,6 +24,32 @@ This register documents EduSphere's third-party vendor relationships, the associ
 
 ---
 
+```mermaid
+flowchart TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#01579b
+
+    A["New Vendor<br/>Identified"]:::client --> B["Risk Assessment<br/>& Data Classification"]:::data
+    B --> C{"Risk<br/>Level?"}:::infra
+    C -->|"LOW"| D["Add to Register<br/>Annual Review"]:::service
+    C -->|"MEDIUM"| E["CISO Approval<br/>Required"]:::data
+    C -->|"HIGH / CRITICAL"| F["CISO + Legal<br/>Review"]:::error
+    E --> G{"DPA<br/>Required?"}:::infra
+    F --> G
+    G -->|"Yes"| H["Execute DPA<br/>& SCCs"]:::error
+    G -->|"No"| I["ToS Review<br/>Only"]:::service
+    H --> J["Update Register<br/>+ DPIA + ROPA"]:::data
+    I --> J
+    D --> J
+    J --> K["Schedule Annual<br/>Review Date"]:::service
+    K --> L["Production<br/>Approved"]:::client
+```
+
+---
+
 ## Vendor Registry
 
 ### V-001: OpenAI

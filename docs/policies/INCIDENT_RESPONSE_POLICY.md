@@ -24,6 +24,36 @@ All security incidents affecting EduSphere's production environment, customer da
 - Insider threats
 - Third-party/subprocessor incidents affecting EduSphere data
 
+## Incident Response Flow
+
+```mermaid
+stateDiagram-v2
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    [*] --> Detection
+    Detection --> Triage
+    Triage --> Containment
+    Containment --> Eradication
+    Eradication --> Recovery
+    Recovery --> PostIncident
+    PostIncident --> [*]
+
+    Detection: Phase 1 — Detection\n0–15 min (P0/P1)\nWazuh SIEM / Falco eBPF / Manual
+    Triage: Phase 2 — Triage\n15–60 min\nAssign severity / Activate IC
+    Containment: Phase 3 — Containment\nIsolate systems / Revoke creds\nPreserve evidence
+    Eradication: Phase 4 — Eradication\nRemove threat / Patch vuln\nRotate credentials
+    Recovery: Phase 5 — Recovery\nRestore from backup\nVerify RLS intact
+    PostIncident: Phase 6 — Post-Incident\nBlameless post-mortem (5 days)\nPreventive measures
+
+    Containment --> GDPRCheck
+    GDPRCheck: GDPR Art.33 Check\nPII involved?
+    GDPRCheck --> DPANotify
+    DPANotify: DPA Notification\nWithin 72 hours
+```
+
 ## 3. Incident Severity Classification
 
 | Severity          | Definition                                    | Response SLA                     | Examples                                      |

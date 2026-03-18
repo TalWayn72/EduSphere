@@ -23,6 +23,33 @@ Applies to all EduSphere employees, contractors, subprocessors, and systems that
 - Mobile applications (iOS, Android)
 - Internal development and CI/CD systems
 
+## Security Framework Overview
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    CISO["CISO<br/>Policy Owner"]:::infra
+    SEC["Security Team<br/>Monitor + Respond"]:::infra
+    ENG["Engineering<br/>Secure SDLC"]:::service
+    SRE["DevOps / SRE<br/>Infra Hardening"]:::service
+
+    CISO --> SEC & ENG & SRE
+
+    subgraph "Defense Layers"
+        AES["Encryption<br/>AES-256-GCM + TLS 1.3"]:::error
+        AUTH["Authentication<br/>Keycloak MFA + OIDC"]:::error
+        RBAC["Authorization<br/>RBAC + RLS Isolation"]:::error
+        VULN["Vulnerability Mgmt<br/>OWASP + Trivy + Pentest"]:::data
+        LOG["Audit Logging<br/>7-Year Retention"]:::data
+    end
+
+    SEC --> AES & AUTH & RBAC & VULN & LOG
+```
+
 ## 3. Policy Statements
 
 ### 3.1 Information Classification

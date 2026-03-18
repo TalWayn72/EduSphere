@@ -14,6 +14,33 @@
 
 Define how EduSphere classifies, labels, and handles data throughout its lifecycle to ensure appropriate protection commensurate with sensitivity.
 
+## Data Classification Hierarchy
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    R["RESTRICTED<br/>PII, credentials, keys"]:::error
+    C["CONFIDENTIAL<br/>Source code, contracts"]:::data
+    I["INTERNAL<br/>Runbooks, meeting notes"]:::service
+    P["PUBLIC<br/>Marketing, open-source"]:::service
+
+    R -->|"AES-256-GCM + MFA<br/>+ Audit + RLS"| R_C["Controls"]:::error
+    C -->|"Encryption + RBAC<br/>No external sharing"| C_C["Controls"]:::data
+    I -->|"Auth access only<br/>No public sharing"| I_C["Controls"]:::service
+    P -->|"IP review<br/>before publishing"| P_C["Controls"]:::service
+
+    subgraph "Retention Rules"
+        R_RET["RESTRICTED<br/>Purpose + 90 days<br/>Crypto erasure"]:::error
+        C_RET["CONFIDENTIAL<br/>Contract + 1 year<br/>Secure deletion"]:::data
+        I_RET["INTERNAL<br/>3 years<br/>Standard deletion"]:::service
+        P_RET["PUBLIC<br/>Indefinite"]:::service
+    end
+```
+
 ## 2. Data Classification Levels
 
 ### RESTRICTED (Highest Sensitivity)

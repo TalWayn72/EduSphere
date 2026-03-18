@@ -4,6 +4,41 @@
 
 ---
 
+## i18n Data Flow — Phase A + Phase B
+
+```mermaid
+graph TD
+    subgraph "Phase A — UI i18n"
+        PKG["packages/i18n<br/>Shared translations"]:::service
+        WEB["React i18next<br/>(Web)"]:::client
+        RN["React i18next<br/>(Mobile)"]:::client
+        DB["users.preferences<br/>JSONB → locale"]:::data
+        GQL["GraphQL mutation<br/>updateLocale"]:::service
+    end
+
+    subgraph "Phase B — Content + LLM"
+        LLM["LLM Translation<br/>(on-demand)"]:::llm
+        CACHE["Translation Cache<br/>(DB table)"]:::data
+        AGENT["AI Agent Prompts<br/>Locale-aware"]:::llm
+        OFL["Offline Cache<br/>(expo-sqlite)"]:::infra
+    end
+
+    PKG --> WEB & RN
+    WEB & RN -->|"user selects locale"| GQL --> DB
+    DB -->|"load preference"| PKG
+    WEB -->|"content request"| LLM
+    LLM --> CACHE
+    CACHE -->|"cached hit"| WEB
+    AGENT -->|"system prompt<br/>in user locale"| LLM
+    CACHE --> OFL
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#000
+```
+
 ## Context
 
 EduSphere currently has zero internationalization infrastructure. Every string displayed to users — across 14 web pages, 18 React components, and 7 mobile screens — is hardcoded English. The `users.preferences` JSONB column already exists in the database but is not surfaced through GraphQL. AI agent system prompts are hardcoded English, and no content translation pipeline exists.

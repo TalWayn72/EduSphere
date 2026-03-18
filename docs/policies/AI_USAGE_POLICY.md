@@ -14,6 +14,36 @@
 
 Govern the use of AI systems within EduSphere's educational platform to ensure transparency, fairness, human oversight, and compliance with EU AI Act requirements.
 
+## AI Architecture and Consent Flow
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    USER["User Request"]:::data
+    CONSENT{"Consent<br/>Check"}:::infra
+
+    USER --> CONSENT
+    CONSENT -->|"AI_PROCESSING<br/>granted"| L1["Layer 1: LLM<br/>Vercel AI SDK v6"]:::service
+    CONSENT -->|"No consent"| NOAI["Platform Works<br/>AI Disabled"]:::error
+
+    L1 --> LOCAL{"THIRD_PARTY_LLM<br/>consent?"}:::infra
+    LOCAL -->|"Yes"| CLOUD["OpenAI / Anthropic<br/>+ PII Scrubber"]:::data
+    LOCAL -->|"No"| OLLAMA["Ollama Local<br/>Data Stays On-Prem"]:::service
+
+    L1 --> L2["Layer 2: Agents<br/>LangGraph.js"]:::service
+    L2 --> ASSESS["Assessment AI"]:::service
+    L2 --> QUIZ["Quiz Generator"]:::service
+    L2 --> DEBATE["Chavruta Debate"]:::service
+
+    L1 --> L3["Layer 3: RAG<br/>LlamaIndex.TS"]:::service
+    L3 --> PGV["pgvector<br/>Semantic Search"]:::infra
+    L3 --> AGE["Apache AGE<br/>Graph Traversal"]:::infra
+```
+
 ## 2. AI System Inventory
 
 EduSphere operates AI systems at three layers:

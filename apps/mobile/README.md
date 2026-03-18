@@ -11,6 +11,40 @@ Native mobile application for iOS and Android built with Expo SDK 54 and React N
 - 🔐 **Secure Storage**: expo-secure-store for tokens
 - 📊 **GraphQL**: Apollo Client with offline mutations queue
 
+## Architecture
+
+```mermaid
+graph TD
+    ENTRY["App.tsx<br/>(Entry Point)"]
+    NAV["React Navigation 7<br/>(Stack + Tabs)"]
+    APOLLO["Apollo Client<br/>(GraphQL + Cache)"]
+    OFFLINE["Offline Link<br/>(Mutation Queue)"]
+    SQLITE["expo-sqlite<br/>(Local DB)"]
+    SCREENS["Screens<br/>(Courses, AI Tutor, ...)"]
+    SHARED["@edusphere/ui<br/>(Shared Components)"]
+    GW["Hive Gateway<br/>:4000"]
+    NET["NetInfo<br/>(Online/Offline)"]
+
+    ENTRY --> NAV
+    NAV --> SCREENS
+    SCREENS --> APOLLO
+    SCREENS --> SHARED
+    APOLLO --> OFFLINE
+    OFFLINE --> SQLITE
+    APOLLO -- "GraphQL / WS" --> GW
+    NET -- "status" --> OFFLINE
+
+    classDef client fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef gateway fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class ENTRY,NAV,SCREENS,SHARED client
+    class APOLLO,OFFLINE,NET service
+    class SQLITE data
+    class GW gateway
+```
+
 ## Tech Stack
 
 - **Framework**: Expo SDK 54 (React Native 0.76.8)

@@ -14,6 +14,27 @@ The DPA is required under GDPR Article 28 whenever EduSphere processes personal 
 
 ---
 
+## DPA Execution Process
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    S1["Step 1: Identify Parties<br/>Collect client legal details"]:::data
+    S2["Step 2: Review TOMs<br/>Verify encryption + TLS<br/>+ audit logging"]:::infra
+    S3["Step 3: Fill Template<br/>Replace all placeholders<br/>grep for remaining [ ]"]:::service
+    S4["Step 4: Legal Review<br/>EduSphere counsel review<br/>Escalate changes to DPO"]:::infra
+    S5["Step 5: Sign Both Parties<br/>PDF + DocuSign<br/>DPO countersigns"]:::service
+    FILE["Filed in<br/>docs/legal/executed/"]:::data
+
+    S1 --> S2 --> S3 --> S4 --> S5 --> FILE
+
+    S4 -->|"Client requests<br/>TOM changes"| REJECT["TOMs Non-Negotiable<br/>Client may add stricter only"]:::error
+```
+
 ## Step-by-Step Process
 
 ### Step 1: Identify the Parties

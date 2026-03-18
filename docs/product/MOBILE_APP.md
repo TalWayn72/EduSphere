@@ -13,6 +13,38 @@ The mobile app provides a native iOS/Android experience with:
 - ✅ Automatic offline mutation queuing
 - ✅ Network-aware sync system
 
+## Offline-First Data Flow
+
+```mermaid
+graph LR
+    subgraph "Device (Offline-First)"
+        UI[React Native UI]
+        SQLITE[(expo-sqlite<br/>Local Cache)]
+        TQ[TanStack Query<br/>Cache Manager]
+    end
+
+    subgraph "Cloud"
+        GW[GraphQL Gateway]
+        PG[(PostgreSQL<br/>Source of Truth)]
+    end
+
+    UI --> TQ
+    TQ --> SQLITE
+    TQ -->|Online| GW
+    GW --> PG
+
+    SQLITE -.->|Sync on reconnect| GW
+
+    classDef device fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef cloud fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class UI,TQ device
+    class SQLITE data
+    class GW cloud
+    class PG data
+```
+
 ## Architecture Layers
 
 ### 1. Presentation Layer (Screens)

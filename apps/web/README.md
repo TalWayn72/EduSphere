@@ -13,6 +13,41 @@ React 19 + Vite 6 frontend application for the EduSphere Knowledge Graph Educati
 - **Styling:** Tailwind CSS
 - **TypeScript:** Strict mode
 
+## Architecture
+
+```mermaid
+graph TD
+    ENTRY["main.tsx<br/>(Entry Point)"]
+    APP["App.tsx<br/>React Router v6"]
+    AUTH["Keycloak<br/>OIDC Auth"]
+    URQL["urql Client<br/>(GraphQL)"]
+    PAGES["Pages<br/>(Dashboard, Login, ...)"]
+    HOOKS["Custom Hooks<br/>(useAuth, useQuery)"]
+    UI["shadcn/ui<br/>(Radix + Tailwind)"]
+    GW["Hive Gateway<br/>:4000"]
+    KC["Keycloak<br/>:8080"]
+
+    ENTRY --> APP
+    APP --> AUTH
+    APP --> PAGES
+    PAGES --> HOOKS
+    PAGES --> UI
+    HOOKS --> URQL
+    AUTH -- "JWT" --> URQL
+    URQL -- "GraphQL / WS" --> GW
+    AUTH -- "OIDC" --> KC
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef gateway fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef client fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+
+    class ENTRY,APP,PAGES,HOOKS,UI client
+    class URQL,AUTH service
+    class GW gateway
+    class KC infra
+```
+
 ## Getting Started
 
 ### Prerequisites

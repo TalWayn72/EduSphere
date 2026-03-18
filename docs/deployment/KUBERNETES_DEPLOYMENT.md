@@ -27,6 +27,63 @@
 
 ## 1. Cluster Requirements
 
+### Cluster Topology Overview
+
+```mermaid
+graph TD
+    subgraph "Control Plane"
+        API[API Server]
+        ETCD[(etcd)]
+        SCHED[Scheduler]
+        CM[Controller Manager]
+    end
+
+    subgraph "Application Nodes"
+        GW[Gateway Pod<br/>Hive + Traefik]
+        S1[Core Subgraph Pod]
+        S2[Content Subgraph Pod]
+        S3[Annotation Pod]
+        S4[Collab Pod]
+        S5[Agent Pod]
+        S6[Knowledge Pod]
+    end
+
+    subgraph "Data Nodes"
+        PG[(PostgreSQL 16<br/>StatefulSet)]
+        NATS[NATS JetStream<br/>StatefulSet]
+        MINIO[(MinIO<br/>StatefulSet)]
+    end
+
+    subgraph "Infrastructure Nodes"
+        KC[Keycloak<br/>Deployment]
+        JAEGER[Jaeger<br/>DaemonSet]
+    end
+
+    API --> GW
+    API --> S1
+    API --> PG
+    GW --> S1
+    GW --> S2
+    GW --> S3
+    GW --> S4
+    GW --> S5
+    GW --> S6
+    S1 --> PG
+    S2 --> MINIO
+    S5 -.-> NATS
+    GW -.-> KC
+
+    classDef control fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef app fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef infra fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class API,ETCD,SCHED,CM control
+    class GW,S1,S2,S3,S4,S5,S6 app
+    class PG,NATS,MINIO data
+    class KC,JAEGER infra
+```
+
 ### Minimum Kubernetes Version
 
 - Kubernetes 1.28+
@@ -2149,6 +2206,27 @@ spec:
 
 ## 12. Traefik Ingress
 
+### Ingress Routing Overview
+
+```mermaid
+flowchart LR
+    INTERNET[Internet<br/>HTTPS] --> TRAEFIK[Traefik v3.6<br/>IngressRoute]
+    TRAEFIK -->|/graphql| GW[Hive Gateway<br/>Service:4000]
+    TRAEFIK -->|/| WEB[React SPA<br/>Service:5173]
+    TRAEFIK -->|/auth| KC[Keycloak<br/>Service:8080]
+    TRAEFIK -->|/jaeger| JAEGER[Jaeger UI<br/>Service:16686]
+
+    GW --> SUBS[6 Subgraphs<br/>ClusterIP]
+
+    classDef external fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef proxy fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class INTERNET external
+    class TRAEFIK proxy
+    class GW,WEB,KC,JAEGER,SUBS service
+```
+
 ### Install Traefik via Helm
 
 ```bash
@@ -2306,6 +2384,51 @@ All critical services have PodDisruptionBudgets defined:
 ---
 
 ## 14. Network Policies
+
+### Network Policy Map
+
+```mermaid
+graph LR
+    subgraph "edusphere-app namespace"
+        GW[Gateway]
+        SUBS[6 Subgraphs]
+    end
+
+    subgraph "edusphere-data namespace"
+        PG[(PostgreSQL)]
+        NATS[NATS]
+        MINIO[(MinIO)]
+    end
+
+    subgraph "edusphere-infra namespace"
+        KC[Keycloak]
+        JAEGER[Jaeger]
+    end
+
+    subgraph "edusphere-workers namespace"
+        TRANS[Transcription]
+        EMBED[Embedding]
+    end
+
+    GW -->|Port 4001-4006| SUBS
+    SUBS -->|Port 5432| PG
+    SUBS -->|Port 4222| NATS
+    SUBS -->|Port 9000| MINIO
+    GW -.->|Port 8080| KC
+    GW -.->|Port 16686| JAEGER
+    TRANS -->|Port 4222| NATS
+    EMBED -->|Port 4222| NATS
+
+    classDef app fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef worker fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+
+    class GW,SUBS app
+    class PG,NATS,MINIO data
+    class KC,JAEGER infra
+    class TRANS,EMBED worker
+```
 
 ```yaml
 # network-policies.yaml
@@ -2931,6 +3054,30 @@ deploy:production:
 
 ## 18. Zero-Downtime Updates
 
+### Rolling Update Sequence
+
+```mermaid
+sequenceDiagram
+    participant K8s as K8s Controller
+    participant Old as Old Pod (v1)
+    participant New as New Pod (v2)
+    participant LB as Service Load Balancer
+
+    K8s->>New: Create new pod (v2)
+    New->>New: Start application
+    New->>K8s: Readiness probe: OK
+
+    K8s->>LB: Add new pod to endpoints
+    LB->>New: Route new traffic
+
+    K8s->>Old: Send SIGTERM
+    Old->>Old: Graceful shutdown<br/>(drain connections, 30s)
+    K8s->>LB: Remove old pod from endpoints
+    Old->>K8s: Pod terminated
+
+    K8s->>K8s: Verify desired replicas met
+```
+
 ### Rolling Update Strategy
 
 ```yaml
@@ -3065,6 +3212,30 @@ spec:
 ---
 
 ## 19. Disaster Recovery
+
+### Disaster Recovery State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Normal: All systems healthy
+
+    Normal --> Degraded: Service failure detected
+    Degraded --> Normal: Auto-healing succeeds
+
+    Degraded --> Failover: Multiple failures<br/>or data node down
+    Failover --> Recovery: Backup restored<br/>or node replaced
+
+    Recovery --> Normal: Health checks pass<br/>+ data integrity verified
+    Recovery --> Failover: Recovery failed
+
+    Normal --> Maintenance: Planned upgrade
+    Maintenance --> Normal: Upgrade complete
+
+    note right of Failover
+        RTO: < 15 minutes
+        RPO: < 5 minutes
+    end note
+```
 
 ### Backup Strategy
 

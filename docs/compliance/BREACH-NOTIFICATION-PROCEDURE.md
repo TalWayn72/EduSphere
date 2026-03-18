@@ -14,6 +14,42 @@
 
 ---
 
+```mermaid
+stateDiagram-v2
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#01579b
+
+    [*] --> Detection: Alert fired<br/>(SIEM / user report)
+    Detection --> Assessment: Hour 0–4<br/>Is it a breach?
+    Assessment --> NotABreach: No personal<br/>data involved
+    Assessment --> TierClassification: Yes — personal<br/>data breach
+    NotABreach --> [*]: Document<br/>internally
+    TierClassification --> Containment: Hour 4–24<br/>Isolate & preserve
+    Containment --> ImpactAnalysis: Hour 24–48<br/>Count subjects
+    ImpactAnalysis --> DPANotification: Hour 48–72<br/>HARD DEADLINE
+    DPANotification --> SubjectNotification: Hour 72–96<br/>If high risk (Art. 34)
+    DPANotification --> Recovery: No high risk
+    SubjectNotification --> Recovery: Hour 96+<br/>Restore & remediate
+    Recovery --> PostMortem: Within 14 days
+    PostMortem --> [*]: Lessons learned<br/>& register updated
+
+    state Detection:::error
+    state Assessment:::service
+    state TierClassification:::data
+    state Containment:::error
+    state ImpactAnalysis:::infra
+    state DPANotification:::client
+    state SubjectNotification:::client
+    state Recovery:::service
+    state PostMortem:::data
+    state NotABreach:::service
+```
+
+---
+
 ## Section 1 — Trigger Conditions
 
 A **personal data breach** is any security incident leading to the accidental or unlawful destruction, loss, alteration, unauthorised disclosure of, or access to, personal data transmitted, stored or otherwise processed by EduSphere.

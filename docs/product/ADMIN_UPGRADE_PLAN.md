@@ -74,6 +74,32 @@ _העבר לפרויקט: `docs/plans/ADMIN_UPGRADE_PLAN.md` לפני מימוש
 
 ---
 
+## Admin Upgrade — Phase Dependency Map
+
+```mermaid
+graph TD
+    P1["Phase 1<br/>Dashboard + Branding"]:::service
+    P2["Phase 2<br/>Users + Roles"]:::service
+    P3["Phase 3<br/>Tenant Languages"]:::data
+    P4["Phase 4<br/>Gamification +<br/>Announcements"]:::infra
+    P5["Phase 5<br/>Enrollment +<br/>At-Risk"]:::data
+    P6["Phase 6<br/>Security +<br/>Audit Log"]:::llm
+    P7["Phase 7<br/>Email Templates +<br/>Sub-Admin"]:::infra
+
+    P1 -->|"Admin Layout<br/>required"| P2
+    P1 --> P3
+    P2 -->|"Roles needed"| P4
+    P2 -->|"User mgmt"| P5
+    P2 -->|"Role checks"| P6
+    P6 -->|"Audit trail"| P7
+    P4 --> P7
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+```
+
 ## תוכנית השדרוג — 7 פאזות
 
 ### פאזה 1: תשתית Admin מרכזית (Priority: Critical)

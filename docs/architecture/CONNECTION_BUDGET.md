@@ -4,6 +4,50 @@
 
 ---
 
+```mermaid
+graph LR
+    subgraph "PgBouncer Pool (18 conns)"
+        C1[Core: 3]
+        C2[Content: 3]
+        C3[Annotation: 3]
+        C4[Collab: 3]
+        C5[Agent: 3]
+        C6[Knowledge: 3]
+    end
+
+    subgraph "Direct Connections (11 conns)"
+        D1[RLS Context: 6<br/>one per subgraph]
+        D2[AGE Queries: 3]
+        D3[Migrations: 1]
+        D4[Drizzle Studio: 1]
+    end
+
+    subgraph "Reserved (5 conns)"
+        R1[superuser: 3]
+        R2[replication: 2]
+    end
+
+    PG[(PostgreSQL<br/>max_connections=100<br/>Used: 34 / 100)]
+
+    C1 --> PG
+    C2 --> PG
+    D1 --> PG
+    D2 --> PG
+    R1 --> PG
+
+    classDef pool fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef direct fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef reserved fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef db fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class C1,C2,C3,C4,C5,C6 pool
+    class D1,D2,D3,D4 direct
+    class R1,R2 reserved
+    class PG db
+```
+
+---
+
 ## Current Configuration
 
 | Parameter | Value | Source |

@@ -22,6 +22,32 @@ Manage the security and privacy risks introduced by third-party vendors and subp
 | **Tier 2 — Important** | Access to non-PII operational data           | GitHub, Sentry, Datadog          | Security review, DPA if EU data         |
 | **Tier 3 — Standard**  | No data access (tools only)                  | Figma, Notion                    | Standard contract, ToS review           |
 
+## Vendor Onboarding Flow
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    REQ["Vendor Request"]:::data
+    CLASS["Classify Tier<br/>1=Critical / 2=Important / 3=Standard"]:::data
+    VSQ["Security Assessment<br/>VSQ + SOC2 + ISO 27001"]:::infra
+    DPA["Legal Review<br/>DPA + Data Residency"]:::infra
+    T1["Tier 1 Approval<br/>CISO + Legal"]:::error
+    T2["Tier 2 Approval<br/>CISO"]:::service
+    T3["Tier 3 Approval<br/>Eng Lead"]:::service
+    REG["Vendor Register<br/>+ Review Date Set"]:::service
+    MON["Ongoing Monitoring<br/>Annual SOC2 Review"]:::infra
+
+    REQ --> CLASS
+    CLASS -->|Tier 1| VSQ --> DPA --> T1 --> REG --> MON
+    CLASS -->|Tier 2| VSQ
+    DPA --> T2 --> REG
+    CLASS -->|Tier 3| T3 --> REG
+```
+
 ## 3. Vendor Onboarding Process
 
 ### Step 1: Security Assessment

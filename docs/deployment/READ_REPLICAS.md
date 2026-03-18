@@ -8,28 +8,30 @@
 
 ## Architecture
 
-```
-                        ┌─────────────────────────────────┐
-                        │         Application Layer        │
-                        │   NestJS Subgraphs (6 services)  │
-                        └────────────┬──────┬─────────────┘
-                                     │      │
-                        WRITES ◄─────┘      └─────► READS
-                             │                        │
-                   ┌─────────▼──────┐     ┌──────────▼──────────┐
-                   │  PRIMARY (RW)  │     │  readReplica helper  │
-                   │ postgres:5432  │     │ REPLICA_DATABASE_URL │
-                   └─────────┬──────┘     └──────────┬──────────┘
-                             │                        │
-                   WAL Stream│                        │ Queries
-                   (async)   │              ┌─────────┴──────────┐
-                             │              │                    │
-                   ┌─────────▼──────┐  ┌───▼────────┐  ┌───────▼────┐
-                   │  WAL Archiver  │  │ Replica-1  │  │ Replica-2  │
-                   │  (pg_wal/)     │  │ (port 5432)│  │ (port 5432)│
-                   └────────────────┘  │ hot_standby│  │ hot_standby│
-                                       │    = on    │  │    = on    │
-                                       └────────────┘  └────────────┘
+```mermaid
+graph LR
+    APP["NestJS Subgraphs<br/>(6 services)"]
+    PRI["Primary (RW)<br/>:5432"]
+    RH["readReplica<br/>helper"]
+    R1["Replica-1<br/>hot_standby=on"]
+    R2["Replica-2<br/>hot_standby=on"]
+    WAL["WAL Archiver<br/>(pg_wal/)"]
+
+    APP -- "INSERT / UPDATE<br/>DELETE" --> PRI
+    APP -- "SELECT" --> RH
+    RH --> R1
+    RH --> R2
+    PRI -- "WAL stream<br/>(async)" --> R1
+    PRI -- "WAL stream<br/>(async)" --> R2
+    PRI --> WAL
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef gateway fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class APP service
+    class PRI,R1,R2,WAL data
+    class RH gateway
 ```
 
 **Replication type:** Synchronous-optional streaming replication (asynchronous by default; set `synchronous_standby_names` for zero data-loss on writes).

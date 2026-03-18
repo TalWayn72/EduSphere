@@ -18,6 +18,56 @@ Complete AI/ML infrastructure with RAG, LangGraph workflows, and semantic search
 - Streaming responses
 - Multi-tenant isolation
 
+## Architecture — AI Pipeline Layers
+
+```mermaid
+graph TD
+    subgraph "Client Layer"
+        WEB["Web App<br/>(React 19)"]:::client
+        MOB["Mobile App<br/>(Expo SDK 54)"]:::client
+    end
+
+    subgraph "Layer 1 — LLM Abstraction"
+        VSDK["Vercel AI SDK v6<br/>Model routing"]:::llm
+        OLL["Ollama<br/>(dev)"]:::llm
+        OAI["OpenAI / Anthropic<br/>(prod)"]:::llm
+    end
+
+    subgraph "Layer 2 — Agent Workflows"
+        LG["LangGraph.js<br/>State machines"]:::service
+        TUT["Tutor<br/>Workflow"]:::service
+        QZ["Quiz<br/>Workflow"]:::service
+        DBT["Debate<br/>Workflow"]:::service
+        ASM["Assessment<br/>Workflow"]:::service
+    end
+
+    subgraph "Layer 3 — RAG Pipeline"
+        LI["LlamaIndex.TS<br/>Indexing + retrieval"]:::service
+        HR["HybridRAG<br/>Semantic + Graph fusion"]:::data
+    end
+
+    subgraph "Data Stores"
+        PGV["pgvector<br/>768-dim HNSW"]:::data
+        AGE["Apache AGE<br/>Knowledge graph"]:::data
+        RDS["Redis<br/>Embedding cache"]:::infra
+    end
+
+    WEB & MOB --> VSDK
+    VSDK --> OLL & OAI
+    VSDK --> LG
+    LG --> TUT & QZ & DBT & ASM
+    LG --> LI
+    LI --> HR
+    HR --> PGV & AGE
+    LI --> RDS
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#000
+```
+
 ## RAG Package (@edusphere/rag)
 
 ### Architecture

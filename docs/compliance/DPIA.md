@@ -15,6 +15,41 @@
 
 ---
 
+## Personal Data Flow
+
+```mermaid
+flowchart TD
+    INPUT[User Input<br/>Registration, Profile,<br/>Annotations] --> VALIDATE[Input Validation<br/>Zod schemas]
+    VALIDATE --> ENCRYPT[PII Encryption<br/>AES-256-GCM]
+    ENCRYPT --> STORE[(PostgreSQL<br/>RLS tenant isolation)]
+
+    STORE --> PROCESS[Processing<br/>Analytics, Grading,<br/>Recommendations]
+
+    PROCESS --> AI{AI Processing<br/>Consent required?}
+    AI -->|Consent given| LLM[Third-party LLM<br/>OpenAI / Anthropic]
+    AI -->|No consent| LOCAL[Local Ollama<br/>On-premise only]
+
+    LLM --> OUTPUT[AI Response<br/>Streamed to user]
+    LOCAL --> OUTPUT
+
+    STORE --> EXPORT[Data Export<br/>GDPR Article 20]
+    STORE --> DELETE[Data Erasure<br/>GDPR Article 17]
+
+    classDef input fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef process fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef storage fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef ai fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef rights fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class INPUT,VALIDATE input
+    class ENCRYPT,PROCESS process
+    class STORE storage
+    class AI,LLM,LOCAL ai
+    class OUTPUT,EXPORT,DELETE rights
+```
+
+---
+
 ## Section 1 — Description of Processing
 
 ### 1.1 Systems in Scope

@@ -16,6 +16,45 @@
 
 ---
 
+```mermaid
+flowchart TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#01579b
+
+    subgraph "Data Subjects"
+        U["Students<br/>Instructors<br/>Admins"]:::client
+    end
+
+    subgraph "Collection & Processing"
+        A["Account Mgmt<br/>(Activity 1)"]:::service
+        B["Progress Tracking<br/>(Activity 2)"]:::service
+        C["AI Tutoring<br/>(Activity 3)"]:::data
+        D["KG Personalisation<br/>(Activity 4)"]:::data
+    end
+
+    subgraph "Storage & Security"
+        PG["PostgreSQL<br/>RLS + AES-256"]:::infra
+        MIO["MinIO<br/>Encrypted Objects"]:::infra
+        KC["Keycloak<br/>Auth & Identity"]:::infra
+    end
+
+    subgraph "Third-Party (Consent-Gated)"
+        LLM["OpenAI / Anthropic<br/>(Activity 11)"]:::error
+    end
+
+    U --> A & B & C & D
+    A --> KC
+    A & B --> PG
+    C --> PG
+    C -->|"SI-10<br/>Consent Gate"| LLM
+    D --> PG
+```
+
+---
+
 ## Activity 1 — User Account Management
 
 | Field | Detail |

@@ -3,6 +3,35 @@
 > **Purpose:** Ensure security review and QA testability requirements are created at Wave 1, not Wave 2.
 > **Effective:** 2026-03-17 | **Item:** #63, #103
 
+```mermaid
+flowchart LR
+    W1["Wave 1<br/>Planning"]
+    TM["Threat Model<br/>Stub (STRIDE)"]
+    TC["Testability<br/>Contract"]
+    W2["Wave 2<br/>Implementation"]
+    FE["Frontend:<br/>data-testid attrs"]
+    BE["Backend:<br/>Mitigations"]
+    CI["CI Gate<br/>Enforce"]
+
+    W1 --> TM
+    W1 --> TC
+    TM --> W2
+    TC --> W2
+    W2 --> FE
+    W2 --> BE
+    FE --> CI
+    BE --> CI
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef error fill:#ffebee,stroke:#c62828,stroke-width:2px
+
+    class W1,W2 infra
+    class TM,TC error
+    class FE,BE service
+    class CI infra
+```
+
 ---
 
 ## Problem

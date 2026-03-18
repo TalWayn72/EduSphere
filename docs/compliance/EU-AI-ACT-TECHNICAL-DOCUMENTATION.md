@@ -17,6 +17,33 @@
 
 ---
 
+```mermaid
+flowchart TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+    classDef client fill:#e1f5ff,stroke:#01579b,color:#01579b
+
+    A["New AI System<br/>Identified"]:::client --> B{"Annex III<br/>High-Risk?"}:::infra
+    B -->|"Yes — Education<br/>(point 3b)"| C["Art. 11 Technical<br/>Documentation"]:::data
+    B -->|"No"| D{"General-Purpose<br/>AI (GPAI)?"}:::infra
+    D -->|"Yes"| E["GPAI Obligations<br/>(Art. 52+)"]:::data
+    D -->|"No"| F["Minimal Risk<br/>Transparency Only"]:::service
+
+    C --> G["Art. 12<br/>Automatic Logging"]:::service
+    C --> H["Art. 13<br/>User Transparency"]:::service
+    C --> I["Art. 14<br/>Human Oversight"]:::service
+    C --> J["Art. 15<br/>Accuracy & Robustness"]:::service
+
+    G & H & I & J --> K{"Conformity<br/>Assessment<br/>(Art. 43)"}:::error
+    K -->|"Pass"| L["EU Market<br/>Deployment"]:::client
+    K -->|"Fail"| M["Remediate &<br/>Re-assess"]:::error
+    M --> K
+```
+
+---
+
 ## System 1 — Chavruta AI Tutor
 
 ### 1.1 General Description

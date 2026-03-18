@@ -94,35 +94,62 @@ Verify all services are running before starting work:
 
 ### System Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                      Client Applications                            │
-│          React SPA (Vite) · React Native (Expo) · PWA              │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │
-                  GraphQL over HTTPS / WebSocket
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                  Hive Gateway v2 (Port 4000)                        │
-│  Federation v2.7 · JWT Validation · Rate Limiting · Caching         │
-└─┬──────┬──────┬──────┬──────┬──────┬─────────────────────────────┘
-  │      │      │      │      │      │
-  ▼      ▼      ▼      ▼      ▼      ▼
-┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐
-│Core│ │Cont│ │Anno│ │Coll│ │Agnt│ │Know│  ← 6 GraphQL Subgraphs
-│4001│ │4002│ │4003│ │4004│ │4005│ │4006│    (NestJS + GraphQL Yoga)
-└─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘
-  │      │      │      │      │      │
-  └──────┴──────┴──────┴──────┴──────┘
-                 │
-     ┌───────────┼───────────┐
-     ▼           ▼           ▼
-┌──────────┐ ┌────────┐ ┌──────────┐
-│PostgreSQL│ │ MinIO  │ │  NATS    │
-│ 16 + AGE │ │  (S3)  │ │JetStream │
-│+ pgvector│ │        │ │          │
-└──────────┘ └────────┘ └──────────┘
+```mermaid
+graph TD
+    subgraph "Clients"
+        WEB[React SPA]
+        MOBILE[Expo Mobile]
+        PWA[Offline PWA]
+    end
+
+    subgraph "API Layer"
+        TRAEFIK[Traefik Proxy]
+        GW[Hive Gateway v2<br/>Federation v2.7]
+    end
+
+    subgraph "6 GraphQL Subgraphs"
+        CORE[Core 4001]
+        CONTENT[Content 4002]
+        ANNOT[Annotation 4003]
+        COLLAB[Collab 4004]
+        AGENT[Agent 4005]
+        KNOW[Knowledge 4006]
+    end
+
+    subgraph "Data & Infrastructure"
+        PG[(PostgreSQL 16<br/>AGE + pgvector)]
+        MINIO[(MinIO)]
+        NATS[NATS JetStream]
+        KC[Keycloak v26]
+    end
+
+    WEB --> TRAEFIK
+    MOBILE --> TRAEFIK
+    PWA --> TRAEFIK
+    TRAEFIK --> GW
+
+    GW --> CORE
+    GW --> CONTENT
+    GW --> ANNOT
+    GW --> COLLAB
+    GW --> AGENT
+    GW --> KNOW
+
+    CORE --> PG
+    CONTENT --> PG
+    CONTENT --> MINIO
+    AGENT -.-> NATS
+    GW -.JWT.-> KC
+
+    classDef client fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef gateway fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class WEB,MOBILE,PWA client
+    class TRAEFIK,GW gateway
+    class CORE,CONTENT,ANNOT,COLLAB,AGENT,KNOW service
+    class PG,MINIO,NATS,KC data
 ```
 
 ### Monorepo Structure
@@ -219,6 +246,27 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Layer 3: RAG + Knowledge**     | LlamaIndex.TS | latest  | MIT        | Data connectors, indexing, HybridRAG (vector + graph fusion)      |
 | **Local LLMs**                   | Ollama        | latest  | MIT        | 100+ models, Llama 3.1 8B, Phi-4 14B, nomic-embed-text (768-dim)  |
 | **Sandboxing**                   | gVisor        | latest  | Apache 2.0 | User-space kernel, 10-20% overhead, Docker/K8s integration        |
+
+### Request Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Gateway as Hive Gateway
+    participant Subgraph as NestJS Subgraph
+    participant PG as PostgreSQL + RLS
+
+    Browser->>Gateway: POST /graphql<br/>Authorization: Bearer JWT
+    Gateway->>Gateway: Validate JWT via Keycloak JWKS
+    Gateway->>Subgraph: Forward query<br/>x-tenant-id, x-user-id headers
+
+    Subgraph->>PG: SET LOCAL app.current_tenant<br/>= 'tenant-uuid'
+    PG->>PG: Apply RLS policies
+    PG-->>Subgraph: Tenant-filtered results
+
+    Subgraph-->>Gateway: GraphQL response
+    Gateway-->>Browser: JSON response
+```
 
 ---
 

@@ -40,6 +40,39 @@
 
 ---
 
+## Feature Domain Map
+
+```mermaid
+graph TD
+    EDUSPHERE[EduSphere Platform]
+
+    EDUSPHERE --> CONTENT[Content Management<br/>Courses, Media, Transcripts]
+    EDUSPHERE --> ANNOT[Annotation System<br/>Layers, Highlights, Replies]
+    EDUSPHERE --> COLLAB[Collaboration<br/>Real-time CRDT, Presence]
+    EDUSPHERE --> AI[AI Agents<br/>Chavruta, Quiz, Explain]
+    EDUSPHERE --> KG[Knowledge Graph<br/>Concepts, Relations, Search]
+    EDUSPHERE --> ENTERPRISE[Enterprise<br/>Multi-tenant, RBAC, SSO]
+
+    CONTENT --> C1[Video + Audio + PDF]
+    CONTENT --> C2[SCORM/xAPI Import]
+    AI --> A1[HybridRAG Pipeline]
+    AI --> A2[4 Agent Templates]
+    KG --> K1[Apache AGE Graph]
+    KG --> K2[pgvector Embeddings]
+    ENTERPRISE --> E1[Keycloak SSO]
+    ENTERPRISE --> E2[Row-Level Security]
+
+    classDef platform fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef domain fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef feature fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class EDUSPHERE platform
+    class CONTENT,ANNOT,COLLAB,AI,KG,ENTERPRISE domain
+    class C1,C2,A1,A2,K1,K2,E1,E2 feature
+```
+
+---
+
 ## 1. Executive Summary
 
 ### 1.1 Product Overview

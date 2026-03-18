@@ -19,21 +19,44 @@ cause `FATAL: remaining connection slots are reserved`.
 PgBouncer solves this by multiplexing many application connections onto a
 small, stable set of server connections:
 
-```
-App pods (up to 1,000 client conns)
-         │
-   ┌─────▼──────────────┐
-   │   PgBouncer 1.22   │  port 5433
-   │  pool_mode=transaction│
-   │  max_client=1000   │
-   │  pool_size=25      │
-   └─────┬──────────────┘
-         │ 25 server connections
-   ┌─────▼──────────────┐
-   │   PostgreSQL 18    │  port 5432
-   │  (Apache AGE +     │
-   │   pgvector + RLS)  │
-   └────────────────────┘
+```mermaid
+graph TD
+    subgraph "Application Pods"
+        S1[Core Subgraph]
+        S2[Content Subgraph]
+        S3[Annotation Subgraph]
+        S4[Collab Subgraph]
+        S5[Agent Subgraph]
+        S6[Knowledge Subgraph]
+    end
+
+    subgraph "Connection Pooler"
+        PGB[PgBouncer 1.22<br/>Port 5433<br/>pool_mode=transaction<br/>max_client=1000<br/>pool_size=25]
+    end
+
+    subgraph "Database"
+        PG[(PostgreSQL 16<br/>Port 5432<br/>AGE + pgvector + RLS)]
+    end
+
+    S1 --> PGB
+    S2 --> PGB
+    S3 --> PGB
+    S4 --> PGB
+    S5 --> PGB
+    S6 --> PGB
+
+    PGB -->|25 server connections| PG
+
+    S1 -.RLS/AGE direct.-> PG
+    S5 -.RLS/AGE direct.-> PG
+
+    classDef app fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef pooler fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef db fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class S1,S2,S3,S4,S5,S6 app
+    class PGB pooler
+    class PG db
 ```
 
 ---
@@ -44,6 +67,34 @@ In **transaction** mode a server connection is borrowed from the pool for the
 duration of a single transaction (or a single statement when outside an
 explicit transaction) and returned immediately on `COMMIT` / `ROLLBACK`. This
 gives maximum server connection reuse.
+
+### Transaction Mode Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant App as NestJS Subgraph
+    participant PGB as PgBouncer
+    participant PG as PostgreSQL
+
+    App->>PGB: Connect (client connection)
+    Note over PGB: Client queued in pool
+
+    App->>PGB: BEGIN
+    PGB->>PG: Borrow server connection
+    PGB->>PG: BEGIN
+
+    App->>PGB: SET LOCAL app.current_tenant
+    PGB->>PG: SET LOCAL app.current_tenant
+
+    App->>PGB: SELECT * FROM courses
+    PGB->>PG: SELECT * FROM courses
+    PG-->>PGB: Results (RLS filtered)
+    PGB-->>App: Results
+
+    App->>PGB: COMMIT
+    PGB->>PG: COMMIT
+    Note over PGB: Return server connection to pool
+```
 
 ### Implications for EduSphere
 

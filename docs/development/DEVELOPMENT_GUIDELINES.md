@@ -753,6 +753,50 @@ type Mutation {
 
 ## 7. NestJS Patterns
 
+### NestJS Module Architecture
+
+```mermaid
+graph TD
+    CTRL[Controller<br/>Thin — route + validate] --> SVC[Service<br/>Business logic]
+    SVC --> REPO[Repository<br/>Drizzle ORM queries]
+    REPO --> PG[(PostgreSQL<br/>with RLS)]
+
+    SVC --> NATS[NATS Publisher<br/>Async events]
+    SVC --> GUARD[Auth Guard<br/>JWT + scopes]
+
+    classDef handler fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef logic fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+
+    class CTRL handler
+    class SVC,GUARD logic
+    class REPO,PG data
+    class NATS infra
+```
+
+### NestJS Request Pipeline
+
+```mermaid
+graph LR
+    REQ[Request] --> GUARD[Guards<br/>Auth + Role]
+    GUARD --> INTERCEPT[Interceptors<br/>Logging + Cache]
+    INTERCEPT --> PIPE[Pipes<br/>Zod Validation]
+    PIPE --> HANDLER[Resolver/Controller<br/>Business Logic]
+    HANDLER --> FILTER[Exception Filter<br/>Error Mapping]
+    FILTER --> RES[Response]
+
+    classDef input fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef middleware fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef handler fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef output fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+
+    class REQ input
+    class GUARD,INTERCEPT,PIPE middleware
+    class HANDLER handler
+    class FILTER,RES output
+```
+
 ### 7.1 Module Structure
 
 Each feature has its own **module** with clear boundaries:
@@ -1066,6 +1110,31 @@ export async function seed() {
 ---
 
 ## 9. Multi-tenancy
+
+### RLS Multi-tenancy Flow
+
+```mermaid
+sequenceDiagram
+    participant Resolver
+    participant Context as GraphQL Context
+    participant Helper as withTenantContext()
+    participant PG as PostgreSQL
+
+    Resolver->>Context: Extract tenantId, userId, role
+    Resolver->>Helper: Call with tenant context + callback
+
+    Helper->>PG: BEGIN
+    Helper->>PG: SET LOCAL app.current_tenant = 'uuid'
+    Helper->>PG: SET LOCAL app.current_user_id = 'uuid'
+    Helper->>PG: SET LOCAL app.current_user_role = 'INSTRUCTOR'
+
+    Note over PG: RLS policies now active:<br/>tenant_id = current_setting('app.current_tenant')
+
+    Helper->>PG: Execute Drizzle query
+    PG-->>Helper: Tenant-filtered results
+    Helper->>PG: COMMIT
+    Helper-->>Resolver: Return results
+```
 
 ### 9.1 Tenant Context Propagation
 
@@ -1555,6 +1624,34 @@ pnpm turbo test -- --coverage
 ---
 
 ## 14. Git Workflow
+
+### Git Branching Strategy
+
+```mermaid
+gitGraph
+    commit id: "init"
+    branch develop
+    checkout develop
+    commit id: "setup"
+    branch feature/auth
+    checkout feature/auth
+    commit id: "add auth"
+    commit id: "add tests"
+    checkout develop
+    merge feature/auth id: "PR #12"
+    branch feature/courses
+    checkout feature/courses
+    commit id: "course CRUD"
+    checkout develop
+    merge feature/courses id: "PR #15"
+    checkout main
+    merge develop id: "Release v1.0"
+    checkout develop
+    branch fix/rls-bug
+    commit id: "fix RLS"
+    checkout develop
+    merge fix/rls-bug id: "PR #18"
+```
 
 ### 14.1 Branch Naming
 

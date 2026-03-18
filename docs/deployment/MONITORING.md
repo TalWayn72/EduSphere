@@ -15,22 +15,41 @@ The monitoring stack provides:
 
 ## Architecture
 
-```
-┌─────────────┐
-│  Services   │───▶ Metrics ───▶ Prometheus ───▶ Grafana
-│  (Gateway,  │                      │              │
-│  Subgraphs) │                      │              │
-└─────────────┘                      ▼              │
-                               AlertManager ────────┘
-                                     │
-      ┌──────────────────────────────┼───────────────────┐
-      ▼                              ▼                   ▼
-   Slack                        PagerDuty             Email
+```mermaid
+graph TD
+    SVC["Services<br/>(Gateway + 6 Subgraphs)"]
+    PROM["Prometheus<br/>:9090"]
+    GRAF["Grafana<br/>:3001"]
+    AM["AlertManager<br/>:9093"]
+    LOKI["Loki<br/>(Log Store)"]
+    PT["Promtail<br/>(Log Shipper)"]
+    CA["cAdvisor<br/>:8081"]
+    PGX["postgres_exporter<br/>:9187"]
+    SL["Slack"]
+    PD["PagerDuty"]
+    EM["Email / SMTP"]
 
-┌─────────────┐
-│  Services   │───▶ Logs ───▶ Promtail ───▶ Loki ───▶ Grafana
-│  (Containers)│
-└─────────────┘
+    SVC -- "/metrics" --> PROM
+    SVC -- "stdout/stderr" --> PT
+    CA -- "container metrics" --> PROM
+    PGX -- "pg metrics" --> PROM
+    PROM --> GRAF
+    PROM --> AM
+    PT --> LOKI
+    LOKI --> GRAF
+    AM --> SL
+    AM --> PD
+    AM --> EM
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef gateway fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class SVC service
+    class PROM,AM,CA,PGX infra
+    class GRAF,LOKI,PT data
+    class SL,PD,EM gateway
 ```
 
 ## Quick Start

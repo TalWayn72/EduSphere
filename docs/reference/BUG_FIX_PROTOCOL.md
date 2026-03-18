@@ -5,6 +5,40 @@
 
 ---
 
+```mermaid
+flowchart TD
+    S0[Stage 0<br/>Triage & Registration<br/>Assign P0-P3 severity] --> S1[Stage 1<br/>Discovery<br/>3-Wave Search]
+    S1 --> S15{P0/P1?}
+    S15 -->|Yes| S1B[Stage 1.5<br/>Containment<br/>Feature flag / rollback]
+    S15 -->|No| S2
+    S1B --> S2[Stage 2<br/>Fix Rounds<br/>FE + BE + QA parallel]
+    S2 --> S3[Stage 3<br/>Visual Verification<br/>Playwright screenshots]
+    S3 --> S4[Stage 4<br/>Full Verification<br/>Tests + health check]
+    S4 --> S5{All pass?}
+    S5 -->|No| S2
+    S5 -->|Yes| S6[Stage 5<br/>Rollback Plan<br/>Document recovery path]
+    S6 --> S7[Stage 6<br/>Container Deploy<br/>5-user auth verification]
+    S7 --> S8[Stage 7<br/>Auto-Commit<br/>git commit + push]
+    S8 --> S9[Stage 8<br/>RCA + OPEN_ISSUES<br/>Document root cause]
+
+    classDef triage fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef discover fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef fix fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef verify fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef deploy fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    classDef decision fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class S0 triage
+    class S1,S1B discover
+    class S2 fix
+    class S3,S4 verify
+    class S6,S7 deploy
+    class S8,S9 triage
+    class S15,S5 decision
+```
+
+---
+
 ## Stage 0 — Triage & Registration
 
 1. **Assign severity:**
@@ -54,6 +88,49 @@ Search all usages of the same API or pattern class. Examples:
 ### Output
 **Numbered Discovery List** — every affected file + the exact issue.
 Report to user before proceeding.
+
+```mermaid
+graph LR
+    subgraph "Wave 1: Exact Match"
+        W1[Grep exact broken<br/>pattern across<br/>entire codebase]
+    end
+
+    subgraph "Wave 2: Similarity"
+        W2A[All pages/]
+        W2B[All hooks/]
+        W2C[All components/]
+        W2D[All subgraphs/]
+        W2E[Mobile screens/]
+    end
+
+    subgraph "Wave 3: Pattern Class"
+        W3[All usages of<br/>same API or<br/>pattern class]
+    end
+
+    W1 -->|Found pattern| W2A
+    W1 --> W2B
+    W1 --> W2C
+    W1 --> W2D
+    W1 --> W2E
+
+    W2A --> W3
+    W2B --> W3
+    W2C --> W3
+    W2D --> W3
+    W2E --> W3
+
+    W3 --> DL[Discovery List<br/>All affected files<br/>documented before fix]
+
+    classDef wave1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef wave2 fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef wave3 fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef output fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class W1 wave1
+    class W2A,W2B,W2C,W2D,W2E wave2
+    class W3 wave3
+    class DL output
+```
 
 ---
 

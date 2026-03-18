@@ -10,6 +10,40 @@ transparency information about the AI models used, as required by the EU AI Act 
 
 ---
 
+## Agent Risk Classification
+
+```mermaid
+graph LR
+    subgraph "Agent Types"
+        CH["CHAVRUTA<br/>Socratic dialogue"]:::service
+        QM["QUIZ_MASTER<br/>Q&A + grading"]:::llm
+        SM["SUMMARIZER<br/>Content summaries"]:::service
+        DB["DEBATE<br/>Multi-perspective"]:::service
+        TU["TUTOR<br/>Learning paths"]:::llm
+    end
+
+    subgraph "Risk Levels"
+        NR["Not High-Risk<br/>No grade impact"]:::service
+        HR["HIGH-RISK<br/>Grade-impacting"]:::llm
+        MR["MEDIUM-RISK<br/>Enrollment impact"]:::data
+    end
+
+    subgraph "Oversight"
+        NONE["No human<br/>oversight"]:::infra
+        REQ["Instructor review<br/>within 24h"]:::llm
+        APP["Instructor<br/>approval"]:::data
+    end
+
+    CH & SM & DB --> NR --> NONE
+    QM --> HR --> REQ
+    TU --> MR --> APP
+
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#000
+    classDef data fill:#ffccbc,stroke:#d84315,color:#000
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#000
+    classDef llm fill:#fce4ec,stroke:#c2185b,color:#000
+```
+
 ## Agent Types
 
 ### CHAVRUTA Agent

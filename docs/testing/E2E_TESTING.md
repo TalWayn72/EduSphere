@@ -2,6 +2,34 @@
 
 ## Overview
 
+### E2E Test Categorization
+
+```mermaid
+graph TD
+    E2E[E2E Test Suite<br/>134 Specs]
+
+    E2E --> AUTH[Authentication Flows<br/>Login, Register, Roles]
+    E2E --> CRUD[CRUD Operations<br/>Courses, Media, Annotations]
+    E2E --> AI[AI Agent Flows<br/>Execute, Stream, History]
+    E2E --> COMP[Compliance<br/>Consent, GDPR, Accessibility]
+    E2E --> COLLAB[Collaboration<br/>Real-time, CRDT, Presence]
+
+    AUTH --> A1[5-user role verification]
+    AUTH --> A2[JWT refresh flow]
+    CRUD --> C1[Course lifecycle]
+    CRUD --> C2[Media upload pipeline]
+    AI --> AI1[Agent execution + streaming]
+    COMP --> CO1[Consent toggle sync]
+
+    classDef root fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef category fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef spec fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class E2E root
+    class AUTH,CRUD,AI,COMP,COLLAB category
+    class A1,A2,C1,C2,AI1,CO1 spec
+```
+
 EduSphere uses Playwright for end-to-end testing, providing comprehensive coverage of user workflows across multiple browsers and devices.
 
 ### Technology Stack

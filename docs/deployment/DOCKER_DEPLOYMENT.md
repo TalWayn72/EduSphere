@@ -15,6 +15,43 @@
 - **GraphQL Gateway** (port 4000)
 - **6 Subgraphs** (ports 4001-4006)
 
+### Architecture Diagram
+
+```mermaid
+graph TD
+    subgraph "Single Docker Container"
+        SUPERVISOR[supervisord<br/>Process Manager]
+
+        SUPERVISOR --> PG[(PostgreSQL 16<br/>AGE + pgvector<br/>Port 5432)]
+        SUPERVISOR --> REDIS[Redis 7<br/>Port 6379]
+        SUPERVISOR --> NATS[NATS JetStream<br/>Port 4222]
+        SUPERVISOR --> MINIO[(MinIO<br/>Port 9000)]
+        SUPERVISOR --> KC[Keycloak 26<br/>Port 8080]
+        SUPERVISOR --> OLLAMA[Ollama LLM<br/>Port 11434]
+        SUPERVISOR --> GW[GraphQL Gateway<br/>Port 4000]
+        SUPERVISOR --> SUBS[6 Subgraphs<br/>Ports 4001-4006]
+    end
+
+    CLIENT[Browser / Mobile] --> GW
+    GW --> SUBS
+    SUBS --> PG
+    SUBS --> MINIO
+    SUBS -.-> NATS
+    GW -.-> KC
+
+    classDef manager fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef external fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+
+    class SUPERVISOR manager
+    class GW,SUBS service
+    class PG,REDIS,MINIO data
+    class NATS,KC,OLLAMA infra
+    class CLIENT external
+```
+
 ---
 
 ## 🚀 Quick Start

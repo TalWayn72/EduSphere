@@ -38,44 +38,67 @@ EduSphere uses **GraphQL Federation v2.7+** (Apollo Federation v2 spec compatibl
 
 > **Why Hive Gateway over Apollo Router?** Apollo Router uses the Elastic License v2 (ELv2), which restricts offering it as a managed service. Hive Gateway v2 is fully MIT-licensed, supports the same Federation v2.7 spec, and is nearly 2x faster than competitors among JS-based gateways. It runs on all runtimes (Node, Deno, Bun, Cloudflare Workers). See EduSphere Architecture Guide §5 for details.
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                         Client Applications                            │
-│         (React SPA · React Native · Offline PWA)                       │
-└───────────────────────────────┬──────────────────────────────────────────┘
-                                │
-                    HTTPS / WSS (GraphQL over WebSocket / SSE)
-                                │
-                                ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                     Hive Gateway v2 (Node.js)                          │
-│                                                                        │
-│   • Supergraph SDL composition          • Query planning               │
-│   • JWT validation (Keycloak JWKS)      • @authenticated enforcement   │
-│   • @requiresScopes enforcement         • @policy evaluation           │
-│   • Rate limiting (per-tenant)          • Response caching              │
-│   • Telemetry (OpenTelemetry → Jaeger)  • Persisted queries            │
-│   • Subscriptions (WS passthrough)      • @defer support               │
-│   • Header propagation                  • Schema registry (Hive)       │
-└────┬─────────┬──────────┬──────────┬──────────┬──────────┬─────────────┘
-     │         │          │          │          │          │
-     ▼         ▼          ▼          ▼          ▼          ▼
-┌─────────┐┌─────────┐┌──────────┐┌──────────┐┌────────┐┌──────────────┐
-│  Core   ││ Content ││Annotation││  Collab  ││ Agent  ││  Knowledge   │
-│Subgraph ││Subgraph ││ Subgraph ││ Subgraph ││Subgraph││  Subgraph    │
-│(Yoga)   ││(Yoga)   ││ (Yoga)   ││ (Yoga)   ││(Yoga)  ││  (Yoga)      │
-│ :4001   ││ :4002   ││  :4003   ││  :4004   ││ :4005  ││   :4006      │
-└─────────┘└─────────┘└──────────┘└──────────┘└────────┘└──────────────┘
-     │         │          │          │          │          │
-     └─────────┴──────────┴──────────┴──────────┴──────────┘
-                                │
-                    ┌───────────┼───────────┐
-                    ▼           ▼           ▼
-              ┌──────────┐┌─────────┐┌──────────┐
-              │PostgreSQL││  MinIO  ││  NATS    │
-              │ 16+ (RLS)││  (S3)   ││ JetStream│
-              │ AGE+pgvec││         ││          │
-              └──────────┘└─────────┘└──────────┘
+```mermaid
+graph TD
+    subgraph "Client Applications"
+        REACT[React SPA<br/>Vite + TanStack Query]
+        NATIVE[React Native<br/>Expo SDK 54]
+        PWA[Offline PWA<br/>Service Workers]
+    end
+
+    subgraph "API Gateway"
+        TRAEFIK[Traefik v3.6<br/>Reverse Proxy + Auto-SSL]
+        GATEWAY[Hive Gateway v2<br/>Port 4000<br/>Federation v2.7]
+    end
+
+    subgraph "GraphQL Subgraphs"
+        CORE[Core<br/>Port 4001<br/>Tenant · User]
+        CONTENT[Content<br/>Port 4002<br/>Course · Media]
+        ANNOTATION[Annotation<br/>Port 4003<br/>Layers · Highlights]
+        COLLAB[Collaboration<br/>Port 4004<br/>CRDT · Presence]
+        AGENT[Agent<br/>Port 4005<br/>AI Execution]
+        KNOWLEDGE[Knowledge<br/>Port 4006<br/>Graph · Embeddings]
+    end
+
+    subgraph "Data Layer"
+        PG[(PostgreSQL 16<br/>AGE + pgvector + RLS)]
+        MINIO[(MinIO<br/>S3-compatible Storage)]
+        NATS[NATS JetStream<br/>Event Bus]
+    end
+
+    REACT --> TRAEFIK
+    NATIVE --> TRAEFIK
+    PWA --> TRAEFIK
+    TRAEFIK --> GATEWAY
+
+    GATEWAY --> CORE
+    GATEWAY --> CONTENT
+    GATEWAY --> ANNOTATION
+    GATEWAY --> COLLAB
+    GATEWAY --> AGENT
+    GATEWAY --> KNOWLEDGE
+
+    CORE --> PG
+    CONTENT --> PG
+    CONTENT --> MINIO
+    ANNOTATION --> PG
+    COLLAB --> PG
+    AGENT --> PG
+    KNOWLEDGE --> PG
+
+    CONTENT -.-> NATS
+    ANNOTATION -.-> NATS
+    AGENT -.-> NATS
+
+    classDef client fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef gateway fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef data fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class REACT,NATIVE,PWA client
+    class TRAEFIK,GATEWAY gateway
+    class CORE,CONTENT,ANNOTATION,COLLAB,AGENT,KNOWLEDGE service
+    class PG,MINIO,NATS data
 ```
 
 **Key Decisions:**
@@ -127,6 +150,54 @@ Person              │ Knowledge       │ id
 Term                │ Knowledge       │ id
 Source              │ Knowledge       │ id
 TopicCluster        │ Knowledge       │ id
+```
+
+### Entity Ownership Diagram
+
+```mermaid
+graph LR
+    subgraph "Core Subgraph (Owner)"
+        T[Tenant]
+        U[User]
+    end
+
+    subgraph "Content Subgraph (Owner)"
+        CO[Course]
+        MO[Module]
+        MA[MediaAsset]
+        TR[Transcript]
+    end
+
+    subgraph "Annotation Subgraph (Owner)"
+        AL[AnnotationLayer]
+        AN[Annotation]
+    end
+
+    subgraph "Collaboration (Owner)"
+        CD[CollabDocument]
+        CS[CollabSession]
+    end
+
+    subgraph "Agent Subgraph (Owner)"
+        AD[AgentDefinition]
+        AE[AgentExecution]
+    end
+
+    subgraph "Knowledge Subgraph (Owner)"
+        CE[ContentEmbedding]
+        KG[Knowledge Graph]
+    end
+
+    U -.extends.-> CO
+    U -.extends.-> AN
+    U -.extends.-> AE
+    CO -.extends.-> AL
+    MA -.extends.-> CE
+
+    classDef owner fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef entity fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+
+    class T,U,CO,MO,MA,TR,AL,AN,CD,CS,AD,AE,CE,KG entity
 ```
 
 ---
@@ -386,6 +457,32 @@ If `first`/`last` exceeds the maximum, the server clamps to max and returns a `P
 
 ## 5. Authentication & Authorization Directives
 
+### Auth Directive Evaluation Flow
+
+```mermaid
+flowchart TD
+    REQ[Incoming GraphQL Request] --> JWT{JWT Present?}
+    JWT -->|No| DENY1[401 Unauthorized]
+    JWT -->|Yes| VALIDATE[Validate JWT via JWKS]
+    VALIDATE --> AUTH{@authenticated?}
+    AUTH -->|Fail| DENY2[401 Not Authenticated]
+    AUTH -->|Pass| SCOPES{@requiresScopes?}
+    SCOPES -->|Fail| DENY3[403 Insufficient Scopes]
+    SCOPES -->|Pass| ROLE{@requiresRole?}
+    ROLE -->|Fail| DENY4[403 Insufficient Role]
+    ROLE -->|Pass| RESOLVE[Execute Resolver<br/>with tenant context]
+
+    classDef request fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef check fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef deny fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef success fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class REQ request
+    class JWT,AUTH,SCOPES,ROLE check
+    class DENY1,DENY2,DENY3,DENY4 deny
+    class VALIDATE,RESOLVE success
+```
+
 ### Federation v2 Auth Directives
 
 ```graphql
@@ -508,6 +605,26 @@ headers:
 ---
 
 ## 6. Error Handling Contract
+
+### Error Handling State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> InputValidation: Mutation received
+    InputValidation --> BusinessLogic: Zod schema passes
+    InputValidation --> ValidationError: Zod schema fails
+
+    BusinessLogic --> Success: Operation completes
+    BusinessLogic --> NotFound: Entity missing
+    BusinessLogic --> AuthError: Permission denied
+    BusinessLogic --> ConflictError: Optimistic lock fail
+
+    ValidationError --> [*]: 400 BAD_REQUEST
+    NotFound --> [*]: 404 NOT_FOUND
+    AuthError --> [*]: 403 FORBIDDEN
+    ConflictError --> [*]: 409 CONFLICT
+    Success --> [*]: 200 OK
+```
 
 ### Standard Error Format
 
@@ -3877,6 +3994,30 @@ Subscriptions are handled via **Hive Gateway's WebSocket passthrough** mode. The
 
 Each subgraph that defines subscriptions backs them with **NATS JetStream** events.
 
+### Subscription Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway as Hive Gateway
+    participant Agent as Agent Subgraph
+    participant NATS as NATS JetStream
+
+    Client->>Gateway: WebSocket: subscribe<br/>agentResponseStream(executionId)
+    Gateway->>Agent: Forward subscription
+    Agent->>NATS: Subscribe to<br/>edusphere.{tenant}.agent.stream.{id}
+
+    loop Token Streaming
+        NATS-->>Agent: Token chunk
+        Agent-->>Gateway: GraphQL event
+        Gateway-->>Client: WebSocket frame
+    end
+
+    NATS-->>Agent: Stream complete
+    Agent-->>Gateway: Subscription complete
+    Gateway-->>Client: WebSocket close
+```
+
 ### Subscription Definitions
 
 ```graphql
@@ -4797,38 +4938,56 @@ This section documents how the GraphQL API integrates with the platform's three-
 
 ### Three-Layer AI Architecture
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│  Layer 1: LLM Abstraction — Vercel AI SDK v6 (Apache 2.0)          │
-│                                                                      │
-│  • Unified API across providers (Ollama local ↔ OpenAI/Anthropic)   │
-│  • Zero code changes between dev (phi4:14b) and prod (gpt-4o)       │
-│  • Streaming text generation via ReadableStream                      │
-│  • Tool/function calling with structured outputs                     │
-│                                                                      │
-│  GraphQL integration: Agent subgraph resolvers use                   │
-│  `streamText()` / `generateText()` from @ai-sdk/provider            │
-├──────────────────────────────────────────────────────────────────────┤
-│  Layer 2: Agent Orchestration — LangGraph.js (MIT)                  │
-│                                                                      │
-│  • State-machine workflows for pedagogical agents                    │
-│  • Graph: assess → quiz → explain → debate → reassess               │
-│  • Persistent state across agent execution turns                     │
-│  • Human-in-the-loop review nodes                                    │
-│                                                                      │
-│  GraphQL integration: AgentExecution.status reflects graph state;    │
-│  agentResponseStream subscription emits per-node outputs             │
-├──────────────────────────────────────────────────────────────────────┤
-│  Layer 3: RAG & Knowledge — LlamaIndex.TS (MIT)                     │
-│                                                                      │
-│  • Data connectors for transcript ingestion                          │
-│  • Vector store integration (pgvector via Drizzle)                   │
-│  • Knowledge graph integration (Apache AGE Cypher queries)           │
-│  • HybridRAG: parallel vector + graph retrieval → fused context      │
-│                                                                      │
-│  GraphQL integration: hybridSearch query, semanticSearch query,      │
-│  semanticContextAt on MediaAsset                                     │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph "Layer 1 — LLM Abstraction"
+        VERCEL[Vercel AI SDK v6<br/>Provider abstraction]
+        OLLAMA[Ollama<br/>Dev: phi4:14b]
+        OPENAI[OpenAI<br/>Prod: gpt-4o-mini]
+        ANTHROPIC[Anthropic<br/>Prod: Claude]
+    end
+
+    subgraph "Layer 2 — Agent Workflows"
+        LANGGRAPH[LangGraph.js<br/>State machine orchestration]
+        ASSESS[Assess Node]
+        QUIZ[Quiz Node]
+        EXPLAIN[Explain Node]
+        DEBATE[Debate Node]
+    end
+
+    subgraph "Layer 3 — RAG Pipeline"
+        LLAMAINDEX[LlamaIndex.TS<br/>RAG orchestration]
+        VECTOR[pgvector HNSW<br/>Semantic search]
+        GRAPH[Apache AGE<br/>Graph traversal]
+        FUSION[HybridRAG Fusion<br/>RRF reranking]
+    end
+
+    VERCEL --> OLLAMA
+    VERCEL --> OPENAI
+    VERCEL --> ANTHROPIC
+
+    LANGGRAPH --> ASSESS
+    LANGGRAPH --> QUIZ
+    LANGGRAPH --> EXPLAIN
+    LANGGRAPH --> DEBATE
+
+    ASSESS --> LLAMAINDEX
+    QUIZ --> LLAMAINDEX
+    EXPLAIN --> LLAMAINDEX
+    DEBATE --> LLAMAINDEX
+
+    LLAMAINDEX --> VECTOR
+    LLAMAINDEX --> GRAPH
+    VECTOR --> FUSION
+    GRAPH --> FUSION
+
+    classDef layer1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef layer2 fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef layer3 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+
+    class VERCEL,OLLAMA,OPENAI,ANTHROPIC layer1
+    class LANGGRAPH,ASSESS,QUIZ,EXPLAIN,DEBATE layer2
+    class LLAMAINDEX,VECTOR,GRAPH,FUSION layer3
 ```
 
 ### Agent Template → LangGraph Workflow Mapping

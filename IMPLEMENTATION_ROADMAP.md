@@ -17,6 +17,39 @@
 > - `EduSphere_Claude.pdf` — architecture guide and technology decisions
 > - `EduSphere_DB.pdf` — database design deep-dive
 
+### Implementation Timeline
+
+```mermaid
+gantt
+    title EduSphere Implementation Roadmap
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+
+    section Foundation
+        Phase 0-10 Infrastructure + Schema: done, p0, 2025-06-01, 2025-08-15
+
+    section Core Platform
+        Phase 11-25 Subgraphs + UI: done, p1, 2025-08-16, 2025-11-15
+
+    section AI & Knowledge
+        Phase 26-35 AI Agents + RAG: done, p2, 2025-11-16, 2026-01-10
+
+    section Security & Compliance
+        Phase 36-45 Hardening + GDPR: done, p3, 2026-01-11, 2026-02-10
+
+    section Enterprise Features
+        Phase 46-53 Pilot + Grading + SCORM: done, p4, 2026-02-11, 2026-02-25
+
+    section Polish & Integration
+        Phase 54-58 E2E + Admin + i18n: done, p5, 2026-02-26, 2026-03-05
+
+    section Advanced Features
+        Phase 59-64 Payouts + Badges + Portal: done, p6, 2026-03-06, 2026-03-15
+
+    section Maintenance
+        Ongoing Bug Fixes + Optimization: active, p7, 2026-03-16, 2026-04-30
+```
+
 ---
 
 ## Technology Stack — Validated & Locked
@@ -48,6 +81,52 @@ These have been validated for production viability, MIT/Apache licensing, and ec
 | **Schema Registry**       | GraphQL Hive                | latest                                           | MIT        | ✅ Breaking change detection, composition                                                                                |
 | **Telemetry**             | OpenTelemetry → Jaeger      | latest                                           | Apache 2.0 | ✅ Distributed tracing, Hive Gateway v2 native integration                                                               |
 | **Monorepo**              | pnpm workspaces + Turborepo | latest                                           | MIT        | ✅ Efficient dependency hoisting, parallel builds                                                                        |
+
+### Tech Stack Layers
+
+```mermaid
+graph LR
+    subgraph "Frontend"
+        REACT[React 19 + Vite 6]
+        EXPO[Expo SDK 54]
+        TANSTACK[TanStack Query v5]
+    end
+
+    subgraph "Gateway"
+        HIVE[Hive Gateway v2<br/>Federation v2.7]
+        TRAEFIK[Traefik v3.6]
+    end
+
+    subgraph "Backend"
+        NEST[NestJS + Yoga<br/>6 Subgraphs]
+        NATS[NATS JetStream]
+    end
+
+    subgraph "Data"
+        PG[(PostgreSQL 16<br/>AGE + pgvector)]
+        MINIO[(MinIO)]
+        KC[Keycloak v26]
+    end
+
+    REACT --> TRAEFIK
+    EXPO --> TRAEFIK
+    TRAEFIK --> HIVE
+    HIVE --> NEST
+    NEST --> PG
+    NEST --> MINIO
+    NEST -.-> NATS
+    HIVE -.JWT.-> KC
+
+    classDef fe fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef gw fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef be fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef db fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class REACT,EXPO,TANSTACK fe
+    class HIVE,TRAEFIK gw
+    class NEST,NATS be
+    class PG,MINIO,KC db
+```
 
 ---
 
@@ -89,6 +168,51 @@ edusphere/
 ├── turbo.json
 ├── pnpm-workspace.yaml
 └── .env.example
+```
+
+### Package Dependency Graph
+
+```mermaid
+graph TD
+    subgraph "Applications"
+        WEB[apps/web<br/>React SPA]
+        MOBILE[apps/mobile<br/>Expo]
+        GW[apps/gateway<br/>Hive Gateway]
+        SC[apps/subgraph-core]
+        SCO[apps/subgraph-content]
+        SA[apps/subgraph-annotation]
+        SCL[apps/subgraph-collaboration]
+        SAG[apps/subgraph-agent]
+        SK[apps/subgraph-knowledge]
+    end
+
+    subgraph "Shared Packages"
+        DB[packages/db<br/>Drizzle Schema + RLS]
+        GQL[packages/graphql-shared<br/>SDL + Directives]
+        AUTH[packages/auth<br/>JWT + Guards]
+        NATSC[packages/nats-client]
+        TYPES[packages/graphql-types]
+    end
+
+    SC --> DB
+    SC --> GQL
+    SC --> AUTH
+    SCO --> DB
+    SCO --> NATSC
+    SA --> DB
+    SCL --> DB
+    SAG --> DB
+    SAG --> NATSC
+    SK --> DB
+    GW --> GQL
+    GW --> TYPES
+    WEB --> TYPES
+
+    classDef app fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef pkg fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class WEB,MOBILE,GW,SC,SCO,SA,SCL,SAG,SK app
+    class DB,GQL,AUTH,NATSC,TYPES pkg
 ```
 
 ---
@@ -162,6 +286,29 @@ pnpm audit --audit-level=high
 **Goal**: `docker-compose up` brings up the entire infrastructure stack, and a simple GraphQL query returns a health-check response.
 
 **Duration estimate**: 1–2 days
+
+### Phase 0 Dependency Chain
+
+```mermaid
+flowchart TD
+    DOCKER[Docker Compose Up<br/>postgres, keycloak, nats,<br/>minio, jaeger] --> MIGRATE[Drizzle Migrations<br/>32 tables + RLS]
+    MIGRATE --> SEED[Seed Demo Data<br/>Tenants, Users, Courses]
+    SEED --> GRAPH[Apache AGE Init<br/>Knowledge Graph Ontology]
+    GRAPH --> HEALTH[Health Check<br/>All services verified]
+    HEALTH --> GATEWAY[Start Gateway<br/>Port 4000]
+    GATEWAY --> SUBS[Start 6 Subgraphs<br/>Ports 4001-4006]
+    SUBS --> WEB[Start Frontend<br/>Port 5173]
+
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef db fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef service fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef fe fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+
+    class DOCKER infra
+    class MIGRATE,SEED,GRAPH db
+    class HEALTH,GATEWAY,SUBS service
+    class WEB fe
+```
 
 ### Phase 0.1: Monorepo Scaffolding
 

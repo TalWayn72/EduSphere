@@ -14,6 +14,42 @@
 
 Define encryption standards and key management requirements to protect EduSphere customer data and maintain compliance with GDPR Art.32, SOC2 CC6.1, and ISO 27001 A.10.
 
+## Encryption Layers Overview
+
+```mermaid
+graph TD
+    classDef service fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    classDef data fill:#ffccbc,stroke:#d84315,color:#bf360c
+    classDef infra fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+
+    subgraph "Data at Rest"
+        MK["Master Key<br/>HSM / AWS KMS"]:::infra
+        DEK["Tenant DEK<br/>HKDF-derived per tenant"]:::infra
+        FLE["Field-Level Encryption<br/>AES-256-GCM"]:::data
+        VOL["Volume Encryption<br/>S3 SSE-KMS"]:::data
+        MK --> DEK --> FLE
+        MK --> VOL
+    end
+
+    subgraph "Data in Transit"
+        TLS["TLS 1.3<br/>Client to Gateway"]:::service
+        MTLS["mTLS (Linkerd)<br/>Gateway to Subgraphs"]:::service
+        NATS_TLS["TLS + NKey<br/>Services to NATS"]:::service
+        DB_TLS["TLS + Cert Verify<br/>Services to PostgreSQL"]:::service
+    end
+
+    subgraph "Credentials & Tokens"
+        ARGON["Argon2id<br/>Password Hashing"]:::infra
+        JWT["RS256 JWT<br/>Keycloak Signing"]:::infra
+        VAULT["HashiCorp Vault<br/>API Tokens & Secrets"]:::infra
+    end
+
+    CLIENT["Client Browser<br/>/ Mobile App"]:::data
+    CLIENT -->|TLS 1.3| TLS
+    TLS -->|mTLS| MTLS
+    MTLS -->|Encrypt PII| FLE
+```
+
 ## 2. Encryption Standards
 
 ### Symmetric Encryption
