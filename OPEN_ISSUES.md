@@ -76,7 +76,61 @@
 | BUG-092 | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch) | ✅ Fixed (2 rounds) | (pending commit) |
 | BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
 | BUG-094 | Consent save fails — consent resolver missing from Docker container dist | ✅ Fixed | (pending commit) |
+| BUG-095 | AI course creation fails end-to-end — no course created, redirects to /courses | ✅ Fixed | (pending commit) |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+
+---
+
+## BUG-095 — AI Course Creation Fails End-to-End (19 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** P1 (core AI feature completely broken)
+- **Reporter:** User observation: "spinner runs 3 rounds of identical messages, then redirects to /courses with no new course"
+
+### Root Cause Chain (3 issues)
+
+1. **Backend: llama3.2 (3.2B) too slow for CPU-only containers** — Structured JSON generation with llama3.2 takes 5+ minutes on CPU, causing Node.js fetch to timeout. The error was caught as "LLM service unavailable" because the timeout error message matched the connection-error pattern.
+2. **Frontend: no polling fallback** — The frontend relied solely on WebSocket subscriptions for completion notification. The Hive Gateway terminates the gateway-to-subgraph SSE connection after ~60 seconds, killing the subscription. With no fallback, the frontend never learns the generation result.
+3. **Frontend: createCourse mutation missing required fields** — The `handleCreateDraft` function didn't include `slug` and `instructorId` in the `CreateCourseInput`, causing a GraphQL validation error when creating the draft course.
+
+### Discovery (3 Waves)
+
+- **Wave 1:** Traced full flow: mutation → gateway → agent subgraph → Ollama. Confirmed from logs: subscription aborted at 58.6s, Ollama call failed at 5min with "LLM service unavailable".
+- **Wave 2:** Checked all related files: AiCourseCreatorModal.tsx, course-generator.workflow.ts, course-generator.service.ts, agent.resolver.ts, urql-client.ts, gateway.config.ts, execution-pubsub.provider.ts, content.queries.ts, course.graphql
+- **Wave 3:** Verified qwen2.5:0.5b available in container (0.5B, ~120s on CPU vs 5+ min for llama3.2). Confirmed polling query `AGENT_EXECUTION_QUERY` already existed but was unused.
+
+### Fix Rounds
+
+**Round 1 (Backend):**
+- Auto-select smallest available Ollama model via `/api/tags` (prefers qwen2.5:0.5b)
+- Added 10-minute AbortSignal to Ollama fetch call
+- Improved error categorization for timeout vs connection errors
+- File: `apps/subgraph-agent/src/ai/course-generator.workflow.ts`
+
+**Round 2 (Frontend):**
+- Added polling fallback using `AGENT_EXECUTION_QUERY` (5s interval, starts after initial 5s delay)
+- `resultHandledRef` prevents double-handling from subscription + poll race
+- Proper cleanup on unmount and modal close
+- File: `apps/web/src/components/AiCourseCreatorModal.tsx`
+
+**Round 3 (Frontend):**
+- Fixed `handleCreateDraft` to include `slug` (from title) and `instructorId` (from getCurrentUser)
+- File: `apps/web/src/components/AiCourseCreatorModal.tsx`
+
+### Tests
+
+| File | Tests | Purpose |
+|------|-------|---------|
+| `apps/web/src/components/AiCourseCreatorModal.test.tsx` | 15 | All existing tests pass + useQuery mock added |
+| `apps/subgraph-agent/src/ai/course-generator.service.spec.ts` | 5 | Service tests pass with workflow mock |
+| `scripts/debug/bug095-e2e.cjs` | E2E | Full flow: login → consent → generate → create draft → redirect |
+
+### E2E Result
+
+- Course title: "Introduction to Colors"
+- Course ID: `f4103226-2ec6-4015-a437-ed42ec21dd6e`
+- Generation time: ~45 seconds (vs 5+ minute timeout before)
+- Redirected to: `/courses/f4103226-2ec6-4015-a437-ed42ec21dd6e`
 
 ---
 

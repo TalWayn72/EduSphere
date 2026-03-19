@@ -9,6 +9,10 @@
  * BUG-093: Uses direct Ollama HTTP API for local dev (bypasses @ai-sdk/openai
  * version mismatch: container has v3 spec but ai v5 needs v2). Falls back to
  * generateObject for OpenAI cloud.
+ *
+ * BUG-095: Auto-selects the smallest available Ollama model for fast CPU
+ * generation. llama3.2 (3.2B) is too slow on CPU-only containers (>5 min),
+ * causing fetch timeouts. Prefers qwen2.5:0.5b when available.
  */
 
 import { StateGraph, Annotation } from '@langchain/langgraph';
@@ -54,13 +58,51 @@ const CourseGenState = Annotation.Root({
 
 type CourseGenStateType = typeof CourseGenState.State;
 
+// ── BUG-095: Auto-select fastest available Ollama model ──────────────────────
+// Sorted by parameter size ascending — smaller models generate faster on CPU.
+const PREFERRED_MODELS = ['qwen2.5:0.5b', 'qwen2.5:1.5b', 'llama3.2:1b', 'llama3.2'];
+const FALLBACK_MODEL = 'llama3.2';
+
+/** Cache resolved model name to avoid repeated /api/tags calls. */
+let _resolvedModel: string | null = null;
+
+async function resolveOllamaModel(): Promise<string> {
+  const explicit = process.env.OLLAMA_MODEL;
+  if (explicit) return explicit;
+  if (_resolvedModel) return _resolvedModel;
+
+  try {
+    const resp = await fetch(`${ollamaConfig.url}/api/tags`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!resp.ok) return FALLBACK_MODEL;
+    const data = await resp.json() as { models?: { name: string }[] };
+    const available = new Set(data.models?.map((m) => m.name) ?? []);
+    for (const candidate of PREFERRED_MODELS) {
+      if (available.has(candidate) || available.has(`${candidate}:latest`)) {
+        _resolvedModel = candidate;
+        return candidate;
+      }
+    }
+    // Fallback: use whatever is first available
+    const first = data.models?.[0]?.name ?? FALLBACK_MODEL;
+    _resolvedModel = first;
+    return first;
+  } catch {
+    return FALLBACK_MODEL;
+  }
+}
+
 // ── Direct Ollama API call (bypasses AI SDK version mismatch) ────────────────
+// BUG-095: 10-minute AbortSignal prevents indefinite fetch hangs on slow models.
+
+const OLLAMA_FETCH_TIMEOUT_MS = 10 * 60 * 1000;
 
 async function generateViaOllama(
   systemPrompt: string,
   userPrompt: string,
 ): Promise<GeneratedCourse> {
-  const model = process.env.OLLAMA_MODEL ?? 'llama3.2';
+  const model = await resolveOllamaModel();
   const url = `${ollamaConfig.url}/api/chat`;
 
   const response = await fetch(url, {
@@ -76,6 +118,7 @@ async function generateViaOllama(
       stream: false,
       options: { temperature: 0.7, num_ctx: 4096 },
     }),
+    signal: AbortSignal.timeout(OLLAMA_FETCH_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -159,13 +202,24 @@ async function outlineGenerationNode(
     return { courseOutline: object };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    const errName = err instanceof Error ? err.name : '';
     const isConnectionError =
       msg.includes('ECONNREFUSED') ||
       msg.includes('fetch failed') ||
       msg.includes('network');
+    const isTimeout =
+      errName === 'TimeoutError' ||
+      errName === 'AbortError' ||
+      msg.includes('timed out') ||
+      msg.includes('aborted');
     if (isConnectionError) {
       return {
         error: `LLM service unavailable. Ensure Ollama is running at ${ollamaConfig.url} or set OPENAI_API_KEY for cloud LLM.`,
+      };
+    }
+    if (isTimeout) {
+      return {
+        error: `LLM generation timed out after ${OLLAMA_FETCH_TIMEOUT_MS / 60000} minutes. The model may be too large for CPU-only inference. Try setting OLLAMA_MODEL to a smaller model.`,
       };
     }
     return { error: `outline_generation failed: ${msg}` };

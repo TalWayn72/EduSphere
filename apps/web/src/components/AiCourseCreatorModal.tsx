@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useSubscription } from 'urql';
+import { useMutation, useSubscription, useQuery } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -22,9 +22,11 @@ import {
 import {
   GENERATE_COURSE_FROM_PROMPT_MUTATION,
   EXECUTION_STATUS_SUBSCRIPTION,
+  AGENT_EXECUTION_QUERY,
 } from '@/lib/graphql/agent-course-gen.queries';
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 import { RequirementLink } from '@/components/RequirementLink';
+import { getCurrentUser } from '@/lib/auth';
 
 interface GeneratedModule {
   title: string;
@@ -53,6 +55,13 @@ interface ExecutionStatusPayload {
     output: ExecutionOutputData | null;
   };
 }
+interface AgentExecutionResult {
+  agentExecution: {
+    id: string;
+    status: string;
+    output: ExecutionOutputData | null;
+  } | null;
+}
 interface CreateCourseResult {
   createCourse: { id: string; title: string };
 }
@@ -60,6 +69,9 @@ export interface AiCourseCreatorModalProps {
   open: boolean;
   onClose: () => void;
 }
+
+/** BUG-095: Polling interval — fallback when WebSocket subscription dies. */
+const POLL_INTERVAL_MS = 5000;
 
 export function AiCourseCreatorModal({
   open,
@@ -81,23 +93,25 @@ export function AiCourseCreatorModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isConsentError, setIsConsentError] = useState(false);
   const [pauseSubscription, setPauseSubscription] = useState(true);
+  // BUG-095: Track whether result was already handled (subscription or poll)
+  const resultHandledRef = useRef(false);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // SI-10: Frontend consent gate — show RequirementLink immediately if AI
-  // consent is not granted in localStorage. This works even when the backend
-  // (gateway) is unavailable, unlike the graphQLErrors check alone.
   const needsConsent = useMemo(
     () => localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true',
-    // Re-check when modal opens
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [open],
   );
 
+  // ── Cleanup on unmount ──────────────────────────────────────────────────────
   useEffect(() => {
     return () => {
       setPauseSubscription(true);
+      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     };
   }, []);
 
+  // ── Reset state when modal closes ───────────────────────────────────────────
   useEffect(() => {
     if (!open) {
       setPrompt('');
@@ -109,6 +123,11 @@ export function AiCourseCreatorModal({
       setErrorMsg(null);
       setIsConsentError(false);
       setPauseSubscription(true);
+      resultHandledRef.current = false;
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
     }
   }, [open]);
 
@@ -119,29 +138,91 @@ export function AiCourseCreatorModal({
     CREATE_COURSE_MUTATION
   );
 
+  // ── Subscription (fast path) ────────────────────────────────────────────────
   const [{ data: subData }] = useSubscription<ExecutionStatusPayload>({
     query: EXECUTION_STATUS_SUBSCRIPTION,
     variables: { executionId },
     pause: pauseSubscription,
   });
 
+  // ── Polling query (fallback path — BUG-095) ────────────────────────────────
+  // Paused by default; activated only when generating with an executionId.
+  const [pollResult, executePoll] = useQuery<AgentExecutionResult>({
+    query: AGENT_EXECUTION_QUERY,
+    variables: { id: executionId ?? '' },
+    pause: true,
+  });
+
+  /** Process a completed/failed execution result from either sub or poll. */
+  const handleExecutionResult = useCallback(
+    (status: string, output: ExecutionOutputData | null) => {
+      if (resultHandledRef.current) return;
+      resultHandledRef.current = true;
+      setPauseSubscription(true);
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+      if (status === 'COMPLETED' && output) {
+        setGenerating(false);
+        setOutline({
+          title: output.courseTitle ?? t('aiCreator.untitledCourse'),
+          description: output.courseDescription ?? '',
+          modules: output.modules ?? [],
+        });
+      } else if (status === 'FAILED') {
+        setGenerating(false);
+        setErrorMsg(output?.error ?? t('aiCreator.generationFailed'));
+      }
+    },
+    [t],
+  );
+
+  // ── Handle subscription data ───────────────────────────────────────────────
   useEffect(() => {
     if (!subData) return;
     const exec = subData.executionStatusChanged;
-    if (exec.status === 'COMPLETED' && exec.output) {
-      setPauseSubscription(true);
-      setGenerating(false);
-      setOutline({
-        title: exec.output.courseTitle ?? t('aiCreator.untitledCourse'),
-        description: exec.output.courseDescription ?? '',
-        modules: exec.output.modules ?? [],
-      });
-    } else if (exec.status === 'FAILED') {
-      setPauseSubscription(true);
-      setGenerating(false);
-      setErrorMsg(exec.output?.error ?? t('aiCreator.generationFailed'));
+    if (exec.status === 'COMPLETED' || exec.status === 'FAILED') {
+      handleExecutionResult(exec.status, exec.output);
     }
-  }, [subData]);
+  }, [subData, handleExecutionResult]);
+
+  // ── BUG-095: Start polling fallback after mutation succeeds ─────────────────
+  // Polls every POLL_INTERVAL_MS. Subscription is the fast path; if it delivers
+  // the result first, polling stops. If the subscription dies (gateway SSE
+  // timeout ~60s), polling continues until completion/failure/15-min timeout.
+  useEffect(() => {
+    if (!generating || !executionId || resultHandledRef.current) return;
+
+    // Start polling after a short initial delay (give subscription a chance)
+    const startDelay = setTimeout(() => {
+      if (resultHandledRef.current) return;
+      pollTimerRef.current = setInterval(() => {
+        if (resultHandledRef.current) {
+          if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+          return;
+        }
+        executePoll({ requestPolicy: 'network-only' });
+      }, POLL_INTERVAL_MS);
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      clearTimeout(startDelay);
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+    };
+  }, [generating, executionId, executePoll]);
+
+  // ── Handle poll results ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!pollResult.data?.agentExecution || resultHandledRef.current) return;
+    const exec = pollResult.data.agentExecution;
+    if (exec.status === 'COMPLETED' || exec.status === 'FAILED') {
+      handleExecutionResult(exec.status, exec.output);
+    }
+  }, [pollResult.data, handleExecutionResult]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -149,6 +230,7 @@ export function AiCourseCreatorModal({
     setErrorMsg(null);
     setIsConsentError(false);
     setOutline(null);
+    resultHandledRef.current = false;
     const { data, error } = await generateCourse({
       input: {
         prompt: prompt.trim(),
@@ -158,16 +240,12 @@ export function AiCourseCreatorModal({
     });
     if (error || !data) {
       setGenerating(false);
-      // Check for CONSENT_REQUIRED from SI-10 LLM consent guard
       const consentErr = error?.graphQLErrors?.find(
         (e) => e.extensions?.code === 'CONSENT_REQUIRED'
       );
       if (consentErr) {
         setIsConsentError(true);
       } else {
-        // Map all other server/network errors to a user-friendly message.
-        // Never expose raw GraphQL messages (e.g. "Cannot return null for
-        // non-nullable field") — these are internal implementation details.
         setErrorMsg(t('aiCreator.generateError'));
       }
       return;
@@ -176,10 +254,9 @@ export function AiCourseCreatorModal({
     setExecutionId(eid);
     if (status === 'COMPLETED') {
       const r = data.generateCourseFromPrompt;
-      setGenerating(false);
-      setOutline({
-        title: r.courseTitle ?? t('aiCreator.untitledCourse'),
-        description: r.courseDescription ?? '',
+      handleExecutionResult('COMPLETED', {
+        courseTitle: r.courseTitle ?? undefined,
+        courseDescription: r.courseDescription ?? undefined,
         modules: r.modules,
       });
     } else {
@@ -189,10 +266,17 @@ export function AiCourseCreatorModal({
 
   const handleCreateDraft = async () => {
     if (!outline) return;
+    const user = getCurrentUser();
+    const slug = outline.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || `ai-course-${Date.now().toString(36)}`;
     const { data, error } = await createCourse({
       input: {
         title: outline.title,
+        slug,
         description: outline.description,
+        instructorId: user?.id ?? '',
         isPublished: false,
         estimatedHours: hours ? parseInt(hours, 10) : undefined,
       },

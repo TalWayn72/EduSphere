@@ -13,6 +13,7 @@ vi.mock('urql', () => ({
     ),
   useMutation: vi.fn(),
   useSubscription: vi.fn(),
+  useQuery: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -23,10 +24,18 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('@/lib/graphql/agent-course-gen.queries', () => ({
   GENERATE_COURSE_FROM_PROMPT_MUTATION: 'GENERATE_COURSE_FROM_PROMPT_MUTATION',
   EXECUTION_STATUS_SUBSCRIPTION: 'EXECUTION_STATUS_SUBSCRIPTION',
+  AGENT_EXECUTION_QUERY: 'AGENT_EXECUTION_QUERY',
 }));
 
 vi.mock('@/lib/graphql/content.queries', () => ({
   CREATE_COURSE_MUTATION: 'CREATE_COURSE_MUTATION',
+}));
+
+vi.mock('@/lib/auth', () => ({
+  getCurrentUser: vi.fn(() => ({ id: 'user-1', email: 'instructor@example.com' })),
+  getToken: vi.fn(() => 'mock-token'),
+  isAuthenticated: vi.fn(() => true),
+  logout: vi.fn(),
 }));
 
 const NOOP_EXECUTE = vi
@@ -54,6 +63,11 @@ beforeEach(() => {
   vi.mocked(urql.useMutation).mockReturnValue([{} as never, NOOP_EXECUTE]);
   vi.mocked(urql.useSubscription).mockReturnValue([
     { data: undefined } as never,
+    vi.fn(),
+  ]);
+  // BUG-095: Mock useQuery for polling fallback
+  vi.mocked(urql.useQuery).mockReturnValue([
+    { data: undefined, fetching: false, stale: false } as never,
     vi.fn(),
   ]);
 });
