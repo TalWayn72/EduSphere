@@ -4,6 +4,8 @@ import { Send, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { DebateMessage } from '@/hooks/useChavrutaDebate';
+import { ProgressStatus } from '@/components/ProgressStatus';
+import { AI_CHAT_MESSAGES } from '@/lib/progress-messages';
 
 export interface DebateInterfaceProps {
   topic: string;
@@ -128,7 +130,17 @@ export function DebateInterface({
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
-        {isLoading && <TypingIndicator />}
+        {isLoading && (
+          <>
+            <TypingIndicator />
+            <ProgressStatus
+              messages={[...AI_CHAT_MESSAGES]}
+              active={isLoading}
+              variant="minimal"
+              className="pl-1"
+            />
+          </>
+        )}
         <div ref={scrollRef} />
       </div>
 

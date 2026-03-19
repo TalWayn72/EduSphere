@@ -10,6 +10,8 @@ import { FillBlankQuestion } from './FillBlankQuestion';
 import { QuizResultView } from './QuizResultView';
 import type { QuizContent, QuizItem, QuizResult } from '@/types/quiz';
 import { useGradeQuiz } from '@/hooks/useGradeQuiz';
+import { ProgressStatus } from '@/components/ProgressStatus';
+import { QUIZ_GRADING_MESSAGES } from '@/lib/progress-messages';
 
 interface Props {
   quizContent: QuizContent;
@@ -153,9 +155,17 @@ export function QuizPlayer({ quizContent, contentItemId }: Props) {
             Previous
           </Button>
           {isLast ? (
-            <Button size="sm" onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Submitting...' : 'Submit Quiz'}
-            </Button>
+            <>
+              <Button size="sm" onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Submitting...' : 'Submit Quiz'}
+              </Button>
+              <ProgressStatus
+                messages={[...QUIZ_GRADING_MESSAGES]}
+                active={loading}
+                variant="inline"
+                className="text-muted-foreground"
+              />
+            </>
           ) : (
             <Button size="sm" onClick={() => setCurrentIdx((i) => i + 1)}>
               Next

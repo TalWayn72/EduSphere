@@ -60,5 +60,14 @@
     "message": "You have unsaved changes that will be lost if you leave this page.",
     "leave": "Leave anyway",
     "stay": "Stay on page"
+  },
+  "progress": {
+    "aiGen": { "analyzing": "Анализ темы...", "buildingOutline": "Построение плана курса...", "creatingModules": "Создание модулей...", "almostReady": "Почти готово..." },
+    "upload": { "preparing": "Подготовка загрузки...", "uploading": "Загрузка файла...", "confirming": "Подтверждение...", "done": "Готово!" },
+    "quiz": { "checkingAnswers": "Проверка ответов...", "calculatingScore": "Подсчёт баллов...", "preparingFeedback": "Подготовка отзыва..." },
+    "import": { "connecting": "Подключение к источнику...", "importing": "Импорт контента...", "processingLessons": "Обработка уроков...", "almostDone": "Почти завершено..." },
+    "chat": { "thinking": "Думаю...", "composing": "Составляю ответ...", "almostReady": "Почти готово..." },
+    "page": { "loadingData": "Загрузка данных...", "processing": "Обработка...", "almostReady": "Почти готово..." },
+    "assignment": { "submitting": "Отправка задания...", "validating": "Проверка...", "saving": "Сохранение..." }
   }
 }

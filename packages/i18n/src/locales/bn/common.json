@@ -60,5 +60,14 @@
     "message": "You have unsaved changes that will be lost if you leave this page.",
     "leave": "Leave anyway",
     "stay": "Stay on page"
+  },
+  "progress": {
+    "aiGen": { "analyzing": "বিষয় বিশ্লেষণ করা হচ্ছে...", "buildingOutline": "কোর্সের রূপরেখা তৈরি হচ্ছে...", "creatingModules": "মডিউল তৈরি হচ্ছে...", "almostReady": "প্রায় প্রস্তুত..." },
+    "upload": { "preparing": "আপলোড প্রস্তুত হচ্ছে...", "uploading": "ফাইল আপলোড হচ্ছে...", "confirming": "আপলোড নিশ্চিত করা হচ্ছে...", "done": "সম্পন্ন!" },
+    "quiz": { "checkingAnswers": "উত্তর পরীক্ষা করা হচ্ছে...", "calculatingScore": "স্কোর গণনা হচ্ছে...", "preparingFeedback": "বিস্তারিত প্রতিক্রিয়া প্রস্তুত হচ্ছে..." },
+    "import": { "connecting": "উৎসের সাথে সংযোগ হচ্ছে...", "importing": "বিষয়বস্তু আমদানি হচ্ছে...", "processingLessons": "পাঠ প্রক্রিয়া হচ্ছে...", "almostDone": "প্রায় শেষ..." },
+    "chat": { "thinking": "ভাবছি...", "composing": "উত্তর লেখা হচ্ছে...", "almostReady": "প্রায় প্রস্তুত..." },
+    "page": { "loadingData": "ডেটা লোড হচ্ছে...", "processing": "প্রক্রিয়াকরণ...", "almostReady": "প্রায় প্রস্তুত..." },
+    "assignment": { "submitting": "অ্যাসাইনমেন্ট জমা হচ্ছে...", "validating": "যাচাই হচ্ছে...", "saving": "সংরক্ষণ হচ্ছে..." }
   }
 }

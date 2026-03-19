@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { ProgressStatus } from '@/components/ProgressStatus';
 
 type SpinnerSize = 'sm' | 'md' | 'lg';
 
@@ -17,6 +18,10 @@ interface LoadingSpinnerProps {
   className?: string;
   /** Accessible label for the spinner. */
   label?: string;
+  /** Optional progress messages — when provided, shows cycling status text below spinner */
+  messages?: readonly string[];
+  /** i18n namespace for messages */
+  messagesNamespace?: string;
 }
 
 /**
@@ -28,11 +33,13 @@ export function LoadingSpinner({
   containerHeight = 'h-64',
   className,
   label = 'Loading',
+  messages,
+  messagesNamespace,
 }: LoadingSpinnerProps) {
   return (
     <div
       className={cn(
-        'flex items-center justify-center',
+        'flex flex-col items-center justify-center gap-3',
         containerHeight,
         className,
       )}
@@ -44,6 +51,14 @@ export function LoadingSpinner({
           SPINNER_SIZE[size],
         )}
       />
+      {messages && messages.length > 0 && (
+        <ProgressStatus
+          messages={messages}
+          active
+          variant="minimal"
+          namespace={messagesNamespace}
+        />
+      )}
     </div>
   );
 }

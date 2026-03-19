@@ -70,5 +70,14 @@
       "annotationsCreated": "הערות שנוצרו",
       "xpPoints": "נקודות XP"
     }
+  },
+  "progress": {
+    "aiGen": { "analyzing": "מנתח את הנושא...", "buildingOutline": "בונה מתווה לקורס...", "creatingModules": "יוצר מודולים...", "almostReady": "כמעט מוכן..." },
+    "upload": { "preparing": "מכין העלאה...", "uploading": "מעלה קובץ...", "confirming": "מאשר העלאה...", "done": "הושלם!" },
+    "quiz": { "checkingAnswers": "בודק תשובות...", "calculatingScore": "מחשב ציון...", "preparingFeedback": "מכין משוב מפורט..." },
+    "import": { "connecting": "מתחבר למקור...", "importing": "מייבא תוכן...", "processingLessons": "מעבד שיעורים...", "almostDone": "כמעט סיימנו..." },
+    "chat": { "thinking": "חושב...", "composing": "מנסח תשובה...", "almostReady": "כמעט מוכן..." },
+    "page": { "loadingData": "טוען נתונים...", "processing": "מעבד...", "almostReady": "כמעט מוכן..." },
+    "assignment": { "submitting": "שולח מטלה...", "validating": "מאמת...", "saving": "שומר..." }
   }
 }

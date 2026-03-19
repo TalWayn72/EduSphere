@@ -60,5 +60,14 @@
     "message": "You have unsaved changes that will be lost if you leave this page.",
     "leave": "Leave anyway",
     "stay": "Stay on page"
+  },
+  "progress": {
+    "aiGen": { "analyzing": "Analyse du sujet...", "buildingOutline": "Construction du plan de cours...", "creatingModules": "Création des modules...", "almostReady": "Presque prêt..." },
+    "upload": { "preparing": "Préparation du téléversement...", "uploading": "Téléversement en cours...", "confirming": "Confirmation...", "done": "Terminé !" },
+    "quiz": { "checkingAnswers": "Vérification des réponses...", "calculatingScore": "Calcul du score...", "preparingFeedback": "Préparation des commentaires..." },
+    "import": { "connecting": "Connexion à la source...", "importing": "Importation du contenu...", "processingLessons": "Traitement des leçons...", "almostDone": "Presque terminé..." },
+    "chat": { "thinking": "Réflexion...", "composing": "Rédaction de la réponse...", "almostReady": "Presque prêt..." },
+    "page": { "loadingData": "Chargement des données...", "processing": "Traitement...", "almostReady": "Presque prêt..." },
+    "assignment": { "submitting": "Envoi du devoir...", "validating": "Validation...", "saving": "Enregistrement..." }
   }
 }

@@ -60,5 +60,14 @@
     "message": "You have unsaved changes that will be lost if you leave this page.",
     "leave": "Leave anyway",
     "stay": "Stay on page"
+  },
+  "progress": {
+    "aiGen": { "analyzing": "正在分析主题...", "buildingOutline": "正在构建课程大纲...", "creatingModules": "正在创建模块...", "almostReady": "即将完成..." },
+    "upload": { "preparing": "正在准备上传...", "uploading": "正在上传文件...", "confirming": "正在确认上传...", "done": "完成！" },
+    "quiz": { "checkingAnswers": "正在检查答案...", "calculatingScore": "正在计算分数...", "preparingFeedback": "正在准备详细反馈..." },
+    "import": { "connecting": "正在连接数据源...", "importing": "正在导入内容...", "processingLessons": "正在处理课程...", "almostDone": "即将完成..." },
+    "chat": { "thinking": "思考中...", "composing": "正在撰写回复...", "almostReady": "即将完成..." },
+    "page": { "loadingData": "正在加载数据...", "processing": "处理中...", "almostReady": "即将完成..." },
+    "assignment": { "submitting": "正在提交作业...", "validating": "正在验证...", "saving": "正在保存..." }
   }
 }

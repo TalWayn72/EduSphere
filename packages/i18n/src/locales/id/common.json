@@ -60,5 +60,14 @@
     "message": "You have unsaved changes that will be lost if you leave this page.",
     "leave": "Leave anyway",
     "stay": "Stay on page"
+  },
+  "progress": {
+    "aiGen": { "analyzing": "Menganalisis topik...", "buildingOutline": "Membuat kerangka kursus...", "creatingModules": "Membuat modul...", "almostReady": "Hampir siap..." },
+    "upload": { "preparing": "Mempersiapkan unggahan...", "uploading": "Mengunggah file...", "confirming": "Mengonfirmasi unggahan...", "done": "Selesai!" },
+    "quiz": { "checkingAnswers": "Memeriksa jawaban...", "calculatingScore": "Menghitung skor...", "preparingFeedback": "Menyiapkan umpan balik..." },
+    "import": { "connecting": "Menghubungkan ke sumber...", "importing": "Mengimpor konten...", "processingLessons": "Memproses pelajaran...", "almostDone": "Hampir selesai..." },
+    "chat": { "thinking": "Berpikir...", "composing": "Menyusun jawaban...", "almostReady": "Hampir siap..." },
+    "page": { "loadingData": "Memuat data...", "processing": "Memproses...", "almostReady": "Hampir siap..." },
+    "assignment": { "submitting": "Mengirim tugas...", "validating": "Memvalidasi...", "saving": "Menyimpan..." }
   }
 }

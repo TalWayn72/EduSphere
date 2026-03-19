@@ -8,6 +8,8 @@ import { DriveImportCard } from '@/components/content-import/DriveImportCard';
 import { ImportProgressPanel } from '@/components/content-import/ImportProgressPanel';
 import { useContentImport } from '@/hooks/useContentImport';
 import { PageShell } from '@/components/PageShell';
+import { ProgressStatus } from '@/components/ProgressStatus';
+import { CONTENT_IMPORT_MESSAGES } from '@/lib/progress-messages';
 
 type ImportSource = 'youtube' | 'website' | 'folder' | 'drive' | null;
 
@@ -108,13 +110,20 @@ export function ContentImportPage() {
             )}
 
             {selectedSource && selectedSource !== 'folder' && selectedSource !== 'drive' && (
-              <button
-                type="submit"
-                disabled={isImporting}
-                className="bg-primary text-primary-foreground px-6 py-2 rounded font-medium disabled:opacity-50"
-              >
-                {isImporting ? 'Importing…' : 'Start Import'}
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={isImporting}
+                  className="bg-primary text-primary-foreground px-6 py-2 rounded font-medium disabled:opacity-50"
+                >
+                  {isImporting ? 'Importing…' : 'Start Import'}
+                </button>
+                <ProgressStatus
+                  messages={[...CONTENT_IMPORT_MESSAGES]}
+                  active={isImporting}
+                  variant="inline"
+                />
+              </div>
             )}
           </form>
         ) : (

@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { Bot, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
+import { ProgressStatus } from '@/components/ProgressStatus';
+import { AI_CHAT_MESSAGES } from '@/lib/progress-messages';
 
 interface Props {
   chat: UseAgentChatReturn;
@@ -27,6 +29,7 @@ export function AiTab({ chat }: Props) {
     sendMessage,
     chatEndRef,
     isStreaming,
+    isSending,
   } = chat;
 
   const handleSend = () => {
@@ -75,6 +78,15 @@ export function AiTab({ chat }: Props) {
             </div>
           </div>
         ))}
+        {isSending && !isStreaming && (
+          <div className="flex justify-start px-1">
+            <ProgressStatus
+              messages={[...AI_CHAT_MESSAGES]}
+              active={isSending}
+              variant="minimal"
+            />
+          </div>
+        )}
         {isStreaming && (
           <div className="flex justify-start">
             <div className="bg-muted rounded-lg rounded-bl-none px-3 py-2 flex gap-1 items-center">

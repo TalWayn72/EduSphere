@@ -71,6 +71,7 @@
 | BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | `66a0b79` |
 | BUG-088 | Consent toggle saves to localStorage only — backend DB never synced; no return navigation | ✅ Fixed | (pending commit) |
 | BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback | ✅ Fixed | (pending commit) |
+| FEAT-090 | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s | ✅ Implemented | (pending commit) |
 
 ---
 
@@ -131,6 +132,46 @@
 - PubSub now shared via DI — any new service that updates execution status can inject the same provider
 - Polling fallback ensures frontend never hangs even if WebSocket/subscription infrastructure fails
 - `@ai-sdk/openai` with Ollama `/v1` endpoint uses spec v2 — no version mismatch
+
+---
+
+### FEAT-090: Dynamic Progress Status Indicator ✅
+
+| Field | Value |
+|-------|-------|
+| **Status** | ✅ Implemented |
+| **Priority** | 🟡 Medium (UX Enhancement) |
+| **Created** | 2026-03-18 |
+
+**Description:** Claude-like dynamic text status indicator for all operations taking >2 seconds. Instead of a static spinner, shows cycling descriptive text messages (e.g., "מנתח את הנושא..." → "בונה מתווה..." → "יוצר מודולים...").
+
+**Files Created:**
+- `apps/web/src/hooks/useProgressStatus.ts` — Cycling logic hook (78 lines)
+- `apps/web/src/components/ProgressStatus.tsx` — UI component, 3 variants: inline/block/minimal (126 lines)
+- `apps/web/src/lib/progress-messages.ts` — Message registry for 7 operation types (57 lines)
+
+**Files Modified:**
+- `apps/web/src/components/AiCourseCreatorModal.tsx` — Replaced static spinner with ProgressStatus
+- `apps/web/src/components/LoadingSpinner.tsx` — Added optional messages prop
+- `apps/web/src/components/quiz/QuizPlayer.tsx` — Quiz grading progress
+- `apps/web/src/pages/ContentImportPage.tsx` — Content import progress
+- `apps/web/src/components/TextSubmissionForm.tsx` — Assignment submission progress
+- `apps/web/src/components/chavruta/DebateInterface.tsx` — AI debate progress
+- `apps/web/src/pages/UnifiedLearningPage.ai-tab.tsx` — AI chat pre-stream progress
+- `packages/i18n/src/locales/*/common.json` — 10 languages × 27 keys = 270 translations
+
+**Tests:**
+- `apps/web/src/hooks/useProgressStatus.test.ts` — 8 unit tests
+- `apps/web/src/hooks/useProgressStatus.memory.test.ts` — 5 memory safety tests
+- `apps/web/src/components/ProgressStatus.test.tsx` — 8 component tests
+- `apps/web/e2e/progress-status.spec.ts` — 5 E2E Playwright tests (skeleton)
+- Total: 26 new tests, all passing
+
+**Documentation:**
+- `docs/plans/features/FEAT-progress-status-indicator.md` — PRD
+- `docs/architecture/ADR-progress-status-indicator.md` — Architecture Decision Record
+- `docs/plans/features/FEAT-progress-status-ux-spec.md` — UX/UI Design Specification
+- `docs/plans/features/FEAT-progress-status-security-review.md` — Security Clearance (6/6 PASS)
 
 ---
 

@@ -69,5 +69,14 @@
       "xpPoints": "XP Points",
       "annotationsCreated": "Annotations Created"
     }
+  },
+  "progress": {
+    "aiGen": { "analyzing": "Analyzing topic...", "buildingOutline": "Building course outline...", "creatingModules": "Creating modules...", "almostReady": "Almost ready..." },
+    "upload": { "preparing": "Preparing upload...", "uploading": "Uploading file...", "confirming": "Confirming upload...", "done": "Done!" },
+    "quiz": { "checkingAnswers": "Checking answers...", "calculatingScore": "Calculating score...", "preparingFeedback": "Preparing detailed feedback..." },
+    "import": { "connecting": "Connecting to source...", "importing": "Importing content...", "processingLessons": "Processing lessons...", "almostDone": "Almost done..." },
+    "chat": { "thinking": "Thinking...", "composing": "Composing response...", "almostReady": "Almost ready..." },
+    "page": { "loadingData": "Loading data...", "processing": "Processing...", "almostReady": "Almost ready..." },
+    "assignment": { "submitting": "Submitting assignment...", "validating": "Validating...", "saving": "Saving..." }
   }
 }

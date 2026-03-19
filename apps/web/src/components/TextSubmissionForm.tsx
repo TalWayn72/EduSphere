@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useSubmitAssignment } from '@/hooks/useSubmitAssignment';
+import { ProgressStatus } from '@/components/ProgressStatus';
+import { ASSIGNMENT_SUBMIT_MESSAGES } from '@/lib/progress-messages';
 
 const MIN_WORDS = 10;
 const MAX_CHARS = 50_000;
@@ -89,9 +91,16 @@ export function TextSubmissionForm({
         </p>
       )}
 
-      <Button type="submit" disabled={!canSubmit}>
-        {loading ? 'Submitting...' : 'Submit Assignment'}
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button type="submit" disabled={!canSubmit}>
+          {loading ? 'Submitting...' : 'Submit Assignment'}
+        </Button>
+        <ProgressStatus
+          messages={[...ASSIGNMENT_SUBMIT_MESSAGES]}
+          active={loading}
+          variant="inline"
+        />
+      </div>
     </form>
   );
 }
