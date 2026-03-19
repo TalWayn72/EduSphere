@@ -39,6 +39,7 @@
   "graph": "גרף",
   "accountInformation": "פרטי חשבון",
   "errorLoadingUser": "שגיאה בטעינת נתוני המשתמש",
+  "unableToLoad": "לא ניתן לטעון",
   "unsavedChanges": {
     "title": "שינויים שלא נשמרו",
     "message": "יש לך שינויים שלא נשמרו. אם תעזוב עכשיו, השינויים יאבדו.",

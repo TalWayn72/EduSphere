@@ -39,6 +39,8 @@ import navEn from '../../../../packages/i18n/src/locales/en/nav.json';
 import settingsEn from '../../../../packages/i18n/src/locales/en/settings.json';
 import gamificationEn from '../../../../packages/i18n/src/locales/en/gamification.json';
 import offlineEn from '../../../../packages/i18n/src/locales/en/offline.json';
+import profileEn from '../../../../packages/i18n/src/locales/en/profile.json';
+import socialEn from '../../../../packages/i18n/src/locales/en/social.json';
 
 type TranslationRecord = Record<string, unknown>;
 
@@ -57,7 +59,9 @@ const EN_RESOURCES: Record<string, TranslationRecord> = {
   knowledge: knowledgeEn as TranslationRecord,
   nav: navEn as TranslationRecord,
   offline: offlineEn as TranslationRecord,
+  profile: profileEn as TranslationRecord,
   settings: settingsEn as TranslationRecord,
+  social: socialEn as TranslationRecord,
 };
 
 /** Resolve a dot-notation key path inside a translation object. */

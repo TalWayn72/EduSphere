@@ -323,7 +323,7 @@ describe('AppSidebar', () => {
     renderAt();
     const helpLink = screen.getByTestId('nav-item-help');
     expect(helpLink).toBeInTheDocument();
-    expect(helpLink).toHaveAttribute('aria-label', 'Help and Support');
+    expect(helpLink).toHaveAttribute('aria-label', 'Help & Support');
     expect(helpLink).toHaveTextContent('Help & Support');
   });
 
