@@ -5,6 +5,7 @@ import { SUPPORTED_LOCALES, type SupportedLocale } from '@edusphere/i18n';
 import { ME_QUERY, UPDATE_USER_PREFERENCES_MUTATION } from '@/lib/queries';
 import { MY_TENANT_LANGUAGE_SETTINGS_QUERY } from '@/lib/graphql/tenant-language.queries';
 import { applyDocumentDirection } from '@/lib/i18n';
+import { LOCALE_SYNCED_KEY } from '@/lib/auth';
 
 interface MeQueryResult {
   me: {
@@ -65,29 +66,30 @@ export function useUserPreferences(): UseUserPreferencesReturn {
   // - setLocale() (user's explicit selection on this page)
   const currentLocale = i18n.language as SupportedLocale;
 
-  // Sync DB locale → i18next for the SETTINGS PAGE ONLY.
-  // This handles the case where GlobalLocaleSync already ran globally but the
-  // Settings page needs to show the latest DB value immediately on mount.
-  //
-  // CRITICAL: Only apply DB locale if localStorage is NOT set.
-  // If localStorage IS set, it reflects the user's intent in this session
-  // (either from initI18n startup OR from a recent setLocale call).
-  // Overriding it would reset a just-changed locale back to the stale DB value.
+  // Sync DB locale → i18next for the SETTINGS PAGE.
+  // BUG-091: Also sync after fresh login (sessionStorage flag cleared by auth.ts).
   useEffect(() => {
     const dbLocale = meResult.data?.me?.preferences?.locale;
     if (!dbLocale) return;
     if (!(SUPPORTED_LOCALES as readonly string[]).includes(dbLocale)) return;
 
     const cachedLocale = localStorage.getItem('edusphere_locale');
+    const alreadySynced =
+      sessionStorage.getItem(LOCALE_SYNCED_KEY) === 'true';
 
-    if (!cachedLocale && dbLocale !== i18n.language) {
-      // Fresh session: no localStorage, DB has a locale → apply it
+    const needsSync =
+      dbLocale !== i18n.language &&
+      (!cachedLocale || !alreadySynced);
+
+    if (needsSync) {
       void i18n.changeLanguage(dbLocale as SupportedLocale);
       localStorage.setItem('edusphere_locale', dbLocale);
       applyDocumentDirection(dbLocale);
     }
-    // If localStorage exists, trust it. initI18n() already applied it on startup.
-    // Do NOT override localStorage-set language with a potentially stale DB value.
+
+    if (!alreadySynced) {
+      sessionStorage.setItem(LOCALE_SYNCED_KEY, 'true');
+    }
   }, [meResult.data?.me?.preferences?.locale, i18n]);
 
   // Auto-fallback: if admin disabled user's current language, switch to tenant default

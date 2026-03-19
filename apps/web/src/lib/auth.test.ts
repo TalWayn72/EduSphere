@@ -173,6 +173,36 @@ describe('auth — DEV_MODE', () => {
     expect(hrefSetter).toHaveBeenCalledWith('/');
   });
 
+  it('BUG-091: login() clears LOCALE_SYNCED_KEY so GlobalLocaleSync re-syncs from DB', async () => {
+    vi.stubEnv('VITE_DEV_MODE', 'true');
+    vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+    stubHref();
+
+    // Pre-set the sync flag (as if from a previous session)
+    window.sessionStorage.setItem('edusphere_locale_synced', 'true');
+
+    const { login, LOCALE_SYNCED_KEY: key } = await import('@/lib/auth');
+    login();
+
+    expect(window.sessionStorage.getItem(key)).toBeNull();
+  });
+
+  it('BUG-091: logout() clears LOCALE_SYNCED_KEY for clean re-login', async () => {
+    vi.stubEnv('VITE_DEV_MODE', 'true');
+    vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+    stubHref();
+
+    window.sessionStorage.setItem('edusphere_dev_logged_in', 'true');
+    window.sessionStorage.setItem('edusphere_locale_synced', 'true');
+
+    const { initKeycloak, logout, LOCALE_SYNCED_KEY: key } =
+      await import('@/lib/auth');
+    await initKeycloak();
+    logout();
+
+    expect(window.sessionStorage.getItem(key)).toBeNull();
+  });
+
   it('getCurrentUser() returns null when devAuthenticated is false (no login called)', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');

@@ -1,8 +1,9 @@
 /**
- * GlobalLocaleSync unit tests — BUG-045 regression.
+ * GlobalLocaleSync unit tests — BUG-045 + BUG-091 regression.
  *
  * Verifies that the DB locale is applied globally on every page (not only
- * on SettingsPage), and that localStorage takes precedence once set.
+ * on SettingsPage), that localStorage takes precedence once set, and that
+ * fresh logins force a re-sync from DB (BUG-091).
  *
  * NOTE: react-i18next is globally mocked via setup.ts (vi.mock, hoisted).
  * We cannot intercept i18n.changeLanguage directly because each call to
@@ -13,6 +14,7 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as urql from 'urql';
+import { LOCALE_SYNCED_KEY } from '@/lib/auth';
 
 // ── urql mock ─────────────────────────────────────────────────────────────────
 
@@ -55,6 +57,7 @@ describe('GlobalLocaleSync — BUG-045', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('applies DB locale and saves to localStorage when localStorage is empty', async () => {
@@ -69,8 +72,10 @@ describe('GlobalLocaleSync — BUG-045', () => {
     expect(applyDocumentDirection).toHaveBeenCalledWith('he');
   });
 
-  it('does NOT override localStorage-set locale with DB locale', async () => {
+  it('does NOT override localStorage when already synced this session (BUG-045)', async () => {
     localStorage.setItem('edusphere_locale', 'fr');
+    // Mark as already synced — simulates a second render in same session
+    sessionStorage.setItem(LOCALE_SYNCED_KEY, 'true');
     vi.mocked(urql.useQuery).mockReturnValue(makeUrqlResult('he'));
 
     await act(async () => {
@@ -126,5 +131,57 @@ describe('GlobalLocaleSync — BUG-045', () => {
     });
 
     expect(container.firstChild).toBeNull();
+  });
+});
+
+describe('GlobalLocaleSync — BUG-091: fresh login re-sync', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it('BUG-091: overrides stale localStorage with DB locale after fresh login', async () => {
+    // Stale localStorage from previous session
+    localStorage.setItem('edusphere_locale', 'en');
+    // No LOCALE_SYNCED_KEY → fresh login
+    vi.mocked(urql.useQuery).mockReturnValue(makeUrqlResult('he'));
+
+    await act(async () => {
+      render(<GlobalLocaleSync />);
+    });
+
+    // DB locale 'he' should win over stale localStorage 'en'
+    expect(localStorage.getItem('edusphere_locale')).toBe('he');
+    expect(applyDocumentDirection).toHaveBeenCalledWith('he');
+    // Sync flag should be set after sync
+    expect(sessionStorage.getItem(LOCALE_SYNCED_KEY)).toBe('true');
+  });
+
+  it('BUG-091: does NOT override after locale already synced this session', async () => {
+    localStorage.setItem('edusphere_locale', 'en');
+    // Already synced — user may have manually set to 'en' via settings
+    sessionStorage.setItem(LOCALE_SYNCED_KEY, 'true');
+    vi.mocked(urql.useQuery).mockReturnValue(makeUrqlResult('he'));
+
+    await act(async () => {
+      render(<GlobalLocaleSync />);
+    });
+
+    // Should not override — session already synced
+    expect(localStorage.getItem('edusphere_locale')).toBe('en');
+    expect(applyDocumentDirection).not.toHaveBeenCalled();
+  });
+
+  it('BUG-091: sets sync flag even when DB locale matches current language', async () => {
+    // DB returns 'en', i18n.language is 'en' (from mock) → no change needed
+    // but sync flag should still be set
+    vi.mocked(urql.useQuery).mockReturnValue(makeUrqlResult('en'));
+
+    await act(async () => {
+      render(<GlobalLocaleSync />);
+    });
+
+    expect(sessionStorage.getItem(LOCALE_SYNCED_KEY)).toBe('true');
   });
 });

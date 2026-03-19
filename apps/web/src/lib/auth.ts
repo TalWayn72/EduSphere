@@ -141,14 +141,23 @@ export function initKeycloak(): Promise<boolean> {
   return initPromise;
 }
 
+/** SessionStorage key — cleared on login/logout so GlobalLocaleSync re-syncs from DB. */
+export const LOCALE_SYNCED_KEY = 'edusphere_locale_synced';
+
 export function login(): void {
   if (DEV_MODE) {
     window.sessionStorage.setItem(DEV_LOGGED_IN_KEY, 'true');
+    // BUG-091: Clear locale-sync flag so GlobalLocaleSync re-reads DB locale
+    // after the full page reload.  Without this, a stale localStorage value
+    // would be trusted even though the DB has a different user preference.
+    window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
     devAuthenticated = true;
     window.location.href = '/';
     return;
   }
 
+  // BUG-091: Clear locale-sync flag before Keycloak redirect
+  window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
   keycloak!.login({
     redirectUri: window.location.origin,
   });
@@ -163,11 +172,15 @@ export function logout(): void {
     window.sessionStorage.removeItem(DEV_LOGGED_IN_KEY);
     // Also purge any legacy "logged-out" key left by older builds.
     window.sessionStorage.removeItem(_DEV_LOGOUT_KEY_LEGACY);
+    // BUG-091: Clear locale-sync flag so next login triggers DB re-sync
+    window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
     window.location.href = '/login';
     return;
   }
 
   clearTokenRefresh();
+  // BUG-091: Clear locale-sync flag before Keycloak logout redirect
+  window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
   keycloak!.logout({
     redirectUri: window.location.origin,
   });
