@@ -80,9 +80,23 @@ services:
       # subgraph-core: dist mounted — consent resolver/module missing from image build (BUG-094)
       # NOT :ro — startup.sh copies SDL files into dist/
       - ./apps/subgraph-core/dist:/app/apps/subgraph-core/dist
+      # subgraph-annotation: dist mounted — supervisord runs `node dist/main` (BUG-094 Wave 2)
+      - ./apps/subgraph-annotation/dist:/app/apps/subgraph-annotation/dist:ro
+      # subgraph-collaboration: dist mounted — supervisord runs `node dist/main` (BUG-094 Wave 2)
+      - ./apps/subgraph-collaboration/dist:/app/apps/subgraph-collaboration/dist:ro
       # subgraph-content: rebuilt dist with MinIO full-URL fix (endpoint: `http://${host}:${port}`)
       # MINIO_ENDPOINT in supervisord.conf must be just the hostname (e.g. "localhost"), not a full URL.
       - ./apps/subgraph-content/dist:/app/apps/subgraph-content/dist:ro
+      # packages/metrics: all 6 subgraphs import createSubgraphLoggerModule (BUG-094 Wave 3)
+      - ./packages/metrics/dist:/app/packages/metrics/dist:ro
+      # packages/config: all 6 subgraphs depend on config (BUG-094 Wave 3)
+      - ./packages/config/dist:/app/packages/config/dist:ro
+      # packages/graphql-shared: shared SDL types used by 4+ subgraphs (BUG-094 Wave 3)
+      - ./packages/graphql-shared/dist:/app/packages/graphql-shared/dist:ro
+      # packages/health: health-check module used by subgraphs (BUG-094 Wave 3)
+      - ./packages/health/dist:/app/packages/health/dist:ro
+      # packages/rag: RAG pipeline used by subgraph-knowledge (BUG-094 Wave 3)
+      - ./packages/rag/dist:/app/packages/rag/dist:ro
       # nats-pubsub: new package from Phase 65 — NatsPubSub engine for GraphQL subscriptions
       - ./packages/nats-pubsub:/app/packages/nats-pubsub:ro
       # nats-client dist: Phase 65 adds LessonNEREntitiesPayload + gateway-events subjects
