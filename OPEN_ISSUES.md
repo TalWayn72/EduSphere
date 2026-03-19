@@ -72,6 +72,7 @@
 | BUG-088 | Consent toggle saves to localStorage only — backend DB never synced; no return navigation | ✅ Fixed | (pending commit) |
 | BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback | ✅ Fixed | (pending commit) |
 | FEAT-090 | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s | ✅ Implemented | (pending commit) |
+| BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
 
 ---
 
@@ -9835,3 +9836,109 @@ Commit: `ae622ce`
 | `AiCourseCreatorModal.test.tsx` | Updated: localStorage consent in beforeEach + consent-specific test |
 
 **Visual Verification:** Screenshot at `docs/screenshots/feat066-modal-consent-link.png` confirms RequirementLink is visible with clickable link to `/settings?highlight=ai-consent`.
+
+---
+
+## BUG-091 — Container Subgraphs FATAL: pnpm Workspace Packages Not Hoisted (19 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (all 6 subgraphs crash on container start — frontend shows "שרת לא נגיש")
+- **Reporter:** User (screenshot showing error banner on /courses page)
+
+### Symptom
+
+All 6 subgraphs enter `FATAL` state in supervisord immediately after container start. Frontend displays red error banner "שרת לא נגיש — מציג נתוני גיבוי" (Server not accessible — showing backup data).
+
+### Root Cause
+
+Two issues combined:
+
+1. **Missing workspace package symlinks:** `startup.sh` only created symlinks for 3 specific packages (`prom-client`, `nats`, `@edusphere/langgraph-workflows`) using individual if-blocks. All other 19 `@edusphere/*` workspace packages were missing from `/app/node_modules/@edusphere/`. This caused `ERR_MODULE_NOT_FOUND: Cannot find package '@edusphere/nats-client'`.
+
+2. **Missing npm dependency hoisting:** Even after fixing workspace symlinks, shared packages like `packages/auth/dist/tracing.interceptor.js` import npm packages (`@nestjs/graphql`) that exist only in individual subgraph `node_modules` (pnpm strict mode). Node.js ESM resolution follows the realpath of the importing file (`/app/packages/auth/`), not the subgraph that imported it, so these transitive deps were unreachable.
+
+3. **Insufficient supervisor retries:** `startretries` defaulted to 3 — too few for transient startup failures during container initialization.
+
+### Fix (3 parts)
+
+| File | Change |
+|------|--------|
+| `infrastructure/docker/startup.sh` | Replaced 3 individual if-blocks with comprehensive loop: (1) symlinks ALL `/app/packages/*/` to `/app/node_modules/@edusphere/`, (2) hoists ALL npm packages from `/app/apps/subgraph-*/node_modules/` to root |
+| `infrastructure/docker/supervisord.conf` | Added `startretries=10` to all 6 subgraph programs |
+| `tests/infrastructure/workspace-hoist.spec.ts` | 10 regression tests validating the fix |
+
+### Discovery List
+
+| Wave | Location | Issue |
+|------|----------|-------|
+| 1 | `startup.sh` lines 134-173 | Only 3 packages symlinked (prom-client, nats, langgraph-workflows) |
+| 2 | `supervisord.conf` all subgraph sections | No `startretries` set (default=3, too low) |
+| 3 | All workspace packages | 19 of 20 packages missing from root node_modules |
+| 3 | All subgraph npm deps | @nestjs/graphql, @nestjs/common, @ai-sdk/*, etc. not hoisted |
+
+### Tests Added
+
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `tests/infrastructure/workspace-hoist.spec.ts` | 10 | startup.sh loop pattern, no old individual blocks, supervisord retries ≥5, autorestart=true, critical packages exist |
+
+### Anti-Recurrence
+
+- `workspace-hoist.spec.ts` enforces that startup.sh uses a loop over `/app/packages/*/` (not individual hardcoded blocks)
+- `workspace-hoist.spec.ts` enforces `startretries >= 5` for all 6 subgraphs
+- The new symlink loop is generic — any new workspace package added to `packages/` is automatically covered
+
+---
+
+## BUG-091 — Language Reverts to English After Login (19 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium
+- **Reporter:** Internal
+
+### Symptom
+
+After a fresh login, the UI language reverts to English even when the user's DB preference is set to another language (e.g. Hebrew). The locale stored in the DB was ignored on every login.
+
+### Root Cause
+
+`GlobalLocaleSync` only synced DB→localStorage when `localStorage` was **completely empty**. After a fresh login with stale localStorage, the cached locale (`cachedLocale`) was already set, so the DB preference (e.g. `'he'`) was silently ignored. The component had no mechanism to detect a fresh-login event and force a re-sync.
+
+### Fix
+
+Added a `sessionStorage` flag (`LOCALE_SYNCED_KEY = 'edusphere_locale_synced'`) that is **cleared by `login()` and `logout()`** in `auth.ts`. `GlobalLocaleSync` checks this flag on mount — if the flag is absent (fresh login), it forces a re-sync from the DB regardless of the current `localStorage` state.
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/GlobalLocaleSync.tsx` | Added fresh-login detection via `LOCALE_SYNCED_KEY`; forces DB re-sync when flag is absent |
+| `apps/web/src/lib/auth.ts` | Exported `LOCALE_SYNCED_KEY`; clears the flag in `login()` and `logout()` |
+| `apps/web/src/hooks/useUserPreferences.ts` | Same fresh-login detection pattern added for consistency |
+
+### Tests Added
+
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `apps/web/src/components/GlobalLocaleSync.test.tsx` | 3 | BUG-091 regression guards — forces re-sync on fresh login, skips re-sync when flag present, clears flag after sync |
+| `apps/web/src/lib/auth.test.ts` | 2 | BUG-091 regression guards — `login()` clears flag, `logout()` clears flag |
+| `apps/web/e2e/bug091-locale-login-sync.spec.ts` | 4 | Full E2E: login → locale synced from DB → correct language displayed; logout → flag cleared; repeat login → re-sync fires |
+
+### Discovery List
+
+| Wave | Location | Issue |
+|------|----------|-------|
+| Wave 1 — Exact match | `apps/web/src/components/GlobalLocaleSync.tsx` | Primary file — sync guard missing fresh-login detection |
+| Wave 1 — Exact match | `apps/web/src/hooks/useUserPreferences.ts` | Same sync logic — same anti-pattern present |
+| Wave 1 — Exact match | `apps/web/src/lib/auth.ts` | `login()`/`logout()` needed to clear the new flag |
+| Wave 2 — Similarity search | `apps/web/src/pages/` (all) | No similar sync gaps found |
+| Wave 2 — Similarity search | `apps/web/src/hooks/` (all) | `useUserPreferences.ts` — same anti-pattern (fixed in Round 2) |
+| Wave 2 — Similarity search | `apps/web/src/components/` (all) | No other locale sync components found |
+| Wave 2 — Similarity search | `apps/mobile/src/` (all) | No mobile equivalent affected (mobile uses AsyncStorage with separate path) |
+| Wave 3 — Class of bug | `sessionStorage`/`localStorage` sync patterns (all) | `StorageManager.clearLocalStorage()` already preserves `edusphere_locale` — no other sync gaps found |
+
+### Anti-Recurrence
+
+- Inverted reproducer tests in `GlobalLocaleSync.test.tsx` and `auth.test.ts` serve as regression guards — they will fail if the fresh-login detection is ever removed.
+- E2E spec `bug091-locale-login-sync.spec.ts` guards the full login → locale sync flow end-to-end.
+- `LOCALE_SYNCED_KEY` is exported from `auth.ts` as a shared constant to prevent key-name drift across files.

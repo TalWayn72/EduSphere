@@ -131,46 +131,64 @@ fi
 echo "⏹️  Stopping PostgreSQL (supervisord will take over)..."
 su - postgres -c "$PG_CTL -D $PG_DATA stop -m fast" || true
 
-# ─── Hoist pnpm packages required by compiled dist ───────────
-# prom-client is used by packages/db/dist/rls/withTenantContext.js for RLS metrics.
-# nats is used by subgraphs that have NATS JetStream integration.
-# pnpm's hoisting may not place these at the top-level; ensure they are accessible.
-echo "🔗 Ensuring required packages are hoisted..."
+# ─── Hoist ALL workspace + subgraph packages to root node_modules ─────
+# pnpm strict mode doesn't hoist workspace packages or transitive deps
+# to the root node_modules. Compiled dist files in shared packages
+# (e.g. packages/auth/dist/tracing.interceptor.js importing @nestjs/graphql)
+# resolve from the package's own directory — NOT the subgraph that imported it.
+# This means ALL dependencies must be reachable from /app/node_modules/.
+echo "🔗 Hoisting all workspace + subgraph packages to root node_modules..."
 
-if [ ! -d "/app/node_modules/prom-client" ]; then
-    PROM_PATH=$(find /app/node_modules/.pnpm -maxdepth 4 -type d -name "prom-client" 2>/dev/null | head -1)
-    if [ -n "$PROM_PATH" ]; then
-        ln -sf "$PROM_PATH" /app/node_modules/prom-client
-        echo "✅ prom-client symlinked"
-    else
-        echo "⚠️  prom-client not found in pnpm store — subgraphs may fail to start"
+# Step 1: Symlink ALL @edusphere/* workspace packages
+mkdir -p /app/node_modules/@edusphere
+LINKED_WS=0
+for pkg_dir in /app/packages/*/; do
+    pkg_name=$(basename "$pkg_dir")
+    target="/app/node_modules/@edusphere/$pkg_name"
+    if [ ! -L "$target" ] && [ ! -d "$target" ]; then
+        ln -sf "$pkg_dir" "$target"
+        LINKED_WS=$((LINKED_WS + 1))
     fi
-else
-    echo "✅ prom-client already present"
-fi
+done
+echo "✅ @edusphere/* workspace packages linked ($LINKED_WS new)"
 
-if [ ! -d "/app/node_modules/nats" ]; then
-    NATS_PATH=$(find /app/node_modules/.pnpm -maxdepth 4 -type d -name "nats" 2>/dev/null | head -1)
-    if [ -n "$NATS_PATH" ]; then
-        ln -sf "$NATS_PATH" /app/node_modules/nats
-        echo "✅ nats symlinked"
-    else
-        echo "⚠️  nats not found in pnpm store"
-    fi
-else
-    echo "✅ nats already present"
-fi
-
-# @edusphere/langgraph-workflows: pnpm workspace symlink not created by install
-# (langgraph-workflows is not directly in app's node_modules top-level).
-# Needed by subgraph-agent to load compiled tutorWorkflow.js.
-if [ ! -L "/app/node_modules/@edusphere/langgraph-workflows" ] && [ ! -d "/app/node_modules/@edusphere/langgraph-workflows" ]; then
-    mkdir -p /app/node_modules/@edusphere
-    ln -sf /app/packages/langgraph-workflows /app/node_modules/@edusphere/langgraph-workflows
-    echo "✅ @edusphere/langgraph-workflows symlinked"
-else
-    echo "✅ @edusphere/langgraph-workflows already present"
-fi
+# Step 2: Hoist ALL npm packages from subgraph node_modules to root
+# This ensures shared packages (auth, config, db etc.) can resolve
+# any dependency that subgraphs have installed (e.g. @nestjs/graphql,
+# @nestjs/common, prom-client, nats, etc.)
+LINKED_DEPS=0
+for subgraph_nm in /app/apps/subgraph-*/node_modules; do
+    [ ! -d "$subgraph_nm" ] && continue
+    # Handle @scoped packages (e.g. @nestjs/graphql, @ai-sdk/openai)
+    for scope_dir in "$subgraph_nm"/@*/; do
+        scope=$(basename "$scope_dir" 2>/dev/null)
+        [ "$scope" = "*" ] && continue
+        [ "$scope" = "@edusphere" ] && continue  # already handled in Step 1
+        mkdir -p "/app/node_modules/$scope"
+        for inner_pkg in "$scope_dir"/*/; do
+            inner_name=$(basename "$inner_pkg" 2>/dev/null)
+            [ "$inner_name" = "*" ] && continue
+            link_target="/app/node_modules/$scope/$inner_name"
+            if [ ! -e "$link_target" ]; then
+                ln -sf "$inner_pkg" "$link_target"
+                LINKED_DEPS=$((LINKED_DEPS + 1))
+            fi
+        done
+    done
+    # Handle non-scoped packages (e.g. prom-client, nats, jose)
+    for pkg_dir in "$subgraph_nm"/*/; do
+        pkg_name=$(basename "$pkg_dir" 2>/dev/null)
+        [ "$pkg_name" = "*" ] && continue
+        [[ "$pkg_name" == @* ]] && continue
+        [[ "$pkg_name" == .* ]] && continue
+        link_target="/app/node_modules/$pkg_name"
+        if [ ! -e "$link_target" ]; then
+            ln -sf "$pkg_dir" "$link_target"
+            LINKED_DEPS=$((LINKED_DEPS + 1))
+        fi
+    done
+done
+echo "✅ Subgraph npm dependencies hoisted ($LINKED_DEPS new)"
 
 # ─── Conditional dist rebuild (idempotent, runs only when stale) ──
 # Detects if the compiled dist files predate critical source fixes and rebuilds.
