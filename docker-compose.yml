@@ -77,6 +77,9 @@ services:
       # subgraph-core: mount src/ — fixes @requiresRole removed from @link imports (invalid federation import),
       # directive @requiresRole defined locally in user.graphql instead
       - ./apps/subgraph-core/src:/app/apps/subgraph-core/src:ro
+      # subgraph-core: dist mounted — consent resolver/module missing from image build (BUG-094)
+      # NOT :ro — startup.sh copies SDL files into dist/
+      - ./apps/subgraph-core/dist:/app/apps/subgraph-core/dist
       # subgraph-content: rebuilt dist with MinIO full-URL fix (endpoint: `http://${host}:${port}`)
       # MINIO_ENDPOINT in supervisord.conf must be just the hostname (e.g. "localhost"), not a full URL.
       - ./apps/subgraph-content/dist:/app/apps/subgraph-content/dist:ro

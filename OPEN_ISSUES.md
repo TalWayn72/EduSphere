@@ -75,7 +75,21 @@
 | BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
 | BUG-092 | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch) | ✅ Fixed (2 rounds) | (pending commit) |
 | BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
+| BUG-094 | Consent save fails — consent resolver missing from Docker container dist | ✅ Fixed | (pending commit) |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+
+---
+
+## BUG-094 — Consent Save Fails: Resolver Missing from Docker Container (19 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (blocks all AI features requiring consent)
+- **Root Cause:** `apps/subgraph-core/dist/consent/consent.resolver.js` was missing from the Docker image because the image was built before the consent module was added. The GraphQL mutation `updateConsent` returned null/error since no resolver handled it.
+- **Fix:** Added volume mount `./apps/subgraph-core/dist:/app/apps/subgraph-core/dist` (writable, not `:ro`) in `docker-compose.yml`. This ensures the host's compiled consent resolver is available inside the container. The mount is writable because `startup.sh` copies SDL files into the dist directory.
+- **Files Changed:**
+  - `docker-compose.yml` — added subgraph-core dist volume mount
+- **E2E Verification:** `scripts/debug/bug094-full-e2e.cjs` — full Settings UI consent toggle → AI course creation flow. Course "Colors" generated successfully in 282s.
+- **Screenshots:** `docs/screenshots/bug094-*.png` (9 screenshots covering full flow)
 
 ---
 
