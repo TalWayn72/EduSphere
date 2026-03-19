@@ -82,13 +82,32 @@
 
 ## BUG-094 — Consent Save Fails: Resolver Missing from Docker Container (19 Mar 2026)
 
-- **Status:** ✅ Fixed
+- **Status:** ✅ Fixed (3 rounds) — `ee9119ef`, `8762d870`
 - **Severity:** 🔴 Critical (blocks all AI features requiring consent)
 - **Root Cause:** `apps/subgraph-core/dist/consent/consent.resolver.js` was missing from the Docker image because the image was built before the consent module was added. The GraphQL mutation `updateConsent` returned null/error since no resolver handled it.
-- **Fix:** Added volume mount `./apps/subgraph-core/dist:/app/apps/subgraph-core/dist` (writable, not `:ro`) in `docker-compose.yml`. This ensures the host's compiled consent resolver is available inside the container. The mount is writable because `startup.sh` copies SDL files into the dist directory.
-- **Files Changed:**
-  - `docker-compose.yml` — added subgraph-core dist volume mount
-- **E2E Verification:** `scripts/debug/bug094-full-e2e.cjs` — full Settings UI consent toggle → AI course creation flow. Course "Colors" generated successfully in 282s.
+
+### Discovery (3 Waves)
+
+- **W1 — Exact match:** Found 2 subgraph dist directories not mounted: `subgraph-annotation/dist`, `subgraph-collaboration/dist` (both run via supervisord `node dist/main`)
+- **W2 — Similarity search:** Found 5 package dist directories not mounted: `packages/metrics/dist` (CRITICAL — all 6 subgraphs import), `packages/config/dist`, `packages/graphql-shared/dist`, `packages/health/dist`, `packages/rag/dist`
+- **W3 — Class of bug:** Pattern = "module/package added or refactored after Docker image build → dist stale in container". 13 total items identified.
+
+### Fix Rounds
+
+| Round | Scope | Commit | Details |
+|-------|-------|--------|---------|
+| R1 | Original fix | `ee9119ef` | Mount `apps/subgraph-core/dist` (writable — startup.sh copies SDL) |
+| R2 | Wave 2 subgraphs | `8762d870` | Mount `subgraph-annotation/dist`, `subgraph-collaboration/dist` (:ro) |
+| R3 | Wave 3 packages | `8762d870` | Mount `packages/metrics`, `config`, `graphql-shared`, `health`, `rag` dist (:ro) |
+
+### Files Changed
+- `docker-compose.yml` — 8 new volume mounts (1 subgraph-core writable + 2 subgraph :ro + 5 package :ro)
+
+### Verification
+- **E2E:** `scripts/debug/bug094-full-e2e.cjs` — Settings UI consent toggle → AI course "Colors" generated (282s)
+- **Container:** All 6 subgraphs RUNNING (`supervisorctl status`)
+- **Auth:** All 5 users authenticated via Keycloak
+- **Services:** Gateway 200, Frontend 200, Keycloak 200
 - **Screenshots:** `docs/screenshots/bug094-*.png` (9 screenshots covering full flow)
 
 ---
