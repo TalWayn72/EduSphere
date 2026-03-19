@@ -2,9 +2,9 @@
 
 # EduSphere Service Restoration Guard
 # Run after ANY operation that may disrupt services.
-# If any service is down, auto-restores and re-verifies.
+# If any service is down, auto-restores (including supervisord) and re-verifies.
 
-set -euo pipefail
+set -uo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -27,6 +27,9 @@ ENDPOINTS=(
   "NATS:http://localhost:8222/varz"
   "MinIO:http://localhost:9000/minio/health/live"
 )
+
+# One-off services that are EXPECTED to exit after running once
+ONEOFF_SERVICES="compose-supergraph|gpu-detect|keycloak-seed|minio-init|node-deps"
 
 check_all() {
   local FAILED=0
@@ -52,24 +55,78 @@ check_all() {
   return $FAILED
 }
 
+# ── 1. Pre-check: ensure all supervisord services are RUNNING ─────────────────
+# This runs BEFORE the endpoint check to catch the root cause (a stopped
+# supervisord service) before it manifests as a failed HTTP check.
+restore_supervisord() {
+  if ! docker ps --format '{{.Names}}' | grep -q edusphere-all-in-one; then
+    return 1  # container not running at all
+  fi
+  # supervisorctl status returns non-zero if ANY service is not RUNNING (exit 3),
+  # so we test reachability by checking if the output contains process names.
+  local STATUS_OUT
+  STATUS_OUT=$(docker exec edusphere-all-in-one supervisorctl status 2>/dev/null || true)
+  if [ -z "$STATUS_OUT" ]; then
+    return 1  # supervisord not reachable
+  fi
+
+  local STOPPED
+  STOPPED=$(echo "$STATUS_OUT" \
+    | grep -E 'STOPPED|FATAL|BACKOFF' \
+    | grep -vE "$ONEOFF_SERVICES" \
+    | awk '{print $1}' || true)
+
+  if [ -z "$STOPPED" ]; then
+    return 0  # all running
+  fi
+
+  echo -e "${YELLOW}Stopped supervisord services detected:${NC}"
+  for svc in $STOPPED; do
+    echo -e "  ${YELLOW}↻ Starting${NC} $svc..."
+    docker exec edusphere-all-in-one supervisorctl start "$svc" 2>/dev/null || true
+  done
+  echo "Waiting 15s for services to initialize..."
+  sleep 15
+  return 0
+}
+
+# Run pre-check and wait if services were restarted
+if ! restore_supervisord; then
+  echo -e "${YELLOW}Container not available for supervisord check.${NC}"
+fi
+
+# ── 2. Endpoint verification ──────────────────────────────────────────────────
 echo "=== Service Verification ==="
 if check_all; then
   echo -e "\n${GREEN}All services healthy.${NC}"
   exit 0
 fi
 
-echo -e "\n${YELLOW}Services down detected. Auto-restoring...${NC}"
-docker-compose up -d 2>&1 | tail -5
+# ── 3. Auto-restore ──────────────────────────────────────────────────────────
+echo -e "\n${YELLOW}Services down. Auto-restoring...${NC}"
 
-echo "Waiting 15s for services to start..."
-sleep 15
+# 3a. If container is missing, bring it up
+if ! docker ps --format '{{.Names}}' | grep -q edusphere-all-in-one; then
+  echo "Container not running. Starting docker-compose..."
+  docker-compose up -d 2>&1 | tail -5
+  echo "Waiting 30s for full container startup..."
+  sleep 30
+else
+  # 3b. Container exists — restart any stopped supervisord services
+  restore_supervisord
+fi
 
-echo "=== Re-verifying ==="
+# ── 4. Final verification ────────────────────────────────────────────────────
+echo "=== Final Verification ==="
 if check_all; then
   echo -e "\n${GREEN}All services restored successfully.${NC}"
   exit 0
 else
-  echo -e "\n${RED}Some services still down after restore attempt.${NC}"
-  echo "Run: docker-compose logs | tail -50"
+  echo -e "\n${RED}⚠️  SERVICES STILL DOWN after auto-restore.${NC}"
+  echo -e "${RED}   DO NOT declare task complete until all services are healthy.${NC}"
+  echo ""
+  echo "Diagnostics:"
+  echo "  docker exec edusphere-all-in-one supervisorctl status"
+  echo "  docker-compose logs --tail=50"
   exit 1
 fi

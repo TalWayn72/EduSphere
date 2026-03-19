@@ -4,14 +4,20 @@ git lfs post-commit "$@"
 
 # ── Iron Rule: Service Restoration Guard ──────────────────────────────────────
 # After every commit with feat/fix changes, verify services are still running.
-# Runs in background to avoid blocking the developer.
+# Runs in FOREGROUND so failures are visible and block completion declaration.
+# If any service is down, auto-restores (including supervisord services).
 LAST_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "")
 case "$LAST_MSG" in
   feat*|fix*|refactor*)
     if [ -f "scripts/verify-services.sh" ]; then
       echo ""
       echo "[post-commit] Running service verification (Iron Rule)..."
-      bash scripts/verify-services.sh &
+      bash scripts/verify-services.sh
+      if [ $? -ne 0 ]; then
+        echo ""
+        echo "⚠️  SERVICE VERIFICATION FAILED — DO NOT declare task complete!"
+        echo "    Fix services before proceeding."
+      fi
     fi
     ;;
 esac
