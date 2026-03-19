@@ -43,20 +43,16 @@ async function run() {
   console.log('[1/8] Logged in at:', page.url());
   await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'bug093-01-logged-in.png') });
 
-  // ─── Step 2: Enable AI consent ───
-  console.log('[2/8] Settings → AI consent...');
-  await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle', timeout: 30000 });
-  await page.waitForTimeout(2000);
-  const aiToggle = page.locator('#setting-ai-consent [role="switch"]');
-  const toggleVisible = await aiToggle.isVisible({ timeout: 10000 }).catch(() => false);
-  if (toggleVisible) {
-    const state = await aiToggle.getAttribute('aria-checked');
-    if (state === 'false') {
-      await aiToggle.click();
-      await page.waitForTimeout(2000);
-    }
-    console.log('[2/8] AI consent:', await aiToggle.getAttribute('aria-checked'));
-  }
+  // ─── Step 2: Set AI consent directly in localStorage ───
+  // Skip Settings page — the mutation may fail without backend, which reverts localStorage.
+  // Instead, set consent directly via evaluate right before navigating to /courses/new.
+  console.log('[2/8] Setting AI consent via localStorage...');
+  await page.evaluate(() => {
+    localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
+    localStorage.setItem('edusphere_consent_THIRD_PARTY_LLM', 'true');
+  });
+  const consentCheck = await page.evaluate(() => localStorage.getItem('edusphere_consent_AI_PROCESSING'));
+  console.log('[2/8] AI consent:', consentCheck);
 
   // ─── Step 3: Navigate to /courses/new ───
   console.log('[3/8] /courses/new...');

@@ -22,12 +22,13 @@ import { ollamaConfig } from '@edusphere/config';
 
 export const CourseSchema = z.object({
   title: z.string().max(200),
-  description: z.string().max(1000),
+  description: z.string().max(1000).default(''),
   modules: z
     .array(
       z.object({
         title: z.string().max(200),
-        description: z.string().max(500),
+        // LLMs sometimes omit description — default to empty string
+        description: z.string().max(500).default(''),
         // Default to empty array — LLMs sometimes omit this field or use
         // alternative names (content_items, lessons, topics).
         contentItemTitles: z.array(z.string().max(200)).max(6).default([]),
