@@ -161,3 +161,32 @@ describe('G-04: Consent Service Tests', () => {
     expect(content).toContain('CONSENT_GIVEN');
   });
 });
+
+describe('BUG-092: Consent module included in subgraph-core build', () => {
+  it('consent.resolver.ts is imported by app.module.ts', () => {
+    const content = readFile('apps/subgraph-core/src/app.module.ts');
+    expect(content).toContain('ConsentModule');
+    expect(content).toContain("'./consent/consent.module'");
+  });
+
+  it('consent.module.ts exists and exports ConsentModule', () => {
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.module.ts'
+    );
+    expect(content).toContain('ConsentModule');
+    expect(content).toContain('ConsentResolver');
+    expect(content).toContain('ConsentService');
+  });
+
+  it('Dockerfile clears subgraph dist/ dirs before build to prevent stale cache', () => {
+    const dockerfile = readFile('Dockerfile');
+    expect(dockerfile).toContain('apps/subgraph-core/dist');
+    expect(dockerfile).toContain('apps/subgraph-content/dist');
+    expect(dockerfile).toContain('apps/subgraph-agent/dist');
+  });
+
+  it('consent.graphql SDL is included in nest-cli.json assets', () => {
+    const nestCli = readFile('apps/subgraph-core/nest-cli.json');
+    expect(nestCli).toContain('*.graphql');
+  });
+});

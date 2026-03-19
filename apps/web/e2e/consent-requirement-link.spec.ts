@@ -270,4 +270,29 @@ test.describe('Consent Requirement Link', () => {
     // The mutation should have returned { data: { updateConsent: true } }
     expect(mutationSucceeded).toBe(true);
   });
+
+  // BUG-092 REGRESSION: consent mutation must NOT return "Cannot return null for
+  // non-nullable field Mutation.updateConsent" — root cause was consent.resolver.js
+  // and consent.module.js missing from Docker container dist/ due to stale turbo cache.
+  test('REGRESSION BUG-092: consent save does not show sync error toast', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    const toggle = page.locator('#setting-ai-consent [role="switch"]');
+    await expect(toggle).toBeVisible({ timeout: 10_000 });
+
+    // Toggle consent (whichever direction)
+    await toggle.click();
+
+    // Wait for mutation round-trip
+    await page.waitForTimeout(3000);
+
+    // BUG-092 symptom: error toast "שמירת ההסכמה לשרת נכשלה. נסה שוב."
+    const errorToast = page.locator('[data-sonner-toast][data-type="error"]');
+    await expect(errorToast).not.toBeVisible({ timeout: 2_000 });
+
+    // Success toast should appear instead
+    const successToast = page.locator('[data-sonner-toast][data-type="success"]');
+    await expect(successToast).toBeVisible({ timeout: 5_000 });
+  });
 });

@@ -175,8 +175,13 @@ COPY apps ./apps
 # Install + build (cached unless packages/apps change)
 # Build all services including web frontend (served via vite preview inside container)
 RUN pnpm install --no-frozen-lockfile
-# Clear stale build artifacts to force fresh build (prevents .dockerignore bypass)
-RUN rm -rf apps/web/dist apps/web/.vite .turbo
+# Clear ALL stale build artifacts to force fresh build (prevents .dockerignore bypass)
+# BUG-092 fix: also clear subgraph dist/ directories to prevent stale NestJS builds
+# where newly added modules (e.g. consent.resolver, consent.module) are missing from dist/
+RUN rm -rf apps/web/dist apps/web/.vite .turbo \
+    apps/subgraph-core/dist apps/subgraph-content/dist apps/subgraph-annotation/dist \
+    apps/subgraph-collaboration/dist apps/subgraph-agent/dist apps/subgraph-knowledge/dist \
+    apps/gateway/dist
 RUN pnpm turbo build --filter='./packages/*' --filter='./apps/subgraph-*' --filter='./apps/gateway' --filter='./apps/transcription-worker' --filter='./apps/web'
 
 # ═══════════════════════════════════════════════════════════════

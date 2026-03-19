@@ -73,6 +73,58 @@
 | BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback | ✅ Fixed | (pending commit) |
 | FEAT-090 | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s | ✅ Implemented | (pending commit) |
 | BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
+| BUG-092 | AI consent save fails — consent.resolver.js missing from Docker container dist/ | ✅ Fixed | (pending commit) |
+
+---
+
+## BUG-092 — AI Consent Save Fails: Missing Compiled Files in Docker Container (19 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (AI course creation entirely blocked — consent toggle shows "שמירת ההסכמה לשרת נכשלה")
+- **Reporter:** User (consent toggle error toast at `/settings?returnTo=%2Fcourses%2Fnew`)
+
+### Symptom
+
+Toggling AI Processing consent in Settings page shows error toast "שמירת ההסכמה לשרת נכשלה. נסה שוב." (`privacy.syncError`). The `updateConsent` GraphQL mutation returns `Cannot return null for non-nullable field Mutation.updateConsent`.
+
+### Root Cause Chain
+
+1. **Docker image built with stale turbo cache** — `pnpm turbo build` cached output from a previous build that didn't include `consent.resolver.ts` and `consent.module.ts`
+2. **`dist/consent/` directory** in the container only had `consent.service.js` and `consent.graphql` — missing `consent.resolver.js`, `consent.module.js`
+3. **NestJS app.module.js** in the container didn't import `ConsentModule` (also stale)
+4. **Result:** Gateway forwarded mutation to subgraph-core, but no resolver was registered for `updateConsent` → GraphQL returned null for non-nullable Boolean! field
+
+### Fix (Round 1)
+
+| File | Change |
+|------|--------|
+| `Dockerfile:179-184` | Added `rm -rf` for ALL subgraph `dist/` directories before `pnpm turbo build` — forces fresh NestJS compilation, prevents stale turbo cache from skipping new modules |
+
+### Hotfix (immediate container fix without rebuild)
+
+1. Copied locally-built `dist/consent/` files into running container via `tar | docker exec`
+2. Copied updated `app.module.js` (with ConsentModule import) via `cat | docker exec`
+3. Restarted `subgraph-core` via `supervisorctl restart subgraph-core`
+4. Reset Keycloak brute-force lockouts and user passwords via Node.js HTTP (curl JSON encoding broken in container)
+
+### Tests Added
+
+| File | Count | Description |
+|------|-------|-------------|
+| `apps/web/e2e/consent-requirement-link.spec.ts` | 1 | BUG-092 regression: consent save shows success toast, no error toast |
+| `tests/security/consent-management.spec.ts` | 4 | BUG-092: ConsentModule imported, consent.module.ts exists, Dockerfile clears dist/, nest-cli assets include .graphql |
+
+### Discovery List (Wave 1-3)
+
+- **Wave 1 (exact match):** `consent.resolver.js` missing from container `/app/apps/subgraph-core/dist/consent/`
+- **Wave 2 (similarity):** `app.module.js` also stale — missing `ConsentModule` and `WhatsAppModule` imports
+- **Wave 3 (class of bug):** All 6 subgraph `dist/` directories could have same stale cache issue — Dockerfile now clears all of them
+
+### Anti-Recurrence
+
+- Dockerfile `rm -rf` line ensures every Docker build starts with clean `dist/` across all subgraphs
+- Security test verifies `ConsentModule` is imported by `app.module.ts`
+- E2E test verifies consent mutation succeeds through gateway (no error toast)
 
 ---
 
