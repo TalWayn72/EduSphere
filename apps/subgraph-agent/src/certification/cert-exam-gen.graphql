@@ -1,0 +1,17 @@
+input GenerateCertExamItemsInput {
+  moduleId: ID!
+  targetBloomLevels: [String!]!
+  targetCount: Int!
+  targetDifficulty: String!
+  locale: String
+}
+
+type CertExamGenResult {
+  executionId: ID!
+  status: String!
+  itemCount: Int!
+}
+
+extend type Mutation {
+  generateCertExamItems(input: GenerateCertExamItemsInput!): CertExamGenResult! @authenticated
+}

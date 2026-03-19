@@ -150,10 +150,13 @@ export class CourseGeneratorService implements OnModuleDestroy {
 
     const executionId = execution.id;
 
-    // Fire-and-forget with 5-min timeout (Memory Safety: Promise.race required)
-    const WORKFLOW_TIMEOUT_MS = 5 * 60 * 1000;
+    // Fire-and-forget with 15-min timeout (Memory Safety: Promise.race required)
+    // BUG-093: Increased from 5 min → 15 min — CPU-based Ollama (llama3.2) on
+    // dev machines regularly takes 8-12 min for structured JSON generation
+    // with generateObject + Zod schema.
+    const WORKFLOW_TIMEOUT_MS = 15 * 60 * 1000;
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Course generation timed out after 5 minutes')), WORKFLOW_TIMEOUT_MS)
+      setTimeout(() => reject(new Error('Course generation timed out after 15 minutes')), WORKFLOW_TIMEOUT_MS)
     );
     Promise.race([this.runWorkflowAsync(executionId, options), timeoutPromise]).catch(
       async (err: unknown) => {

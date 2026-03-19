@@ -133,11 +133,13 @@ export class AgentService implements OnModuleDestroy {
         throw new NotFoundException('Agent definition not found');
       }
 
-      // Execute with AI service (Memory Safety: Promise.race with 5-min timeout)
-      const EXECUTION_TIMEOUT_MS = 300_000;
+      // Execute with AI service (Memory Safety: Promise.race with 10-min timeout)
+      // BUG-093: Increased from 5 min → 10 min — CPU-based Ollama on dev
+      // machines regularly needs 4-6 min for structured JSON generation.
+      const EXECUTION_TIMEOUT_MS = 600_000;
       const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(
-          () => reject(new Error('Execution timed out after 5 minutes')),
+          () => reject(new Error('Execution timed out after 10 minutes')),
           EXECUTION_TIMEOUT_MS
         )
       );

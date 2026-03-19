@@ -23,6 +23,7 @@ export const contentTypeEnum = pgEnum('content_type', [
   'RICH_DOCUMENT',
   'MICROLESSON',
   'SCENARIO',
+  'EXAM',
 ]);
 
 export const contentItems = pgTable('content_items', {

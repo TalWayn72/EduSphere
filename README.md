@@ -272,6 +272,10 @@ sequenceDiagram
 
 ## Features
 
+### Recently Added (Phase 65 — Certification Exam System)
+
+- **Certification Exam System** — Full certification-grade examination with AI question generation (LangGraph 7-node pipeline), psychometric analysis (IRT 3PL, CTT, KR-20, Cronbach's α), Computer Adaptive Testing (MFI item selection, EAP/MLE estimation), browser lockdown (7 security layers), exam blueprints with domain/bloom distribution, server-authoritative timer, 8 new DB tables with RLS, 211+ tests
+
 ### Recently Added (Phases 59-64 — Compliance, Marketplace & Portal Builder)
 
 - **Instructor Payouts** — InstructorPayoutService (70/30 revenue split), myPayouts/allPayouts GraphQL, InstructorEarningsPage with BarChart
@@ -453,8 +457,9 @@ sequenceDiagram
 | **Phase 62**     | SCORM 2004 Export — ScormExportService (imsmanifest.xml + entry HTML)                   | 1 day    | ✅ Complete    |
 | **Phase 63**     | Portal Builder — PortalBlockEditor (@dnd-kit/sortable, 5 block types)                  | 1 day    | ✅ Complete    |
 | **Phase 64**     | Compliance Library — 8 compliance course seeds + ComplianceLibraryService               | 1 day    | ✅ Complete    |
+| **Phase 65**     | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Gen, Browser Lockdown | 2 days   | ✅ Complete    |
 
-**Current Status:** All 64 phases complete (0-64) ✅ — Backend + Frontend + Mobile fully built. Branch: `feat/compliance-accessibility-security`. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). 9 languages supported. B2B GTM platform, Air-Gapped deployment, Partner Portal, HRIS integrations, Auto-Grading, Gap Analysis, Marketplace, 360° Assessments, OpenBadges 3.0, SCORM 2004 Export, Portal Builder, Compliance Library all complete. GraphQL federation active across all 6 subgraphs. **~8,000+ tests passing** (web ~4,424 / 370 files | security 1,370 / 48 files | 134 E2E Playwright specs | subgraph-content 1,233 | subgraph-agent 719 | subgraph-core 879 | subgraph-knowledge 610). TypeScript: 0 errors. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** All 65 phases complete (0-65) ✅ — Backend + Frontend + Mobile fully built. Branch: `feat/compliance-accessibility-security`. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). 9 languages supported. B2B GTM platform, Air-Gapped deployment, Partner Portal, HRIS integrations, Auto-Grading, Gap Analysis, Marketplace, 360° Assessments, OpenBadges 3.0, SCORM 2004 Export, Portal Builder, Compliance Library, Certification Exam System all complete. GraphQL federation active across all 6 subgraphs. **~8,200+ tests passing** (web ~4,504 / 374 files | security 1,370 / 48 files | 134 E2E Playwright specs | subgraph-content 1,364 | subgraph-agent 719 | subgraph-core 879 | subgraph-knowledge 610). TypeScript: 0 errors. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -554,9 +559,9 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~4,424+ tests passing** (370 test files)  |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~4,504+ tests passing** (374 test files)  |
 | **Security Tests**      | Vitest                  | `tests/security/*.spec.ts`                   | ✅ **1,370 tests passing** (48 spec files)     |
-| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (core 879 / content 1,233 / agent 719 / knowledge 610) |
+| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (core 879 / content 1,364 / agent 719 / knowledge 610) |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ✅ **134 E2E specs**                           |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |
 | **RLS Validation**      | Vitest                  | `packages/db/src/rls/*.test.ts`              | ⏳ Planned Phase 7                                 |

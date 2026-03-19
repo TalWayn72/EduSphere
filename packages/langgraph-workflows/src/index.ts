@@ -10,3 +10,4 @@ export * from './structuredNotesWorkflow';
 export * from './diagramGeneratorWorkflow';
 export * from './citationVerifierWorkflow';
 export * from './qaWorkflow';
+export * from './certExamGen';

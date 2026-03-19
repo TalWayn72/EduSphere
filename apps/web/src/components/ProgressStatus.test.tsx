@@ -94,6 +94,20 @@ describe('ProgressStatus', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
+  // BUG-093: regression — AI_COURSE_GENERATION_MESSAGES has 4+ messages
+  it('BUG-093: AI_COURSE_GENERATION_MESSAGES has at least 4 cycling messages', async () => {
+    const { AI_COURSE_GENERATION_MESSAGES } = await import(
+      '../lib/progress-messages'
+    );
+    expect(AI_COURSE_GENERATION_MESSAGES.length).toBeGreaterThanOrEqual(4);
+    // Each message should be a non-empty i18n key
+    for (const msg of AI_COURSE_GENERATION_MESSAGES) {
+      expect(typeof msg).toBe('string');
+      expect(msg.length).toBeGreaterThan(0);
+      expect(msg).toMatch(/^progress\./);
+    }
+  });
+
   it('does not render when messages array is empty', () => {
     const { container } = render(
       <ProgressStatus messages={[]} active={true} />,

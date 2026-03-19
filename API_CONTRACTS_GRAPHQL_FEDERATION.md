@@ -122,7 +122,7 @@ graph TD
 | Subgraph          | Port | Owned Entities                                                                                     | Extended Entities                               | Domain                                 |
 | ----------------- | ---- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------- |
 | **Core**          | 4001 | `Tenant`, `User`                                                                                   | —                                               | Identity, tenancy, auth                |
-| **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`                                | `User` (createdCourses), `Tenant`               | Courses, media pipeline, transcription |
+| **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`, `ExamItem`, `ExamBlueprint`, `ExamSession`, `ExamResult` | `User` (createdCourses), `Tenant`               | Courses, media pipeline, transcription, certification exams |
 | **Annotation**    | 4003 | `Annotation`                                                                                       | `User`, `MediaAsset`                            | Markings, sketches, spatial comments   |
 | **Collaboration** | 4004 | `CollabDocument`, `CollabSession`                                                                  | `User`, `Annotation`                            | CRDT persistence, real-time presence   |
 | **Agent**         | 4005 | `AgentDefinition`, `AgentExecution`                                                                | `User`, `Annotation`, `Course`                  | AI agents, templates, executions       |
@@ -140,6 +140,10 @@ Module              │ Content         │ id
 MediaAsset          │ Content         │ id
 Transcript          │ Content         │ id
 TranscriptSegment   │ Content         │ id
+ExamItem            │ Content         │ id
+ExamBlueprint       │ Content         │ id
+ExamSession         │ Content         │ id
+ExamResult          │ Content         │ id
 Annotation          │ Annotation      │ id
 CollabDocument      │ Collaboration   │ id
 CollabSession       │ Collaboration   │ id
@@ -1896,6 +1900,409 @@ type TranscriptSearchResultConnection {
 type TranscriptSearchResultEdge {
   node: TranscriptSearchResult!
   cursor: Cursor!
+}
+```
+
+### 8.X Certification Exam System (subgraph-content — port 4002)
+
+**Additional tables:** `exam_items`, `exam_blueprints`, `exam_sessions`, `exam_responses`, `exam_results`, `exam_item_statistics`, `exam_reliability_reports`, `exam_security_events`
+
+```graphql
+# ─── File: apps/subgraph-content/src/exam/exam-types.graphql ───
+
+enum BloomLevel {
+  REMEMBER
+  UNDERSTAND
+  APPLY
+  ANALYZE
+  EVALUATE
+  CREATE
+}
+
+enum CalibrationStatus {
+  DRAFT
+  PILOT
+  CALIBRATED
+  RETIRED
+}
+
+enum ExamItemSource {
+  MANUAL
+  AI_GENERATED
+  IMPORTED
+}
+
+enum QualityTier {
+  AI_GENERATED
+  SME_REVIEWED
+  PILOT_TESTED
+  CALIBRATED
+}
+
+enum BlueprintStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum PassingMethod {
+  PERCENTAGE
+  SCALED_SCORE
+  IRT_THETA
+}
+
+"""
+A single question in the item bank with IRT calibration parameters.
+"""
+type ExamItem {
+  id: ID!
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevel: BloomLevel!
+  questionData: JSON!
+  irtA: Float
+  irtB: Float
+  irtC: Float
+  calibrationStatus: CalibrationStatus!
+  source: ExamItemSource!
+  qualityTier: QualityTier!
+  pValue: Float
+  rpbis: Float
+  exposureCount: Int!
+  createdAt: DateTime!
+}
+
+"""
+Exam blueprint defining structure, constraints, and passing criteria.
+"""
+type ExamBlueprint {
+  id: ID!
+  courseId: ID!
+  title: String!
+  description: String
+  timeLimitMinutes: Int!
+  totalQuestions: Int!
+  passingScore: Float!
+  passingMethod: PassingMethod!
+  domainDistribution: JSON!
+  bloomDistribution: JSON!
+  shuffleQuestions: Boolean!
+  shuffleAnswers: Boolean!
+  maxRetakes: Int!
+  retakeCooldownHours: Int!
+  isAdaptive: Boolean!
+  catMinItems: Int
+  catMaxItems: Int
+  status: BlueprintStatus!
+  version: Int!
+  createdAt: DateTime!
+}
+
+type ExamItemStatistics {
+  itemId: ID!
+  totalAdministrations: Int!
+  pValue: Float!
+  rpbis: Float!
+  dIndex: Float!
+  distractorAnalysis: [DistractorStat!]!
+  irtA: Float
+  irtB: Float
+  irtC: Float
+}
+
+type DistractorStat {
+  optionIndex: Int!
+  selectionRate: Float!
+  rpbis: Float!
+  functional: Boolean!
+}
+
+type ExamItemGenerationResult {
+  generatedCount: Int!
+  validCount: Int!
+  items: [ExamItem!]!
+}
+
+type ExamItemEdge {
+  node: ExamItem!
+  cursor: String!
+}
+
+type ExamItemConnection {
+  edges: [ExamItemEdge!]!
+  nodes: [ExamItem!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+```
+
+```graphql
+# ─── File: apps/subgraph-content/src/exam/exam-sessions.graphql ───
+
+enum ExamSessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+  TIMED_OUT
+  VOIDED
+}
+
+"""
+An active or completed exam attempt by a user.
+"""
+type ExamSession {
+  id: ID!
+  blueprintId: ID!
+  userId: ID!
+  status: ExamSessionStatus!
+  attemptNumber: Int!
+  startedAt: DateTime!
+  submittedAt: DateTime
+  timeRemainingSeconds: Int
+  questionOrder: [ID!]!
+  isAdaptive: Boolean!
+  currentQuestionIndex: Int
+}
+
+type ExamResponse {
+  itemId: ID!
+  answerData: JSON!
+  isCorrect: Boolean
+  isFlagged: Boolean!
+  timeSpentMs: Int
+}
+
+"""
+Exam result with raw/scaled scores, IRT theta, and domain/bloom breakdowns.
+"""
+type ExamResult {
+  id: ID!
+  sessionId: ID!
+  rawScore: Float!
+  scaledScore: Float
+  passed: Boolean!
+  thetaEstimate: Float
+  sem: Float
+  confidenceInterval: JSON
+  domainScores: [DomainScore!]!
+  bloomScores: [BloomScore!]!
+  gradedAt: DateTime!
+}
+
+type DomainScore {
+  domain: String!
+  correct: Int!
+  total: Int!
+  scaledScore: Float
+}
+
+type BloomScore {
+  level: BloomLevel!
+  correct: Int!
+  total: Int!
+}
+
+type ExamReliabilityReport {
+  blueprintId: ID!
+  kr20: Float!
+  cronbachAlpha: Float!
+  sem: Float!
+  totalSessions: Int!
+  averageScore: Float!
+}
+
+type BlueprintAnalytics {
+  blueprintId: ID!
+  totalSessions: Int!
+  passRate: Float!
+  averageScore: Float!
+  averageTime: Float!
+  domainBreakdown: [DomainScore!]!
+}
+
+type ExamTimeEvent {
+  sessionId: ID!
+  timeRemainingSeconds: Int!
+  isExpired: Boolean!
+}
+```
+
+```graphql
+# ─── File: apps/subgraph-content/src/exam/exam-inputs.graphql ───
+
+input CreateExamItemInput {
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevel: BloomLevel!
+  questionData: JSON!
+  source: ExamItemSource
+}
+
+input UpdateExamItemInput {
+  domainTag: String
+  bloomLevel: BloomLevel
+  questionData: JSON
+}
+
+input ExamItemFilterInput {
+  courseId: ID
+  domainTag: String
+  bloomLevel: BloomLevel
+  calibrationStatus: CalibrationStatus
+  source: ExamItemSource
+}
+
+input GenerateExamItemsInput {
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevels: [BloomLevel!]!
+  count: Int!
+  targetDifficulty: Float
+}
+
+input CreateExamBlueprintInput {
+  courseId: ID!
+  title: String!
+  description: String
+  timeLimitMinutes: Int!
+  totalQuestions: Int!
+  passingScore: Float!
+  passingMethod: PassingMethod!
+  domainDistribution: JSON!
+  bloomDistribution: JSON!
+  shuffleQuestions: Boolean
+  shuffleAnswers: Boolean
+  maxRetakes: Int
+  retakeCooldownHours: Int
+  isAdaptive: Boolean
+  catMinItems: Int
+  catMaxItems: Int
+}
+
+input UpdateExamBlueprintInput {
+  title: String
+  description: String
+  timeLimitMinutes: Int
+  totalQuestions: Int
+  passingScore: Float
+  passingMethod: PassingMethod
+  domainDistribution: JSON
+  bloomDistribution: JSON
+  shuffleQuestions: Boolean
+  shuffleAnswers: Boolean
+  maxRetakes: Int
+  retakeCooldownHours: Int
+  isAdaptive: Boolean
+  catMinItems: Int
+  catMaxItems: Int
+  status: BlueprintStatus
+}
+```
+
+```graphql
+# ─── Exam Queries ───
+
+extend type Query {
+  """Item bank with filtering and pagination (instructor+ only)"""
+  examItemBank(
+    courseId: ID!
+    filters: ExamItemFilterInput
+    first: Int
+    after: String
+  ): ExamItemConnection! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """All blueprints for a course"""
+  examBlueprints(courseId: ID!): [ExamBlueprint!]! @authenticated
+
+  """Single blueprint by ID"""
+  examBlueprint(id: ID!): ExamBlueprint @authenticated
+
+  """Current user's exam sessions for a blueprint"""
+  myExamSessions(blueprintId: ID!): [ExamSession!]! @authenticated
+
+  """Single exam session by ID"""
+  examSession(id: ID!): ExamSession! @authenticated
+
+  """Exam result for a session"""
+  examResult(sessionId: ID!): ExamResult @authenticated
+
+  """Current user's exam results, optionally filtered by course"""
+  myExamResults(courseId: ID): [ExamResult!]! @authenticated
+
+  """Item-level statistics (instructor+ only)"""
+  examItemStatistics(itemId: ID!): ExamItemStatistics
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Blueprint-level analytics (instructor+ only)"""
+  examBlueprintAnalytics(blueprintId: ID!): BlueprintAnalytics!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Psychometric reliability report (instructor+ only)"""
+  examReliabilityReport(blueprintId: ID!): ExamReliabilityReport!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+# ─── Exam Mutations ───
+
+extend type Mutation {
+  """Create a new exam item in the item bank"""
+  createExamItem(input: CreateExamItemInput!): ExamItem!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Update an existing exam item"""
+  updateExamItem(id: ID!, input: UpdateExamItemInput!): ExamItem!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Retire an exam item (soft delete from active pool)"""
+  retireExamItem(id: ID!): ExamItem!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """AI-generate exam items with bloom/domain targeting"""
+  generateExamItems(input: GenerateExamItemsInput!): ExamItemGenerationResult!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Create a new exam blueprint"""
+  createExamBlueprint(input: CreateExamBlueprintInput!): ExamBlueprint!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Update an existing blueprint"""
+  updateExamBlueprint(id: ID!, input: UpdateExamBlueprintInput!): ExamBlueprint!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Start a new exam session (assembles exam from blueprint)"""
+  startExamSession(blueprintId: ID!): ExamSession! @authenticated
+
+  """Submit an answer for a single question"""
+  submitExamAnswer(sessionId: ID!, itemId: ID!, answer: JSON!): Boolean!
+    @authenticated
+
+  """Flag a question for review"""
+  flagExamQuestion(sessionId: ID!, itemId: ID!): Boolean! @authenticated
+
+  """Submit the entire exam for grading"""
+  submitExam(sessionId: ID!): ExamResult! @authenticated
+
+  """Void an exam session (admin override for security violations)"""
+  voidExamSession(sessionId: ID!): Boolean!
+    @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  """Run IRT 3PL calibration on all items for a blueprint (SUPER_ADMIN only)"""
+  calibrateExamItems(blueprintId: ID!): Boolean!
+    @authenticated @requiresRole(roles: [SUPER_ADMIN])
+}
+
+# ─── Exam Subscriptions ───
+
+extend type Subscription {
+  """Real-time exam timer countdown"""
+  examTimeUpdate(sessionId: ID!): ExamTimeEvent!
+
+  """Exam session status changes (e.g., TIMED_OUT, VOIDED)"""
+  examSessionStatusChanged(sessionId: ID!): ExamSession!
 }
 ```
 

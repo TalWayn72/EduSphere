@@ -1,0 +1,148 @@
+enum ExamSessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+  TIMED_OUT
+  VOIDED
+}
+
+type ExamSession {
+  id: ID!
+  blueprintId: ID!
+  userId: ID!
+  status: ExamSessionStatus!
+  attemptNumber: Int!
+  startedAt: DateTime!
+  submittedAt: DateTime
+  timeRemainingSeconds: Int
+  questionOrder: [ID!]!
+  isAdaptive: Boolean!
+  currentQuestionIndex: Int
+}
+
+type ExamResponse {
+  itemId: ID!
+  answerData: JSON!
+  isCorrect: Boolean
+  isFlagged: Boolean!
+  timeSpentMs: Int
+}
+
+type ExamResult {
+  id: ID!
+  sessionId: ID!
+  rawScore: Float!
+  scaledScore: Float
+  passed: Boolean!
+  thetaEstimate: Float
+  sem: Float
+  confidenceInterval: JSON
+  domainScores: [DomainScore!]!
+  bloomScores: [BloomScore!]!
+  gradedAt: DateTime!
+}
+
+type DomainScore {
+  domain: String!
+  correct: Int!
+  total: Int!
+  scaledScore: Float
+}
+
+type BloomScore {
+  level: BloomLevel!
+  correct: Int!
+  total: Int!
+}
+
+type ExamReliabilityReport {
+  blueprintId: ID!
+  kr20: Float!
+  cronbachAlpha: Float!
+  sem: Float!
+  totalSessions: Int!
+  averageScore: Float!
+}
+
+type BlueprintAnalytics {
+  blueprintId: ID!
+  totalSessions: Int!
+  passRate: Float!
+  averageScore: Float!
+  averageTime: Float!
+  domainBreakdown: [DomainScore!]!
+}
+
+type ExamTimeEvent {
+  sessionId: ID!
+  timeRemainingSeconds: Int!
+  isExpired: Boolean!
+}
+
+extend type Query {
+  examItemBank(
+    courseId: ID!
+    filters: ExamItemFilterInput
+    first: Int
+    after: String
+  ): ExamItemConnection! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  examBlueprints(courseId: ID!): [ExamBlueprint!]! @authenticated
+  examBlueprint(id: ID!): ExamBlueprint @authenticated
+
+  myExamSessions(blueprintId: ID!): [ExamSession!]! @authenticated
+  examSession(id: ID!): ExamSession! @authenticated
+
+  examResult(sessionId: ID!): ExamResult @authenticated
+  myExamResults(courseId: ID): [ExamResult!]! @authenticated
+
+  examItemStatistics(itemId: ID!): ExamItemStatistics
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  examBlueprintAnalytics(blueprintId: ID!): BlueprintAnalytics!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  examReliabilityReport(blueprintId: ID!): ExamReliabilityReport!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  createExamItem(input: CreateExamItemInput!): ExamItem!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  updateExamItem(id: ID!, input: UpdateExamItemInput!): ExamItem!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  retireExamItem(id: ID!): ExamItem!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  generateExamItems(input: GenerateExamItemsInput!): ExamItemGenerationResult!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  createExamBlueprint(input: CreateExamBlueprintInput!): ExamBlueprint!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  updateExamBlueprint(id: ID!, input: UpdateExamBlueprintInput!): ExamBlueprint!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  startExamSession(blueprintId: ID!): ExamSession! @authenticated
+
+  submitExamAnswer(sessionId: ID!, itemId: ID!, answer: JSON!): Boolean!
+    @authenticated
+
+  flagExamQuestion(sessionId: ID!, itemId: ID!): Boolean! @authenticated
+
+  submitExam(sessionId: ID!): ExamResult! @authenticated
+
+  voidExamSession(sessionId: ID!): Boolean!
+    @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  calibrateExamItems(blueprintId: ID!): Boolean!
+    @authenticated @requiresRole(roles: [SUPER_ADMIN])
+}
+
+extend type Subscription {
+  examTimeUpdate(sessionId: ID!): ExamTimeEvent!
+  examSessionStatusChanged(sessionId: ID!): ExamSession!
+}

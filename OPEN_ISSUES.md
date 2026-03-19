@@ -74,6 +74,8 @@
 | FEAT-090 | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s | ✅ Implemented | (pending commit) |
 | BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
 | BUG-092 | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch) | ✅ Fixed (2 rounds) | (pending commit) |
+| BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
+| F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Implemented | Phase 65 |
 
 ---
 
@@ -192,6 +194,67 @@ Additionally, `ollama-ai-provider@1.2.0` (spec v1) is deprecated and documented 
 - End-to-end course generation verified with real Ollama model through gateway (Round 2)
 - E2E test `apps/web/e2e/ai-course-generation-flow.spec.ts` covers full consent-to-generation flow (Round 2)
 - **Future guard:** Remaining 3 packages with `^3.0.30` must be pinned before any `pnpm install` resolves them to v3.x
+
+---
+
+## BUG-093 — AI Course Creator: No Progress Text + 5-min Timeout (19 Mar 2026)
+
+- **Status:** ✅ Fixed (3 rounds)
+- **Severity:** 🔴 Critical (AI course generation times out or shows no progress feedback)
+- **Reporter:** User (ProgressStatus component missing in modal + generation timeout after 5 min)
+
+### Symptom
+
+Two issues in the AI Course Creator flow:
+1. **No progress text:** The `ProgressStatus` component (added in FEAT-090 / BUG-089R2) was not rendering in the AI Course Creator modal — users saw a spinner with no descriptive text during generation.
+2. **5-minute timeout:** Backend `WORKFLOW_TIMEOUT_MS` (course-generator.service.ts) and `EXECUTION_TIMEOUT_MS` (agent.service.ts) were both set to 5 minutes (300,000ms), but CPU-based Ollama typically takes 4–6 minutes for structured JSON course generation, causing frequent timeouts.
+
+### Root Cause Chain
+
+1. **Stale Docker dist:** The Docker container `web-frontend` was serving a built `dist/` from before the ProgressStatus integration in BUG-089R2. The docker-compose volume mount `./apps/web/dist:/app/apps/web/dist:ro` was not effective because `pnpm --filter @edusphere/web build` was not re-run after the BUG-089R2 commit.
+2. **Timeout too aggressive:** `WORKFLOW_TIMEOUT_MS` in `course-generator.service.ts` was 300,000ms (5 min). CPU-based Ollama (no GPU) needs 4–6 min for structured JSON output, causing the workflow to abort just before completion.
+3. **Agent service same timeout:** `EXECUTION_TIMEOUT_MS` in `agent.service.ts` mirrored the same 5-min limit, compounding the issue.
+
+### Discovery Waves
+
+- **Wave 1 (exact match):** Found `WORKFLOW_TIMEOUT_MS` in `course-generator.service.ts` and `EXECUTION_TIMEOUT_MS` in `agent.service.ts` — both 300,000ms.
+- **Wave 2 (similarity search):** `agent.service.ts` had the same 5-min timeout pattern (fixed in Round 2). No other stale frontend patterns found across web components.
+- **Wave 3 (class of bug):** Searched all timeout constants across subgraph-agent — only these two files affected.
+
+### Fix (Round 1) — Increase course-generator timeout
+
+| File | Change |
+|------|--------|
+| `apps/subgraph-agent/src/ai/course-generator.service.ts` | Increased `WORKFLOW_TIMEOUT_MS` from 300,000ms (5 min) to 600,000ms (10 min) |
+
+### Fix (Round 2) — Increase agent service timeout
+
+| File | Change |
+|------|--------|
+| `apps/subgraph-agent/src/agent/agent.service.ts` | Increased `EXECUTION_TIMEOUT_MS` from 300,000ms to 600,000ms |
+
+### Fix (Round 3) — Rebuild frontend for Docker
+
+| File | Change |
+|------|--------|
+| `apps/web/dist/` (rebuilt) | Ran `pnpm --filter @edusphere/web build` to generate new dist with ProgressStatus component, served by Docker container via volume mount |
+
+### Tests Added
+
+| Test File | Coverage |
+|-----------|----------|
+| `apps/web/src/components/AiCourseCreatorModal.test.tsx` | BUG-093 regression: ProgressStatus renders in modal |
+| `tests/security/ai-compliance.spec.ts` | BUG-093: timeout >= 10 min assertions |
+| `apps/web/src/components/ProgressStatus.test.tsx` | BUG-093: message count verification |
+| `scripts/debug/bug093-visual-test.cjs` | Full visual E2E course creation flow |
+| `scripts/debug/bug093-dom-inspect.cjs` | DOM inspection during generation |
+
+### Anti-Recurrence
+
+- Frontend rebuild (`pnpm --filter @edusphere/web build`) must happen after any commit that touches web components before Docker container restart.
+- Docker-compose volume mount ensures container serves latest dist when rebuild is performed.
+- Timeout security test asserts both `WORKFLOW_TIMEOUT_MS` and `EXECUTION_TIMEOUT_MS` are >= 600,000ms.
+- Regression test in `AiCourseCreatorModal.test.tsx` verifies ProgressStatus component renders during generation state.
 
 ---
 
@@ -10061,3 +10124,47 @@ Added a `sessionStorage` flag (`LOCALE_SYNCED_KEY = 'edusphere_locale_synced'`) 
 - Inverted reproducer tests in `GlobalLocaleSync.test.tsx` and `auth.test.ts` serve as regression guards — they will fail if the fresh-login detection is ever removed.
 - E2E spec `bug091-locale-login-sync.spec.ts` guards the full login → locale sync flow end-to-end.
 - `LOCALE_SYNCED_KEY` is exported from `auth.ts` as a shared constant to prevent key-name drift across files.
+
+---
+
+## F-065 — Certification Exam System (19 Mar 2026)
+
+- **Status:** ✅ Implemented
+- **Priority:** 🔴 High
+- **Phase:** 65
+
+### Description
+
+Full certification-grade examination system with AI-powered question generation, psychometric analysis, Computer Adaptive Testing (CAT), and browser lockdown security.
+
+### Components
+
+- **Item Bank** with IRT 3PL calibration (a, b, c parameters)
+- **Exam Blueprints** with domain/bloom distribution constraints
+- **Exam Assembly Engine** (stratified sampling, Fisher-Yates shuffle)
+- **Exam Delivery** with server-authoritative timer
+- **Score Calculation** (raw → scaled 0-1000 → domain/bloom subscores)
+- **Psychometric Engine** (CTT: p-value, D-index, r_pbis | IRT: 3PL EM calibration | KR-20, Cronbach's α)
+- **AI Question Generation** (LangGraph 7-node pipeline: retrieve → generate → validateBloom → detectIWF → enhanceDistractors → verifyAnswers)
+- **Computer Adaptive Testing** (MFI item selection, EAP/MLE ability estimation, 3 termination criteria)
+- **Browser Lockdown** (7 security layers: fullscreen, tab detection, clipboard, DevTools, etc.)
+
+### Files Created
+
+~90+ files across `packages/db`, `subgraph-content`, `subgraph-agent`, `langgraph-workflows`, `apps/web`
+
+### Database
+
+8 new tables with RLS, 7 enums, migration 0035
+
+### GraphQL API Surface
+
+**Queries (8):** `examItemBank`, `examBlueprints`, `examBlueprint`, `myExamSessions`, `examSession`, `examResult`, `myExamResults`, `examItemStatistics`, `examBlueprintAnalytics`, `examReliabilityReport`
+
+**Mutations (11):** `createExamItem`, `updateExamItem`, `retireExamItem`, `generateExamItems`, `createExamBlueprint`, `updateExamBlueprint`, `startExamSession`, `submitExamAnswer`, `flagExamQuestion`, `submitExam`, `voidExamSession`, `calibrateExamItems`
+
+**Subscriptions (2):** `examTimeUpdate`, `examSessionStatusChanged`
+
+### Tests
+
+211+ tests (131 backend + 80 frontend/E2E)

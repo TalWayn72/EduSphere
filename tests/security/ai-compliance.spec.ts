@@ -86,6 +86,33 @@ describe('EU AI Act: PII Scrubbing', () => {
   });
 });
 
+describe('BUG-093: Course generation timeout configuration', () => {
+  it('WORKFLOW_TIMEOUT_MS in course-generator.service.ts is >= 10 minutes (600000ms)', () => {
+    const src = read('apps/subgraph-agent/src/ai/course-generator.service.ts');
+    expect(src).toBeTruthy();
+    // Extract the timeout value — pattern: WORKFLOW_TIMEOUT_MS = 10 * 60 * 1000 or a numeric literal
+    const literalMatch = src.match(/WORKFLOW_TIMEOUT_MS\s*=\s*(\d[\d_]*)/);
+    const exprMatch = src.match(/WORKFLOW_TIMEOUT_MS\s*=\s*(\d+)\s*\*\s*(\d+)\s*\*\s*(\d+)/);
+    let timeoutMs = 0;
+    if (exprMatch) {
+      timeoutMs =
+        Number(exprMatch[1]) * Number(exprMatch[2]) * Number(exprMatch[3]);
+    } else if (literalMatch) {
+      timeoutMs = Number(literalMatch[1].replace(/_/g, ''));
+    }
+    expect(timeoutMs).toBeGreaterThanOrEqual(600_000);
+  });
+
+  it('EXECUTION_TIMEOUT_MS in agent.service.ts is >= 10 minutes (600000ms)', () => {
+    const src = read('apps/subgraph-agent/src/agent/agent.service.ts');
+    expect(src).toBeTruthy();
+    const match = src.match(/EXECUTION_TIMEOUT_MS\s*=\s*(\d[\d_]*)/);
+    expect(match).not.toBeNull();
+    const timeoutMs = Number(match![1].replace(/_/g, ''));
+    expect(timeoutMs).toBeGreaterThanOrEqual(600_000);
+  });
+});
+
 describe('BUG-092R2: AI SDK Version Compatibility', () => {
   it('@ai-sdk/openai version compatible with ai SDK (spec v2 match)', () => {
     const pkg = read('apps/subgraph-agent/package.json');

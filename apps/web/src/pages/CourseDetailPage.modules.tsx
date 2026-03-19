@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Link,
   PenSquare,
+  ClipboardCheck,
 } from 'lucide-react';
 
 interface ContentItemSummary {
@@ -57,6 +58,8 @@ function ContentTypeIcon({ type }: { type: string }) {
       return <BookOpen className="h-3.5 w-3.5 text-green-500" />;
     case 'QUIZ':
       return <HelpCircle className="h-3.5 w-3.5 text-orange-500" />;
+    case 'EXAM':
+      return <ClipboardCheck className="h-3.5 w-3.5 text-indigo-500" />;
     case 'ASSIGNMENT':
       return <PenSquare className="h-3.5 w-3.5 text-yellow-600" />;
     case 'LINK':

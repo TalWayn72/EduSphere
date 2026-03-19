@@ -205,3 +205,6 @@ export * from './whatsapp-contacts';
 
 // Phase 65: Tenant Social Links (footer/header social media)
 export * from './tenant-social-links';
+
+// Certification Exam System (Item Bank, Blueprints, Sessions, Results, Psychometrics)
+export * from './exam';

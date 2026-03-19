@@ -33,6 +33,8 @@ import { DocumentVersionModule } from './document-version/document-version.modul
 import { ContentImportModule } from './content-import/content-import.module';
 import { PeerReviewModule } from './peer-review/peer-review.module';
 import { AeoModule } from './aeo/aeo.module';
+import { ExamModule } from './exam/exam.module';
+import { PsychometricsModule } from './psychometrics/psychometrics.module';
 
 @Module({
   imports: [
@@ -77,6 +79,8 @@ import { AeoModule } from './aeo/aeo.module';
     ContentImportModule,
     PeerReviewModule,
     AeoModule,
+    ExamModule,
+    PsychometricsModule,
   ],
 })
 export class AppModule {}

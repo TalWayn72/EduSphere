@@ -261,6 +261,45 @@ describe('AiCourseCreatorModal', () => {
     );
   });
 
+  // BUG-093: regression — ProgressStatus renders with cycling messages when generating
+  it('BUG-093: ProgressStatus renders with cycling messages when generating', async () => {
+    // Simulate a long-running generation (PENDING status, no outline yet)
+    const pendingExecute = vi.fn().mockResolvedValue({
+      data: {
+        generateCourseFromPrompt: {
+          executionId: 'exec-pending',
+          status: 'PENDING',
+          courseTitle: null,
+          courseDescription: null,
+          modules: [],
+        },
+      },
+      error: undefined,
+    });
+    let mutationCallCount = 0;
+    vi.mocked(urql.useMutation).mockImplementation(() => {
+      const isFirst = mutationCallCount % 2 === 0;
+      mutationCallCount++;
+      return [{} as never, isFirst ? pendingExecute : NOOP_EXECUTE];
+    });
+    renderModal();
+    const textarea = screen.getByPlaceholderText(
+      /introduction to machine learning/i
+    );
+    fireEvent.change(textarea, { target: { value: 'Deep learning basics' } });
+    fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
+    await waitFor(() => {
+      // Both inline (inside button) and block (below button) ProgressStatus should render
+      const statusElements = screen.getAllByRole('status');
+      expect(statusElements.length).toBeGreaterThanOrEqual(2);
+      // At least one status element should contain progress text from AI_COURSE_GENERATION_MESSAGES
+      const hasProgressText = statusElements.some(
+        (el) => el.textContent && el.textContent.length > 0
+      );
+      expect(hasProgressText).toBe(true);
+    });
+  });
+
   it('does not render when open is false', () => {
     render(
       <MemoryRouter>

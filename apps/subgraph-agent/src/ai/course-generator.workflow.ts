@@ -58,12 +58,16 @@ function buildModel(): LanguageModel {
     const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
     return openai('gpt-4o-mini') as unknown as LanguageModel;
   }
-  // Use Ollama's OpenAI-compatible API (/v1) — the dedicated ollama-ai-provider
-  // only supports AI SDK spec v1, but AI SDK v5 requires spec v2.
+  // Use Ollama's OpenAI-compatible API (/v1) with compatibility mode.
+  // @ai-sdk/openai v3+ defaults to "responses" API (spec v3) which Ollama
+  // does not support. `compatibility: 'compatible'` forces classic chat
+  // completions API (spec v2) that Ollama implements.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ollamaProvider = createOpenAI({
     baseURL: `${ollamaConfig.url}/v1`,
     apiKey: 'ollama', // Ollama ignores API key but field is required
-  });
+    compatibility: 'compatible',
+  } as any);
   return ollamaProvider(
     process.env.OLLAMA_MODEL ?? 'llama3.2'
   ) as unknown as LanguageModel;

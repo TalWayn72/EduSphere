@@ -46,8 +46,11 @@ gantt
     section Advanced Features
         Phase 59-64 Payouts + Badges + Portal: done, p6, 2026-03-06, 2026-03-15
 
+    section Certification & Exams
+        Phase 65-68 Cert Exam + Social + Links: done, p7, 2026-03-16, 2026-03-19
+
     section Maintenance
-        Ongoing Bug Fixes + Optimization: active, p7, 2026-03-16, 2026-04-30
+        Ongoing Bug Fixes + Optimization: active, p8, 2026-03-20, 2026-04-30
 ```
 
 ---
@@ -2518,6 +2521,98 @@ pnpm turbo typecheck  # 0 errors
 # Social components render correctly
 # SocialLinksBar shows icons for all 7 platforms
 # SocialShareMenu opens with LinkedIn/Facebook/X/WhatsApp/Copy Link options
+```
+
+---
+
+## Phase 68 — Certification Exam System (F-065) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-19 | **Commit:** (pending)
+
+### What Was Built
+
+**Wave A — Item Bank & Blueprints:**
+- `exam_items` schema — IRT 3PL calibration (a, b, c parameters), calibration lifecycle (DRAFT → PILOT → CALIBRATED → RETIRED), quality tiers (AI_GENERATED → SME_REVIEWED → PILOT_TESTED → CALIBRATED)
+- `exam_blueprints` schema — domain/bloom distribution constraints, passing methods (PERCENTAGE, SCALED_SCORE, IRT_THETA), CAT configuration (min/max items), retake policy (cooldown hours, max retakes)
+- Exam Assembly Engine — stratified sampling by domain/bloom, Fisher-Yates shuffle, exposure control
+- 7 enums: `BloomLevel`, `CalibrationStatus`, `ExamItemSource`, `QualityTier`, `BlueprintStatus`, `PassingMethod`, `ExamSessionStatus`
+
+**Wave B — Exam Delivery & Scoring:**
+- `exam_sessions` schema — server-authoritative timer, attempt tracking, question ordering, adaptive mode flag
+- `exam_responses` schema — per-item answer recording, flag support, time-spent tracking
+- `exam_results` schema — raw/scaled scores (0-1000), theta estimates, SEM, confidence intervals, domain/bloom subscores
+- Score calculation pipeline: raw → scaled 0-1000 → domain breakdown → bloom breakdown → pass/fail determination
+
+**Wave C — Psychometric Engine:**
+- Classical Test Theory (CTT): p-value, discrimination index (D-index), point-biserial correlation (r_pbis), distractor analysis
+- Item Response Theory (IRT): 3PL model, EM calibration algorithm
+- Reliability: KR-20, Cronbach's alpha, Standard Error of Measurement (SEM)
+- Blueprint analytics: pass rate, average score, average time, domain breakdown
+
+**Wave D — AI Question Generation:**
+- LangGraph 7-node pipeline: retrieve → generate → validateBloom → detectIWF (item writing flaws) → enhanceDistractors → verifyAnswers
+- `generateExamItems` mutation with domain/bloom targeting and difficulty control
+- Quality validation: Bloom taxonomy alignment, distractor plausibility, answer key verification
+
+**Wave E — Computer Adaptive Testing (CAT):**
+- Maximum Fisher Information (MFI) item selection algorithm
+- EAP/MLE ability estimation with iterative refinement
+- 3 termination criteria: max items reached, SEM threshold met, minimum items completed
+- Adaptive session flow: start → select next item → update ability estimate → check termination → repeat
+
+**Wave F — Browser Lockdown & Security:**
+- 7 security layers: fullscreen enforcement, tab/window detection, clipboard blocking, DevTools detection, right-click prevention, keyboard shortcut blocking, copy/paste prevention
+- `voidExamSession` mutation for admin override on security violations
+- RLS on all 8 tables — tenant isolation enforced
+
+**Wave G — Frontend UI:**
+- Exam item bank management page (CRUD, filtering, pagination)
+- Blueprint editor with domain/bloom distribution configuration
+- Exam delivery interface with timer, question navigation, flagging
+- Results page with domain/bloom score breakdowns
+- Psychometric dashboard with item statistics and reliability reports
+
+### Database Migration
+
+Migration `0035`: 8 new tables (`exam_items`, `exam_blueprints`, `exam_sessions`, `exam_responses`, `exam_results`, `exam_item_statistics`, `exam_reliability_reports`, `exam_security_events`) with RLS policies
+
+### Tests
+
+- 131 backend tests (item bank CRUD, assembly engine, scoring, psychometrics, IRT calibration, CAT algorithm, AI generation pipeline)
+- 80 frontend/E2E tests (exam UI components, delivery flow, timer, results display, browser lockdown)
+- Total: 211+ tests
+
+### GraphQL API
+
+**10 Queries:** `examItemBank`, `examBlueprints`, `examBlueprint`, `myExamSessions`, `examSession`, `examResult`, `myExamResults`, `examItemStatistics`, `examBlueprintAnalytics`, `examReliabilityReport`
+
+**12 Mutations:** `createExamItem`, `updateExamItem`, `retireExamItem`, `generateExamItems`, `createExamBlueprint`, `updateExamBlueprint`, `startExamSession`, `submitExamAnswer`, `flagExamQuestion`, `submitExam`, `voidExamSession`, `calibrateExamItems`
+
+**2 Subscriptions:** `examTimeUpdate`, `examSessionStatusChanged`
+
+**Acceptance Criteria:**
+
+```bash
+# All exam tests pass
+pnpm turbo test --filter='@edusphere/subgraph-content' --filter='@edusphere/subgraph-agent' --filter='@edusphere/web'  # all green
+
+# TypeScript strict compilation
+pnpm turbo typecheck  # 0 errors
+
+# Exam delivery with server-authoritative timer
+# examTimeUpdate subscription delivers real-time countdown
+
+# CAT adaptive item selection
+# MFI algorithm selects optimal next item based on ability estimate
+
+# Psychometric reports
+# examReliabilityReport returns KR-20, Cronbach's α, SEM for blueprint
+
+# Browser lockdown active during exam sessions
+# 7 security layers prevent cheating during exam delivery
+
+# RLS enforcement on all 8 exam tables
+# Tenant isolation verified across exam_items, exam_sessions, exam_results
 ```
 
 ---

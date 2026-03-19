@@ -1,0 +1,69 @@
+input CreateExamItemInput {
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevel: BloomLevel!
+  questionData: JSON!
+  source: ExamItemSource
+}
+
+input UpdateExamItemInput {
+  domainTag: String
+  bloomLevel: BloomLevel
+  questionData: JSON
+}
+
+input ExamItemFilterInput {
+  courseId: ID
+  domainTag: String
+  bloomLevel: BloomLevel
+  calibrationStatus: CalibrationStatus
+  source: ExamItemSource
+}
+
+input GenerateExamItemsInput {
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevels: [BloomLevel!]!
+  count: Int!
+  targetDifficulty: Float
+}
+
+input CreateExamBlueprintInput {
+  courseId: ID!
+  title: String!
+  description: String
+  timeLimitMinutes: Int!
+  totalQuestions: Int!
+  passingScore: Float!
+  passingMethod: PassingMethod!
+  domainDistribution: JSON!
+  bloomDistribution: JSON!
+  shuffleQuestions: Boolean
+  shuffleAnswers: Boolean
+  maxRetakes: Int
+  retakeCooldownHours: Int
+  isAdaptive: Boolean
+  catMinItems: Int
+  catMaxItems: Int
+}
+
+input UpdateExamBlueprintInput {
+  title: String
+  description: String
+  timeLimitMinutes: Int
+  totalQuestions: Int
+  passingScore: Float
+  passingMethod: PassingMethod
+  domainDistribution: JSON
+  bloomDistribution: JSON
+  shuffleQuestions: Boolean
+  shuffleAnswers: Boolean
+  maxRetakes: Int
+  retakeCooldownHours: Int
+  isAdaptive: Boolean
+  catMinItems: Int
+  catMaxItems: Int
+  status: BlueprintStatus
+}

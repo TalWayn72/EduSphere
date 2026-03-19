@@ -1,0 +1,122 @@
+scalar JSON
+scalar DateTime
+
+enum BloomLevel {
+  REMEMBER
+  UNDERSTAND
+  APPLY
+  ANALYZE
+  EVALUATE
+  CREATE
+}
+
+enum CalibrationStatus {
+  DRAFT
+  PILOT
+  CALIBRATED
+  RETIRED
+}
+
+enum ExamItemSource {
+  MANUAL
+  AI_GENERATED
+  IMPORTED
+}
+
+enum QualityTier {
+  AI_GENERATED
+  SME_REVIEWED
+  PILOT_TESTED
+  CALIBRATED
+}
+
+enum BlueprintStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum PassingMethod {
+  PERCENTAGE
+  SCALED_SCORE
+  IRT_THETA
+}
+
+type ExamItem {
+  id: ID!
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevel: BloomLevel!
+  questionData: JSON!
+  irtA: Float
+  irtB: Float
+  irtC: Float
+  calibrationStatus: CalibrationStatus!
+  source: ExamItemSource!
+  qualityTier: QualityTier!
+  pValue: Float
+  rpbis: Float
+  exposureCount: Int!
+  createdAt: DateTime!
+}
+
+type ExamBlueprint {
+  id: ID!
+  courseId: ID!
+  title: String!
+  description: String
+  timeLimitMinutes: Int!
+  totalQuestions: Int!
+  passingScore: Float!
+  passingMethod: PassingMethod!
+  domainDistribution: JSON!
+  bloomDistribution: JSON!
+  shuffleQuestions: Boolean!
+  shuffleAnswers: Boolean!
+  maxRetakes: Int!
+  retakeCooldownHours: Int!
+  isAdaptive: Boolean!
+  catMinItems: Int
+  catMaxItems: Int
+  status: BlueprintStatus!
+  version: Int!
+  createdAt: DateTime!
+}
+
+type ExamItemStatistics {
+  itemId: ID!
+  totalAdministrations: Int!
+  pValue: Float!
+  rpbis: Float!
+  dIndex: Float!
+  distractorAnalysis: [DistractorStat!]!
+  irtA: Float
+  irtB: Float
+  irtC: Float
+}
+
+type DistractorStat {
+  optionIndex: Int!
+  selectionRate: Float!
+  rpbis: Float!
+  functional: Boolean!
+}
+
+type ExamItemGenerationResult {
+  generatedCount: Int!
+  validCount: Int!
+  items: [ExamItem!]!
+}
+
+type ExamItemEdge {
+  node: ExamItem!
+  cursor: String!
+}
+
+type ExamItemConnection {
+  edges: [ExamItemEdge!]!
+  nodes: [ExamItem!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
