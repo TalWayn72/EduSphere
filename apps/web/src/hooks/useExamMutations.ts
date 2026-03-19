@@ -68,51 +68,65 @@ export function useStartExamSession() {
 }
 
 export function useSubmitExamAnswer() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [, executeMutation] = useMutation(SUBMIT_ANSWER_MUTATION);
 
   const submitAnswer = useCallback(
-    async (
-      sessionId: string,
-      itemId: string,
-      answer: unknown,
-    ) => {
+    async (sessionId: string, itemId: string, answer: unknown) => {
+      setLoading(true);
+      setError(null);
       try {
         const res = await executeMutation({ sessionId, itemId, answer });
         if (res.error) {
           console.error('[useSubmitExamAnswer] Submit failed:', res.error.message);
+          setError('Failed to submit answer.');
+          return null;
         }
         return res.data?.submitExamAnswer ?? null;
       } catch (err) {
         console.error('[useSubmitExamAnswer] Unexpected error:', err);
+        setError('Failed to submit answer.');
         return null;
+      } finally {
+        setLoading(false);
       }
     },
     [executeMutation],
   );
 
-  return { submitAnswer };
+  return { submitAnswer, loading, error };
 }
 
 export function useFlagExamQuestion() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [, executeMutation] = useMutation(FLAG_QUESTION_MUTATION);
 
   const flagQuestion = useCallback(
     async (sessionId: string, itemId: string) => {
+      setLoading(true);
+      setError(null);
       try {
         const res = await executeMutation({ sessionId, itemId });
         if (res.error) {
           console.error('[useFlagExamQuestion] Flag failed:', res.error.message);
+          setError('Failed to flag question.');
+          return null;
         }
         return res.data?.flagExamQuestion ?? null;
       } catch (err) {
         console.error('[useFlagExamQuestion] Unexpected error:', err);
+        setError('Failed to flag question.');
         return null;
+      } finally {
+        setLoading(false);
       }
     },
     [executeMutation],
   );
 
-  return { flagQuestion };
+  return { flagQuestion, loading, error };
 }
 
 export function useSubmitExam() {

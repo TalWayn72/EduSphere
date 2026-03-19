@@ -81,6 +81,7 @@ export interface ExamResponse {
 export interface ExamResult {
   id: string;
   sessionId: string;
+  blueprintId?: string;
   rawScore: number;
   scaledScore?: number;
   passed: boolean;

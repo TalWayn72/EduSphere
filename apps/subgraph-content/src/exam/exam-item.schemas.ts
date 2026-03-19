@@ -27,7 +27,7 @@ export const createExamItemSchema = z.object({
   moduleId: z.string().uuid().optional(),
   domainTag: z.string().min(1).max(100),
   bloomLevel: BloomLevelSchema,
-  questionData: z.record(z.unknown()).refine(
+  questionData: z.record(z.string(), z.unknown()).refine(
     (data) => data && typeof data === 'object',
     { message: 'questionData must be a valid object' },
   ),
@@ -37,7 +37,7 @@ export const createExamItemSchema = z.object({
 export const updateExamItemSchema = z.object({
   domainTag: z.string().min(1).max(100).optional(),
   bloomLevel: BloomLevelSchema.optional(),
-  questionData: z.record(z.unknown()).optional(),
+  questionData: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const examItemFilterSchema = z.object({
@@ -60,7 +60,7 @@ export const generateExamItemsSchema = z.object({
 export const submitExamAnswerSchema = z.object({
   sessionId: z.string().uuid(),
   itemId: z.string().uuid(),
-  answer: z.record(z.unknown()).refine(
+  answer: z.record(z.string(), z.unknown()).refine(
     (data) => data && typeof data === 'object',
     { message: 'answer must be a valid object' },
   ),

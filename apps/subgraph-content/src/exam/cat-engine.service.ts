@@ -64,6 +64,12 @@ export class CatEngineService implements OnModuleDestroy {
     const session = await this.helpers.loadSession(sessionId, ctx);
     const catState = this.loader.parseCatState(session);
 
+    const bp = await this.helpers.loadBlueprint(session.blueprintId, ctx);
+    const maxItems = bp.catMaxItems ?? 60;
+    if (catState.administeredItemIds.length >= maxItems) {
+      throw new Error(`CAT max items exceeded (${maxItems})`);
+    }
+
     catState.administeredItemIds.push(itemId);
     catState.responsePattern.push(isCorrect);
 

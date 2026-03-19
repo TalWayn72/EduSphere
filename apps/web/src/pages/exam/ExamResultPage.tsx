@@ -9,7 +9,7 @@ import {
   ArrowLeft,
   Loader2,
 } from 'lucide-react';
-import { useExamResult } from '@/hooks/useExamSession';
+import { useExamResult, useExamSession } from '@/hooks/useExamSession';
 import { DomainScoreChart, BloomScoreChart } from '@/components/exam/ExamResultChart';
 import { ExamScoreCard } from '@/components/exam/ExamScoreCard';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ export function ExamResultPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const { result, loading } = useExamResult(sessionId ?? '');
+  const { session } = useExamSession(sessionId ?? '');
 
   if (loading) {
     return (
@@ -82,7 +83,8 @@ export function ExamResultPage() {
         </Button>
         <Button
           className="flex-1"
-          onClick={() => navigate(-1)}
+          disabled={!result.blueprintId && !session?.blueprintId}
+          onClick={() => navigate(`/exams/${result.blueprintId ?? session?.blueprintId}/start`)}
         >
           <RotateCcw className="h-4 w-4 mr-2" aria-hidden />
           Retake Exam

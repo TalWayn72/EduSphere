@@ -16,6 +16,7 @@ import {
   closeAllPools,
   schema,
   withTenantContext,
+  bloomLevelEnum,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { detectItemWritingFlaws } from './exam-iwf-detector';
@@ -93,7 +94,7 @@ export class ExamItemGeneratorService implements OnModuleDestroy {
               courseId: input.courseId,
               moduleId: input.moduleId ?? null,
               domainTag: item.domainTag,
-              bloomLevel: item.bloomLevel,
+              bloomLevel: item.bloomLevel as (typeof bloomLevelEnum.enumValues)[number],
               questionData,
               source: 'AI_GENERATED',
               createdBy: input.userId,

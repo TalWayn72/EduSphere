@@ -141,7 +141,29 @@ export const examItemEmbeddings = pgTable(
       .notNull()
       .defaultNow(),
   },
-);
+  (t) => [
+    pgPolicy('exam_item_embeddings_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM exam_items ei
+          WHERE ei.id = ${t.itemId}
+            AND ei.tenant_id::text = current_setting('app.current_tenant', TRUE)
+            AND current_setting('app.current_user_role', TRUE)
+                IN ('INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN')
+        )
+      `,
+      withCheck: sql`
+        EXISTS (
+          SELECT 1 FROM exam_items ei
+          WHERE ei.id = ${t.itemId}
+            AND ei.tenant_id::text = current_setting('app.current_tenant', TRUE)
+            AND current_setting('app.current_user_role', TRUE)
+                IN ('INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN')
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 export const examItemEmbeddingsHnswIdx = sql`
 CREATE INDEX IF NOT EXISTS idx_exam_item_embeddings_hnsw

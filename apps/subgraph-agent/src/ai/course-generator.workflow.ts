@@ -2,13 +2,13 @@
  * Course Generator LangGraph workflow.
  *
  * Nodes:
- *  1. outline_generation — generateObject with CourseSchema (Vercel AI SDK)
+ *  1. outline_generation — generates structured JSON course outline
  *  2. concept_linking    — extract key concept names for knowledge-graph linking
  *  3. finalize           — assemble final output state
  *
- * The workflow uses the "simpler approach": generates the outline and returns
- * it as structured JSON for frontend preview before the instructor accepts it.
- * No inter-service DB calls are made here to avoid circular dependencies.
+ * BUG-093: Uses direct Ollama HTTP API for local dev (bypasses @ai-sdk/openai
+ * version mismatch: container has v3 spec but ai v5 needs v2). Falls back to
+ * generateObject for OpenAI cloud.
  */
 
 import { StateGraph, Annotation } from '@langchain/langgraph';
@@ -51,26 +51,42 @@ const CourseGenState = Annotation.Root({
 
 type CourseGenStateType = typeof CourseGenState.State;
 
-// ── Model builder ─────────────────────────────────────────────────────────────
+// ── Direct Ollama API call (bypasses AI SDK version mismatch) ────────────────
 
-function buildModel(): LanguageModel {
-  if (process.env.OPENAI_API_KEY) {
-    const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    return openai('gpt-4o-mini') as unknown as LanguageModel;
+async function generateViaOllama(
+  systemPrompt: string,
+  userPrompt: string,
+): Promise<GeneratedCourse> {
+  const model = process.env.OLLAMA_MODEL ?? 'llama3.2';
+  const url = `${ollamaConfig.url}/api/chat`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      format: 'json',
+      stream: false,
+      options: { temperature: 0.7, num_ctx: 4096 },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
   }
-  // Use Ollama's OpenAI-compatible API (/v1) with compatibility mode.
-  // @ai-sdk/openai v3+ defaults to "responses" API (spec v3) which Ollama
-  // does not support. `compatibility: 'compatible'` forces classic chat
-  // completions API (spec v2) that Ollama implements.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ollamaProvider = createOpenAI({
-    baseURL: `${ollamaConfig.url}/v1`,
-    apiKey: 'ollama', // Ollama ignores API key but field is required
-    compatibility: 'compatible',
-  } as any);
-  return ollamaProvider(
-    process.env.OLLAMA_MODEL ?? 'llama3.2'
-  ) as unknown as LanguageModel;
+
+  const data = await response.json() as { message?: { content?: string } };
+  const content = data.message?.content;
+  if (!content) {
+    throw new Error('Ollama returned empty response');
+  }
+
+  const parsed: unknown = JSON.parse(content);
+  return CourseSchema.parse(parsed);
 }
 
 // ── Node: outline_generation ──────────────────────────────────────────────────
@@ -89,7 +105,12 @@ async function outlineGenerationNode(
       ? `Generate content in language: ${state.language}.`
       : '';
 
-  const prompt = [
+  const systemPrompt =
+    'You are an expert instructional designer. Generate structured, pedagogically sound course outlines. ' +
+    'Respond with a JSON object matching this schema: { title: string, description: string, modules: [{ title: string, description: string, contentItemTitles: string[] }] }. ' +
+    'Include 2-8 modules with 2-6 content items each.';
+
+  const userPrompt = [
     `Create a comprehensive course outline for: "${state.prompt}".`,
     levelHint,
     hoursHint,
@@ -101,20 +122,32 @@ async function outlineGenerationNode(
     .join(' ');
 
   try {
-    const model = buildModel();
-    const { object } = await generateObject({
-      model: model as Parameters<typeof generateObject>[0]['model'],
-      schema: CourseSchema,
-      system:
-        'You are an expert instructional designer. Generate structured, pedagogically sound course outlines.',
-      prompt,
-    });
+    // Use OpenAI cloud if API key is set (generateObject works with real OpenAI)
+    if (process.env.OPENAI_API_KEY) {
+      const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const model = openai('gpt-4o-mini') as unknown as LanguageModel;
+      const { object } = await generateObject({
+        model: model as Parameters<typeof generateObject>[0]['model'],
+        schema: CourseSchema,
+        system: systemPrompt,
+        prompt: userPrompt,
+      });
+      return { courseOutline: object };
+    }
+
+    // BUG-093: Direct Ollama HTTP API — bypasses @ai-sdk/openai v3 spec mismatch
+    const object = await generateViaOllama(systemPrompt, userPrompt);
     return { courseOutline: object };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    const isConnectionError = msg.includes('ECONNREFUSED') || msg.includes('fetch failed') || msg.includes('network');
+    const isConnectionError =
+      msg.includes('ECONNREFUSED') ||
+      msg.includes('fetch failed') ||
+      msg.includes('network');
     if (isConnectionError) {
-      return { error: `LLM service unavailable. Ensure Ollama is running at ${process.env.OLLAMA_URL ?? 'http://localhost:11434'} or set OPENAI_API_KEY for cloud LLM.` };
+      return {
+        error: `LLM service unavailable. Ensure Ollama is running at ${ollamaConfig.url} or set OPENAI_API_KEY for cloud LLM.`,
+      };
     }
     return { error: `outline_generation failed: ${msg}` };
   }
@@ -128,7 +161,6 @@ function conceptLinkingNode(
   if (!state.courseOutline) {
     return { conceptNames: [] };
   }
-  // Extract concept names from title and module titles for knowledge-graph linking
   const names = [
     state.courseOutline.title,
     ...state.courseOutline.modules.map((m) => m.title),
@@ -141,7 +173,6 @@ function conceptLinkingNode(
 // ── Node: finalize ────────────────────────────────────────────────────────────
 
 function finalizeNode(_state: CourseGenStateType): Partial<CourseGenStateType> {
-  // No additional transformation — just pass state through
   return {};
 }
 

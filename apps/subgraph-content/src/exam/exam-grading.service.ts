@@ -34,6 +34,7 @@ export class ExamGradingService implements OnModuleDestroy {
   private readonly sc = StringCodec();
   private readonly persistence: ExamGradingPersistence;
   private nc: NatsConnection | null = null;
+  private connectingPromise: Promise<NatsConnection> | null = null;
 
   constructor() {
     this.persistence = new ExamGradingPersistence(this.db);
@@ -135,12 +136,25 @@ export class ExamGradingService implements OnModuleDestroy {
     }));
   }
 
+  private async ensureNatsConnection(): Promise<NatsConnection> {
+    if (this.nc) return this.nc;
+    if (!this.connectingPromise) {
+      this.connectingPromise = connect(buildNatsOptions()).then((nc) => {
+        this.nc = nc;
+        this.connectingPromise = null;
+        return nc;
+      }).catch((err) => {
+        this.connectingPromise = null;
+        throw err;
+      });
+    }
+    return this.connectingPromise;
+  }
+
   private async publishCertificateEvent(result: ExamResult, tenantId: string): Promise<void> {
     try {
-      if (!this.nc) {
-        this.nc = await connect(buildNatsOptions());
-      }
-      this.nc.publish(CERT_SUBJECT, this.sc.encode(JSON.stringify({
+      const nc = await this.ensureNatsConnection();
+      nc.publish(CERT_SUBJECT, this.sc.encode(JSON.stringify({
         resultId: result.id, sessionId: result.sessionId,
         userId: result.userId, blueprintId: result.blueprintId,
         scaledScore: result.scaledScore, tenantId,

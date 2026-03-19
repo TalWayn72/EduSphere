@@ -16,7 +16,7 @@ export function gradeExamItem(
   questionData: Record<string, unknown>,
   answerData: unknown,
 ): boolean {
-  const qd = questionData as ExamQuestionData;
+  const qd = questionData as unknown as ExamQuestionData;
   const type = qd.type?.toUpperCase();
 
   switch (type) {

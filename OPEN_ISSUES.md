@@ -75,7 +75,7 @@
 | BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
 | BUG-092 | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch) | ✅ Fixed (2 rounds) | (pending commit) |
 | BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
-| F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Implemented | Phase 65 |
+| F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 
 ---
 
@@ -10129,9 +10129,9 @@ Added a `sessionStorage` flag (`LOCALE_SYNCED_KEY = 'edusphere_locale_synced'`) 
 
 ## F-065 — Certification Exam System (19 Mar 2026)
 
-- **Status:** ✅ Implemented
+- **Status:** ✅ Complete (Implementation + Completion Protocol)
 - **Priority:** 🔴 High
-- **Phase:** 65
+- **Phase:** 68 (IMPLEMENTATION_ROADMAP.md)
 
 ### Description
 
@@ -10149,6 +10149,36 @@ Full certification-grade examination system with AI-powered question generation,
 - **Computer Adaptive Testing** (MFI item selection, EAP/MLE ability estimation, 3 termination criteria)
 - **Browser Lockdown** (7 security layers: fullscreen, tab detection, clipboard, DevTools, etc.)
 
+### Discovery Waves (Completion Protocol)
+
+**Wave 1 — Exact Match (TypeScript + lint errors):**
+- 5 TypeScript errors in exam backend services
+  - `apps/subgraph-content/src/exam/exam-item-generator.service.ts` — missing type annotations on AI SDK response
+  - `apps/subgraph-content/src/exam/exam-item-grader.ts` — incorrect return type on grading pipeline
+  - `apps/subgraph-content/src/exam/exam-item.schemas.ts` — Zod schema type mismatch with IRT parameters
+
+**Wave 2 — Similarity Search (same anti-patterns in sibling code):**
+- CAT engine `administeredItems` array lacked max-size eviction guard (memory safety violation)
+- NATS connection race condition in exam event publisher — `connect()` called before `onModuleInit` complete
+- `exam_item_embeddings` table missing RLS policy (SI-9 violation — cross-tenant vector search possible)
+- Auth pattern inconsistency across 4 exam resolvers — mixed `@authenticated` + manual JWT check instead of standardized `@requiresScopes`
+
+**Wave 3 — Class of Bug (broader pattern search):**
+- `ExamResultPage` retake button used stale session ID after exam void — fixed with fresh query
+- `useExamMutations` hook swallowed GraphQL errors silently — added structured error exposure to UI toast
+
+### Fixes Applied (All Rounds)
+
+| Round | Fix | Files |
+|-------|-----|-------|
+| R1 | 5 TypeScript errors fixed (type annotations, return types, Zod schemas) | `exam-item-generator.service.ts`, `exam-item-grader.ts`, `exam-item.schemas.ts` |
+| R2 | CAT array size guard — `administeredItems.slice(-maxItems)` eviction at configured limit | `cat-engine.service.ts` |
+| R2 | NATS connection race condition — deferred publish until `onModuleInit` resolves | `exam-event.publisher.ts` |
+| R2 | RLS added to `exam_item_embeddings` — tenant isolation on vector similarity search | `packages/db` migration |
+| R2 | Auth pattern standardized — `@requiresScopes` on all 4 exam resolvers | `exam-item.resolver.ts`, `exam-blueprint.resolver.ts`, `exam-session.resolver.ts`, `exam-result.resolver.ts` |
+| R3 | ExamResultPage retake button — fresh session query after void | `ExamResultPage.tsx` |
+| R3 | useExamMutations error exposure — GraphQL errors surfaced to toast notifications | `useExamMutations.ts` |
+
 ### Files Created
 
 ~90+ files across `packages/db`, `subgraph-content`, `subgraph-agent`, `langgraph-workflows`, `apps/web`
@@ -10159,12 +10189,23 @@ Full certification-grade examination system with AI-powered question generation,
 
 ### GraphQL API Surface
 
-**Queries (8):** `examItemBank`, `examBlueprints`, `examBlueprint`, `myExamSessions`, `examSession`, `examResult`, `myExamResults`, `examItemStatistics`, `examBlueprintAnalytics`, `examReliabilityReport`
+**Queries (10):** `examItemBank`, `examBlueprints`, `examBlueprint`, `myExamSessions`, `examSession`, `examResult`, `myExamResults`, `examItemStatistics`, `examBlueprintAnalytics`, `examReliabilityReport`
 
-**Mutations (11):** `createExamItem`, `updateExamItem`, `retireExamItem`, `generateExamItems`, `createExamBlueprint`, `updateExamBlueprint`, `startExamSession`, `submitExamAnswer`, `flagExamQuestion`, `submitExam`, `voidExamSession`, `calibrateExamItems`
+**Mutations (12):** `createExamItem`, `updateExamItem`, `retireExamItem`, `generateExamItems`, `createExamBlueprint`, `updateExamBlueprint`, `startExamSession`, `submitExamAnswer`, `flagExamQuestion`, `submitExam`, `voidExamSession`, `calibrateExamItems`
 
 **Subscriptions (2):** `examTimeUpdate`, `examSessionStatusChanged`
 
 ### Tests
 
-211+ tests (131 backend + 80 frontend/E2E)
+**211+ tests across 27 files:**
+- 131 backend tests (resolvers, services, CAT engine, psychometrics, assembly, AI generation)
+- 80 frontend/E2E tests (exam UI components, delivery flow, timer, results display, browser lockdown)
+- **4 Playwright E2E specs:** exam delivery flow, item bank CRUD, blueprint management, results page
+- **1 Visual QA spec:** exam UI screenshot regression (`toHaveScreenshot`)
+
+### Anti-Recurrence
+
+- CAT array size guard prevents unbounded memory growth in long adaptive sessions
+- RLS on `exam_item_embeddings` prevents cross-tenant vector search leakage
+- Standardized auth pattern across all exam resolvers prevents future scope-check omissions
+- NATS race condition fix uses `OnModuleInit` lifecycle hook pattern consistently

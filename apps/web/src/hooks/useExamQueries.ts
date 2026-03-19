@@ -30,7 +30,7 @@ const EXAM_SESSION_QUERY = `
 const EXAM_RESULT_QUERY = `
   query ExamResult($sessionId: ID!) {
     examResult(sessionId: $sessionId) {
-      id sessionId passed
+      id sessionId blueprintId passed
       rawScore scaledScore thetaEstimate sem
       confidenceInterval
       domainScores { domain correct total scaledScore }
