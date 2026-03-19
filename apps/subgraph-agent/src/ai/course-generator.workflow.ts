@@ -28,7 +28,9 @@ export const CourseSchema = z.object({
       z.object({
         title: z.string().max(200),
         description: z.string().max(500),
-        contentItemTitles: z.array(z.string().max(200)).max(6),
+        // Default to empty array — LLMs sometimes omit this field or use
+        // alternative names (content_items, lessons, topics).
+        contentItemTitles: z.array(z.string().max(200)).max(6).default([]),
       })
     )
     .min(2)
@@ -85,7 +87,23 @@ async function generateViaOllama(
     throw new Error('Ollama returned empty response');
   }
 
-  const parsed: unknown = JSON.parse(content);
+  const parsed = JSON.parse(content) as Record<string, unknown>;
+
+  // Normalize common LLM field name variations for modules
+  if (Array.isArray(parsed.modules)) {
+    for (const mod of parsed.modules as Record<string, unknown>[]) {
+      if (!mod.contentItemTitles && Array.isArray(mod.content_items)) {
+        mod.contentItemTitles = mod.content_items;
+      } else if (!mod.contentItemTitles && Array.isArray(mod.lessons)) {
+        mod.contentItemTitles = (mod.lessons as Array<string | { title?: string }>).map(
+          (l) => (typeof l === 'string' ? l : l.title ?? '')
+        );
+      } else if (!mod.contentItemTitles && Array.isArray(mod.topics)) {
+        mod.contentItemTitles = mod.topics;
+      }
+    }
+  }
+
   return CourseSchema.parse(parsed);
 }
 
