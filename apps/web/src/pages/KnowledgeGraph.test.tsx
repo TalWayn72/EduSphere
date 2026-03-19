@@ -389,7 +389,7 @@ describe('KnowledgeGraph — BUG-043 regression: clean error banner (no raw erro
       {
         data: undefined,
         fetching: false,
-        error: { message: '[Network] Failed to fetch' },
+        error: { message: '[Network] Failed to fetch', networkError: new Error('Failed to fetch') },
       },
     ]);
     renderKG();
@@ -414,5 +414,110 @@ describe('KnowledgeGraph — BUG-043 regression: clean error banner (no raw erro
     // The button text must be "Retry", not the raw key "retry"
     expect(retryBtn.textContent?.trim()).toBe('Retry');
     expect(retryBtn.textContent).not.toBe('retry');
+  });
+});
+
+// ─── BUG-096 regression: error banner must show context-specific messages ────
+// Problem: the error banner always showed "שרת לא נגיש" (server not accessible)
+// even when the actual error was an auth error or a GraphQL validation error.
+// Additionally, mock data was shown in production on error, which is misleading.
+// Fix: classifyGraphError() categorises errors into network/auth/graphql, and
+// the banner shows the appropriate i18n message for each category.
+describe('KnowledgeGraph — BUG-096 regression: context-specific error messages', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('BUG-096: shows "Authentication required" for auth errors', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: {
+          message: 'Authentication required',
+          graphQLErrors: [
+            { message: 'Authentication required', extensions: { code: 'UNAUTHENTICATED' } },
+          ],
+        },
+      },
+    ]);
+    renderKG();
+    const msg = screen.getByTestId('graph-error-message');
+    expect(msg.textContent).toContain('Authentication required');
+    expect(msg.textContent).not.toContain('Server unavailable');
+  });
+
+  it('BUG-096: shows "Failed to load graph" for generic GraphQL errors', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: {
+          message: 'Some GraphQL error',
+          graphQLErrors: [
+            { message: 'Some GraphQL error', extensions: {} },
+          ],
+        },
+      },
+    ]);
+    renderKG();
+    const msg = screen.getByTestId('graph-error-message');
+    expect(msg.textContent).toContain('Failed to load graph');
+  });
+
+  it('BUG-096: shows "Server unavailable" for network errors', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: {
+          message: '[Network] Failed to fetch',
+          networkError: new Error('Failed to fetch'),
+        },
+      },
+    ]);
+    renderKG();
+    const msg = screen.getByTestId('graph-error-message');
+    expect(msg.textContent).toContain('Server unavailable');
+  });
+
+  it('BUG-096: does NOT show mock data nodes when there is an error in production', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: {
+          message: '[Network] Failed to fetch',
+          networkError: new Error('Failed to fetch'),
+        },
+      },
+    ]);
+    renderKG();
+    // Mock graph would show "Free Will" — it should NOT appear on error
+    const freeWill = screen.queryByText('Free Will');
+    expect(freeWill).toBeNull();
+  });
+
+  it('BUG-096: banner never shows the Hebrew mock-data text "נתוני ריצוי"', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: {
+          message: '[Network] Failed to fetch',
+          networkError: new Error('Failed to fetch'),
+        },
+      },
+    ]);
+    renderKG();
+    const banner = screen.getByTestId('graph-error-banner');
+    // The old message said "showing backup data" — now it says "check your connection"
+    expect(banner.textContent).not.toContain('backup data');
+    expect(banner.textContent).not.toContain('showing');
   });
 });

@@ -60,7 +60,13 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
             data-testid="graph-error-banner"
             className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded px-3 py-2"
           >
-            <span data-testid="graph-error-message">{t('networkUnavailable')}</span>
+            <span data-testid="graph-error-message">
+              {graph.errorKind === 'auth'
+                ? t('authRequired')
+                : graph.errorKind === 'graphql'
+                  ? t('loadError')
+                  : t('networkUnavailable')}
+            </span>
             <button
               onClick={graph.handleRefresh}
               data-testid="graph-error-retry"

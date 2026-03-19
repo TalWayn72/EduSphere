@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useQuery } from 'urql';
+import type { CombinedError } from 'urql';
 import {
   mockGraphData,
   type GraphNode,
@@ -14,6 +15,36 @@ import {
 } from '@/lib/graphql/knowledge.queries';
 import { DEV_MODE } from '@/lib/auth';
 import type { ApiConcept, ApiRelatedConcept, ApiConceptNode } from './types';
+
+/** Empty graph returned when real data is unavailable in production. */
+const EMPTY_GRAPH: { nodes: GraphNode[]; edges: GraphEdge[] } = { nodes: [], edges: [] };
+
+/**
+ * Classify a urql CombinedError into a category so the UI can show
+ * an appropriate message instead of the generic "server not accessible".
+ */
+export type GraphErrorKind = 'network' | 'auth' | 'graphql' | null;
+
+const AUTH_PATTERNS = [
+  'unauthorized',
+  'unauthenticated',
+  'authentication required',
+  'forbidden',
+];
+
+export function classifyGraphError(error: CombinedError | undefined): GraphErrorKind {
+  if (!error) return null;
+  if (error.networkError) return 'network';
+  const msg = error.message?.toLowerCase() ?? '';
+  if (AUTH_PATTERNS.some((p) => msg.includes(p))) return 'auth';
+  const hasAuthCode = error.graphQLErrors?.some((e) => {
+    const code = String((e.extensions as Record<string, unknown>)?.code ?? '').toUpperCase();
+    return code === 'UNAUTHENTICATED' || code === 'UNAUTHORIZED' || code === 'FORBIDDEN';
+  });
+  if (hasAuthCode) return 'auth';
+  if (error.graphQLErrors?.length) return 'graphql';
+  return 'network';
+}
 
 export function useGraphData() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -57,14 +88,34 @@ export function useGraphData() {
     pause: DEV_MODE || !selectedNodeName,
   } as Parameters<typeof useQuery>[0]);
 
-  // ── Build graph from real API data or fall back to mock ──
+  // BUG-096: Classify the error so the UI can show context-specific messages
+  // instead of the misleading "server not accessible" for auth/GraphQL errors.
+  const errorKind = classifyGraphError(conceptsResult.error);
+
+  // ── Build graph from real API data ──
+  // DEV_MODE: always show mock data (no real backend).
+  // Production with error: show EMPTY graph (not mock data!) so the UI
+  // clearly indicates "no data" rather than showing fake nodes.
+  // Production with empty result: show mock data as demo/placeholder.
   const graphData = useMemo((): { nodes: GraphNode[]; edges: GraphEdge[] } => {
-    if (
-      DEV_MODE ||
-      conceptsResult.error ||
-      !conceptsResult.data?.concepts?.length
-    ) {
+    if (DEV_MODE) {
       return mockGraphData;
+    }
+
+    // BUG-096: On error, return empty graph instead of mock data.
+    // Mock data in production is misleading — it makes the user think
+    // the graph is real when it's not.
+    if (conceptsResult.error) {
+      return EMPTY_GRAPH;
+    }
+
+    // Still loading or no data yet — show empty graph (loading spinner visible)
+    if (!conceptsResult.data?.concepts?.length) {
+      // If the query finished (not fetching) but returned empty, show mock as demo
+      if (!conceptsResult.fetching) {
+        return mockGraphData;
+      }
+      return EMPTY_GRAPH;
     }
 
     const apiConcepts = conceptsResult.data.concepts;
@@ -89,6 +140,7 @@ export function useGraphData() {
   }, [
     conceptsResult.data,
     conceptsResult.error,
+    conceptsResult.fetching,
     relatedResult.data,
     selectedId,
   ]);
@@ -162,6 +214,7 @@ export function useGraphData() {
     setTypeFilter,
     toast,
     isLoading,
+    errorKind,
     conceptsResult,
     relatedResult,
     relatedByNameResult,
