@@ -81,7 +81,7 @@
 
 ## BUG-093 — AI Course Generation Fails (Direct Ollama API Fix) (19 Mar 2026)
 
-- **Status:** ✅ Fixed — `629de946`
+- **Status:** ✅ Fixed — `629de946`, `ce008cb0`, `28322d73`
 - **Severity:** 🔴 Critical — AI course creation completely broken
 - **Symptom:** Spinner hangs forever, then times out. Error: "Unsupported model version v3/v1"
 - **Root Cause Chain:**
@@ -90,13 +90,22 @@
   3. `compatibility: 'compatible'` option ignored by v3.0.30
   4. Backend timeout was 5 min, too short for CPU Ollama (needs 2-5 min)
   5. Zod schema required `contentItemTitles` but LLM sometimes omits or renames it
-- **Fix (3 rounds):**
+  6. LLM also omits `description` fields — Zod `.string()` without `.default('')` fails
+- **Discovery (3 Waves):**
+  - W1: `createOpenAI`-for-Ollama pattern — fixed, no remaining instances
+  - W2: 34 AI files + 16 workflow files checked — no replicated BUG-093 patterns
+  - W3: 2 fragile Zod schemas found (roleplay + assessment) — fixed in R4
+- **Fix (4 rounds):**
   - R1: Bypass `@ai-sdk/openai` entirely — direct Ollama HTTP API (`/api/chat` + `format: "json"`)
   - R2: Increase timeout 5→15 min, `contentItemTitles` default to `[]`, field name normalization
   - R3: `LanguageModelV1` → `LanguageModel` in 6 files (AI SDK v5 rename)
-- **Visual E2E:** `scripts/debug/bug093-visual-test.cjs` — course "Colors" generated in 156s
-- **ProgressStatus (FEAT-090):** Confirmed rendering with cycling messages in both inline + block variants
-- **Anti-recurrence:** Direct HTTP API avoids SDK version coupling; Zod `.default([])` handles missing fields
+  - R4: `.default('')` for `description` fields in CourseSchema + Wave 3 fixes:
+    - `roleplay.workflow.ts`: `strengths`/`areasForImprovement` → `.default([])`
+    - `assessmentWorkflow.ts`: `strengths`/`weaknesses`/`recommendations` → `.default([])`
+- **Tests:** 5 service tests + 79 workflow tests — all GREEN
+- **Visual E2E:** `scripts/debug/bug093-visual-test.cjs` — course "Colors" generated in 156s (2 successful runs)
+- **ProgressStatus (FEAT-090):** Confirmed rendering with cycling messages ("Analyzing topic...", "Creating modules...")
+- **Anti-recurrence:** Direct HTTP API avoids SDK version coupling; Zod `.default([])`/`.default('')` handles missing fields across all LLM schemas
 
 ---
 

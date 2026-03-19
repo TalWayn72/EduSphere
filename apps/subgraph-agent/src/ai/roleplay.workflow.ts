@@ -28,8 +28,8 @@ export const EvaluationSchema = z.object({
   criteriaScores: z.array(
     z.object({ name: z.string(), score: z.number(), feedback: z.string() })
   ),
-  strengths: z.array(z.string()),
-  areasForImprovement: z.array(z.string()),
+  strengths: z.array(z.string()).default([]),
+  areasForImprovement: z.array(z.string()).default([]),
   summary: z.string(),
 });
 

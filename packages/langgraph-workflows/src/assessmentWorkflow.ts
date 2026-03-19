@@ -5,9 +5,9 @@ import { z } from 'zod';
 import { injectLocale } from './locale-prompt';
 
 const AssessmentResultSchema = z.object({
-  strengths: z.array(z.string()),
-  weaknesses: z.array(z.string()),
-  recommendations: z.array(z.string()),
+  strengths: z.array(z.string()).default([]),
+  weaknesses: z.array(z.string()).default([]),
+  recommendations: z.array(z.string()).default([]),
   overallScore: z.number().min(0).max(100),
 });
 
