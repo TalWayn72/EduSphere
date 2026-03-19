@@ -118,7 +118,7 @@ describe('DashboardPage', () => {
     const levelBadge = screen.getByTestId('xp-level-badge');
     expect(levelBadge).toBeInTheDocument();
     // DEV_MODE=true + no real stats → level defaults to 1
-    expect(levelBadge).toHaveTextContent('Lv. 1');
+    expect(levelBadge).toHaveTextContent('Level 1');
   });
 
   it('does not use hardcoded MOCK_XP value of 2340', () => {

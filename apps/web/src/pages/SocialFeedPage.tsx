@@ -125,8 +125,9 @@ export function SocialFeedPage() {
                   <li key={rec.contentItemId} className="py-3">
                     <p className="text-sm font-medium">{rec.contentTitle}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {rec.followersCount} follower
-                      {rec.followersCount !== 1 ? 's' : ''} completed this
+                      {rec.followersCount}{' '}
+                      {rec.followersCount !== 1 ? t('followers') : t('follower')}{' '}
+                      {t('completedThis')}
                     </p>
                   </li>
                 ))}

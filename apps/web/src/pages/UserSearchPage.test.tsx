@@ -109,6 +109,6 @@ describe('UserSearchPage', () => {
 
   it('renders page heading', () => {
     renderPage();
-    expect(screen.getByText('Find People')).toBeInTheDocument();
+    expect(screen.getByText('Find People to Follow')).toBeInTheDocument();
   });
 });

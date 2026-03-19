@@ -42,6 +42,7 @@ interface TeamQueryData {
 
 export function ManagerDashboardPage() {
   const { t } = useTranslation('admin');
+  const { t: tGamification } = useTranslation('gamification');
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -167,7 +168,7 @@ export function ManagerDashboardPage() {
                     <td className="p-4 text-sm">{m.coursesEnrolled}</td>
                     <td className="p-4 text-sm">{m.avgCompletionPct}%</td>
                     <td className="p-4">
-                      <Badge variant="outline">Lv. {m.level}</Badge>
+                      <Badge variant="outline">{tGamification('level')} {m.level}</Badge>
                     </td>
                     <td className="p-4 text-sm font-semibold text-indigo-600">
                       {m.totalXp.toLocaleString()}

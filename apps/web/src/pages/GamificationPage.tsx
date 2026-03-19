@@ -205,7 +205,7 @@ export function GamificationPage() {
                         {entry.displayName}
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline">Lv. {entry.level}</Badge>
+                        <Badge variant="outline">{t('level')} {entry.level}</Badge>
                       </td>
                       <td className="p-4 text-right text-sm font-semibold text-indigo-600">
                         {entry.totalXp.toLocaleString()}

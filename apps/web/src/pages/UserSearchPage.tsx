@@ -5,6 +5,7 @@
  */
 import React, { useState } from 'react';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,7 @@ function getInitials(name: string): string {
 }
 
 export function UserSearchPage() {
+  const { t } = useTranslation('social');
   const [query, setQuery] = useState('');
 
   const [{ data, fetching }] = useQuery<SearchUsersData>({
@@ -54,7 +56,7 @@ export function UserSearchPage() {
       <PageShell size="sm" className="py-10">
         <div className="flex items-center gap-3">
           <Users className="h-7 w-7 text-primary" aria-hidden="true" />
-          <h1 className="text-2xl font-bold">Find People</h1>
+          <h1 className="text-2xl font-bold">{t('findPeopleToFollow')}</h1>
         </div>
 
         <Input
@@ -104,7 +106,7 @@ export function UserSearchPage() {
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {user.followersCount} followers
+                        {user.followersCount} {t('followers')}
                       </p>
                     </div>
                     <FollowButton

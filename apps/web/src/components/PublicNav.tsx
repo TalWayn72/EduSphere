@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ interface PublicNavProps {
 }
 
 export function PublicNav({ variant = 'full' }: PublicNavProps) {
+  const { t } = useTranslation('auth');
   const [menuOpen, setMenuOpen] = useState(false);
   const isFull = variant === 'full';
   const { pathname } = useLocation();
@@ -42,7 +44,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
 
         <div className="hidden md:flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild className="text-gray-700 dark:text-white">
-            <Link to="/login">Log In</Link>
+            <Link to="/login">{t('logIn')}</Link>
           </Button>
           {isFull && (
             <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white" asChild>
@@ -73,7 +75,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
           )}
           <div className="flex gap-3 pt-2">
             <Button variant="outline" size="sm" asChild className="flex-1">
-              <Link to="/login">Log In</Link>
+              <Link to="/login">{t('logIn')}</Link>
             </Button>
             {isFull && (
               <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white" asChild>

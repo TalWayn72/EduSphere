@@ -190,8 +190,8 @@ describe('GamificationPage', () => {
 
   it('renders level badges in leaderboard', () => {
     renderPage();
-    expect(screen.getByText('Lv. 3')).toBeDefined();
-    expect(screen.getByText('Lv. 2')).toBeDefined();
+    expect(screen.getByText('Level 3')).toBeDefined();
+    expect(screen.getByText('Level 2')).toBeDefined();
   });
 
   it('does NOT show raw error messages or stack traces', () => {

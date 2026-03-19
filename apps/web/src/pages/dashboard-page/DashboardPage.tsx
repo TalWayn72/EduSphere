@@ -18,6 +18,7 @@ import { useDashboardData } from './useDashboardData';
 export function DashboardPage() {
   const { t } = useTranslation('dashboard');
   const { t: tCommon } = useTranslation('common');
+  const { t: tGamification } = useTranslation('gamification');
 
   const {
     displayName,
@@ -120,7 +121,7 @@ export function DashboardPage() {
                   data-testid="xp-level-badge"
                   aria-label={`Level ${level}`}
                 >
-                  {`Lv. ${level}`}
+                  {`${tGamification('level')} ${level}`}
                 </span>
               </div>
             </div>
