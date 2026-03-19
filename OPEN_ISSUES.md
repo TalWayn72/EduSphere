@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 18 מרץ 2026
+**תאריך עדכון:** 19 מרץ 2026
 
 ---
 
@@ -73,14 +73,14 @@
 | BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback | ✅ Fixed | (pending commit) |
 | FEAT-090 | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s | ✅ Implemented | (pending commit) |
 | BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
-| BUG-092 | AI consent save fails — consent.resolver.js missing from Docker container dist/ | ✅ Fixed | (pending commit) |
+| BUG-092 | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch) | ✅ Fixed (2 rounds) | (pending commit) |
 
 ---
 
-## BUG-092 — AI Consent Save Fails: Missing Compiled Files in Docker Container (19 Mar 2026)
+## BUG-092 — AI Consent Save Fails + Course Generation Spec Mismatch (19 Mar 2026)
 
-- **Status:** ✅ Fixed
-- **Severity:** 🔴 Critical (AI course creation entirely blocked — consent toggle shows "שמירת ההסכמה לשרת נכשלה")
+- **Status:** ✅ Fixed (2 rounds)
+- **Severity:** 🔴 Critical (AI course creation entirely blocked — consent toggle shows "שמירת ההסכמה לשרת נכשלה", then course generation crashes with spec v3 mismatch)
 - **Reporter:** User (consent toggle error toast at `/settings?returnTo=%2Fcourses%2Fnew`)
 
 ### Symptom
@@ -114,17 +114,84 @@ Toggling AI Processing consent in Settings page shows error toast "שמירת ה
 | `apps/web/e2e/consent-requirement-link.spec.ts` | 1 | BUG-092 regression: consent save shows success toast, no error toast |
 | `tests/security/consent-management.spec.ts` | 4 | BUG-092: ConsentModule imported, consent.module.ts exists, Dockerfile clears dist/, nest-cli assets include .graphql |
 
-### Discovery List (Wave 1-3)
+### Discovery List — Round 1 (Waves 1-3)
 
 - **Wave 1 (exact match):** `consent.resolver.js` missing from container `/app/apps/subgraph-core/dist/consent/`
 - **Wave 2 (similarity):** `app.module.js` also stale — missing `ConsentModule` and `WhatsAppModule` imports
 - **Wave 3 (class of bug):** All 6 subgraph `dist/` directories could have same stale cache issue — Dockerfile now clears all of them
 
+### Fix (Round 2) — @ai-sdk/openai v3 spec mismatch
+
+**Root Cause:** `@ai-sdk/openai@3.0.30` (provider spec v3) is incompatible with `ai@5.0.137` (provider spec v2). The agent subgraph imported `createOpenAI` from `@ai-sdk/openai`, but spec v3 models fail at runtime with AI SDK v5's `generateObject()`.
+
+**Solution:** Pinned `@ai-sdk/openai` to `~2.0.0` in `apps/subgraph-agent/package.json`, which uses provider spec v2 matching `ai@5.x`. Ran `pnpm install` to downgrade from 3.0.30 to 2.0.x.
+
+| File | Change |
+|------|--------|
+| `apps/subgraph-agent/package.json` | Changed `@ai-sdk/openai` from `^3.0.30` to `~2.0.0` (spec v2, compatible with ai@5.x) |
+
+**Verification:** Course "Introduction to Basic Mathematics for Beginners" generated successfully — 4+ modules with lessons, polled to COMPLETED status.
+
+### Discovery List — Round 2 (Waves 1-3)
+
+**Wave 1 — Exact match (`@ai-sdk/openai@^3.0.30` paired with `ai@^5.0.0`):**
+
+| # | File | `@ai-sdk/openai` | `ai` | Status |
+|---|------|-------------------|------|--------|
+| 1 | `apps/subgraph-agent/package.json` | `~2.0.0` | `^5.0.0` | ✅ Fixed in Round 2 |
+| 2 | `packages/langgraph-workflows/package.json` | `^3.0.30` | `^5.0.0` | **AFFECTED** — same spec v3 mismatch, will crash at runtime |
+| 3 | `apps/subgraph-content/package.json` | `^3.0.30` | `^5.0.0` | **AFFECTED** — same spec v3 mismatch (alt-text-generator) |
+| 4 | `apps/transcription-worker/package.json` | `^3.0.30` | `^5.0.0` | **AFFECTED** — same spec v3 mismatch (concept-extractor) |
+
+**Wave 2 — Similarity (other AI SDK version patterns):**
+
+| # | File | `@ai-sdk/openai` | `ai` | Status |
+|---|------|-------------------|------|--------|
+| 5 | `packages/rag/package.json` | `^1.0.0` | `^4.0.38` | OK — v1.x is spec v2, ai v4 is compatible |
+| 6 | `apps/subgraph-collaboration/package.json` | `^1.3.22` | `^5.0.0` | OK — v1.x is spec v2, compatible with ai v5 |
+
+`ollama-ai-provider@^1.2.0` (spec v1, incompatible with `ai@5` `generateObject`) still present in 4 packages:
+- `apps/subgraph-agent/package.json`
+- `apps/subgraph-collaboration/package.json`
+- `apps/subgraph-content/package.json`
+- `apps/transcription-worker/package.json`
+
+8 source files still import `createOllama` from `ollama-ai-provider`:
+- `apps/subgraph-agent/src/ai/ai-legacy-runner.service.ts`
+- `apps/subgraph-agent/src/ai/roleplay.workflow.ts`
+- `apps/subgraph-agent/src/ai/local-inference.service.ts`
+- `apps/subgraph-agent/src/agent/lesson-pipeline.resolver.ts`
+- `apps/subgraph-agent/src/ai/auto-grading.service.ts`
+- `apps/subgraph-collaboration/src/discussion/discussion-insights.service.ts`
+- `apps/subgraph-content/src/media/alt-text-generator.service.ts`
+- `apps/transcription-worker/src/knowledge/concept-extractor.ts`
+
+**Wave 3 — Class of bug (provider spec version mismatch pattern):**
+
+The root cause is a **provider spec version mismatch** — `@ai-sdk/openai` v3.x uses spec v3 but `ai@5.x` expects spec v2. Three packages besides subgraph-agent still have this mismatch:
+
+1. `packages/langgraph-workflows` — 12 workflow files (`tutorWorkflow.ts`, `summarizationWorkflow.ts`, `structuredNotesWorkflow.ts`, `quizWorkflow.ts`, `qaWorkflow.ts`, `lessonIngestionWorkflow.ts`, `hebrewNERWorkflow.ts`, `diagramGeneratorWorkflow.ts`, `debateWorkflow.ts`, `contentCleaningWorkflow.ts`, `citationVerifierWorkflow.ts`, `assessmentWorkflow.ts`) all import `openai` from `@ai-sdk/openai`
+2. `apps/subgraph-content` — `alt-text-generator.service.ts` uses `createOpenAI` from `@ai-sdk/openai`
+3. `apps/transcription-worker` — `concept-extractor.ts` uses `createOpenAI` from `@ai-sdk/openai`
+
+Additionally, `ollama-ai-provider@1.2.0` (spec v1) is deprecated and documented in `docs/reference/STACK_CAPABILITIES_UPGRADE_PLAN.md` as requiring replacement.
+
+**Remaining items (documented for future fix — not in scope for BUG-092 Round 2):**
+- [ ] Pin `@ai-sdk/openai` to `~2.0.0` in `packages/langgraph-workflows/package.json` (currently `^3.0.30`)
+- [ ] Pin `@ai-sdk/openai` to `~2.0.0` in `apps/subgraph-content/package.json` (currently `^3.0.30`)
+- [ ] Pin `@ai-sdk/openai` to `~2.0.0` in `apps/transcription-worker/package.json` (currently `^3.0.30`)
+- [ ] Replace all 8 `ollama-ai-provider` `createOllama` usages with `createOpenAI({ baseURL: ollamaUrl + '/v1' })` pattern (as done in `course-generator.workflow.ts`)
+- [ ] Remove `ollama-ai-provider` dependency from all 4 package.json files after migration
+
 ### Anti-Recurrence
 
-- Dockerfile `rm -rf` line ensures every Docker build starts with clean `dist/` across all subgraphs
-- Security test verifies `ConsentModule` is imported by `app.module.ts`
-- E2E test verifies consent mutation succeeds through gateway (no error toast)
+- Dockerfile `rm -rf` line ensures every Docker build starts with clean `dist/` across all subgraphs (Round 1)
+- Security test verifies `ConsentModule` is imported by `app.module.ts` (Round 1)
+- E2E test verifies consent mutation succeeds through gateway (no error toast) (Round 1)
+- `@ai-sdk/openai` pinned to `~2.0.0` in subgraph-agent — tilde range prevents accidental major bump to spec v3 (Round 2)
+- End-to-end course generation verified with real Ollama model through gateway (Round 2)
+- E2E test `apps/web/e2e/ai-course-generation-flow.spec.ts` covers full consent-to-generation flow (Round 2)
+- **Future guard:** Remaining 3 packages with `^3.0.30` must be pinned before any `pnpm install` resolves them to v3.x
 
 ---
 

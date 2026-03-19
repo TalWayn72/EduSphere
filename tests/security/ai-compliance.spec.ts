@@ -85,3 +85,15 @@ describe('EU AI Act: PII Scrubbing', () => {
     ).toBe(true);
   });
 });
+
+describe('BUG-092R2: AI SDK Version Compatibility', () => {
+  it('@ai-sdk/openai version compatible with ai SDK (spec v2 match)', () => {
+    const pkg = read('apps/subgraph-agent/package.json');
+    const parsed = JSON.parse(pkg);
+    const openaiDep = parsed.dependencies['@ai-sdk/openai'] || '';
+    // v2.x = spec v2 (compatible with ai@5.0.x)
+    // v3.x = spec v3 (requires ai@5.1.x+) — MUST NOT be used
+    expect(openaiDep).not.toMatch(/\^3\./);
+    expect(openaiDep).not.toMatch(/\^4\./);
+  });
+});

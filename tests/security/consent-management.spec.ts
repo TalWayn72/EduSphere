@@ -189,4 +189,15 @@ describe('BUG-092: Consent module included in subgraph-core build', () => {
     const nestCli = readFile('apps/subgraph-core/nest-cli.json');
     expect(nestCli).toContain('*.graphql');
   });
+
+  it('BUG-092R2: subgraph-agent @ai-sdk/openai version is compatible with ai SDK v5 (spec v2)', () => {
+    const pkg = readFile('apps/subgraph-agent/package.json');
+    const parsed = JSON.parse(pkg);
+    const openaiVersion = parsed.dependencies['@ai-sdk/openai'];
+    // Must be ~2.x (spec v2) — NOT ^3.x (spec v3, incompatible with ai@5.0.x)
+    expect(openaiVersion).toMatch(/^[~^]?2\./);
+    // ai SDK must be v5.x
+    const aiVersion = parsed.dependencies['ai'];
+    expect(aiVersion).toMatch(/\^5\./);
+  });
 });
