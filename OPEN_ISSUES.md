@@ -77,60 +77,115 @@
 | BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
 | BUG-094 | Consent save fails — consent resolver missing from Docker container dist | ✅ Fixed | (pending commit) |
 | BUG-095 | AI course creation fails end-to-end — no course created, redirects to /courses | ✅ Fixed | (pending commit) |
+| BUG-096 | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring) | ✅ Fixed | (pending commit) |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 
 ---
 
 ## BUG-095 — AI Course Creation Fails End-to-End (19 Mar 2026)
 
-- **Status:** ✅ Fixed
+- **Status:** ✅ Fixed (2 sessions)
 - **Severity:** P1 (core AI feature completely broken)
 - **Reporter:** User observation: "spinner runs 3 rounds of identical messages, then redirects to /courses with no new course"
 
-### Root Cause Chain (3 issues)
+### Root Cause Chain (4 issues — final session)
 
-1. **Backend: llama3.2 (3.2B) too slow for CPU-only containers** — Structured JSON generation with llama3.2 takes 5+ minutes on CPU, causing Node.js fetch to timeout. The error was caught as "LLM service unavailable" because the timeout error message matched the connection-error pattern.
-2. **Frontend: no polling fallback** — The frontend relied solely on WebSocket subscriptions for completion notification. The Hive Gateway terminates the gateway-to-subgraph SSE connection after ~60 seconds, killing the subscription. With no fallback, the frontend never learns the generation result.
-3. **Frontend: createCourse mutation missing required fields** — The `handleCreateDraft` function didn't include `slug` and `instructorId` in the `CreateCourseInput`, causing a GraphQL validation error when creating the draft course.
+1. **Backend: Zod `.max(8)` on modules array** — LLM generated >8 modules, `CourseSchema.parse()` rejected with `too_big` error. Raw Zod JSON error was propagated to frontend as `outline_generation failed: [{"code":"too_big",...}]`.
+2. **Frontend: useQuery polling returned stale cached data** — `executePoll({ requestPolicy: 'network-only' })` via urql `useQuery` hook returned stale cache despite network-only flag. The FAILED status was never detected by polling.
+3. **Frontend: Raw Zod JSON shown to user** — Error display showed the full Zod validation JSON instead of a user-friendly message.
+4. **Frontend: RequirementLink hardcoded `returnTo="/courses/new"`** — When modal opened from `/courses` list page, consent redirect returned to wrong page.
 
-### Discovery (3 Waves)
+### Discovery (3 Waves — Session 2)
 
-- **Wave 1:** Traced full flow: mutation → gateway → agent subgraph → Ollama. Confirmed from logs: subscription aborted at 58.6s, Ollama call failed at 5min with "LLM service unavailable".
-- **Wave 2:** Checked all related files: AiCourseCreatorModal.tsx, course-generator.workflow.ts, course-generator.service.ts, agent.resolver.ts, urql-client.ts, gateway.config.ts, execution-pubsub.provider.ts, content.queries.ts, course.graphql
-- **Wave 3:** Verified qwen2.5:0.5b available in container (0.5B, ~120s on CPU vs 5+ min for llama3.2). Confirmed polling query `AGENT_EXECUTION_QUERY` already existed but was unused.
+- **Wave 1 (exact):** Diagnostic E2E captured: `GenerateCourseFromPrompt` returned `RUNNING`, 10 polls all returned `RUNNING`, then at ~60s the error `outline_generation failed: [{"code":"too_big"}]` appeared in `.text-destructive`.
+- **Wave 2 (similarity):** Checked `RequirementLink` usage — hardcoded `returnTo="/courses/new"` in 2 places in modal. `AiCourseCreatorModal` imported from `CourseListPage.tsx` AND `CourseCreatePage.tsx` — both need dynamic returnTo.
+- **Wave 3 (class-of-bug):** All `useQuery` + `executePoll` patterns across codebase (70+ usages). The modal's polling was the only one using `useQuery` for periodic re-fetching — all others use it for one-shot or mutation-triggered refetch.
 
-### Fix Rounds
+### Fix Rounds (Session 2)
 
-**Round 1 (Backend):**
-- Auto-select smallest available Ollama model via `/api/tags` (prefers qwen2.5:0.5b)
-- Added 10-minute AbortSignal to Ollama fetch call
-- Improved error categorization for timeout vs connection errors
+**Round 1 (Backend — Zod schema):**
+- Increased `CourseSchema.modules.max(8)` → `.max(20)` and `.min(2)` → `.min(1)`
+- Increased `contentItemTitles.max(6)` → `.max(10)`
 - File: `apps/subgraph-agent/src/ai/course-generator.workflow.ts`
 
-**Round 2 (Frontend):**
-- Added polling fallback using `AGENT_EXECUTION_QUERY` (5s interval, starts after initial 5s delay)
-- `resultHandledRef` prevents double-handling from subscription + poll race
-- Proper cleanup on unmount and modal close
+**Round 2 (Frontend — Polling mechanism):**
+- Replaced `useQuery` + `executePoll()` with direct `urqlClient.query()` inside `setInterval`
+- Direct client query bypasses urql hook cache entirely
+- Added 5-minute hard timeout with user-friendly error message
 - File: `apps/web/src/components/AiCourseCreatorModal.tsx`
 
-**Round 3 (Frontend):**
-- Fixed `handleCreateDraft` to include `slug` (from title) and `instructorId` (from getCurrentUser)
+**Round 3 (Frontend — Error visibility):**
+- Added `formatError()` that detects raw Zod JSON and returns i18n error message
+- Added retry button (RotateCw icon) on error display
+- Added `console.error` logging at every failure path with `[AiCourseCreatorModal]` prefix
+- File: `apps/web/src/components/AiCourseCreatorModal.tsx`
+
+**Round 4 (Frontend — returnTo fix):**
+- Replaced hardcoded `returnTo="/courses/new"` with `useLocation().pathname`
+- Works correctly from both `/courses` and `/courses/new`
 - File: `apps/web/src/components/AiCourseCreatorModal.tsx`
 
 ### Tests
 
 | File | Tests | Purpose |
 |------|-------|---------|
-| `apps/web/src/components/AiCourseCreatorModal.test.tsx` | 15 | All existing tests pass + useQuery mock added |
-| `apps/subgraph-agent/src/ai/course-generator.service.spec.ts` | 5 | Service tests pass with workflow mock |
-| `scripts/debug/bug095-e2e.cjs` | E2E | Full flow: login → consent → generate → create draft → redirect |
+| `apps/web/src/components/AiCourseCreatorModal.test.tsx` | 16 | All pass — removed useQuery mock, added urqlClient mock, added retry test |
+| `apps/subgraph-agent/src/ai/course-generator.service.spec.ts` | 5 | Service tests pass |
+| `scripts/debug/bug095-deep-e2e.cjs` | E2E | Full flow: Keycloak login → /courses → AI modal → generate → outline → create draft → redirect |
 
-### E2E Result
+### E2E Result (Session 2 — final verification)
 
-- Course title: "Introduction to Colors"
-- Course ID: `f4103226-2ec6-4015-a437-ed42ec21dd6e`
-- Generation time: ~45 seconds (vs 5+ minute timeout before)
-- Redirected to: `/courses/f4103226-2ec6-4015-a437-ed42ec21dd6e`
+- Course title: "Color Theory"
+- Course ID: `9df04908-3ac9-4349-834c-46fd03add80d`
+- Generation time: ~70 seconds
+- CreateCourse mutation: 1 successful call
+- Redirected to: `/courses/9df04908-3ac9-4349-834c-46fd03add80d`
+- All 6 subgraphs RUNNING, all 5 users authenticate OK
+
+---
+
+## BUG-096 — Knowledge Graph "שרת לא נגיש" Error Banner Shows on All Errors (19 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium
+- **Recurring:** Yes — same symptom as BUG-039, BUG-050 (different root cause each time)
+- **Route:** `/knowledge-graph`
+
+### Symptom
+
+Pink error banner "שרת לא נגיש — מציג נתוני ריצוי" (Server not accessible — showing backup data) appears even when the server IS accessible. Mock data (fake Jewish philosophy concepts) displayed instead of real data.
+
+### Root Cause Chain
+
+1. `apps/web/src/pages/knowledge-graph/use-graph-data.ts` treated ALL urql `CombinedError` types identically — network, auth, and GraphQL errors all triggered the same "server unavailable" banner
+2. On ANY error, the hook returned `mockGraphData` (hardcoded fake data) instead of empty graph — misleading users into thinking they see real data
+3. i18n message `networkUnavailable` said "showing backup data" when it was actually fake mock data
+
+### Discovery (3 Waves)
+
+- **Wave 1 (exact):** `use-graph-data.ts` — single error handler for all error types
+- **Wave 2 (similarity):** `useCourseDetailQueries.ts:94-96`, `useCourseListData.ts:165` — similar mock-on-error fallback patterns (deferred to follow-up)
+- **Wave 3 (class-of-bug):** All urql error handling across app — most pages use toast notifications correctly; KG page was unique in using mock data fallback
+
+### Fix Rounds
+
+| Round | File | Change |
+|-------|------|--------|
+| R1 | `apps/web/src/pages/knowledge-graph/use-graph-data.ts` | Added `classifyGraphError()` → categorizes errors as `network`/`auth`/`graphql`. Returns `EMPTY_GRAPH` on error (not mock data). Exports `errorKind` |
+| R1 | `apps/web/src/pages/knowledge-graph/KnowledgeGraph.tsx` | Banner shows context-specific message per error type (auth → "Authentication required", graphql → "Failed to load graph", network → "Server unavailable") |
+| R2 | `packages/i18n/src/locales/{en,he,es,fr,pt,ru,zh-CN,hi,bn,id}/knowledge.json` | Added `authRequired` key in 10 languages. Fixed `networkUnavailable` to say "check your connection" (not "showing backup data") |
+
+### Tests
+
+| File | Count | Coverage |
+|------|-------|----------|
+| `apps/web/src/pages/knowledge-graph/classify-graph-error.test.ts` | 11 | Unit tests for classifyGraphError covering all error types |
+| `apps/web/src/pages/KnowledgeGraph.test.tsx` | 5 new | Auth/graphql/network error messages, no mock nodes on error, no "backup data" text |
+| **Total** | **78/78 pass** | All knowledge-graph test files |
+
+### Anti-recurrence
+
+`classify-graph-error.test.ts` ensures error classification works correctly; `KnowledgeGraph.test.tsx` BUG-096 tests verify each error type shows the correct banner message and no mock data appears.
 
 ---
 

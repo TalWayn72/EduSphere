@@ -24,6 +24,8 @@ import { ollamaConfig } from '@edusphere/config';
 
 // ── Zod schema for the AI-generated course outline ────────────────────────────
 
+/** BUG-095: Max modules increased to 20 to avoid Zod rejection of verbose LLMs.
+ *  The UI can display any number; truncation is no longer needed. */
 export const CourseSchema = z.object({
   title: z.string().max(200),
   description: z.string().max(1000).default(''),
@@ -35,11 +37,11 @@ export const CourseSchema = z.object({
         description: z.string().max(500).default(''),
         // Default to empty array — LLMs sometimes omit this field or use
         // alternative names (content_items, lessons, topics).
-        contentItemTitles: z.array(z.string().max(200)).max(6).default([]),
+        contentItemTitles: z.array(z.string().max(200)).max(10).default([]),
       })
     )
-    .min(2)
-    .max(8),
+    .min(1)
+    .max(20),
 });
 
 export type GeneratedCourse = z.infer<typeof CourseSchema>;

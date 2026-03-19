@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useSubscription, useQuery } from 'urql';
-import { useNavigate } from 'react-router-dom';
+import { useMutation, useSubscription } from 'urql';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Sparkles,
   X,
   CheckCircle2,
   AlertTriangle,
+  RotateCw,
 } from 'lucide-react';
 import { ProgressStatus } from '@/components/ProgressStatus';
 import { AI_COURSE_GENERATION_MESSAGES } from '@/lib/progress-messages';
@@ -27,6 +28,7 @@ import {
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 import { RequirementLink } from '@/components/RequirementLink';
 import { getCurrentUser } from '@/lib/auth';
+import { urqlClient } from '@/lib/urql-client';
 
 interface GeneratedModule {
   title: string;
@@ -70,8 +72,10 @@ export interface AiCourseCreatorModalProps {
   onClose: () => void;
 }
 
-/** BUG-095: Polling interval — fallback when WebSocket subscription dies. */
+/** BUG-095: Polling interval for fallback when WebSocket subscription dies. */
 const POLL_INTERVAL_MS = 5000;
+/** BUG-095: Hard timeout — stop polling and show error after 5 minutes. */
+const HARD_TIMEOUT_MS = 5 * 60 * 1000;
 
 export function AiCourseCreatorModal({
   open,
@@ -80,6 +84,7 @@ export function AiCourseCreatorModal({
   const { t } = useTranslation('courses');
   const { t: tCommon } = useTranslation('common');
   const navigate = useNavigate();
+  const location = useLocation();
   const [prompt, setPrompt] = useState('');
   const [level, setLevel] = useState('');
   const [hours, setHours] = useState('');
@@ -96,6 +101,7 @@ export function AiCourseCreatorModal({
   // BUG-095: Track whether result was already handled (subscription or poll)
   const resultHandledRef = useRef(false);
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const needsConsent = useMemo(
     () => localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true',
@@ -103,15 +109,19 @@ export function AiCourseCreatorModal({
     [open],
   );
 
-  // ── Cleanup on unmount ──────────────────────────────────────────────────────
+  /** BUG-095: Return path for consent link — use current route, not hardcoded. */
+  const returnTo = location.pathname;
+
+  // ── Cleanup on unmount ──────────────────────────────────────────────────
   useEffect(() => {
     return () => {
       setPauseSubscription(true);
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+      if (hardTimeoutRef.current) clearTimeout(hardTimeoutRef.current);
     };
   }, []);
 
-  // ── Reset state when modal closes ───────────────────────────────────────────
+  // ── Reset state when modal closes ───────────────────────────────────────
   useEffect(() => {
     if (!open) {
       setPrompt('');
@@ -128,6 +138,10 @@ export function AiCourseCreatorModal({
         clearInterval(pollTimerRef.current);
         pollTimerRef.current = null;
       }
+      if (hardTimeoutRef.current) {
+        clearTimeout(hardTimeoutRef.current);
+        hardTimeoutRef.current = null;
+      }
     }
   }, [open]);
 
@@ -138,20 +152,33 @@ export function AiCourseCreatorModal({
     CREATE_COURSE_MUTATION
   );
 
-  // ── Subscription (fast path) ────────────────────────────────────────────────
+  // ── Subscription (fast path) ────────────────────────────────────────────
   const [{ data: subData }] = useSubscription<ExecutionStatusPayload>({
     query: EXECUTION_STATUS_SUBSCRIPTION,
     variables: { executionId },
     pause: pauseSubscription,
   });
 
-  // ── Polling query (fallback path — BUG-095) ────────────────────────────────
-  // Paused by default; activated only when generating with an executionId.
-  const [pollResult, executePoll] = useQuery<AgentExecutionResult>({
-    query: AGENT_EXECUTION_QUERY,
-    variables: { id: executionId ?? '' },
-    pause: true,
-  });
+  /** BUG-095: Format backend error for user display. */
+  const formatError = useCallback((raw: string): string => {
+    // Detect raw Zod validation JSON and show friendly message
+    if (raw.includes('"code"') && raw.includes('"too_big"')) {
+      return t('aiCreator.generationFailed');
+    }
+    if (raw.includes('timed out')) {
+      return t('aiCreator.generationTimeout', 'Generation timed out. Please try again with a simpler topic.');
+    }
+    if (raw.includes('LLM service unavailable')) {
+      return t('aiCreator.llmUnavailable', 'AI service is temporarily unavailable. Please try again later.');
+    }
+    // Strip "outline_generation failed:" prefix for cleaner display
+    const cleaned = raw.replace(/^outline_generation failed:\s*/i, '');
+    // If it's still JSON-like, return generic error
+    if (cleaned.startsWith('[') || cleaned.startsWith('{')) {
+      return t('aiCreator.generationFailed');
+    }
+    return cleaned || t('aiCreator.generationFailed');
+  }, [t]);
 
   /** Process a completed/failed execution result from either sub or poll. */
   const handleExecutionResult = useCallback(
@@ -163,6 +190,10 @@ export function AiCourseCreatorModal({
         clearInterval(pollTimerRef.current);
         pollTimerRef.current = null;
       }
+      if (hardTimeoutRef.current) {
+        clearTimeout(hardTimeoutRef.current);
+        hardTimeoutRef.current = null;
+      }
       if (status === 'COMPLETED' && output) {
         setGenerating(false);
         setOutline({
@@ -172,13 +203,15 @@ export function AiCourseCreatorModal({
         });
       } else if (status === 'FAILED') {
         setGenerating(false);
-        setErrorMsg(output?.error ?? t('aiCreator.generationFailed'));
+        const rawError = output?.error ?? '';
+        console.error('[AiCourseCreatorModal] Generation failed:', rawError);
+        setErrorMsg(formatError(rawError));
       }
     },
-    [t],
+    [t, formatError],
   );
 
-  // ── Handle subscription data ───────────────────────────────────────────────
+  // ── Handle subscription data ───────────────────────────────────────────
   useEffect(() => {
     if (!subData) return;
     const exec = subData.executionStatusChanged;
@@ -187,24 +220,49 @@ export function AiCourseCreatorModal({
     }
   }, [subData, handleExecutionResult]);
 
-  // ── BUG-095: Start polling fallback after mutation succeeds ─────────────────
-  // Polls every POLL_INTERVAL_MS. Subscription is the fast path; if it delivers
-  // the result first, polling stops. If the subscription dies (gateway SSE
-  // timeout ~60s), polling continues until completion/failure/15-min timeout.
+  // ── BUG-095: Polling via direct urqlClient.query() — bypasses hook cache ──
   useEffect(() => {
     if (!generating || !executionId || resultHandledRef.current) return;
 
-    // Start polling after a short initial delay (give subscription a chance)
+    // Start polling after initial delay (give subscription a chance)
     const startDelay = setTimeout(() => {
       if (resultHandledRef.current) return;
-      pollTimerRef.current = setInterval(() => {
+
+      pollTimerRef.current = setInterval(async () => {
         if (resultHandledRef.current) {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
           return;
         }
-        executePoll({ requestPolicy: 'network-only' });
+        try {
+          const result = await urqlClient
+            .query<AgentExecutionResult>(AGENT_EXECUTION_QUERY, { id: executionId }, { requestPolicy: 'network-only' })
+            .toPromise();
+
+          if (resultHandledRef.current) return;
+          const exec = result.data?.agentExecution;
+          if (!exec) return;
+          if (exec.status === 'COMPLETED' || exec.status === 'FAILED') {
+            handleExecutionResult(exec.status, exec.output);
+          }
+        } catch (err) {
+          console.error('[AiCourseCreatorModal] Poll error:', err);
+        }
       }, POLL_INTERVAL_MS);
     }, POLL_INTERVAL_MS);
+
+    // BUG-095: Hard timeout — stop waiting after 5 minutes
+    hardTimeoutRef.current = setTimeout(() => {
+      if (resultHandledRef.current) return;
+      resultHandledRef.current = true;
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+      setPauseSubscription(true);
+      setGenerating(false);
+      console.error('[AiCourseCreatorModal] Hard timeout reached after 5 minutes');
+      setErrorMsg(t('aiCreator.generationTimeout', 'Generation timed out. Please try again with a simpler topic.'));
+    }, HARD_TIMEOUT_MS);
 
     return () => {
       clearTimeout(startDelay);
@@ -212,17 +270,12 @@ export function AiCourseCreatorModal({
         clearInterval(pollTimerRef.current);
         pollTimerRef.current = null;
       }
+      if (hardTimeoutRef.current) {
+        clearTimeout(hardTimeoutRef.current);
+        hardTimeoutRef.current = null;
+      }
     };
-  }, [generating, executionId, executePoll]);
-
-  // ── Handle poll results ────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!pollResult.data?.agentExecution || resultHandledRef.current) return;
-    const exec = pollResult.data.agentExecution;
-    if (exec.status === 'COMPLETED' || exec.status === 'FAILED') {
-      handleExecutionResult(exec.status, exec.output);
-    }
-  }, [pollResult.data, handleExecutionResult]);
+  }, [generating, executionId, handleExecutionResult, t]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -246,6 +299,7 @@ export function AiCourseCreatorModal({
       if (consentErr) {
         setIsConsentError(true);
       } else {
+        console.error('[AiCourseCreatorModal] Mutation error:', error?.message);
         setErrorMsg(t('aiCreator.generateError'));
       }
       return;
@@ -261,6 +315,23 @@ export function AiCourseCreatorModal({
       });
     } else {
       setPauseSubscription(false);
+    }
+  };
+
+  /** BUG-095: Retry after error — reset and allow regeneration. */
+  const handleRetry = () => {
+    setErrorMsg(null);
+    setIsConsentError(false);
+    setGenerating(false);
+    setExecutionId(null);
+    resultHandledRef.current = false;
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+    if (hardTimeoutRef.current) {
+      clearTimeout(hardTimeoutRef.current);
+      hardTimeoutRef.current = null;
     }
   };
 
@@ -282,6 +353,7 @@ export function AiCourseCreatorModal({
       },
     });
     if (error || !data) {
+      console.error('[AiCourseCreatorModal] createCourse error:', error?.message);
       setErrorMsg(t('aiCreator.createDraftError'));
       return;
     }
@@ -352,11 +424,20 @@ export function AiCourseCreatorModal({
                 />
               </div>
             </div>
-            {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo="/courses/new" />}
+            {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo={returnTo} />}
             {errorMsg && !isConsentError && !needsConsent && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-                {errorMsg}
+                <span className="flex-1">{errorMsg}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRetry}
+                  className="shrink-0 h-6 px-2 text-destructive hover:text-destructive"
+                >
+                  <RotateCw className="h-3 w-3 mr-1" />
+                  {tCommon('retry', 'Retry')}
+                </Button>
               </div>
             )}
             <div className="flex justify-end gap-3 pt-2">
@@ -426,7 +507,7 @@ export function AiCourseCreatorModal({
                 </div>
               ))}
             </div>
-            {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo="/courses/new" />}
+            {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo={returnTo} />}
             {errorMsg && !isConsentError && !needsConsent && (
               <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />

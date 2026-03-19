@@ -13,12 +13,11 @@ vi.mock('urql', () => ({
     ),
   useMutation: vi.fn(),
   useSubscription: vi.fn(),
-  useQuery: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
-  return { ...actual, useNavigate: vi.fn(() => vi.fn()) };
+  return { ...actual, useNavigate: vi.fn(() => vi.fn()), useLocation: vi.fn(() => ({ pathname: '/courses' })) };
 });
 
 vi.mock('@/lib/graphql/agent-course-gen.queries', () => ({
@@ -36,6 +35,14 @@ vi.mock('@/lib/auth', () => ({
   getToken: vi.fn(() => 'mock-token'),
   isAuthenticated: vi.fn(() => true),
   logout: vi.fn(),
+}));
+
+// BUG-095: Mock urqlClient used for direct polling
+vi.mock('@/lib/urql-client', () => ({
+  urqlClient: {
+    query: vi.fn().mockReturnValue({ toPromise: vi.fn().mockResolvedValue({ data: null }) }),
+  },
+  disposeWsClient: vi.fn(),
 }));
 
 const NOOP_EXECUTE = vi
@@ -58,16 +65,10 @@ function renderModal(props = defaultProps) {
 beforeEach(() => {
   vi.clearAllMocks();
   // Grant AI consent by default so non-consent tests work.
-  // The consent-specific test clears this to test the consent flow.
   localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
   vi.mocked(urql.useMutation).mockReturnValue([{} as never, NOOP_EXECUTE]);
   vi.mocked(urql.useSubscription).mockReturnValue([
     { data: undefined } as never,
-    vi.fn(),
-  ]);
-  // BUG-095: Mock useQuery for polling fallback
-  vi.mocked(urql.useQuery).mockReturnValue([
-    { data: undefined, fetching: false, stale: false } as never,
     vi.fn(),
   ]);
 });
@@ -160,7 +161,6 @@ describe('AiCourseCreatorModal', () => {
       error: undefined,
     });
     // useMutation is called twice: [0]=generateCourse [1]=createCourse.
-    // Use a call counter so both calls during re-renders get valid arrays.
     let mutationCallCount = 0;
     vi.mocked(urql.useMutation).mockImplementation(() => {
       const isFirst = mutationCallCount % 2 === 0;
@@ -228,10 +228,6 @@ describe('AiCourseCreatorModal', () => {
 
   it('does NOT contain hardcoded English strings — all text comes from i18n', () => {
     renderModal();
-    // These are the i18n-resolved English strings (from test mock).
-    // The point: if someone reverts to hardcoded text, these still pass —
-    // but the NEGATIVE assertions below catch raw strings that bypass i18n.
-
     // Title comes from t('aiCreator.title'), not hardcoded
     expect(screen.getByText('AI Course Creator')).toBeInTheDocument();
 
@@ -277,7 +273,6 @@ describe('AiCourseCreatorModal', () => {
 
   // BUG-093: regression — ProgressStatus renders with cycling messages when generating
   it('BUG-093: ProgressStatus renders with cycling messages when generating', async () => {
-    // Simulate a long-running generation (PENDING status, no outline yet)
     const pendingExecute = vi.fn().mockResolvedValue({
       data: {
         generateCourseFromPrompt: {
@@ -303,10 +298,8 @@ describe('AiCourseCreatorModal', () => {
     fireEvent.change(textarea, { target: { value: 'Deep learning basics' } });
     fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
     await waitFor(() => {
-      // Both inline (inside button) and block (below button) ProgressStatus should render
       const statusElements = screen.getAllByRole('status');
       expect(statusElements.length).toBeGreaterThanOrEqual(2);
-      // At least one status element should contain progress text from AI_COURSE_GENERATION_MESSAGES
       const hasProgressText = statusElements.some(
         (el) => el.textContent && el.textContent.length > 0
       );
@@ -320,7 +313,31 @@ describe('AiCourseCreatorModal', () => {
         <AiCourseCreatorModal open={false} onClose={vi.fn()} />
       </MemoryRouter>
     );
-    // Dialog content should not be visible
     expect(screen.queryByText('AI Course Creator')).not.toBeInTheDocument();
+  });
+
+  // BUG-095: Retry button appears on error and resets state
+  it('BUG-095: shows retry button on error and resets on click', async () => {
+    const failExecute = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        graphQLErrors: [{ message: 'Server error' }],
+      },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([{} as never, failExecute]);
+    renderModal();
+    fireEvent.change(
+      screen.getByPlaceholderText(/introduction to machine learning/i),
+      { target: { value: 'Colors' } }
+    );
+    fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/retry/i)).toBeInTheDocument()
+    );
+    // Click retry — error should clear
+    fireEvent.click(screen.getByText(/retry/i));
+    expect(screen.queryByText(/failed to generate/i)).not.toBeInTheDocument();
+    // Generate button should be enabled again
+    expect(screen.getByRole('button', { name: /generate course/i })).not.toBeDisabled();
   });
 });
