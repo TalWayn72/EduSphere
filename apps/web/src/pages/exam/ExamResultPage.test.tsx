@@ -45,6 +45,7 @@ let mockLoading = false;
 
 vi.mock('@/hooks/useExamSession', () => ({
   useExamResult: vi.fn(() => ({ result: mockResult, loading: mockLoading })),
+  useExamSession: vi.fn(() => ({ session: null, loading: false })),
 }));
 
 vi.mock('@/components/exam/ExamResultChart', () => ({
@@ -57,6 +58,39 @@ vi.mock('@/components/exam/ExamScoreCard', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ({ scoreDisplay }: any) => <div data-testid="score-card">{scoreDisplay}</div>,
   ),
+}));
+
+vi.mock('@/lib/utils', () => ({
+  cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
+}));
+
+vi.mock('@/components/ui/card', () => ({
+  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="card" className={className}>{children}</div>
+  ),
+  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div className={className}>{children}</div>
+  ),
+}));
+
+vi.mock('@/components/ui/button', () => ({
+  Button: ({ children, ...props }: { children: React.ReactNode; onClick?: () => void; variant?: string; className?: string; disabled?: boolean }) => (
+    <button {...props}>{children}</button>
+  ),
+}));
+
+vi.mock('@/components/ui/badge', () => ({
+  Badge: ({ children, className }: { children: React.ReactNode; variant?: string; className?: string }) => (
+    <span className={className}>{children}</span>
+  ),
+}));
+
+vi.mock('lucide-react', () => ({
+  CheckCircle2: () => <span data-testid="check-icon" />,
+  XCircle: () => <span data-testid="x-icon" />,
+  RotateCcw: () => <span data-testid="rotate-icon" />,
+  ArrowLeft: () => <span data-testid="arrow-icon" />,
+  Loader2: () => <span data-testid="loader-icon" />,
 }));
 
 // ── Import after mocks ──────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 {
   "loading": "Loading...",
   "error": "An error occurred",
+  "unableToLoad": "Unable to load progress data",
   "retry": "Retry",
   "cancel": "Cancel",
   "clear": "Clear",

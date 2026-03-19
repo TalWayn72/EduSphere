@@ -36,6 +36,11 @@ vi.mock('@/components/Layout', () => ({
     React.createElement('div', { 'data-testid': 'layout' }, children),
 }));
 
+vi.mock('@/components/PageShell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('div', { 'data-testid': 'page-shell' }, children),
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { MyProgressPage } from './MyProgressPage';
@@ -95,7 +100,7 @@ describe('MyProgressPage', () => {
 
     renderPage();
 
-    expect(screen.getByText('Start a course to track your progress!')).toBeDefined();
+    expect(screen.getByText('Start a course to track your progress')).toBeDefined();
   });
 
   it('does NOT show raw [GraphQL] error messages', () => {

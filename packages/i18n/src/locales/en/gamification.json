@@ -5,7 +5,7 @@
   "leaderboard": "Leaderboard",
   "currentStreak": "Current Streak",
   "days": "days",
-  "longestStreak": "Longest Streak",
+  "longestStreak": "Longest streak: {{value}} days",
   "activeChallenges": "Active Challenges",
   "completed": "Completed",
   "noActiveChallenges": "No active challenges",

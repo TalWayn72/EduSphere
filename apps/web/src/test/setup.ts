@@ -37,6 +37,7 @@ import errorsEn from '../../../../packages/i18n/src/locales/en/errors.json';
 import knowledgeEn from '../../../../packages/i18n/src/locales/en/knowledge.json';
 import navEn from '../../../../packages/i18n/src/locales/en/nav.json';
 import settingsEn from '../../../../packages/i18n/src/locales/en/settings.json';
+import gamificationEn from '../../../../packages/i18n/src/locales/en/gamification.json';
 import offlineEn from '../../../../packages/i18n/src/locales/en/offline.json';
 
 type TranslationRecord = Record<string, unknown>;
@@ -52,6 +53,7 @@ const EN_RESOURCES: Record<string, TranslationRecord> = {
   courses: coursesEn as TranslationRecord,
   dashboard: dashboardEn as TranslationRecord,
   errors: errorsEn as TranslationRecord,
+  gamification: gamificationEn as TranslationRecord,
   knowledge: knowledgeEn as TranslationRecord,
   nav: navEn as TranslationRecord,
   offline: offlineEn as TranslationRecord,
