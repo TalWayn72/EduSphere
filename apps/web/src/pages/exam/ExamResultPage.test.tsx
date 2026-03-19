@@ -30,10 +30,10 @@ function makeResult(overrides: Partial<ExamResult> = {}): ExamResult {
     rawScore: 0.85,
     scaledScore: 720,
     domainScores: [
-      { domain: 'Math', itemCount: 10, correctCount: 9, percentage: 90 },
+      { domain: 'Math', total: 10, correct: 9 },
     ],
     bloomScores: [
-      { level: 'APPLY', itemCount: 5, correctCount: 4, percentage: 80 },
+      { level: 'APPLY', total: 5, correct: 4 },
     ],
     gradedAt: '2026-03-15T12:00:00Z',
     ...overrides,

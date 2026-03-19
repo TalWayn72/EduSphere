@@ -16,14 +16,14 @@ import type { DomainScore, BloomScore } from '@/types/exam-entities';
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
 const DOMAIN_SCORES: DomainScore[] = [
-  { domain: 'Mathematics', itemCount: 10, correctCount: 8, percentage: 80 },
-  { domain: 'Physics', itemCount: 10, correctCount: 5, percentage: 50 },
+  { domain: 'Mathematics', total: 10, correct: 8 },
+  { domain: 'Physics', total: 10, correct: 5 },
 ];
 
 const BLOOM_SCORES: BloomScore[] = [
-  { level: 'REMEMBER', itemCount: 5, correctCount: 4, percentage: 80 },
-  { level: 'APPLY', itemCount: 5, correctCount: 3, percentage: 60 },
-  { level: 'CREATE', itemCount: 5, correctCount: 2, percentage: 40 },
+  { level: 'REMEMBER', total: 5, correct: 4 },
+  { level: 'APPLY', total: 5, correct: 3 },
+  { level: 'CREATE', total: 5, correct: 2 },
 ];
 
 // ── Tests ───────────────────────────────────────────────────────────────────
