@@ -41,16 +41,16 @@
   "allKnowledge": "All Knowledge",
   "filteredBy": "Filtered by: {{course}}",
   "skillTree": {
-    "title": "Skill Tree",
-    "invalidId": "Invalid course ID",
-    "invalidIdDesc": "The course ID \"{{courseId}}\" is not a valid identifier.",
-    "sampleData": "Sample data — connect to live API for real knowledge graph",
-    "courseLabel": "Course: {{courseId}}",
-    "mastery": "Mastery",
-    "advanceMastery": "Advance Mastery",
-    "loading": "Loading skill tree...",
-    "loadError": "Could not load live data — showing sample skill tree.",
-    "updateError": "Failed to update mastery level. Changes have been reverted.",
-    "sampleNotice": "Showing sample skill tree data. Enroll in a course to see your personalized knowledge graph."
+    "title": "עץ כישורים",
+    "invalidId": "מזהה קורס לא תקין",
+    "invalidIdDesc": "מזהה הקורס \"{{courseId}}\" אינו מזהה תקין.",
+    "sampleData": "נתוני דוגמה — התחבר ל-API לגרף ידע אמיתי",
+    "courseLabel": "קורס: {{courseId}}",
+    "mastery": "שליטה",
+    "advanceMastery": "קדם שליטה",
+    "loading": "טוען עץ כישורים...",
+    "loadError": "לא ניתן לטעון נתונים חיים — מציג עץ כישורים לדוגמה.",
+    "updateError": "עדכון רמת השליטה נכשל. השינויים שוחזרו.",
+    "sampleNotice": "מציג נתוני עץ כישורים לדוגמה. הירשם לקורס כדי לראות את גרף הידע המותאם אישית שלך."
   }
 }
