@@ -37,7 +37,7 @@ export function Layout({ children }: LayoutProps) {
       <AppSidebar />
 
       {/* Main content — offset left to account for sidebar (min-width: 64px collapsed) */}
-      <div className="flex-1 flex flex-col transition-all duration-200" style={{ marginLeft: 'var(--sidebar-w, 64px)' }} data-testid="layout-main">
+      <div className="flex-1 flex flex-col transition-all duration-200" style={{ marginInlineStart: 'var(--sidebar-w, 64px)' }} data-testid="layout-main">
         {/* Topbar */}
         <header className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border px-4 py-2.5 flex items-center justify-end gap-2" data-testid="topbar">
           <Button
@@ -48,7 +48,7 @@ export function Layout({ children }: LayoutProps) {
           >
             <Search className="h-3.5 w-3.5" />
             <span>{t('search')}</span>
-            <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded border">
+            <kbd className="ms-auto text-xs bg-muted px-1.5 py-0.5 rounded border">
               ⌘K
             </kbd>
           </Button>

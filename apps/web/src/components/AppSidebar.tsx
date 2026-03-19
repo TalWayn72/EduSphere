@@ -148,8 +148,8 @@ export function AppSidebar() {
     <aside
       data-testid="app-sidebar"
       className={[
-        'fixed top-0 left-0 h-screen z-30 flex flex-col',
-        'bg-card border-r border-border',
+        'fixed top-0 start-0 h-screen z-30 flex flex-col',
+        'bg-card border-e border-border',
         'transition-all duration-200',
         collapsed ? 'w-16' : 'w-60',
       ].join(' ')}
@@ -212,8 +212,8 @@ export function AppSidebar() {
                     'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
                     'transition-colors hover:bg-muted/60',
                     isActive
-                      ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
-                      : 'text-muted-foreground border-l-2 border-transparent',
+                      ? 'bg-primary/10 text-primary font-semibold border-s-2 border-primary'
+                      : 'text-muted-foreground border-s-2 border-transparent',
                   ].join(' ')}
                 >
                   <Icon className="h-4 w-4 shrink-0" aria-hidden />
@@ -234,21 +234,21 @@ export function AppSidebar() {
             location (bottom of sidebar) on every page that uses this navigation. */}
         <NavLink
           to="/help"
-          title={collapsed ? 'Help & Support' : undefined}
+          title={collapsed ? t('helpAndSupport') : undefined}
           data-testid="nav-item-help"
-          aria-label="Help and Support"
+          aria-label={t('helpAndSupport')}
           className={({ isActive }) =>
             [
               'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
               'transition-colors hover:bg-muted/60',
               isActive
-                ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
-                : 'text-muted-foreground border-l-2 border-transparent',
+                ? 'bg-primary/10 text-primary font-semibold border-s-2 border-primary'
+                : 'text-muted-foreground border-s-2 border-transparent',
             ].join(' ')
           }
         >
           <HelpCircle className="h-4 w-4 shrink-0" aria-hidden />
-          {!collapsed && <span>Help &amp; Support</span>}
+          {!collapsed && <span>{t('helpAndSupport')}</span>}
         </NavLink>
 
         {/* Settings */}
@@ -261,8 +261,8 @@ export function AppSidebar() {
               'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
               'transition-colors hover:bg-muted/60',
               isActive
-                ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
-                : 'text-muted-foreground border-l-2 border-transparent',
+                ? 'bg-primary/10 text-primary font-semibold border-s-2 border-primary'
+                : 'text-muted-foreground border-s-2 border-transparent',
             ].join(' ')
           }
         >
@@ -275,7 +275,7 @@ export function AppSidebar() {
           onClick={toggleTheme}
           title={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
           data-testid="theme-toggle"
-          className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60 transition-colors border-l-2 border-transparent"
+          className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60 transition-colors border-s-2 border-transparent"
           aria-label={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
         >
           {resolvedMode === 'dark' ? (
@@ -312,7 +312,7 @@ export function AppSidebar() {
         {/* Powered-by footer — hidden when white-label branding suppresses it */}
         {!branding.hideEduSphereBranding && !collapsed && (
           <div className="mx-2 px-3 py-1" data-testid="powered-by-edusphere">
-            <span className="text-xs text-muted-foreground/60">Powered by EduSphere</span>
+            <span className="text-xs text-muted-foreground/60">{t('poweredBy')}</span>
           </div>
         )}
 
@@ -321,7 +321,7 @@ export function AppSidebar() {
           onClick={toggleCollapsed}
           data-testid="sidebar-collapse-toggle"
           aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
-          className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted/60 transition-colors border-l-2 border-transparent"
+          className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted/60 transition-colors border-s-2 border-transparent"
         >
           {collapsed ? (
             <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />

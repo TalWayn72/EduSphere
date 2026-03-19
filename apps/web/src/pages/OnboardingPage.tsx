@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +11,7 @@ import {
 } from '@/lib/graphql/onboarding.queries';
 
 export function OnboardingPage() {
+  const { t } = useTranslation('auth');
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -52,8 +54,8 @@ export function OnboardingPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
       <div className="w-full max-w-xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-600">Welcome to EduSphere</h1>
-          <p className="text-muted-foreground mt-2">Let&apos;s personalize your learning experience</p>
+          <h1 className="text-3xl font-bold text-indigo-600">{t('onboarding.welcome')}</h1>
+          <p className="text-muted-foreground mt-2">{t('onboarding.personalize')}</p>
         </div>
 
         {state?.role === 'INSTRUCTOR' ? (

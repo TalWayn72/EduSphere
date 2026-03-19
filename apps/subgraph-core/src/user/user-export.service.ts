@@ -8,7 +8,7 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const piiManifest = require('@edusphere/db/config/pii-bearing-tables.json') as {
   tables: Array<{ name: string; schemaFile: string; piiColumns: string[]; note?: string }>;
 };

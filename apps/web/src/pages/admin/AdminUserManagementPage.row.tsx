@@ -2,6 +2,7 @@
  * UserTableRow — Single row in the user management table.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
 import type { AdminUser } from './AdminUserManagementPage';
@@ -19,6 +20,7 @@ const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive'> = 
 };
 
 export function UserTableRow({ user, selected, onToggle }: UserTableRowProps) {
+  const { t } = useTranslation('admin');
   return (
     <TableRow data-testid={`user-row-${user.id}`}>
       <TableCell>
@@ -38,7 +40,7 @@ export function UserTableRow({ user, selected, onToggle }: UserTableRowProps) {
         </Badge>
       </TableCell>
       <TableCell className="text-muted-foreground text-sm">
-        {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+        {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : t('users.never')}
       </TableCell>
     </TableRow>
   );

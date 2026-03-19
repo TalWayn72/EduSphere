@@ -53,7 +53,7 @@ export function LiveSessionCard({
     try {
       const result = await joinSession({ sessionId: liveSession.id });
       if (result.error) {
-        setJoinError(result.error.message);
+        setJoinError(t('liveSession.joinError'));
         return;
       }
       const joinUrl: string =

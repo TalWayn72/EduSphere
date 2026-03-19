@@ -3,6 +3,7 @@
  * Route: /admin/audit-viewer
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +34,7 @@ export interface AuditEntry {
 }
 
 export function AdminAuditLogPage() {
+  const { t } = useTranslation('admin');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [userFilter, setUserFilter] = useState('');
@@ -57,31 +59,31 @@ export function AdminAuditLogPage() {
   const entries = data?.auditLogs?.nodes ?? [];
 
   return (
-    <AdminLayout title="Audit Log Viewer" description="Review platform activity and security events">
+    <AdminLayout title={t('audit.title')} description={t('audit.description')}>
       <div data-testid="admin-audit-log-page" className="space-y-4">
         <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
 
         <div className="flex gap-3 items-end flex-wrap" data-testid="audit-date-filter">
           <div>
-            <label className="text-xs text-muted-foreground">From</label>
+            <label className="text-xs text-muted-foreground">{t('audit.from')}</label>
             <Input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }} className="w-40" />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">To</label>
+            <label className="text-xs text-muted-foreground">{t('audit.to')}</label>
             <Input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1); }} className="w-40" />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">User</label>
+            <label className="text-xs text-muted-foreground">{t('audit.user')}</label>
             <Input
               data-testid="audit-user-filter"
-              placeholder="Filter by user..."
+              placeholder={t('audit.filterByUser')}
               value={userFilter}
               onChange={(e) => { setUserFilter(e.target.value); setPage(1); }}
               className="w-48"
             />
           </div>
           <Button size="sm" variant="outline" onClick={() => { setDateFrom(''); setDateTo(''); setUserFilter(''); setPage(1); }}>
-            Clear
+            {t('audit.clear')}
           </Button>
         </div>
 
@@ -93,22 +95,22 @@ export function AdminAuditLogPage() {
 
         {error && !fetching && (
           <Card><CardContent className="py-8 text-center text-destructive text-sm">
-            Failed to load audit logs.
+            {t('audit.loadError')}
           </CardContent></Card>
         )}
 
         {!fetching && !error && (
           <Card>
-            <CardHeader><CardTitle>Audit Entries ({data?.auditLogs?.totalCount ?? 0})</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('audit.entriesCount', { count: data?.auditLogs?.totalCount ?? 0 })}</CardTitle></CardHeader>
             <CardContent>
               <Table data-testid="audit-log-table">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Target</TableHead>
-                    <TableHead>Details</TableHead>
+                    <TableHead>{t('audit.colTimestamp')}</TableHead>
+                    <TableHead>{t('audit.colUser')}</TableHead>
+                    <TableHead>{t('audit.colAction')}</TableHead>
+                    <TableHead>{t('audit.colTarget')}</TableHead>
+                    <TableHead>{t('audit.colDetails')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,7 +130,7 @@ export function AdminAuditLogPage() {
                   {entries.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                        No audit entries found.
+                        {t('audit.noEntries')}
                       </TableCell>
                     </TableRow>
                   )}
@@ -136,11 +138,11 @@ export function AdminAuditLogPage() {
               </Table>
               <div className="flex justify-between mt-4">
                 <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-                  Previous
+                  {t('audit.previous')}
                 </Button>
-                <span className="text-sm text-muted-foreground">Page {page}</span>
+                <span className="text-sm text-muted-foreground">{t('audit.page', { page })}</span>
                 <Button size="sm" variant="outline" onClick={() => setPage((p) => p + 1)}>
-                  Next
+                  {t('audit.next')}
                 </Button>
               </div>
             </CardContent>

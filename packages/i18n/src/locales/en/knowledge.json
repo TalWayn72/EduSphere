@@ -39,5 +39,18 @@
   "pathError": "Failed to find learning path",
   "courseContext": "Course Knowledge Graph",
   "allKnowledge": "All Knowledge",
-  "filteredBy": "Filtered by: {{course}}"
+  "filteredBy": "Filtered by: {{course}}",
+  "skillTree": {
+    "title": "Skill Tree",
+    "invalidId": "Invalid course ID",
+    "invalidIdDesc": "The course ID \"{{courseId}}\" is not a valid identifier.",
+    "sampleData": "Sample data — connect to live API for real knowledge graph",
+    "courseLabel": "Course: {{courseId}}",
+    "mastery": "Mastery",
+    "advanceMastery": "Advance Mastery",
+    "loading": "Loading skill tree...",
+    "loadError": "Could not load live data — showing sample skill tree.",
+    "updateError": "Failed to update mastery level. Changes have been reverted.",
+    "sampleNotice": "Showing sample skill tree data. Enroll in a course to see your personalized knowledge graph."
+  }
 }

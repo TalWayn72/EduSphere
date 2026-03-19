@@ -47,11 +47,79 @@
 ## Language & Permissions
 
 - **Communication:** Hebrew | **Code & Docs:** English
-- **Auto-approved:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions, MCP tool calls
-- **No approval needed:** Execute directly without asking - Bash commands, Write operations, Git commits, MCP server tests, Docker operations, file edits
+- **Auto-approved for AGENTS:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions, MCP tool calls — these are approved for SUB-AGENTS spawned by the Orchestrator, NOT for the Orchestrator itself
+- **No approval needed:** Spawn agents immediately without asking — agent-spawning, progress tracking, and user communication require no approval. The Orchestrator delegates ALL code/infra/test work to agents.
+- **Orchestrator tool restriction:** See "Orchestrator Role — IRON RULE" section. The Orchestrator may NOT use Edit, Write, or mutating Bash commands directly.
 - **CRITICAL — IRON RULE — NEVER VIOLATE:** DO NOT ask "Can I do X?" or "Should I do Y?" or "האם לבצע?" or "האם להפעיל?" — Just execute immediately. No exceptions. This applies to ALL operations: MCP tests, Docker, git, file writes, Bash commands, running servers, making API calls. If in doubt — execute, don't ask.
 - **VIOLATION EXAMPLE (FORBIDDEN):** "האם לבצע Reload Window?" / "Should I run the tests?" / "רוצה שאפעיל?"
 - **CORRECT BEHAVIOR:** Detect what needs to be done → execute it → report results.
+
+## Orchestrator Role — IRON RULE (NEVER VIOLATE)
+
+> **The main Claude agent is the ORCHESTRATOR. It manages, it does NOT execute.**
+
+### Allowed Tools (Orchestrator ONLY uses these)
+
+| Tool | Permitted Use |
+|------|---------------|
+| `Agent` | Spawn sub-agents for ALL implementation work — this is the PRIMARY tool |
+| `Read` | Read tracking docs ONLY (OPEN_ISSUES.md, CLAUDE.md, MEMORY.md, docs/*.md, plan files). NEVER read source code (.ts/.tsx/.graphql/.sql) to solve problems — delegate to Explore agent |
+| `Glob` / `Grep` | ONLY for task decomposition analysis (understanding scope before spawning agents). NEVER to debug or fix issues |
+| `Bash` (read-only) | ONLY: `git status`, `git log`, `git diff`, `docker ps`, `./scripts/health-check.sh`. NEVER: `pnpm`, `npm`, build commands, test commands, Docker build/up/down |
+| `TodoWrite` | Track agent progress and task state |
+| Direct text output | Communicate with user (Hebrew), report progress, present agent results |
+
+### FORBIDDEN Tools (Orchestrator MUST NEVER use these directly)
+
+| Tool | Why Forbidden |
+|------|---------------|
+| `Edit` | Code changes are agent work — delegate to FE/BE/DB/DevOps agent |
+| `Write` | File creation is agent work — delegate to appropriate division agent |
+| `Bash` (mutating) | `pnpm test`, `pnpm build`, `docker-compose up`, `git commit`, `git push` — delegate to QA/DevOps agent |
+| `MCP tools` (code-affecting) | `mcp__eslint__*`, `mcp__playwright__*`, `mcp__postgres__*` for fixing — delegate to appropriate agent |
+| `Read` (source code) | Reading `.ts`, `.tsx`, `.graphql`, `.sql` files to solve a problem — delegate to an Explore agent |
+
+### Violation Detection Rules
+
+The Orchestrator is VIOLATING its role if it does ANY of the following:
+1. Uses `Edit` or `Write` tool on any file in `apps/`, `packages/`, `tests/`, `infrastructure/`, or `scripts/`
+2. Uses `Bash` to run `pnpm`, `npm`, `node`, `docker-compose build`, `docker-compose up`, `docker-compose down`, `git add`, `git commit`, `git push`
+3. Uses `Read` on `.ts`, `.tsx`, `.js`, `.jsx`, `.graphql`, `.sql`, `.json` (except `package.json` for scope analysis) files to debug or solve a problem
+4. Writes more than 5 lines of code in a message (even as "example" or "suggestion")
+5. Directly fixes a bug, writes a test, modifies a config, or edits a Dockerfile
+
+### What the Orchestrator DOES
+
+1. **Receives task** from user
+2. **Analyzes scope** — reads tracking docs, uses Glob/Grep to understand affected areas
+3. **Decomposes** into sub-tasks with clear agent assignments
+4. **Spawns agents** via the Agent tool — one per independent sub-task
+5. **Monitors progress** — tracks agent outputs, reports to user every 3 minutes
+6. **Reviews agent results** — checks that agents followed protocols, tests pass, docs updated
+7. **Spawns fix agents** if any agent output has gaps
+8. **Reports completion** to user with the Session Completion Gate table
+
+### Agent Type Catalog
+
+| Work Type | Agent Division | Agent Prompt Pattern |
+|-----------|---------------|----------------------|
+| React/UI component changes | Frontend Engineering | `Agent("Fix/build the X component in apps/web/src/...")` |
+| NestJS/resolver/service changes | Backend Engineering | `Agent("Update the Y service in apps/subgraph-Z/...")` |
+| Schema/migration/RLS changes | Database & Data | `Agent("Add migration for table Z...")` |
+| Docker/CI/deployment/git ops | DevOps & Release | `Agent("Rebuild Docker image and verify..." / "Commit and push...")` |
+| Unit/integration/E2E tests | QA & Validation | `Agent("Write E2E test for feature X...")` |
+| Security audit/pen test | Security & Compliance | `Agent("Audit RLS policies for table X...")` |
+| README/OPEN_ISSUES/docs update | Documentation | `Agent("Update OPEN_ISSUES.md with bug X status...")` |
+| Code exploration/debugging | Architecture (Explore) | `Agent("Investigate why X fails...", subagent_type="Explore")` |
+| Bug investigation (3 waves) | Architecture (Explore) | `Agent("Run discovery waves for bug pattern X...", subagent_type="Explore")` |
+| Planning/design decisions | Architecture (Plan) | `Agent("Design approach for feature X...", subagent_type="Plan")` |
+
+### CRITICAL: "Execute directly" means "spawn agents directly"
+
+The existing rule "Don't ask questions — Execute directly" means:
+- DO spawn agents immediately without asking the user
+- DO NOT execute code changes yourself
+- "Execute" = "launch the right agents" — NOT "write the code yourself"
 
 ## Architecture & Patterns
 
@@ -121,7 +189,7 @@
 
 1. **Read before modify** - Always read a file before modifying it
 2. **Auto-fix errors** - Identify and resolve issues autonomously without asking
-3. **Don't ask questions - Execute directly** - When given a task, execute it immediately without asking for confirmation or clarification unless absolutely critical
+3. **Don't ask questions - Delegate directly** - When given a task, spawn the appropriate agents immediately without asking for confirmation. The Orchestrator NEVER executes code changes itself — it delegates to agents who execute.
 4. **Max 150 lines per file** - Keep files focused and modular. **Exceptions allowed** for: complex GraphQL resolvers with RLS+JWT+NATS, AI agent workflows (LangGraph.js), Apache AGE graph queries, integration tests, entry points. Create barrel files (`index.ts`) when splitting
 5. **TypeScript strict** - `strict: true`, no `any`, no `console.log` (use Pino logger)
 6. **All DB queries via Drizzle** - Never raw SQL (except Apache AGE Cypher queries via graph helpers)
@@ -130,7 +198,7 @@
 9. **Never skip phases** - IMPLEMENTATION_ROADMAP.md defines strict phase order with acceptance criteria
 10. **Test everything** - No untested code enters repository
 11. **Security-first** - RLS validation, JWT scopes, input sanitization, no secrets in code
-12. **Parallel execution mandatory** - Split every task into sub-tasks whenever possible and run Agents/Workers in parallel for maximum efficiency
+12. **Parallel agent execution mandatory** - Split every task into sub-tasks and spawn Agents in parallel for maximum efficiency. The Orchestrator's ONLY execution tool is the Agent tool — all other work is done by agents.
 
 ## Memory Safety (Mandatory)
 
@@ -736,6 +804,20 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 ## Bug Fix Protocol
 
+### Delegation Model (IRON RULE)
+
+> **The Orchestrator does NOT execute any part of the Bug Fix Protocol.**
+> When a bug is reported, the Orchestrator spawns a **QA & Validation Lead Agent** who owns the entire protocol (Stages 0–11).
+> The QA Lead spawns sub-agents (FE, BE, DB, Security, Playwright, DevOps) as needed within each stage.
+> The Orchestrator only monitors progress and relays the QA Lead's reports to the user.
+>
+> **Orchestrator's allowed actions during a bug fix:**
+> - `Agent` — spawn the QA Lead Agent (with full bug context)
+> - `Read` — check OPEN_ISSUES.md status only
+> - Text output — relay progress to user in Hebrew
+>
+> **Orchestrator MUST NOT:** read source code, search patterns, run tests, edit files, make root cause decisions, or run any build/deploy commands during a bug fix.
+
 ### Interactive Debugger — `dap` CLI (MANDATORY tool for all debugging)
 
 **NEVER use `console.log` / `this.logger.debug` for debugging runtime state. Use the `dap` interactive debugger instead.**
@@ -773,20 +855,29 @@ dap stop
 
 ---
 
-### Phase 1 — Discovery (MANDATORY — do not skip any step)
+### Phase 0 — Reproduce First (TEST-FIRST — before any other investigation)
 
-1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
-2. **If no logs exist** - Add Pino logging (`this.logger.error(...)`) as part of the fix so the bug becomes observable
-3. **Reproduce** - Write a failing test that reproduces the bug before touching any fix code
-4. **Identify root cause** - Use `dap` to set a breakpoint at the suspected location, inspect live state, and trace the full call chain; document the exact line(s) that cause the failure
+> **Iron principle:** Never investigate a bug you can't prove exists. Write the test FIRST.
+
+1. **Read logs** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console — understand the symptom
+2. **Write a reproducer test** that demonstrates the bug **as it exists right now**. The test must **PASS** (GREEN) because it asserts the broken behavior:
+   - UI bug → Playwright E2E: `expect(locator).toContainText(badString)` — must PASS
+   - Logic bug → unit test: `expect(result).toBe(wrongValue)` — must PASS
+   - RLS/security leak → integration test proving the leak exists
+   - API bug → GraphQL integration test returning wrong data
+   - Crash → unit test: `expect(() => fn()).toThrow(specificError)`
+3. **Run the test** — it MUST be **GREEN** (proving the bug is real). If RED → the test doesn't reproduce, investigate further.
+4. **Mark the test:** `// BUG-NNN: reproducer — asserts BROKEN state, will be INVERTED after fix`
+
+### Phase 1 — Discovery (3 Waves — MANDATORY before any fix code)
+
 5. **Wide pattern search — DISCOVERY WAVES (MANDATORY, never skip):**
 
-   After identifying the root cause pattern, execute **3 search waves** before writing a single line of fix code:
+   After confirming the bug with the reproducer test, execute **3 search waves** before writing a single line of fix code:
 
    **Wave 1 — Exact match:** Grep for the exact code pattern (string, function name, API call, class structure) across the entire codebase.
 
    **Wave 2 — MANDATORY SIMILARITY SEARCH (NEVER SKIP — "שוני מסויים"):**
-   After finding the root cause pattern, STOP and execute ALL of the following before writing any fix code:
 
    MANDATORY CHECKLIST (mark each ✓ as you complete it):
    □ Every file in `apps/web/src/pages/` — checked for same anti-pattern
@@ -813,19 +904,23 @@ dap stop
    - If bug is "stale urql cache" → grep ALL `useQuery`/`useFragment` reads after mutations
    - If bug is "missing try/catch" → grep ALL async service methods
 
-   **Build a Discovery List** — a numbered list of every affected file + the exact issue in that file. This list MUST be documented before any fix code is written. The bug is NOT finished until EVERY item on the Discovery List is fixed.
+   **Build a Discovery List** — a numbered list of every affected file + the exact issue in that file.
 
-### Phase 2 — Fix Rounds (one round per Wave group)
+### Phase 2 — Root Cause Analysis
 
-Execute one fix round per logical grouping of similar issues. **A round is NEVER done until ALL of the following pass:**
-- `pnpm turbo test` passes 100% for ALL affected packages (not just the one you changed)
-- Visual browser verification passes (if UI change) — open DevTools, reproduce the original failure scenario, confirm clean UI
-- New regression tests are green (at least one unit test + one E2E test per round)
-- Zero new TypeScript errors (`pnpm turbo typecheck`)
-- Pino/console.error logging is in place so the bug would be visible in logs if it recurred
+6. **Use `dap` debugger** — set breakpoint at the location indicated by the reproducer test
+7. **Inspect live state** — locals, call stack, variable values at the point of failure
+8. **Document root cause** — file:line where the bug originates + why it happens
+
+### Phase 3 — Fix Rounds (one round per Wave group)
+
+Execute one fix round per logical grouping of similar issues.
 
 **Round structure:**
-- **Round 1**: Fix the original bug + add missing logging
+- **Round 1**: Fix the original bug + add Pino logging + **INVERT the reproducer test from Phase 0**
+  - `expect(locator).toContainText(badString)` → `expect(locator).not.toContainText(badString)`
+  - `expect(result).toBe(wrongValue)` → `expect(result).toBe(correctValue)`
+  - Remove `// BUG-NNN: reproducer` comment → replace with `// BUG-NNN: regression guard`
 - **Round 2**: Fix all similar issues found in Wave 2 (other pages/components with variations)
 - **Round 3**: Fix all class-of-bug issues found in Wave 3 (if different from Round 2 items)
 - **Round N**: Continue until the Discovery List is 100% empty and grep returns zero matches for the bug pattern outside of test files
@@ -835,8 +930,8 @@ A round is NOT done until ALL of the following pass:
 0. Docker infrastructure UP — `docker ps` shows postgres, keycloak, nats, minio, jaeger healthy. If not: `docker-compose up -d` first. **Never skip — E2E + visual tests fail silently without Docker.**
 1. `pnpm turbo test` passes 100% for ALL affected packages (not just the one you changed)
 2. `pnpm turbo typecheck` — zero TypeScript errors
-3. Visual browser verification — open DevTools, reproduce failure, confirm clean UI
-4. New regression test: asserts the BAD string/state is GONE (not just the fix is present)
+3. **Reproducer test INVERTED and GREEN** — proves the fix actually works
+4. Additional regression test: asserts the BAD string/state is GONE
 5. Console.error/Pino log added so bug is observable if it recurs in production
 6. `./scripts/health-check.sh` — all services PASS
 7. All 5 test users can authenticate successfully:
@@ -849,57 +944,44 @@ A round is NOT done until ALL of the following pass:
    | student@example.com | STUDENT | Student123! |
 
 **Required output per round (non-negotiable):**
-- Unit test asserting the CORRECT behavior is now present
-- Unit test asserting the BAD behavior is GONE (regression guard — explicitly test that the bad string/state is absent)
-- **Playwright E2E test** with `page.route()` interception or mock to reproduce the bug scenario + `expect(element).not.toContainText(badString)` assertion
+- Inverted reproducer test (from Phase 0) now GREEN
+- Unit test asserting the BAD behavior is GONE (regression guard)
+- **Playwright E2E test** with `page.route()` interception or mock + `expect(element).not.toContainText(badString)` assertion
 - Screenshot assertion (`expect(page).toHaveScreenshot(...)`) for visual regressions
 - Console.error/Pino log call so the bug is observable if it recurs in production
 
-**Deployment verification (required at end of EVERY round):**
-After all unit + E2E tests pass, run the local deployment health check and verify all 5 users:
-```bash
-./scripts/health-check.sh   # All services must pass
-```
-| User | Role | Password |
-|------|------|----------|
-| super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
-| instructor@example.com | INSTRUCTOR | Instructor123! |
-| org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
-| researcher@example.com | RESEARCHER | Researcher123! |
-| student@example.com | STUDENT | Student123! |
-
 A round is **not complete** until health-check passes AND all 5 users can authenticate.
 
-### Phase 3 — Verification
+### Phase 4 — Verification
 
-6. **Full test suite** - `pnpm turbo test -- --coverage` must pass 100%
-7. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino/console.error with structured prefix `[ServiceName]` or `[ComponentName]`)
-8. **Visual check (MANDATORY for UI bugs)** - Open browser, reproduce the original scenario (e.g., block the GraphQL endpoint with DevTools → Network → Block Request URL), confirm the correct fallback UI is shown without raw technical strings. Take a screenshot and compare.
-9. **Health check** - `./scripts/health-check.sh` passes
-10. **Pattern clean** - grep for the bug pattern returns zero matches outside of test files
-11. **E2E visual regression test** - A Playwright test that simulates the failure condition and asserts BOTH that the error UI is shown AND that raw technical strings (urql error messages, stack traces) are NOT visible to users
+9. **Full test suite** - `pnpm turbo test -- --coverage` must pass 100%
+10. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino/console.error with structured prefix `[ServiceName]` or `[ComponentName]`)
+11. **Visual check (MANDATORY for UI bugs)** - Open browser, reproduce the original scenario, confirm the correct fallback UI is shown without raw technical strings. Take a screenshot and compare.
+12. **Health check** - `./scripts/health-check.sh` passes
+13. **Pattern clean** - grep for the bug pattern returns zero matches outside of test files
+14. **E2E visual regression test** - A Playwright test that simulates the failure condition and asserts the UI is clean
 
-### Phase 4 — Documentation
+### Phase 5 — Documentation
 
-12. **Document** in `OPEN_ISSUES.md`:
+15. **Document** in `OPEN_ISSUES.md`:
     - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
     - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
+    - **Reproducer test path** from Phase 0 (now inverted as regression guard)
     - Files affected per round (all 3 waves), problem, root cause chain, solution per round, tests added
-    - **Anti-recurrence note**: what prevents this from happening again (the regression test file:line that would catch it)
+    - **Anti-recurrence note**: what prevents this from happening again (the inverted reproducer test file:line)
     - **Discovery List**: the complete list of affected files found in each wave
 
 **IRON RULES (never violate):**
-- Never fix a bug without reading the logs first. No logs = part of the bug.
+- **Never write fix code before a reproducer test proves the bug exists** — Phase 0 reproducer must be GREEN first.
+- **Every reproducer test must be GREEN before fixing and GREEN (inverted) after fixing** — the test lifecycle proves the bug existed and is now gone.
 - Never declare a bug fixed until the entire Discovery List is empty (all 3 waves exhausted).
-- Never close a bug without a regression test that would catch it if it returns.
+- Never close a bug without a regression test that would catch it if it returns (the inverted reproducer IS the regression guard).
 - Never leave logging gaps — the bug must be observable in logs if it recurs (Pino error + structured context).
-- **UI bugs must have a Playwright E2E test that simulates the failure and asserts the UI is clean.** A bug that shows ugly technical errors to users is NOT fixed until a Playwright test guards against the ugly message reappearing.
+- **UI bugs must have a Playwright E2E test that simulates the failure and asserts the UI is clean.**
 - **Never report completion after fixing only the original file.** Always complete all 3 discovery waves and all fix rounds first.
-- Only report completion when ALL rounds are done, all tests pass, grep shows zero recurrence patterns, and OPEN_ISSUES.md is updated.
-- **Every Pino/console.error logging MUST include structured context:** `[ServiceName]` or `[ComponentName]` prefix + `tenantId` + `userId` where applicable. A bug that cannot be observed in logs is NOT fixed.
-- **Never report completion after fixing only the file that was reported.** Always complete all 3 discovery waves first.
+- **Every Pino/console.error logging MUST include structured context:** `[ServiceName]` or `[ComponentName]` prefix + `tenantId` + `userId` where applicable.
 - **Round Completion Gate is mandatory after EVERY round** — never skip health-check.sh or 5-user verification.
-- **ALWAYS restore services after ANY disruption** — If ANY operation (code change, container rebuild, config edit, service restart) causes a service to go down, RESTORE ALL services before ending that operation. Run `./scripts/health-check.sh` after every disruptive action. If any service is down: `docker-compose up -d` → wait → verify ALL endpoints (Keycloak 8080, Gateway 4000, Frontend 5173, Postgres 5432, NATS 8222). The user must NEVER encounter ERR_CONNECTION_REFUSED. This applies after EVERY code change, not just at "session end".
+- **ALWAYS restore services after ANY disruption** — Run `./scripts/health-check.sh` after every disruptive action. The user must NEVER encounter ERR_CONNECTION_REFUSED.
 
 ## Parallel Execution (Agents)
 
@@ -1151,6 +1233,7 @@ Then proceed autonomously without waiting for user approval.
 
 | # | Check | Command | Required Result |
 |---|-------|---------|----------------|
+| -1 | Orchestrator Compliance | Self-audit: Did Orchestrator use Edit/Write/mutating Bash directly? | 0 violations — all work done via agents |
 | 0 | Docker Up | `docker ps \| grep -c healthy` | ≥5 containers healthy |
 | 1 | Unit Tests | `pnpm turbo test` | 100% pass, 0 failures |
 | 2 | TypeScript | `pnpm turbo typecheck` | 0 errors |

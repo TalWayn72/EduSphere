@@ -104,6 +104,21 @@
     "networkError": "Network error during upload",
     "failedConfirm": "Failed to confirm upload"
   },
+  "checkout": {
+    "payNow": "Pay Now",
+    "processing": "Processing...",
+    "paymentSuccessful": "Payment Successful!",
+    "redirecting": "Redirecting you to your course...",
+    "paymentFailed": "Payment failed. Please check your card details.",
+    "paymentError": "Payment could not be processed. Please try again.",
+    "noSession": "No Payment Session",
+    "selectCourse": "Please select a course to purchase from the marketplace.",
+    "unavailable": "Payment Unavailable",
+    "unavailableDesc": "Online payments are not configured for this installation. Please contact your administrator.",
+    "completePurchase": "Complete Your Purchase",
+    "paymentDetails": "Payment Details",
+    "stripeNotice": "Payments are processed securely by Stripe. EduSphere does not store your card details."
+  },
   "forkCourse": "Fork Course",
   "forkCourseSuccess": "Course forked successfully!",
   "forkError": "Failed to fork course. Please try again.",

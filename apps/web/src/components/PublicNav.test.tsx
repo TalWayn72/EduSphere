@@ -240,7 +240,7 @@ describe('PublicNav', () => {
 
     it('all 4 desktop tabs render as <a> elements (not React Router Link)', () => {
       renderNav({}, ['/']);
-      const nav = screen.getByTestId('public-nav');
+      screen.getByTestId('public-nav');
       // Desktop nav is the hidden md:flex div — get all links inside nav
       for (const label of tabLabels) {
         const el = screen.getByText(label);

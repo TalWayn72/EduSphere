@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useExamSessionStore } from '@/stores/exam-session.store';
 
 const WARNING_THRESHOLD = 600; // 10 minutes

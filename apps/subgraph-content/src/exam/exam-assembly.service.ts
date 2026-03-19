@@ -15,7 +15,7 @@ import {
   BadRequestException,
   OnModuleDestroy,
 } from '@nestjs/common';
-import type { ExamItem, ExamBlueprint } from '@edusphere/db';
+import type { ExamItem } from '@edusphere/db';
 import { randomInt } from 'crypto';
 import { ExamItemService } from './exam-item.service';
 import { ExamBlueprintService } from './exam-blueprint.service';

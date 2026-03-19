@@ -3,6 +3,7 @@
  * Route: /admin/overview
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,6 +68,7 @@ function MetricsSkeleton() {
 }
 
 export function AdminOverviewPage() {
+  const { t } = useTranslation('admin');
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -79,7 +81,7 @@ export function AdminOverviewPage() {
   const metrics = data?.tenantMetrics;
 
   return (
-    <AdminLayout title="Admin Overview" description="Tenant metrics and platform health">
+    <AdminLayout title={t('overview.title')} description={t('overview.description')}>
       <div data-testid="admin-overview-page" className="space-y-6">
         <Badge variant="outline" className="border-yellow-400 text-yellow-700">
           BETA
@@ -90,7 +92,7 @@ export function AdminOverviewPage() {
         {error && !fetching && (
           <Card>
             <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load metrics. Please try again later.
+              {t('overview.loadError')}
             </CardContent>
           </Card>
         )}
@@ -99,27 +101,27 @@ export function AdminOverviewPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               testId="metric-total-users"
-              title="Total Users"
+              title={t('stats.totalUsers')}
               value={metrics.totalUsers.toLocaleString()}
-              description="Registered users across tenant"
+              description={t('overview.registeredUsers')}
             />
             <MetricCard
               testId="metric-active-courses"
-              title="Active Courses"
+              title={t('overview.activeCourses')}
               value={metrics.activeCourses.toLocaleString()}
-              description="Currently published courses"
+              description={t('overview.publishedCourses')}
             />
             <MetricCard
               testId="metric-storage-used"
-              title="Storage Used"
+              title={t('stats.storageUsed')}
               value={`${(metrics.storageUsedMb / 1024).toFixed(1)} GB`}
-              description="Total media and document storage"
+              description={t('overview.totalStorage')}
             />
             <MetricCard
               testId="metric-monthly-active-users"
-              title="Monthly Active Users"
+              title={t('overview.monthlyActiveUsers')}
               value={metrics.monthlyActiveUsers.toLocaleString()}
-              description="Users active in last 30 days"
+              description={t('overview.usersLast30Days')}
             />
           </div>
         )}

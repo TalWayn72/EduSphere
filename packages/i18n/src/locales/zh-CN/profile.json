@@ -1,0 +1,17 @@
+{
+  "profileNotAvailable": "Profile Not Available",
+  "profilePrivateOrNotExists": "This profile is private or does not exist",
+  "browseCourses": "Browse Courses",
+  "currentStreak": "Current Streak",
+  "coursesCompleted": "Courses Completed",
+  "badgesEarned": "Badges Earned",
+  "conceptsMastered": "Concepts Mastered",
+  "learningMinutes": "Learning Minutes",
+  "memberSince": "Member Since",
+  "followers": "Followers",
+  "following": "Following",
+  "copied": "Copied!",
+  "share": "Share",
+  "completedCourses": "Completed Courses",
+  "moreCourses": "more courses"
+}

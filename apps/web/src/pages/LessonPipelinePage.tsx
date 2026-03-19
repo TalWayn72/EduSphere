@@ -182,7 +182,7 @@ export function LessonPipelinePage() {
           onServerTemplate={(tpl) => { loadServerTemplate(tpl.nodes); setCustomMode(false); }}
           onCreateTemplate={async (name) => {
             const { error } = await createTemplate({ input: { name, nodes, config: {} } });
-            if (error) { toast.error(error.graphQLErrors?.[0]?.message ?? error.message); return false; }
+            if (error) { console.error('[LessonPipelinePage] createTemplate failed:', error.message); toast.error('Failed to save template. Please try again.'); return false; }
             toast.success('התבנית נשמרה בהצלחה'); return true;
           }}
           onRestore={(run) => { if (run.results.length > 0) reexecute({ requestPolicy: 'network-only' }); }}

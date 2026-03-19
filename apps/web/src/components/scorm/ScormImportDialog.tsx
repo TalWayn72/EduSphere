@@ -104,7 +104,7 @@ export function ScormImportDialog({
 
       // 3. Trigger SCORM import mutation
       const result = await importPackage({ fileKey });
-      if (result.error) throw new Error(result.error.message);
+      if (result.error) throw new Error('Import failed');
 
       const courseId = result.data?.importScormPackage.courseId ?? '';
       setProgress(100);

@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,6 +102,7 @@ const ALLOWED_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
 export function CourseAnalyticsPage() {
   const { courseId = '' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation('errors');
   const role = useAuthRole();
   const [resolving, setResolving] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -154,7 +156,7 @@ export function CourseAnalyticsPage() {
       <Layout>
         <div className="flex items-center gap-2 p-6 text-destructive">
           <AlertCircle className="h-5 w-5" />
-          <span>Failed to load analytics. {error?.message}</span>
+          <span>{t('loadFailed')}</span>
         </div>
       </Layout>
     );

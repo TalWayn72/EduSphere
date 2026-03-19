@@ -83,7 +83,7 @@ interface DistributionRowProps {
   onUpdate: (patch: Partial<DistributionItem>) => void;
 }
 
-function DistributionRow({ item, index, onUpdate }: DistributionRowProps) {
+function DistributionRow({ item, index: _index, onUpdate }: DistributionRowProps) {
   return (
     <div className="grid grid-cols-[140px_1fr_70px_70px] items-center gap-3">
       <span className="text-sm font-medium truncate">{item.label}</span>

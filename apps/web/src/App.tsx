@@ -15,6 +15,7 @@ import { useTokenExpiryWatcher } from '@/hooks/useTokenExpiryWatcher';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { DirectionProvider } from '@/contexts/DirectionContext';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { SkipLinks } from '@/components/a11y/SkipLinks';
 import { registerServiceWorker } from '@/pwa';
@@ -127,24 +128,26 @@ function App() {
 
   return (
     <ThemeProvider>
-      <WebSiteSchema />
-      <OrganizationSchema />
-      <SkipLinks />
-      <QueryClientProvider client={queryClient}>
-        <UrqlProvider value={urqlClient}>
-          <BrandingProvider>
-            <TooltipProvider>
-              <GlobalLocaleSync />
-              <StorageWarningBanner />
-              <Toaster />
-              <SessionExpiryDialog open={sessionExpired} onReLogin={handleReLogin} />
-              <ErrorBoundary pageName="App">
-                <RouterProvider router={router} />
-              </ErrorBoundary>
-            </TooltipProvider>
-          </BrandingProvider>
-        </UrqlProvider>
-      </QueryClientProvider>
+      <DirectionProvider>
+        <WebSiteSchema />
+        <OrganizationSchema />
+        <SkipLinks />
+        <QueryClientProvider client={queryClient}>
+          <UrqlProvider value={urqlClient}>
+            <BrandingProvider>
+              <TooltipProvider>
+                <GlobalLocaleSync />
+                <StorageWarningBanner />
+                <Toaster />
+                <SessionExpiryDialog open={sessionExpired} onReLogin={handleReLogin} />
+                <ErrorBoundary pageName="App">
+                  <RouterProvider router={router} />
+                </ErrorBoundary>
+              </TooltipProvider>
+            </BrandingProvider>
+          </UrqlProvider>
+        </QueryClientProvider>
+      </DirectionProvider>
     </ThemeProvider>
   );
 }

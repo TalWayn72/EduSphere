@@ -11,6 +11,7 @@
  * memory (React state) for the lifetime of this page.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import {
@@ -41,6 +42,7 @@ interface CheckoutFormProps {
 }
 
 function CheckoutForm({ courseId }: CheckoutFormProps) {
+  const { t } = useTranslation('courses');
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -65,8 +67,8 @@ function CheckoutForm({ courseId }: CheckoutFormProps) {
       setStatus('error');
       setErrorMessage(
         error.type === 'card_error' || error.type === 'validation_error'
-          ? (error.message ?? 'Payment failed. Please check your card details.')
-          : 'Payment could not be processed. Please try again.'
+          ? (error.message ?? t('checkout.paymentFailed'))
+          : t('checkout.paymentError')
       );
       return;
     }
@@ -93,9 +95,9 @@ function CheckoutForm({ courseId }: CheckoutFormProps) {
         aria-live="polite"
       >
         <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Payment Successful!</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('checkout.paymentSuccessful')}</h2>
         <p className="text-muted-foreground">
-          Redirecting you to your course…
+          {t('checkout.redirecting')}
         </p>
       </div>
     );
@@ -128,10 +130,10 @@ function CheckoutForm({ courseId }: CheckoutFormProps) {
         {status === 'processing' ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing…
+            {t('checkout.processing')}
           </>
         ) : (
-          'Pay Now'
+          t('checkout.payNow')
         )}
       </Button>
     </form>
@@ -141,6 +143,7 @@ function CheckoutForm({ courseId }: CheckoutFormProps) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export function CheckoutPage() {
+  const { t } = useTranslation('courses');
   const [searchParams] = useSearchParams();
   const clientSecret = searchParams.get('secret');
   const courseId = searchParams.get('course');
@@ -151,9 +154,9 @@ export function CheckoutPage() {
       <Layout>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
           <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">No Payment Session</h1>
+          <h1 className="text-2xl font-bold mb-2">{t('checkout.noSession')}</h1>
           <p className="text-muted-foreground">
-            Please select a course to purchase from the marketplace.
+            {t('checkout.selectCourse')}
           </p>
         </div>
       </Layout>
@@ -166,10 +169,9 @@ export function CheckoutPage() {
       <Layout>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
           <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Payment Unavailable</h1>
+          <h1 className="text-2xl font-bold mb-2">{t('checkout.unavailable')}</h1>
           <p className="text-muted-foreground">
-            Online payments are not configured for this installation. Please
-            contact your administrator.
+            {t('checkout.unavailableDesc')}
           </p>
         </div>
       </Layout>
@@ -180,11 +182,11 @@ export function CheckoutPage() {
     <Layout>
       <div className="max-w-lg mx-auto px-4 py-12">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          Complete Your Purchase
+          {t('checkout.completePurchase')}
         </h1>
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Payment Details</CardTitle>
+            <CardTitle className="text-lg">{t('checkout.paymentDetails')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Elements
@@ -202,8 +204,7 @@ export function CheckoutPage() {
           </CardContent>
         </Card>
         <p className="mt-4 text-xs text-center text-muted-foreground">
-          Payments are processed securely by Stripe. EduSphere does not store
-          your card details.
+          {t('checkout.stripeNotice')}
         </p>
       </div>
     </Layout>

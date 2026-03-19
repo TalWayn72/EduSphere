@@ -1,5 +1,12 @@
 {
   "generic": "出现错误，请重试。",
+  "genericError": "发生错误，请重试。",
+  "loadFailed": "数据加载失败，请重试。",
+  "saveFailed": "保存失败，请重试。",
+  "paymentFailed": "支付失败，请检查您的信息。",
+  "networkError": "网络错误，请检查您的连接。",
+  "sessionExpired": "您的会话已过期，请重新登录。",
+  "permissionDenied": "您没有权限执行此操作。",
   "network": "网络错误，请检查您的连接。",
   "notFound": "未找到请求的资源。",
   "unauthorized": "您无权执行此操作。",

@@ -52,7 +52,7 @@ export function ScheduleLiveSessionModal({
     });
 
     if (result.error) {
-      setError(result.error.message);
+      setError(t('liveSession.scheduleFailed', 'Failed to schedule session. Please try again.'));
       return;
     }
 

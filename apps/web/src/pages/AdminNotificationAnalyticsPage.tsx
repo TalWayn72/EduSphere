@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BarChart3 } from 'lucide-react';
@@ -48,6 +49,7 @@ function DataTable({ headers, rows }: { headers: string[]; rows: (string | numbe
 }
 
 export function AdminNotificationAnalyticsPage() {
+  const { t } = useTranslation('admin');
   const today = new Date().toISOString().slice(0, 10);
   const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
   const [startDate, setStartDate] = useState(weekAgo);
@@ -64,39 +66,39 @@ export function AdminNotificationAnalyticsPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
         <BarChart3 className="h-6 w-6" aria-hidden="true" />
-        <h1 className="text-2xl font-bold">Notification Analytics</h1>
+        <h1 className="text-2xl font-bold">{t('notifications.analyticsTitle')}</h1>
       </div>
 
       <div className="flex items-end gap-4 mb-6">
         <div>
-          <Label htmlFor="start-date">Start Date</Label>
+          <Label htmlFor="start-date">{t('notifications.startDate')}</Label>
           <Input id="start-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </div>
         <div>
-          <Label htmlFor="end-date">End Date</Label>
+          <Label htmlFor="end-date">{t('notifications.endDate')}</Label>
           <Input id="end-date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>
       </div>
 
-      {fetching ? <p>Loading...</p> : analytics ? (
+      {fetching ? <p>{t('notifications.loading')}</p> : analytics ? (
         <div className="space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatCard label="Total Sent" value={analytics.totalSent} />
-            <StatCard label="Total Delivered" value={analytics.totalDelivered} />
-            <StatCard label="Total Failed" value={analytics.totalFailed} />
+            <StatCard label={t('notifications.totalSent')} value={analytics.totalSent} />
+            <StatCard label={t('notifications.totalDelivered')} value={analytics.totalDelivered} />
+            <StatCard label={t('notifications.totalFailed')} value={analytics.totalFailed} />
           </div>
           <section>
-            <h2 className="text-lg font-semibold mb-3">By Channel</h2>
-            <DataTable headers={['Channel', 'Sent', 'Delivered', 'Failed']}
+            <h2 className="text-lg font-semibold mb-3">{t('notifications.byChannel')}</h2>
+            <DataTable headers={[t('notifications.channel'), t('notifications.sent'), t('notifications.delivered'), t('notifications.failed')]}
               rows={analytics.byChannel.map((r) => [r.channel, r.sent, r.delivered, r.failed])} />
           </section>
           <section>
-            <h2 className="text-lg font-semibold mb-3">By Notification Type</h2>
-            <DataTable headers={['Type', 'Sent', 'Delivered', 'Failed']}
+            <h2 className="text-lg font-semibold mb-3">{t('notifications.byType')}</h2>
+            <DataTable headers={[t('notifications.type'), t('notifications.sent'), t('notifications.delivered'), t('notifications.failed')]}
               rows={analytics.byType.map((r) => [r.notificationType, r.sent, r.delivered, r.failed])} />
           </section>
         </div>
-      ) : <p>No data available</p>}
+      ) : <p>{t('notifications.noData')}</p>}
     </div>
   );
 }

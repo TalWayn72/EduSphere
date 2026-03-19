@@ -2,7 +2,8 @@
  * ItemBankTable — sortable, paginated data table for the exam item bank.
  * Supports row selection for bulk operations.
  */
-import { useState } from 'react';
+// useState reserved for future row selection state
+// import { useState } from 'react';
 import {
   Table,
   TableBody,

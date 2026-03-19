@@ -52,5 +52,8 @@ export const NAMESPACES = [
   'offline',
   'admin',
   'srs',
+  'social',
+  'gamification',
+  'profile',
 ] as const;
 export type I18nNamespace = (typeof NAMESPACES)[number];

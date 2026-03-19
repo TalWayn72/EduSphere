@@ -2,7 +2,7 @@
  * ExamItemGeneratorPage — AI-powered exam item generation.
  * Route: /courses/:courseId/exams/generate
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Layout } from '@/components/Layout';
@@ -83,7 +83,7 @@ export function ExamItemGeneratorPage() {
     setResults((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleEdit = (index: number) => {
+  const handleEdit = (_index: number) => {
     toast.info('Edit in the Item Editor after approving');
   };
 

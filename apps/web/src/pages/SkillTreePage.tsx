@@ -6,6 +6,7 @@
  * Falls back to SAMPLE_SKILL_TREE_DATA when query errors or returns empty.
  */
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -108,6 +109,7 @@ function isValidCourseId(id: string): boolean {
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function SkillTreePage() {
+  const { t } = useTranslation('knowledge');
   const { courseId = 'all' } = useParams<{ courseId?: string }>();
   const [mounted, setMounted] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -192,9 +194,9 @@ export function SkillTreePage() {
           data-testid="skill-tree-invalid-id"
           role="alert"
         >
-          <p className="text-lg font-semibold text-destructive">Invalid course ID</p>
+          <p className="text-lg font-semibold text-destructive">{t('skillTree.invalidId')}</p>
           <p className="text-sm text-muted-foreground">
-            The course ID &quot;{courseId}&quot; is not a valid identifier.
+            {t('skillTree.invalidIdDesc', { courseId })}
           </p>
         </div>
       </Layout>
@@ -212,12 +214,12 @@ export function SkillTreePage() {
               data-testid="skill-tree-page-title"
             >
               <Network className="h-6 w-6 text-indigo-500" />
-              Skill Tree
+              {t('skillTree.title')}
             </h1>
             <p className="text-sm text-muted-foreground">
               {isSampleData
-                ? 'Sample data — connect to live API for real knowledge graph'
-                : `Course: ${courseId}`}
+                ? t('skillTree.sampleData')
+                : t('skillTree.courseLabel', { courseId })}
             </p>
           </div>
 
@@ -230,7 +232,7 @@ export function SkillTreePage() {
               <div>
                 <p className="text-xs font-semibold">{selectedNode.label}</p>
                 <p className="text-xs text-muted-foreground capitalize">
-                  Mastery: {selectedNode.mastery}
+                  {t('skillTree.mastery')}: {selectedNode.mastery}
                 </p>
               </div>
               <Button
@@ -246,7 +248,7 @@ export function SkillTreePage() {
                 {updateResult.fetching ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  'Advance Mastery'
+                  t('skillTree.advanceMastery')
                 )}
               </Button>
             </div>
@@ -260,7 +262,7 @@ export function SkillTreePage() {
             data-testid="skill-tree-loading"
           >
             <Loader2 className="h-3 w-3 animate-spin" />
-            Loading skill tree...
+            {t('skillTree.loading')}
           </div>
         )}
 
@@ -272,7 +274,7 @@ export function SkillTreePage() {
             className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2"
             data-testid="skill-tree-error"
           >
-            Could not load live data — showing sample skill tree.
+            {t('skillTree.loadError')}
           </div>
         )}
 
@@ -284,7 +286,7 @@ export function SkillTreePage() {
             className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded px-3 py-2"
             data-testid="mastery-update-error"
           >
-            Failed to update mastery level. Changes have been reverted.
+            {t('skillTree.updateError')}
           </div>
         )}
 
@@ -294,8 +296,7 @@ export function SkillTreePage() {
             className="text-xs text-muted-foreground bg-muted/40 border border-muted rounded px-3 py-2"
             data-testid="skill-tree-sample-notice"
           >
-            Showing sample skill tree data. Enroll in a course to see your
-            personalized knowledge graph.
+            {t('skillTree.sampleNotice')}
           </div>
         )}
 

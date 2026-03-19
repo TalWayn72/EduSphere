@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EXPORT_COURSE_AS_SCORM_MUTATION } from '@/lib/graphql/scorm.queries';
@@ -22,6 +23,7 @@ export function ScormExportButton({
   courseId,
   courseTitle,
 }: ScormExportButtonProps) {
+  const { t } = useTranslation('errors');
   const [error, setError] = useState<string | null>(null);
   const [, exportScorm] = useMutation<ExportMutationData>(
     EXPORT_COURSE_AS_SCORM_MUTATION
@@ -32,7 +34,7 @@ export function ScormExportButton({
     const result = await exportScorm({ courseId });
 
     if (result.error) {
-      setError(result.error.message);
+      setError(t('saveFailed'));
       return;
     }
 

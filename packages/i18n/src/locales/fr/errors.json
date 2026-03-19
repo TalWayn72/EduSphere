@@ -1,5 +1,12 @@
 {
   "generic": "Quelque chose s'est mal passé. Veuillez réessayer.",
+  "genericError": "Une erreur s'est produite. Veuillez réessayer.",
+  "loadFailed": "Échec du chargement des données. Veuillez réessayer.",
+  "saveFailed": "Échec de l'enregistrement. Veuillez réessayer.",
+  "paymentFailed": "Le paiement a échoué. Veuillez vérifier vos informations.",
+  "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+  "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+  "permissionDenied": "Vous n'avez pas la permission d'effectuer cette action.",
   "network": "Erreur réseau. Veuillez vérifier votre connexion.",
   "notFound": "La ressource demandée est introuvable.",
   "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",

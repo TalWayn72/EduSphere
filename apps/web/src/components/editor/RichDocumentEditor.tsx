@@ -96,11 +96,7 @@ export function RichDocumentEditor({
     });
 
     if (error) {
-      const msg =
-        error.graphQLErrors?.[0]?.message ??
-        error.message ??
-        'Failed to save document';
-      toast.error(msg);
+      toast.error('Failed to save. Please try again.');
       return;
     }
 

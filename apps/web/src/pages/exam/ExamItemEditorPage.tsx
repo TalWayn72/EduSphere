@@ -15,7 +15,7 @@ import { useAuthRole } from '@/hooks/useAuthRole';
 import {
   useExamItem, useCreateExamItem, useUpdateExamItem,
 } from '@/hooks/useExamApi';
-import { ExamItemFormFields, type ExamItemFormData } from './ExamItemFormFields';
+import { ExamItemFormFields } from './ExamItemFormFields';
 import { ExamItemIrtDisplay } from './ExamItemIrtDisplay';
 import type { BloomLevel } from '@/types/exam';
 

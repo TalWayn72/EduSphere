@@ -5,6 +5,7 @@
  */
 import React, { useState } from 'react';
 import { useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { ProctoringOverlay } from '@/components/ProctoringOverlay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -77,6 +78,7 @@ export function AssessmentForm({
   const [narrative, setNarrative] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
+  const { t } = useTranslation('errors');
   const [{ fetching, error }, submit] = useMutation(SUBMIT_RESPONSE_MUTATION);
 
   function handleScoreChange(id: string, score: number) {
@@ -155,7 +157,7 @@ export function AssessmentForm({
             rows={3}
           />
         </div>
-        {error && <p className="text-sm text-destructive">{error.message}</p>}
+        {error && <p className="text-sm text-destructive">{t('saveFailed')}</p>}
         <Button
           onClick={() => void handleSubmit()}
           disabled={fetching || !allRated}

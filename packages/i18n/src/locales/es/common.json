@@ -28,6 +28,7 @@
   "optional": "Opcional",
   "required": "Obligatorio",
   "add": "Agregar",
+  "browse": "Browse",
   "annotations": "Anotaciones",
   "graph": "Gráfico",
   "accountInformation": "Información de cuenta",
@@ -62,12 +63,43 @@
     "stay": "Stay on page"
   },
   "progress": {
-    "aiGen": { "analyzing": "Analizando el tema...", "buildingOutline": "Construyendo esquema del curso...", "creatingModules": "Creando módulos...", "almostReady": "Casi listo..." },
-    "upload": { "preparing": "Preparando subida...", "uploading": "Subiendo archivo...", "confirming": "Confirmando subida...", "done": "¡Listo!" },
-    "quiz": { "checkingAnswers": "Revisando respuestas...", "calculatingScore": "Calculando puntuación...", "preparingFeedback": "Preparando retroalimentación..." },
-    "import": { "connecting": "Conectando al origen...", "importing": "Importando contenido...", "processingLessons": "Procesando lecciones...", "almostDone": "Casi terminamos..." },
-    "chat": { "thinking": "Pensando...", "composing": "Redactando respuesta...", "almostReady": "Casi listo..." },
-    "page": { "loadingData": "Cargando datos...", "processing": "Procesando...", "almostReady": "Casi listo..." },
-    "assignment": { "submitting": "Enviando tarea...", "validating": "Validando...", "saving": "Guardando..." }
+    "aiGen": {
+      "analyzing": "Analizando el tema...",
+      "buildingOutline": "Construyendo esquema del curso...",
+      "creatingModules": "Creando módulos...",
+      "almostReady": "Casi listo..."
+    },
+    "upload": {
+      "preparing": "Preparando subida...",
+      "uploading": "Subiendo archivo...",
+      "confirming": "Confirmando subida...",
+      "done": "¡Listo!"
+    },
+    "quiz": {
+      "checkingAnswers": "Revisando respuestas...",
+      "calculatingScore": "Calculando puntuación...",
+      "preparingFeedback": "Preparando retroalimentación..."
+    },
+    "import": {
+      "connecting": "Conectando al origen...",
+      "importing": "Importando contenido...",
+      "processingLessons": "Procesando lecciones...",
+      "almostDone": "Casi terminamos..."
+    },
+    "chat": {
+      "thinking": "Pensando...",
+      "composing": "Redactando respuesta...",
+      "almostReady": "Casi listo..."
+    },
+    "page": {
+      "loadingData": "Cargando datos...",
+      "processing": "Procesando...",
+      "almostReady": "Casi listo..."
+    },
+    "assignment": {
+      "submitting": "Enviando tarea...",
+      "validating": "Validando...",
+      "saving": "Guardando..."
+    }
   }
 }

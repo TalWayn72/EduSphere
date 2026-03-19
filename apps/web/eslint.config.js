@@ -109,6 +109,9 @@ export default [
         IntersectionObserverInit: 'readonly',
         IntersectionObserverEntry: 'readonly',
         HTMLMediaElement: 'readonly',
+        sessionStorage: 'readonly',
+        Storage: 'readonly',
+        DOMException: 'readonly',
       },
     },
     plugins: {

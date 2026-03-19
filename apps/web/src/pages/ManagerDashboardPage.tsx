@@ -4,6 +4,7 @@
  * Phase 37: new Manager Dashboard feature.
  */
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +41,7 @@ interface TeamQueryData {
 }
 
 export function ManagerDashboardPage() {
+  const { t } = useTranslation('admin');
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -80,7 +82,7 @@ export function ManagerDashboardPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Users className="h-8 w-8 text-indigo-500" aria-hidden />
-        <h1 className="text-3xl font-bold">Manager Dashboard</h1>
+        <h1 className="text-3xl font-bold">{t('manager.title')}</h1>
       </div>
 
       {/* Stats row */}
@@ -88,7 +90,7 @@ export function ManagerDashboardPage() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <CardTitle className="text-sm font-medium">Team Members</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('manager.teamMembers')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{overview?.memberCount ?? 0}</p>
@@ -98,7 +100,7 @@ export function ManagerDashboardPage() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
             <TrendingUp className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <CardTitle className="text-sm font-medium">Avg Completion</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('manager.avgCompletion')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{overview?.avgCompletionPct ?? 0}%</p>
@@ -108,7 +110,7 @@ export function ManagerDashboardPage() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500" aria-hidden />
-            <CardTitle className="text-sm font-medium">At-Risk Learners</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('manager.atRiskLearners')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p
@@ -122,7 +124,7 @@ export function ManagerDashboardPage() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
             <Star className="h-4 w-4 text-yellow-500" aria-hidden />
-            <CardTitle className="text-sm font-medium">Avg XP This Week</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('manager.avgXpThisWeek')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{overview?.avgXpThisWeek ?? 0}</p>
@@ -133,23 +135,23 @@ export function ManagerDashboardPage() {
       {/* Members table */}
       <Card>
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle>{t('manager.teamMembers')}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {members.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">
-              No team members yet. Add members to start tracking progress.
+              {t('manager.noMembers')}
             </div>
           ) : (
             <table className="w-full">
               <thead>
                 <tr className="border-b text-left text-sm text-muted-foreground">
-                  <th className="p-4">Name</th>
-                  <th className="p-4">Courses</th>
-                  <th className="p-4">Avg Completion</th>
-                  <th className="p-4">Level</th>
-                  <th className="p-4">Total XP</th>
-                  <th className="p-4">Status</th>
+                  <th className="p-4">{t('manager.colName')}</th>
+                  <th className="p-4">{t('manager.colCourses')}</th>
+                  <th className="p-4">{t('manager.colAvgCompletion')}</th>
+                  <th className="p-4">{t('manager.colLevel')}</th>
+                  <th className="p-4">{t('manager.colTotalXp')}</th>
+                  <th className="p-4">{t('manager.colStatus')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -173,11 +175,11 @@ export function ManagerDashboardPage() {
                     <td className="p-4">
                       {m.isAtRisk ? (
                         <Badge variant="destructive" className="text-xs">
-                          At Risk
+                          {t('manager.statusAtRisk')}
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="text-xs">
-                          Active
+                          {t('manager.statusActive')}
                         </Badge>
                       )}
                     </td>

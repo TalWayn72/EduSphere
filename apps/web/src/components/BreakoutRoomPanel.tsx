@@ -3,6 +3,7 @@
  */
 import { useState } from 'react';
 import { useMutation, useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,7 @@ function RoomRow({ room }: { room: BreakoutRoomData }) {
 }
 
 export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
+  const { t } = useTranslation('errors');
   const [rooms, setRooms] = useState<RoomFormEntry[]>([
     { roomName: '', capacity: 10, assignedUserIds: [] },
   ]);
@@ -98,7 +100,7 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
         })),
       });
       if (result.error) {
-        setError(result.error.message);
+        setError(t('saveFailed'));
         return;
       }
       setRooms([{ roomName: '', capacity: 10, assignedUserIds: [] }]);

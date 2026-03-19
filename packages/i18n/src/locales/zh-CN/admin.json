@@ -1,84 +1,178 @@
 {
   "sidebar": {
     "groups": {
-      "overview": "概览",
-      "organization": "组织",
-      "people": "人员",
-      "learning": "学习",
-      "integrations": "集成",
-      "securityCompliance": "安全与合规",
-      "settings": "设置"
+      "overview": "Overview",
+      "organization": "Organization",
+      "people": "People",
+      "learning": "Learning",
+      "integrations": "Integrations",
+      "securityCompliance": "Security & Compliance",
+      "settings": "Settings"
     },
     "nav": {
-      "dashboard": "控制台",
-      "branding": "品牌",
-      "languages": "语言",
-      "portalBuilder": "门户构建器",
-      "announcements": "公告",
-      "users": "用户",
-      "rolesPermissions": "角色与权限",
-      "enrollment": "注册",
-      "compliance": "合规",
-      "cpd": "CPD / 学分",
-      "assessments": "360°评估",
-      "atRiskLearners": "高风险学员",
-      "gamification": "游戏化",
+      "dashboard": "Dashboard",
+      "branding": "Branding",
+      "languages": "Languages",
+      "portalBuilder": "Portal Builder",
+      "announcements": "Announcements",
+      "users": "Users",
+      "rolesPermissions": "Roles & Permissions",
+      "enrollment": "Enrollment",
+      "compliance": "Compliance",
+      "cpd": "CPD / Credits",
+      "assessments": "360° Assessments",
+      "atRiskLearners": "At-Risk Learners",
+      "gamification": "Gamification",
       "lti": "LTI 1.3",
       "scimHris": "SCIM / HRIS",
       "crmSalesforce": "CRM (Salesforce)",
       "xapiLrs": "xAPI / LRS",
-      "biExport": "BI导出",
-      "securitySettings": "安全设置",
-      "auditLog": "审计日志",
-      "notificationTemplates": "通知模板"
+      "biExport": "BI Export",
+      "securitySettings": "Security Settings",
+      "auditLog": "Audit Log",
+      "notificationTemplates": "Notification Templates"
     }
   },
   "dashboard": {
-    "title": "管理控制台",
-    "description": "平台概览与关键指标",
-    "adminTools": "管理工具",
-    "recentActivity": "最近活动",
-    "activityFeed": "活动记录",
-    "noActivity": "最近的管理活动将显示在这里。",
-    "loadError": "加载仪表盘数据失败",
+    "title": "Admin Dashboard",
+    "description": "Platform overview and key metrics",
+    "adminTools": "Admin Tools",
+    "recentActivity": "Recent Activity",
+    "activityFeed": "Activity Feed",
+    "noActivity": "Recent admin activity will appear here.",
+    "loadError": "Failed to load dashboard data",
     "quickLinks": {
-      "branding": {
-        "label": "品牌",
-        "desc": "标志、颜色、主题"
-      },
-      "users": {
-        "label": "用户",
-        "desc": "管理学员和管理员"
-      },
-      "compliance": {
-        "label": "合规",
-        "desc": "报告和截止日期"
-      },
+      "branding": { "label": "Branding", "desc": "Logos, colors, themes" },
+      "users": { "label": "Users", "desc": "Manage learners and admins" },
+      "compliance": { "label": "Compliance", "desc": "Reports and deadlines" },
       "gamification": {
-        "label": "游戏化",
-        "desc": "积分、徽章、排行榜"
+        "label": "Gamification",
+        "desc": "Points, badges, leaderboards"
       },
-      "security": {
-        "label": "安全",
-        "desc": "MFA、SSO、会话策略"
-      },
-      "auditLog": {
-        "label": "审计日志",
-        "desc": "管理员操作历史"
-      }
+      "security": { "label": "Security", "desc": "MFA, SSO, session policy" },
+      "auditLog": { "label": "Audit Log", "desc": "Admin action history" }
     }
-  },
-  "stats": {
-    "totalUsers": "总用户数",
-    "activeThisMonth": "本月活跃",
-    "totalCourses": "总课程数",
-    "completions30d": "完成数(30天)",
-    "atRiskLearners": "高风险学员",
-    "storageUsed": "已用存储"
   },
   "activityFeed": {
     "title": "Recent Activity",
     "noActivity": "No recent activity",
     "viewAll": "View all"
+  },
+  "stats": {
+    "totalUsers": "Total Users",
+    "activeThisMonth": "Active This Month",
+    "totalCourses": "Total Courses",
+    "completions30d": "Completions (30d)",
+    "atRiskLearners": "At-Risk Learners",
+    "storageUsed": "Storage Used"
+  },
+  "manager": {
+    "title": "Manager Dashboard",
+    "teamMembers": "Team Members",
+    "avgCompletion": "Avg Completion",
+    "atRiskLearners": "At-Risk Learners",
+    "avgXpThisWeek": "Avg XP This Week",
+    "noMembers": "No team members yet. Add members to start tracking progress.",
+    "colName": "Name",
+    "colCourses": "Courses",
+    "colAvgCompletion": "Avg Completion",
+    "colLevel": "Level",
+    "colTotalXp": "Total XP",
+    "colStatus": "Status",
+    "statusAtRisk": "At Risk",
+    "statusActive": "Active"
+  },
+  "overview": {
+    "title": "Admin Overview",
+    "description": "Tenant metrics and platform health",
+    "loadError": "Failed to load metrics. Please try again later.",
+    "registeredUsers": "Registered users across tenant",
+    "activeCourses": "Active Courses",
+    "publishedCourses": "Currently published courses",
+    "totalStorage": "Total media and document storage",
+    "monthlyActiveUsers": "Monthly Active Users",
+    "usersLast30Days": "Users active in last 30 days"
+  },
+  "users": {
+    "title": "User Management",
+    "description": "Search, filter, and manage platform users",
+    "searchPlaceholder": "Search users by name or email...",
+    "enroll": "Enroll ({{count}})",
+    "deactivate": "Deactivate ({{count}})",
+    "loadError": "Failed to load users.",
+    "usersCount": "Users ({{count}})",
+    "colName": "Name",
+    "colEmail": "Email",
+    "colRole": "Role",
+    "colStatus": "Status",
+    "colLastLogin": "Last Login",
+    "noUsers": "No users found.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{page}}",
+    "never": "Never"
+  },
+  "announcements": {
+    "title": "Announcements Editor",
+    "description": "Create and schedule platform announcements",
+    "create": "Create Announcement",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Announcement title...",
+    "titleRequired": "Title is required",
+    "bodyLabel": "Body",
+    "bodyPlaceholder": "Announcement body (rich text coming soon)...",
+    "bodyRequired": "Body is required",
+    "scheduleDate": "Schedule Date",
+    "targetRoles": "Target Roles",
+    "save": "Save Announcement",
+    "showPreview": "Show Preview",
+    "hidePreview": "Hide Preview",
+    "preview": "Preview",
+    "untitled": "Untitled Announcement",
+    "noContent": "No content yet...",
+    "scheduled": "Scheduled"
+  },
+  "audit": {
+    "title": "Audit Log Viewer",
+    "description": "Review platform activity and security events",
+    "from": "From",
+    "to": "To",
+    "user": "User",
+    "filterByUser": "Filter by user...",
+    "clear": "Clear",
+    "loadError": "Failed to load audit logs.",
+    "entriesCount": "Audit Entries ({{count}})",
+    "colTimestamp": "Timestamp",
+    "colUser": "User",
+    "colAction": "Action",
+    "colTarget": "Target",
+    "colDetails": "Details",
+    "noEntries": "No audit entries found.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{page}}"
+  },
+  "roleMatrix": {
+    "title": "Role Permission Matrix",
+    "description": "Read-only view of role-based permissions",
+    "rolesVsPermissions": "Roles vs Permissions",
+    "permission": "Permission"
+  },
+  "notifications": {
+    "analyticsTitle": "Notification Analytics",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "loading": "Loading...",
+    "totalSent": "Total Sent",
+    "totalDelivered": "Total Delivered",
+    "totalFailed": "Total Failed",
+    "byChannel": "By Channel",
+    "byType": "By Notification Type",
+    "channel": "Channel",
+    "type": "Type",
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "failed": "Failed",
+    "noData": "No data available"
   }
 }

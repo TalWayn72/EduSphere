@@ -14,7 +14,6 @@ import {
   count,
   closeAllPools,
   withTenantContext,
-  sql,
   isNull,
   desc,
 } from '@edusphere/db';

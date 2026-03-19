@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import {
@@ -91,6 +92,7 @@ function useCopyLink(userId: string) {
 type FollowListType = 'followers' | 'following' | null;
 
 export function PublicProfilePage() {
+  const { t } = useTranslation('profile');
   const { userId } = useParams<{ userId: string }>();
   const { copied, copy } = useCopyLink(userId ?? '');
   const [followListOpen, setFollowListOpen] =
@@ -121,12 +123,12 @@ export function PublicProfilePage() {
       <PublicLayout navVariant="minimal">
         <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-4">
           <Lock className="h-16 w-16 text-muted-foreground" />
-          <h1 className="text-2xl font-bold">Profile Not Available</h1>
+          <h1 className="text-2xl font-bold">{t('profileNotAvailable')}</h1>
           <p className="text-muted-foreground max-w-sm">
-            This profile is private or does not exist.
+            {t('profilePrivateOrNotExists')}
           </p>
           <Button asChild variant="outline">
-            <Link to="/courses">Browse Courses</Link>
+            <Link to="/courses">{t('browseCourses')}</Link>
           </Button>
         </div>
       </PublicLayout>
@@ -140,23 +142,23 @@ export function PublicProfilePage() {
   const stats = [
     {
       icon: Flame,
-      label: 'Current Streak',
+      label: t('currentStreak'),
       value: `${profile.currentStreak}d`,
     },
     {
       icon: BookOpen,
-      label: 'Courses Completed',
+      label: t('coursesCompleted'),
       value: String(profile.completedCoursesCount),
     },
-    { icon: Award, label: 'Badges Earned', value: String(profile.badgesCount) },
+    { icon: Award, label: t('badgesEarned'), value: String(profile.badgesCount) },
     {
       icon: Brain,
-      label: 'Concepts Mastered',
+      label: t('conceptsMastered'),
       value: String(profile.conceptsMastered),
     },
     {
       icon: Clock,
-      label: 'Learning Minutes',
+      label: t('learningMinutes'),
       value: String(profile.totalLearningMinutes),
     },
   ];
@@ -185,7 +187,7 @@ export function PublicProfilePage() {
             <p className="text-sm text-muted-foreground">{profile.bio}</p>
           )}
           <p className="text-xs text-muted-foreground">
-            Member since {formatDate(profile.joinedAt)}
+            {t('memberSince')} {formatDate(profile.joinedAt)}
           </p>
           {/* Follower / following counts */}
           <div className="flex gap-3 pt-1 text-xs">
@@ -197,7 +199,7 @@ export function PublicProfilePage() {
               <span className="font-semibold text-foreground">
                 {followersCount}
               </span>{' '}
-              followers
+              {t('followers')}
             </button>
             <button
               type="button"
@@ -207,7 +209,7 @@ export function PublicProfilePage() {
               <span className="font-semibold text-foreground">
                 {followingCount}
               </span>{' '}
-              following
+              {t('following')}
             </button>
           </div>
         </div>
@@ -225,7 +227,7 @@ export function PublicProfilePage() {
             ) : (
               <Copy className="h-4 w-4 mr-1" />
             )}
-            {copied ? 'Copied!' : 'Share'}
+            {copied ? t('copied') : t('share')}
           </Button>
         </div>
       </Card>

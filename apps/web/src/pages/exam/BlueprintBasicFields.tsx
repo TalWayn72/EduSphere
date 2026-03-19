@@ -5,7 +5,8 @@ import { type UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
+// Slider reserved for future weight distribution UI
+// import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
@@ -20,7 +21,6 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { BlueprintFormData } from './blueprint-schema';

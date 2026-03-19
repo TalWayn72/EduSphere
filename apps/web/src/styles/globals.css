@@ -315,6 +315,21 @@
   text-align: right;
 }
 
+/* Flip text-left / text-right for RTL */
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+
+/* Flip rounded corners for RTL */
+[dir="rtl"] .rounded-l-lg { border-radius: 0 0.5rem 0.5rem 0; }
+[dir="rtl"] .rounded-r-lg { border-radius: 0.5rem 0 0 0.5rem; }
+
+/* Ensure tables respect RTL */
+[dir="rtl"] table th,
+[dir="rtl"] table td { text-align: right; }
+
+/* Flip directional icons in RTL */
+[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+
 /* ── LandingPage — CTA shimmer effect ──────────────────────────────────── */
 @keyframes shimmer {
   0% { background-position: -1000px 0; }

@@ -91,14 +91,14 @@ function setupInsertChain(row: unknown) {
   mockInsert.mockReturnValue({ values: mockValues });
 }
 
-function setupUpdateChain(row: unknown) {
+function _setupUpdateChain(row: unknown) {
   mockReturning.mockResolvedValue([row]);
   mockWhere.mockReturnValue({ returning: mockReturning });
   mockSet.mockReturnValue({ where: mockWhere });
   mockUpdate.mockReturnValue({ set: mockSet });
 }
 
-function setupDeleteChain(rows: unknown[]) {
+function _setupDeleteChain(rows: unknown[]) {
   mockReturning.mockResolvedValue(rows);
   mockWhere.mockReturnValue({ returning: mockReturning });
   mockDelete.mockReturnValue({ where: mockWhere });

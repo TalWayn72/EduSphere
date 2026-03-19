@@ -11,13 +11,6 @@ const NOTIFICATIONS_DIR = resolve(
   join(import.meta.dirname, '.')
 );
 
-const CHANNELS_DIR = resolve(
-  join(import.meta.dirname, 'channels')
-);
-
-const WHATSAPP_DIR = resolve(
-  join(import.meta.dirname, '..', 'whatsapp')
-);
 
 /**
  * Services that manage resources (timers, connections, subscriptions)

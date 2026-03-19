@@ -3,6 +3,7 @@
  * Route: /admin/role-matrix
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,21 +44,22 @@ const MATRIX: Record<Role, Set<Permission>> = {
 };
 
 export function AdminRoleMatrixPage() {
+  const { t } = useTranslation('admin');
   return (
-    <AdminLayout title="Role Permission Matrix" description="Read-only view of role-based permissions">
+    <AdminLayout title={t('roleMatrix.title')} description={t('roleMatrix.description')}>
       <div data-testid="admin-role-matrix-page" className="space-y-4">
         <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
 
         <Card>
           <CardHeader>
-            <CardTitle>Roles vs Permissions</CardTitle>
+            <CardTitle>{t('roleMatrix.rolesVsPermissions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div data-testid="role-matrix-grid" className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="sticky left-0 bg-background">Permission</TableHead>
+                    <TableHead className="sticky left-0 bg-background">{t('roleMatrix.permission')}</TableHead>
                     {ROLES.map((role) => (
                       <TableHead key={role} className="text-center min-w-[100px]">
                         {role}

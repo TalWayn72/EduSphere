@@ -1,5 +1,12 @@
 {
   "generic": "Terjadi kesalahan. Silakan coba lagi.",
+  "genericError": "Terjadi kesalahan. Silakan coba lagi.",
+  "loadFailed": "Gagal memuat data. Silakan coba lagi.",
+  "saveFailed": "Gagal menyimpan. Silakan coba lagi.",
+  "paymentFailed": "Pembayaran gagal. Silakan periksa detail Anda.",
+  "networkError": "Kesalahan jaringan. Silakan periksa koneksi Anda.",
+  "sessionExpired": "Sesi Anda telah berakhir. Silakan masuk kembali.",
+  "permissionDenied": "Anda tidak memiliki izin untuk melakukan tindakan ini.",
   "network": "Kesalahan jaringan. Silakan periksa koneksi Anda.",
   "notFound": "Sumber daya yang diminta tidak ditemukan.",
   "unauthorized": "Anda tidak diizinkan untuk melakukan tindakan ini.",

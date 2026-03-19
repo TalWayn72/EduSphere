@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Zap } from 'lucide-react';
 import {
   Card,
@@ -46,6 +47,7 @@ function parseMicrolessonData(
 }
 
 export function DailyLearningWidget() {
+  const { t } = useTranslation('errors');
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -86,7 +88,7 @@ export function DailyLearningWidget() {
         )}
         {error && (
           <p className="text-sm text-destructive">
-            Could not load lesson: {error.message}
+            {t('loadFailed')}
           </p>
         )}
         {completed && (

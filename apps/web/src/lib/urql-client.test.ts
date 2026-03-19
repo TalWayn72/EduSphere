@@ -280,7 +280,8 @@ describe('APQ (persistedExchange) guard — VITE_APQ_ENABLED', () => {
     // Verify the guard logic used in urql-client.ts
     expect('true' === 'true').toBe(true);
     expect('false' === 'true').toBe(false);
-    expect(undefined === 'true').toBe(false);
+    const undef: string | undefined = undefined;
+    expect(undef === 'true').toBe(false);
     expect('' === 'true').toBe(false);
   });
 });

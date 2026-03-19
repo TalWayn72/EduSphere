@@ -85,7 +85,7 @@ export class ExamItemResolver {
     @Args('input') input: unknown,
     @Context() ctx: GraphQLContext
   ) {
-    const { tenantId, userId } = this.extractAuth(ctx);
+    const { tenantId } = this.extractAuth(ctx);
     this.logger.log({ tenantId }, 'generateExamItems mutation (stub)');
 
     // AI generation is a stub — returns empty result for now.

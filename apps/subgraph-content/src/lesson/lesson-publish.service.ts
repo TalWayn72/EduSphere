@@ -16,7 +16,6 @@ import {
   eq,
   and,
   isNull,
-  desc,
   closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';

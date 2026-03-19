@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { useQuery } from 'urql';
@@ -26,6 +27,7 @@ interface GamificationStats {
 }
 
 export function MyProgressPage() {
+  const { t } = useTranslation(['gamification', 'common']);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export function MyProgressPage() {
     return (
       <Layout>
         <div className="p-6" aria-busy="true" aria-label="Loading progress data">
-          Loading...
+          {t('common:loading')}
         </div>
       </Layout>
     );
@@ -53,7 +55,7 @@ export function MyProgressPage() {
     return (
       <Layout>
         <div className="p-6">
-          <p className="text-destructive">Unable to load progress data. Please try again.</p>
+          <p className="text-destructive">{t('common:unableToLoad')}</p>
         </div>
       </Layout>
     );
@@ -69,34 +71,34 @@ export function MyProgressPage() {
   return (
     <Layout>
       <PageShell size="md" className="p-6">
-        <h1 className="text-3xl font-bold">My Progress</h1>
+        <h1 className="text-3xl font-bold">{t('gamification:myProgress')}</h1>
 
         {!stats ? (
           <p className="text-muted-foreground">
-            Start a course to track your progress!
+            {t('gamification:startCourseToTrack')}
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">Current Streak</p>
+              <p className="text-sm text-muted-foreground">{t('gamification:currentStreak')}</p>
               <p className="text-3xl font-bold">
                 {stats.currentStreak}{' '}
-                <span className="text-sm font-normal">days</span>
+                <span className="text-sm font-normal">{t('gamification:days')}</span>
               </p>
               {stats.longestStreak > 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Longest streak: {stats.longestStreak} days
+                  {t('gamification:longestStreak', { value: stats.longestStreak })}
                 </p>
               )}
             </div>
 
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">Active Challenges</p>
+              <p className="text-sm text-muted-foreground">{t('gamification:activeChallenges')}</p>
               <p className="text-3xl font-bold">{activeChallengesCount}</p>
             </div>
 
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">Leaderboard Position</p>
+              <p className="text-sm text-muted-foreground">{t('gamification:leaderboardPosition')}</p>
               <p className="text-3xl font-bold">
                 {myRank != null ? `#${myRank}` : '—'}
               </p>

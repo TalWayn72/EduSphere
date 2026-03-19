@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { CombinedError } from 'urql';
-import { classifyGraphError, type GraphErrorKind } from './use-graph-data';
+import { classifyGraphError } from './use-graph-data';
 
 // Helper: build a minimal CombinedError-like object for testing.
 function fakeError(

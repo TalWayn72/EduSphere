@@ -7,7 +7,6 @@ import {
   withTenantContext,
   closeAllPools,
   buildRelayConnection,
-  encodeCursor,
 } from '@edusphere/db';
 import type { Database, TenantContext, RelayConnection } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';

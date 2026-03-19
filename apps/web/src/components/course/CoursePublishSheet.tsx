@@ -4,6 +4,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -64,6 +65,7 @@ export const CoursePublishSheet: React.FC<Props> = ({
   onOpenChange,
   onPublished,
 }) => {
+  const { t } = useTranslation('errors');
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [readinessResult] = useQuery<CourseReadinessData>({
@@ -140,7 +142,7 @@ export const CoursePublishSheet: React.FC<Props> = ({
 
           {publishResult.error && (
             <p className="text-sm text-destructive" role="alert">
-              {publishResult.error.message}
+              {t('saveFailed')}
             </p>
           )}
 

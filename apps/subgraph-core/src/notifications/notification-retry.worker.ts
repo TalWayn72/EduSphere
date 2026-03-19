@@ -12,7 +12,6 @@ import {
   lte,
   closeAllPools,
   withTenantContext,
-  sql,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import { EmailChannelService } from './channels/email-channel.service';

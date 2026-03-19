@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,6 +34,7 @@ interface RecommendationsData {
 }
 
 export function SocialFeedPage() {
+  const { t } = useTranslation('social');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -61,13 +63,13 @@ export function SocialFeedPage() {
         {/* Page heading */}
         <div className="flex items-center gap-3">
           <Users className="h-8 w-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">Social Feed</h1>
+          <h1 className="text-3xl font-bold">{t('socialFeed')}</h1>
         </div>
 
         {/* Following Activity */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Following Activity</CardTitle>
+            <CardTitle className="text-lg">{t('followingActivity')}</CardTitle>
           </CardHeader>
           <CardContent>
             {(!mounted || feedFetching) && (
@@ -80,7 +82,7 @@ export function SocialFeedPage() {
 
             {mounted && !feedFetching && feed.length === 0 && (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                Follow learners to see their activity here
+                {t('followLearnersEmptyState')}
               </p>
             )}
 
@@ -100,7 +102,7 @@ export function SocialFeedPage() {
         {/* Recommended Content */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Recommended Content</CardTitle>
+            <CardTitle className="text-lg">{t('recommendedContent')}</CardTitle>
           </CardHeader>
           <CardContent>
             {(!mounted || recsFetching) && (
@@ -113,8 +115,7 @@ export function SocialFeedPage() {
 
             {mounted && !recsFetching && recs.length === 0 && (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No recommendations yet. Start following people to get personalised
-                suggestions.
+                {t('noRecommendationsYet')}
               </p>
             )}
 
@@ -140,9 +141,9 @@ export function SocialFeedPage() {
             <div className="flex items-center gap-3">
               <Search className="h-5 w-5 text-primary" aria-hidden="true" />
               <div>
-                <p className="text-sm font-medium">Find People to Follow</p>
+                <p className="text-sm font-medium">{t('findPeopleToFollow')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Discover other learners and grow your network
+                  {t('discoverLearnersDesc')}
                 </p>
               </div>
             </div>
@@ -150,7 +151,7 @@ export function SocialFeedPage() {
               to="/people"
               className="text-sm font-medium text-primary hover:underline"
             >
-              Browse
+              {t('browse')}
             </Link>
           </CardContent>
         </Card>

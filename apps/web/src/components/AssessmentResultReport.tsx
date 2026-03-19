@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +62,7 @@ function CriteriaCard({ criteria }: { criteria: CriteriaAggregation }) {
 }
 
 export function AssessmentResultReport({ campaignId }: Props) {
+  const { t } = useTranslation('errors');
   const [{ data, fetching, error }] = useQuery({
     query: ASSESSMENT_RESULT_QUERY,
     variables: { campaignId },
@@ -83,7 +85,7 @@ export function AssessmentResultReport({ campaignId }: Props) {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-sm text-destructive">{error.message}</p>
+          <p className="text-sm text-destructive">{t('loadFailed')}</p>
         </CardContent>
       </Card>
     );

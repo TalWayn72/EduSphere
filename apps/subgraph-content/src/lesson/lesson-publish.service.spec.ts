@@ -15,12 +15,12 @@ const { mockCloseAllPools, mockNatsDrain, mockNatsPublish, mockNatsConnect } =
   }));
 
 const mockSelect = vi.fn();
-const mockFrom = vi.fn();
-const mockWhere = vi.fn();
-const mockLimit = vi.fn();
+const _mockFrom = vi.fn();
+const _mockWhere = vi.fn();
+const _mockLimit = vi.fn();
 const mockUpdate = vi.fn();
-const mockSet = vi.fn();
-const mockReturning = vi.fn();
+const _mockSet = vi.fn();
+const _mockReturning = vi.fn();
 
 const mockDb = {
   select: mockSelect,
@@ -89,7 +89,7 @@ const MOCK_RUN_RUNNING = {
 
 /* ── helpers ──────────────────────────────────────────────────────────────── */
 
-function setupFindLesson(lesson: unknown = MOCK_LESSON) {
+function _setupFindLesson(lesson: unknown = MOCK_LESSON) {
   const limitFn = vi.fn().mockResolvedValue(lesson ? [lesson] : []);
   const whereFn = vi.fn().mockReturnValue({ limit: limitFn });
   const fromFn = vi.fn().mockReturnValue({ where: whereFn });
@@ -97,7 +97,7 @@ function setupFindLesson(lesson: unknown = MOCK_LESSON) {
   return { limitFn, whereFn, fromFn };
 }
 
-function setupFindRun(run: unknown = MOCK_RUN_COMPLETED) {
+function _setupFindRun(run: unknown = MOCK_RUN_COMPLETED) {
   // Called second time via select().from().where().limit()
   const limitFn = vi.fn().mockResolvedValue(run ? [run] : []);
   const whereFn = vi.fn().mockReturnValue({ limit: limitFn });

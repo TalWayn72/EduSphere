@@ -60,6 +60,23 @@
     "syncError": "Failed to save consent to server. Please try again."
   },
   "backToPage": "Back",
+  "languageAdmin": {
+    "title": "Language Settings",
+    "subtitle": "Configure language options for your organization",
+    "loading": "Loading language settings...",
+    "defaultLanguage": "Default Language",
+    "defaultLanguageDesc": "New users will see this language by default",
+    "enabledLanguages": "Enabled Languages",
+    "enabledLanguagesDesc": "Choose which languages users can select",
+    "atLeastOne": "At least one language must be enabled",
+    "default": "default",
+    "preview": "Preview",
+    "previewDesc": "Enabled languages in your organization",
+    "rtlApplied": "Right-to-left layout will be applied",
+    "saveChanges": "Save Changes",
+    "saved": "Language settings saved",
+    "saveError": "Failed to save language settings. Please try again."
+  },
   "downloads": {
     "wifiOnlyTitle": "WiFi-Only Downloads",
     "wifiOnlyDescription": "Only download courses when connected to WiFi to save mobile data",

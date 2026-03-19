@@ -4,6 +4,7 @@
  * Access: ORG_ADMIN, SUPER_ADMIN only
  */
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -75,6 +76,7 @@ function RtlBadge() {
 }
 
 export function LanguageSettingsPage() {
+  const { t } = useTranslation('settings');
   const navigate = useNavigate();
   const role = useAuthRole();
   const [defaultLanguage, setDefaultLanguage] = useState('en');
@@ -146,7 +148,7 @@ export function LanguageSettingsPage() {
       input: { defaultLanguage, supportedLanguages: [...supported] },
     });
     if (result.error) {
-      setSaveError('Failed to save language settings. Please try again.');
+      setSaveError(t('languageAdmin.saveError'));
     } else {
       setSaved(true);
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
@@ -163,32 +165,31 @@ export function LanguageSettingsPage() {
       <PageShell size="sm" className="max-w-3xl">
         <Breadcrumbs
           items={[
-            { label: 'Settings', href: '/settings' },
-            { label: 'Language' },
+            { label: t('title'), href: '/settings' },
+            { label: t('language.title') },
           ]}
         />
         <div className="flex items-center gap-3">
           <Languages className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">Language Settings</h1>
+            <h1 className="text-2xl font-bold">{t('languageAdmin.title')}</h1>
             <p className="text-muted-foreground text-sm">
-              Configure language options for your organization
+              {t('languageAdmin.subtitle')}
             </p>
           </div>
         </div>
 
         {queryResult.fetching ? (
           <div className="flex items-center gap-2 text-muted-foreground py-8">
-            <Loader2 className="h-5 w-5 animate-spin" /> Loading language
-            settings...
+            <Loader2 className="h-5 w-5 animate-spin" /> {t('languageAdmin.loading')}
           </div>
         ) : (
           <>
             <Card>
               <CardHeader>
-                <CardTitle>Default Language</CardTitle>
+                <CardTitle>{t('languageAdmin.defaultLanguage')}</CardTitle>
                 <CardDescription>
-                  New users will see this language by default
+                  {t('languageAdmin.defaultLanguageDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -209,16 +210,16 @@ export function LanguageSettingsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Enabled Languages</CardTitle>
+                <CardTitle>{t('languageAdmin.enabledLanguages')}</CardTitle>
                 <CardDescription>
-                  Choose which languages users can select
+                  {t('languageAdmin.enabledLanguagesDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 {supported.size === 0 && (
                   <div className="flex items-center gap-2 text-sm text-amber-600">
                     <AlertCircle className="h-4 w-4" />
-                    At least one language must be enabled
+                    {t('languageAdmin.atLeastOne')}
                   </div>
                 )}
                 {AVAILABLE_LOCALES.map((l) => {
@@ -248,7 +249,7 @@ export function LanguageSettingsPage() {
                       {l.rtl && <RtlBadge />}
                       {isDefault && (
                         <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                          default
+                          {t('languageAdmin.default')}
                         </span>
                       )}
                     </label>
@@ -259,9 +260,9 @@ export function LanguageSettingsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Preview</CardTitle>
+                <CardTitle>{t('languageAdmin.preview')}</CardTitle>
                 <CardDescription>
-                  Enabled languages in your organization
+                  {t('languageAdmin.previewDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -285,9 +286,9 @@ export function LanguageSettingsPage() {
                 </div>
                 {defaultLocale && (
                   <p className="mt-3 text-xs text-muted-foreground">
-                    Default: <strong>{defaultLocale.name}</strong>
+                    {t('languageAdmin.default')}: <strong>{defaultLocale.name}</strong>
                     {defaultLocale.rtl
-                      ? ' - Right-to-left layout will be applied'
+                      ? ` - ${t('languageAdmin.rtlApplied')}`
                       : ''}
                   </p>
                 )}
@@ -302,11 +303,11 @@ export function LanguageSettingsPage() {
                 {mutResult.fetching && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
-                Save Changes
+                {t('languageAdmin.saveChanges')}
               </Button>
               {saved && (
                 <span className="flex items-center gap-1.5 text-sm text-green-600">
-                  <CheckCircle2 className="h-4 w-4" /> Language settings saved
+                  <CheckCircle2 className="h-4 w-4" /> {t('languageAdmin.saved')}
                 </span>
               )}
               {saveError && (

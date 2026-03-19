@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { Trophy } from 'lucide-react';
 import { Layout } from '@/components/Layout';
@@ -32,15 +33,16 @@ const MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
 type Period = 'all' | 'month' | 'week';
 
-const PERIODS: { key: Period; label: string }[] = [
-  { key: 'all', label: 'All Time' },
-  { key: 'month', label: 'This Month' },
-  { key: 'week', label: 'This Week' },
-];
+const PERIOD_KEYS: Record<Period, string> = {
+  all: 'allTime',
+  month: 'thisMonth',
+  week: 'thisWeek',
+};
 
 // ─── LeaderboardPage ──────────────────────────────────────────────────────────
 
 export function LeaderboardPage() {
+  const { t } = useTranslation('gamification');
   const localUser = getCurrentUser();
   const [period, setPeriod] = useState<Period>('all');
 
@@ -63,11 +65,11 @@ export function LeaderboardPage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Trophy className="h-7 w-7 text-yellow-500" />
-            <h1 className="text-2xl font-bold">Leaderboard</h1>
+            <h1 className="text-2xl font-bold">{t('leaderboard')}</h1>
           </div>
           {myRank !== undefined && (
             <span className="bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full">
-              Your rank: #{myRank}
+              {t('yourRank')}: #{myRank}
             </span>
           )}
         </div>
@@ -78,7 +80,7 @@ export function LeaderboardPage() {
           role="tablist"
           aria-label="Time period"
         >
-          {PERIODS.map(({ key, label }) => (
+          {(['all', 'month', 'week'] as Period[]).map((key) => (
             <button
               key={key}
               role="tab"
@@ -90,7 +92,7 @@ export function LeaderboardPage() {
                   : 'bg-background text-muted-foreground hover:bg-muted'
               } ${key !== 'all' ? 'border-l' : ''}`}
             >
-              {label}
+              {t(PERIOD_KEYS[key])}
             </button>
           ))}
         </div>
@@ -103,8 +105,7 @@ export function LeaderboardPage() {
             ))
           ) : entries.length === 0 ? (
             <div className="text-center py-20 text-muted-foreground text-sm">
-              No leaderboard data yet. Complete courses and earn badges to rank
-              up!
+              {t('emptyLeaderboard')}
             </div>
           ) : (
             entries.map((entry) => {
@@ -128,10 +129,10 @@ export function LeaderboardPage() {
                   </span>
                   <span className="flex-1 truncate">{entry.displayName}</span>
                   <span className="text-xs text-muted-foreground shrink-0">
-                    {entry.badgeCount} badge{entry.badgeCount !== 1 ? 's' : ''}
+                    {t('badgeCount', { count: entry.badgeCount })}
                   </span>
                   <span className="font-bold text-primary shrink-0 tabular-nums">
-                    {entry.totalPoints.toLocaleString()} pts
+                    {entry.totalPoints.toLocaleString()} {t('pts')}
                   </span>
                 </div>
               );

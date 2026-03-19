@@ -147,7 +147,7 @@ export class CrdtCompactionService implements OnModuleDestroy {
       .where(eq(schema.collab_documents.id, documentId));
 
     // 5. Delete compacted rows
-    const deleteResult = await this.db
+    await this.db
       .delete(schema.crdt_updates)
       .where(
         sql`${schema.crdt_updates.document_id} = ${documentId} AND ${schema.crdt_updates.created_at} <= ${cutoff}`,

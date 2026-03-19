@@ -64,7 +64,7 @@ function createMockSubscription(): {
 }
 
 // Hoisted mocks for vi.mock factory access
-const { mockDLQPublish, mockJSM, mockNatsConnection } = vi.hoisted(() => {
+const { mockDLQPublish: _mockDLQPublish, mockJSM, mockNatsConnection } = vi.hoisted(() => {
   const mockDLQPublish = vi.fn();
   const mockJSM = {
     streams: {

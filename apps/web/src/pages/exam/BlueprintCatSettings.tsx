@@ -15,7 +15,6 @@ import {
   FormDescription,
   Form,
 } from '@/components/ui/form';
-import type { BlueprintFormData } from './blueprint-schema';
 
 interface BlueprintCatSettingsProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -248,7 +248,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-40"
+          className="fixed bottom-6 end-6 h-14 w-14 rounded-full shadow-lg z-40"
           size="icon"
           aria-label="Open AI chat"
         >
@@ -259,7 +259,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
       <div
         aria-label="AI Chat Panel"
         className={cn(
-          'fixed top-0 right-0 h-full w-full md:w-[480px] bg-background border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col',
+          'fixed top-0 end-0 h-full w-full md:w-[480px] bg-background border-s shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col',
           isOpen ? 'translate-x-0' : 'translate-x-full',
           className
         )}

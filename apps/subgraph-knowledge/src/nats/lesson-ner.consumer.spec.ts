@@ -123,7 +123,7 @@ describe('LessonNERConsumer', () => {
   describe('message processing — consumeLoop (via private access)', () => {
     it('processes valid NER event and calls upsertConceptsFromNER', async () => {
       const payload = createValidPayload();
-      const msg = createNatsMessage('EDUSPHERE.content.tenant-1.ner.extracted', payload);
+      const _msg = createNatsMessage('EDUSPHERE.content.tenant-1.ner.extracted', payload);
 
       // Access the private consumeLoop indirectly by simulating a message
       // We test the core logic via extractTenantFromSubject + direct cypherService call

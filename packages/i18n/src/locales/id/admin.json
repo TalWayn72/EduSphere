@@ -1,84 +1,178 @@
 {
   "sidebar": {
     "groups": {
-      "overview": "Ikhtisar",
-      "organization": "Organisasi",
-      "people": "Orang",
-      "learning": "Pembelajaran",
-      "integrations": "Integrasi",
-      "securityCompliance": "Keamanan & Kepatuhan",
-      "settings": "Pengaturan"
+      "overview": "Overview",
+      "organization": "Organization",
+      "people": "People",
+      "learning": "Learning",
+      "integrations": "Integrations",
+      "securityCompliance": "Security & Compliance",
+      "settings": "Settings"
     },
     "nav": {
-      "dashboard": "Dasbor",
-      "branding": "Merek",
-      "languages": "Bahasa",
-      "portalBuilder": "Pembangun Portal",
-      "announcements": "Pengumuman",
-      "users": "Pengguna",
-      "rolesPermissions": "Peran & Izin",
-      "enrollment": "Pendaftaran",
-      "compliance": "Kepatuhan",
-      "cpd": "CPD / Kredit",
-      "assessments": "Penilaian 360°",
-      "atRiskLearners": "Pelajar Berisiko",
-      "gamification": "Gamifikasi",
+      "dashboard": "Dashboard",
+      "branding": "Branding",
+      "languages": "Languages",
+      "portalBuilder": "Portal Builder",
+      "announcements": "Announcements",
+      "users": "Users",
+      "rolesPermissions": "Roles & Permissions",
+      "enrollment": "Enrollment",
+      "compliance": "Compliance",
+      "cpd": "CPD / Credits",
+      "assessments": "360° Assessments",
+      "atRiskLearners": "At-Risk Learners",
+      "gamification": "Gamification",
       "lti": "LTI 1.3",
       "scimHris": "SCIM / HRIS",
       "crmSalesforce": "CRM (Salesforce)",
       "xapiLrs": "xAPI / LRS",
-      "biExport": "Ekspor BI",
-      "securitySettings": "Pengaturan Keamanan",
-      "auditLog": "Log Audit",
-      "notificationTemplates": "Template Notifikasi"
+      "biExport": "BI Export",
+      "securitySettings": "Security Settings",
+      "auditLog": "Audit Log",
+      "notificationTemplates": "Notification Templates"
     }
   },
   "dashboard": {
-    "title": "Dasbor Admin",
-    "description": "Ikhtisar platform dan metrik utama",
-    "adminTools": "Alat Admin",
-    "recentActivity": "Aktivitas Terkini",
-    "activityFeed": "Feed Aktivitas",
-    "noActivity": "Aktivitas admin terkini akan muncul di sini.",
-    "loadError": "Gagal memuat data dasbor",
+    "title": "Admin Dashboard",
+    "description": "Platform overview and key metrics",
+    "adminTools": "Admin Tools",
+    "recentActivity": "Recent Activity",
+    "activityFeed": "Activity Feed",
+    "noActivity": "Recent admin activity will appear here.",
+    "loadError": "Failed to load dashboard data",
     "quickLinks": {
-      "branding": {
-        "label": "Merek",
-        "desc": "Logo, warna, tema"
-      },
-      "users": {
-        "label": "Pengguna",
-        "desc": "Kelola pelajar dan admin"
-      },
-      "compliance": {
-        "label": "Kepatuhan",
-        "desc": "Laporan dan tenggat waktu"
-      },
+      "branding": { "label": "Branding", "desc": "Logos, colors, themes" },
+      "users": { "label": "Users", "desc": "Manage learners and admins" },
+      "compliance": { "label": "Compliance", "desc": "Reports and deadlines" },
       "gamification": {
-        "label": "Gamifikasi",
-        "desc": "Poin, lencana, papan peringkat"
+        "label": "Gamification",
+        "desc": "Points, badges, leaderboards"
       },
-      "security": {
-        "label": "Keamanan",
-        "desc": "MFA, SSO, kebijakan sesi"
-      },
-      "auditLog": {
-        "label": "Log Audit",
-        "desc": "Riwayat tindakan admin"
-      }
+      "security": { "label": "Security", "desc": "MFA, SSO, session policy" },
+      "auditLog": { "label": "Audit Log", "desc": "Admin action history" }
     }
-  },
-  "stats": {
-    "totalUsers": "Total Pengguna",
-    "activeThisMonth": "Aktif Bulan Ini",
-    "totalCourses": "Total Kursus",
-    "completions30d": "Selesai (30h)",
-    "atRiskLearners": "Pelajar Berisiko",
-    "storageUsed": "Penyimpanan Terpakai"
   },
   "activityFeed": {
     "title": "Recent Activity",
     "noActivity": "No recent activity",
     "viewAll": "View all"
+  },
+  "stats": {
+    "totalUsers": "Total Users",
+    "activeThisMonth": "Active This Month",
+    "totalCourses": "Total Courses",
+    "completions30d": "Completions (30d)",
+    "atRiskLearners": "At-Risk Learners",
+    "storageUsed": "Storage Used"
+  },
+  "manager": {
+    "title": "Manager Dashboard",
+    "teamMembers": "Team Members",
+    "avgCompletion": "Avg Completion",
+    "atRiskLearners": "At-Risk Learners",
+    "avgXpThisWeek": "Avg XP This Week",
+    "noMembers": "No team members yet. Add members to start tracking progress.",
+    "colName": "Name",
+    "colCourses": "Courses",
+    "colAvgCompletion": "Avg Completion",
+    "colLevel": "Level",
+    "colTotalXp": "Total XP",
+    "colStatus": "Status",
+    "statusAtRisk": "At Risk",
+    "statusActive": "Active"
+  },
+  "overview": {
+    "title": "Admin Overview",
+    "description": "Tenant metrics and platform health",
+    "loadError": "Failed to load metrics. Please try again later.",
+    "registeredUsers": "Registered users across tenant",
+    "activeCourses": "Active Courses",
+    "publishedCourses": "Currently published courses",
+    "totalStorage": "Total media and document storage",
+    "monthlyActiveUsers": "Monthly Active Users",
+    "usersLast30Days": "Users active in last 30 days"
+  },
+  "users": {
+    "title": "User Management",
+    "description": "Search, filter, and manage platform users",
+    "searchPlaceholder": "Search users by name or email...",
+    "enroll": "Enroll ({{count}})",
+    "deactivate": "Deactivate ({{count}})",
+    "loadError": "Failed to load users.",
+    "usersCount": "Users ({{count}})",
+    "colName": "Name",
+    "colEmail": "Email",
+    "colRole": "Role",
+    "colStatus": "Status",
+    "colLastLogin": "Last Login",
+    "noUsers": "No users found.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{page}}",
+    "never": "Never"
+  },
+  "announcements": {
+    "title": "Announcements Editor",
+    "description": "Create and schedule platform announcements",
+    "create": "Create Announcement",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Announcement title...",
+    "titleRequired": "Title is required",
+    "bodyLabel": "Body",
+    "bodyPlaceholder": "Announcement body (rich text coming soon)...",
+    "bodyRequired": "Body is required",
+    "scheduleDate": "Schedule Date",
+    "targetRoles": "Target Roles",
+    "save": "Save Announcement",
+    "showPreview": "Show Preview",
+    "hidePreview": "Hide Preview",
+    "preview": "Preview",
+    "untitled": "Untitled Announcement",
+    "noContent": "No content yet...",
+    "scheduled": "Scheduled"
+  },
+  "audit": {
+    "title": "Audit Log Viewer",
+    "description": "Review platform activity and security events",
+    "from": "From",
+    "to": "To",
+    "user": "User",
+    "filterByUser": "Filter by user...",
+    "clear": "Clear",
+    "loadError": "Failed to load audit logs.",
+    "entriesCount": "Audit Entries ({{count}})",
+    "colTimestamp": "Timestamp",
+    "colUser": "User",
+    "colAction": "Action",
+    "colTarget": "Target",
+    "colDetails": "Details",
+    "noEntries": "No audit entries found.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{page}}"
+  },
+  "roleMatrix": {
+    "title": "Role Permission Matrix",
+    "description": "Read-only view of role-based permissions",
+    "rolesVsPermissions": "Roles vs Permissions",
+    "permission": "Permission"
+  },
+  "notifications": {
+    "analyticsTitle": "Notification Analytics",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "loading": "Loading...",
+    "totalSent": "Total Sent",
+    "totalDelivered": "Total Delivered",
+    "totalFailed": "Total Failed",
+    "byChannel": "By Channel",
+    "byType": "By Notification Type",
+    "channel": "Channel",
+    "type": "Type",
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "failed": "Failed",
+    "noData": "No data available"
   }
 }

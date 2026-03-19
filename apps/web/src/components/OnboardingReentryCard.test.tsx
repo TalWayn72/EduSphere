@@ -15,9 +15,9 @@ const storage: Record<string, string> = {};
 
 beforeEach(() => {
   vi.clearAllMocks();
-  for (const key of Object.keys(storage)) delete storage[key]; // eslint-disable-line security/detect-object-injection
-  vi.spyOn(Storage.prototype, 'getItem').mockImplementation((k) => storage[k] ?? null); // eslint-disable-line security/detect-object-injection
-  vi.spyOn(Storage.prototype, 'setItem').mockImplementation((k, v) => { storage[k] = v; }); // eslint-disable-line security/detect-object-injection
+  for (const key of Object.keys(storage)) delete storage[key];
+  vi.spyOn(Storage.prototype, 'getItem').mockImplementation((k) => storage[k] ?? null);
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation((k, v) => { storage[k] = v; });
 });
 
 // ── Tests ───────────────────────────────────────────────────────────────────

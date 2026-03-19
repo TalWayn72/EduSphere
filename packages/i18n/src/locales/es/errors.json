@@ -1,5 +1,12 @@
 {
   "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+  "genericError": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+  "loadFailed": "Error al cargar datos. Por favor, inténtalo de nuevo.",
+  "saveFailed": "Error al guardar. Por favor, inténtalo de nuevo.",
+  "paymentFailed": "El pago falló. Por favor, verifica tus datos.",
+  "networkError": "Error de red. Por favor, comprueba tu conexión.",
+  "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
+  "permissionDenied": "No tienes permiso para realizar esta acción.",
   "network": "Error de red. Por favor, comprueba tu conexión.",
   "notFound": "No se encontró el recurso solicitado.",
   "unauthorized": "No estás autorizado para realizar esta acción.",

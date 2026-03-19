@@ -3,6 +3,7 @@
  * Route: /admin/user-management
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,6 +38,7 @@ export interface AdminUser {
 const ROLES = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN', 'RESEARCHER'];
 
 export function AdminUserManagementPage() {
+  const { t } = useTranslation('admin');
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [page, setPage] = useState(1);
@@ -64,14 +66,14 @@ export function AdminUserManagementPage() {
   }, []);
 
   return (
-    <AdminLayout title="User Management" description="Search, filter, and manage platform users">
+    <AdminLayout title={t('users.title')} description={t('users.description')}>
       <div data-testid="admin-user-management-page" className="space-y-4">
         <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
 
         <div className="flex gap-3 items-center">
           <Input
             data-testid="user-search-input"
-            placeholder="Search users by name or email..."
+            placeholder={t('users.searchPlaceholder')}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="max-w-sm"
@@ -87,10 +89,10 @@ export function AdminUserManagementPage() {
           {selected.size > 0 && (
             <div className="flex gap-2">
               <Button size="sm" variant="outline" data-testid="bulk-enroll-btn">
-                Enroll ({selected.size})
+                {t('users.enroll', { count: selected.size })}
               </Button>
               <Button size="sm" variant="destructive" data-testid="bulk-deactivate-btn">
-                Deactivate ({selected.size})
+                {t('users.deactivate', { count: selected.size })}
               </Button>
             </div>
           )}
@@ -104,23 +106,23 @@ export function AdminUserManagementPage() {
 
         {error && !fetching && (
           <Card><CardContent className="py-8 text-center text-destructive text-sm">
-            Failed to load users.
+            {t('users.loadError')}
           </CardContent></Card>
         )}
 
         {!fetching && !error && (
           <Card>
-            <CardHeader><CardTitle>Users ({data?.adminUsers?.totalCount ?? 0})</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('users.usersCount', { count: data?.adminUsers?.totalCount ?? 0 })}</CardTitle></CardHeader>
             <CardContent>
               <Table data-testid="user-management-table">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-8" />
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Login</TableHead>
+                    <TableHead>{t('users.colName')}</TableHead>
+                    <TableHead>{t('users.colEmail')}</TableHead>
+                    <TableHead>{t('users.colRole')}</TableHead>
+                    <TableHead>{t('users.colStatus')}</TableHead>
+                    <TableHead>{t('users.colLastLogin')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -135,7 +137,7 @@ export function AdminUserManagementPage() {
                   {users.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        No users found.
+                        {t('users.noUsers')}
                       </TableCell>
                     </TableRow>
                   )}
@@ -143,11 +145,11 @@ export function AdminUserManagementPage() {
               </Table>
               <div className="flex justify-between mt-4">
                 <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-                  Previous
+                  {t('users.previous')}
                 </Button>
-                <span className="text-sm text-muted-foreground">Page {page}</span>
+                <span className="text-sm text-muted-foreground">{t('users.page', { page })}</span>
                 <Button size="sm" variant="outline" disabled={!data?.adminUsers?.pageInfo?.hasNextPage} onClick={() => setPage((p) => p + 1)}>
-                  Next
+                  {t('users.next')}
                 </Button>
               </div>
             </CardContent>

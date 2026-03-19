@@ -37,7 +37,7 @@ export async function runCertExamGenerator(
   checkpointer?: Checkpointer,
   searchFn?: CitationSearchFn
 ): Promise<CertExamGenResult> {
-  const cp = checkpointer ?? new MemorySaver();
+  const _cp = checkpointer ?? new MemorySaver();
   const compiled = createCertExamGeneratorWorkflow(model, searchFn);
 
   const state = {
