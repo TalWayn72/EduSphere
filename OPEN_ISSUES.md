@@ -79,6 +79,27 @@
 
 ---
 
+## BUG-093 — AI Course Generation Fails (Direct Ollama API Fix) (19 Mar 2026)
+
+- **Status:** ✅ Fixed — `629de946`
+- **Severity:** 🔴 Critical — AI course creation completely broken
+- **Symptom:** Spinner hangs forever, then times out. Error: "Unsupported model version v3/v1"
+- **Root Cause Chain:**
+  1. Container has `@ai-sdk/openai` v3.0.30 (spec v3) but `ai` v5.0.137 needs spec v2
+  2. `ollama-ai-provider` v1.2.0 returns spec v1 — also rejected
+  3. `compatibility: 'compatible'` option ignored by v3.0.30
+  4. Backend timeout was 5 min, too short for CPU Ollama (needs 2-5 min)
+  5. Zod schema required `contentItemTitles` but LLM sometimes omits or renames it
+- **Fix (3 rounds):**
+  - R1: Bypass `@ai-sdk/openai` entirely — direct Ollama HTTP API (`/api/chat` + `format: "json"`)
+  - R2: Increase timeout 5→15 min, `contentItemTitles` default to `[]`, field name normalization
+  - R3: `LanguageModelV1` → `LanguageModel` in 6 files (AI SDK v5 rename)
+- **Visual E2E:** `scripts/debug/bug093-visual-test.cjs` — course "Colors" generated in 156s
+- **ProgressStatus (FEAT-090):** Confirmed rendering with cycling messages in both inline + block variants
+- **Anti-recurrence:** Direct HTTP API avoids SDK version coupling; Zod `.default([])` handles missing fields
+
+---
+
 ## BUG-092 — AI Consent Save Fails + Course Generation Spec Mismatch (19 Mar 2026)
 
 - **Status:** ✅ Fixed (2 rounds)
