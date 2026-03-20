@@ -23,6 +23,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -211,6 +212,7 @@ export function SkillGapWidget() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Skill Profile</DialogTitle>
+            <DialogDescription>Define a role and its required concepts for gap analysis.</DialogDescription>
           </DialogHeader>
           <div className="py-2 space-y-3">
             <Input

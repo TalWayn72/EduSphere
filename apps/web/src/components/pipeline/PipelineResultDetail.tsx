@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ export function PipelineResultDetail({ result, open, onClose, isLoading }: Props
           <DialogTitle data-testid="result-detail-title">
             {result?.moduleName ?? 'תוצאת מודול'}
           </DialogTitle>
+          <DialogDescription className="sr-only">Pipeline module output details</DialogDescription>
         </DialogHeader>
         {isLoading ? <LoadingSkeleton /> : result ? <ResultTabs result={result} /> : null}
       </DialogContent>

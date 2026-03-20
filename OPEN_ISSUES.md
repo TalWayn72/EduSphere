@@ -79,7 +79,197 @@
 | BUG-095 | AI course creation fails end-to-end — no course created, redirects to /courses | ✅ Fixed | (pending commit) |
 | BUG-096 | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring) | ✅ Fixed | c04ded08..59cd59cc |
 | BUG-097 | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken | ✅ Fixed (8 rounds) | c04ded08..77d9931d |
+| BUG-098 | Adding course source fails — 400 Bad Request when auth token missing | ✅ Fixed | (pending commit) |
+| BUG-099 | i18n English content on Hebrew locale — 7 social/collab pages hardcoded English | ✅ Fixed | (pending commit) |
+| BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection | ✅ Fixed | (pending commit) |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+
+---
+
+## BUG-100 — GraphQL 400 Bad Request on Challenges Page: Flat Array Instead of Relay Connection (20 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (page completely broken — no data renders)
+- **Route:** `/challenges` (GroupChallengesPage)
+
+### Problem
+
+The Challenges page fails to load with a GraphQL 400 Bad Request error. The frontend expects a Relay-style `GroupChallengeConnection` response (with `edges`, `pageInfo`, `totalCount`) but the backend resolver returns a flat array of challenges. Additionally, `Date` objects from Drizzle ORM are not serialized to ISO strings, causing serialization errors in GraphQL responses.
+
+### Root Cause
+
+1. **`activeChallenges` resolver** in `apps/subgraph-core/src/challenges/challenges.resolver.ts` returned a raw array instead of wrapping results in the `GroupChallengeConnection` format (Relay cursor pagination with `edges`/`pageInfo`/`totalCount`).
+2. **Date serialization** — Drizzle ORM returns native JS `Date` objects, but the GraphQL `DateTime` scalar expects ISO 8601 strings. No serialization step existed between the ORM layer and the resolver return.
+
+### Fix
+
+- Wrapped resolver return values in Relay Connection format: `{ edges: [...], pageInfo: { hasNextPage, hasPreviousPage, startCursor, endCursor }, totalCount }`
+- Added date serialization helpers to convert `Date` objects to ISO strings before returning from resolvers
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/subgraph-core/src/challenges/challenges.resolver.ts` | Wrapped return in Connection format, added date serialization |
+
+### Tests
+
+| Test Type | Count | Status |
+|-----------|-------|--------|
+| Backend unit/integration | 10 | ✅ All passing |
+| Frontend unit | 5 | ✅ All passing |
+| **Total** | **15** | **✅ 15/15 pass** |
+
+### Anti-Recurrence
+
+- Backend tests assert the resolver returns `GroupChallengeConnection` shape (not flat array)
+- Date serialization helpers reusable for all resolvers returning timestamp fields
+
+---
+
+## BUG-099 — i18n English Content on Hebrew Locale: 7 Social/Collaboration Pages Hardcoded (20 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium
+- **Related:** BUG-097 (same class of bug — hardcoded English instead of `t()`)
+
+### Problem
+
+When a user selects Hebrew as their language, 7 pages in the social/collaboration area still display English text. All strings are hardcoded in JSX instead of using the `useTranslation()` hook from react-i18next.
+
+### Affected Pages (7)
+
+1. `GroupChallengesPage` — gamification namespace
+2. `ChallengeDetailPage` — gamification namespace
+3. `PeerMatchingPage` — social namespace
+4. `PeerReviewPage` — social namespace
+5. `DiscussionsPage` — social namespace
+6. `MentorDiscoveryPage` — social namespace
+7. `ChavrutaPage` — collaboration namespace
+
+### Root Cause
+
+Pages were created with hardcoded English strings instead of using `useTranslation()` hook. This is the same class of bug as BUG-097 but affecting a different set of pages that were missed in the earlier 8-round fix.
+
+### Discovery (3 Waves)
+
+- **Wave 1 (exact match):** Found ~59 hardcoded English strings across the 7 pages
+- **Wave 2 (similarity):** Checked all pages in `apps/web/src/pages/` — these 7 were the remaining unfixed pages
+- **Wave 3 (class of bug):** Same pattern as BUG-097 — JSX string literals not wrapped in `t()`
+
+### Fix
+
+- Added `useTranslation` hook with proper namespace (`gamification`, `social`, `collaboration`) to all 7 pages
+- Replaced ~59 hardcoded English strings with translation keys via `t()` calls
+- Updated locale files across all 10 supported languages
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/GroupChallengesPage.tsx` | Added `useTranslation('gamification')`, replaced hardcoded strings |
+| `apps/web/src/pages/ChallengeDetailPage.tsx` | Added `useTranslation('gamification')`, replaced hardcoded strings |
+| `apps/web/src/pages/PeerMatchingPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
+| `apps/web/src/pages/PeerReviewPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
+| `apps/web/src/pages/DiscussionsPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
+| `apps/web/src/pages/MentorDiscoveryPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
+| `apps/web/src/pages/ChavrutaPage.tsx` | Added `useTranslation('collaboration')`, replaced hardcoded strings |
+| 30 locale JSON files | Updated across 10 locales (`gamification.json`, `social.json`, `collaboration.json`) |
+
+### Tests
+
+| Test File | Count | Status |
+|-----------|-------|--------|
+| `GroupChallengesPage.test.tsx` | 5 | ✅ All passing |
+
+### Anti-Recurrence
+
+- BUG-097 CI lint gate (`apps/web/scripts/lint-i18n-hardcoded.cjs`) catches future hardcoded strings
+- BUG-097 static analysis test (`bug097-i18n-coverage.test.ts`) scans all pages for `useTranslation` import
+- Existing Playwright E2E tests verify Hebrew string rendering on Hebrew locale
+
+---
+
+## BUG-098 — Adding Course Source Fails: 400 Bad Request When Auth Token Missing (20 Mar 2026)
+
+- **Status:** ✅ Fixed (3 rounds)
+- **Severity:** 🔴 Critical (blocks adding any course source — YouTube, URL, file)
+- **URL:** `http://localhost:5173/courses/<id>/edit` → "מקורות מידע" tab
+
+### Problem
+
+On the course edit page, when a user opens the "מקורות מידע" (Sources) tab and attempts to add a YouTube URL, the operation fails with a toast error: "שגיאה בהוספת המקור. נסה שוב." The browser console shows a `400 Bad Request` to `:4000/graphql`. The root issue is that when Keycloak initialization times out (10s default), all authenticated GraphQL requests silently fail because no `Authorization` header is sent.
+
+### Root Cause
+
+**Chain of failure:**
+1. Keycloak `init()` times out after 10s → `keycloak.token` is `undefined`
+2. `authHeaders()` in `urql-client.ts` returns empty headers (no `Authorization` header)
+3. GraphQL request reaches gateway without auth → subgraph resolver's `this.auth(ctx)` throws `UnauthorizedException`
+4. Frontend `onError` handler shows generic error toast instead of an auth-specific message
+5. Additionally, 7 GraphQL operations in `knowledge-source.graphql` were missing `@authenticated` / `@requiresScopes` directives, meaning the schema didn't enforce authentication at the federation level
+
+### Flow
+
+`CourseEditPage` → "מקורות מידע" tab → `SourceManager` → `AddSourceModal` → `useAddSourceMutations` → `addSourceFromUrl` mutation → urql client sends request WITHOUT `Authorization` header → gateway forwards to `subgraph-knowledge` → resolver calls `this.auth(ctx)` → `UnauthorizedException` → 400 Bad Request → generic error toast
+
+### Discovery (3 Waves — 21 files affected)
+
+**Wave 1 (exact match — 4 files):**
+- `apps/web/src/components/source-manager/SourceManager.tsx` — query + delete mutation without `requireAuth()` guard
+- `apps/web/src/components/source-manager/SourceDetailDrawer.tsx` — query without `requireAuth()` guard
+- `apps/web/src/lib/urql-client.ts` — sends empty auth header when token is undefined
+- `apps/subgraph-knowledge/src/sources/knowledge-source.graphql` — 7 operations missing `@authenticated` directive
+
+**Wave 2 (similarity — 14 Dialog components):**
+- 14 Dialog components across the app missing `DialogDescription` for accessibility (a11y), found while fixing `AddSourceModal` conversion to Radix Dialog:
+  - `ConsentDialog.tsx`, `CourseDeleteConfirmDialog.tsx`, `AiConsentDialog.tsx`, `PipelineConfigDialog.tsx`, `PortalBlockEditorDialog.tsx`, `ConfirmPublishDialog.tsx`, `CertificatePreviewDialog.tsx`, `ExamPreviewDialog.tsx`, `BadgePreviewDialog.tsx`, `CredentialVerifyDialog.tsx`, `ExamConfigDialog.tsx`, `TranscriptImportDialog.tsx`, `ScormPackageDialog.tsx`, `ComplianceReviewDialog.tsx`
+
+**Wave 3 (class of bug — missing error handling + auth middleware):**
+- `SourceManager.tsx` delete mutation — no `onError` handler (silent failure)
+- `SourceDetailDrawer.tsx` — no error state UI (loading forever on failure)
+- `urql-client.ts` gqlClient singleton — no auth middleware / no token refresh logic
+
+### Fix Rounds (3 rounds)
+
+| Round | Scope | Details |
+|-------|-------|---------|
+| **Round 1** | Core fix — AddSourceModal + auth guards | Added `hasValidAuth()` and `requireAuth()` utility functions in `utils.ts`. Converted `AddSourceModal` from raw HTML to Radix Dialog. Expanded `getSourceErrorKey()` to handle auth-specific (`UNAUTHENTICATED`, `FORBIDDEN`) and network errors. Added auth guard to `useAddSourceMutations`. |
+| **Round 2** | Discovery fixes — SourceManager, SourceDetailDrawer, Dialogs | Added `requireAuth()` guard to SourceManager query + delete. Added `onError` handler to delete mutation. Added error state UI to SourceDetailDrawer. Fixed 14 Dialog components with missing `DialogDescription` (a11y). |
+| **Round 3** | Backend — GraphQL schema auth directives | Added `@authenticated` and `@requiresScopes(scopes: ["content:read"])` / `@requiresScopes(scopes: ["content:write"])` to all 7 operations in `knowledge-source.graphql`: `knowledgeSources` (query), `knowledgeSource` (query), `createKnowledgeSource`, `updateKnowledgeSource`, `deleteKnowledgeSource`, `ingestKnowledgeSource`, `knowledgeSourceIngestionStatus` |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/source-manager/utils.ts` | NEW — `hasValidAuth()`, `requireAuth()`, `getSourceErrorKey()` |
+| `apps/web/src/components/source-manager/useAddSourceMutations.ts` | Auth guard before mutations, expanded error handling |
+| `apps/web/src/components/source-manager/AddSourceModal.tsx` | Converted to Radix Dialog, auth-aware error messages |
+| `apps/web/src/components/source-manager/SourceManager.tsx` | Auth guard on query + delete, `onError` handler on delete |
+| `apps/web/src/components/source-manager/SourceDetailDrawer.tsx` | Auth guard on query, error state UI |
+| `apps/web/src/components/source-manager/index.ts` | Barrel export updated |
+| `apps/web/src/components/ui/dialog.tsx` | Added `DialogDescription` export/helper |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.graphql` | `@authenticated` + `@requiresScopes` on 7 operations |
+| 14 Dialog components (various) | Added `DialogDescription` for a11y compliance |
+| `packages/i18n/src/locales/en/content.json` | Auth error message keys |
+| `packages/i18n/src/locales/he/content.json` | Hebrew auth error message translations |
+
+### Tests
+
+| Test File | Type | Coverage |
+|-----------|------|----------|
+| Unit tests for `utils.ts` | Unit | `hasValidAuth()`, `requireAuth()`, `getSourceErrorKey()` — all error code paths |
+| Unit tests for `useAddSourceMutations.ts` | Unit | Auth guard blocks mutation when token missing |
+| E2E Playwright test | E2E | Source add flow — verifies auth error toast (not generic), no 400 in console |
+
+### Anti-Recurrence
+
+- **`requireAuth()` guard pattern** — reusable utility that throws a translated auth error before any mutation attempt when token is missing. Can be adopted by all future mutation hooks.
+- **`hasValidAuth()` check** — lightweight boolean check for conditional UI rendering (disable buttons, show login prompt).
+- **Backend `@authenticated` directives** — all 7 knowledge-source operations now enforce auth at the federation/gateway level, preventing unauthenticated requests from ever reaching resolver logic.
+- **`getSourceErrorKey()` maps all error codes** — `UNAUTHENTICATED`, `FORBIDDEN`, `NETWORK_ERROR`, `VALIDATION_ERROR`, `DUPLICATE_SOURCE`, and generic fallback all produce user-friendly i18n keys instead of raw error text.
+- **14 Dialog a11y fixes** — `DialogDescription` added to all Radix Dialog usages, preventing future WCAG violations.
+- **Regression tests** verify the auth guard blocks requests and the UI shows auth-specific messages.
 
 ---
 

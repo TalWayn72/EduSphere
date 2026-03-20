@@ -1,6 +1,18 @@
+/**
+ * CreateSessionModal — BUG-098: Converted from raw <div role="dialog"> to Radix Dialog
+ * for proper a11y (focus trapping, Escape handling, DialogTitle/Description).
+ */
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 export interface CreateSessionModalProps {
   onClose: () => void;
@@ -20,15 +32,14 @@ export function CreateSessionModal({ onClose, onCreate, loading }: CreateSession
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      data-testid="create-session-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Create Live Session"
-    >
-      <div className="bg-background rounded-xl border shadow-lg w-full max-w-md mx-4 p-6">
-        <h2 className="text-lg font-bold mb-4">Create Live Session</h2>
+    <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+      <DialogContent data-testid="create-session-modal" className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Create Live Session</DialogTitle>
+          <DialogDescription className="sr-only">
+            Schedule a new live session with a title and time.
+          </DialogDescription>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-sm font-medium block mb-1" htmlFor="session-name">
@@ -58,7 +69,7 @@ export function CreateSessionModal({ onClose, onCreate, loading }: CreateSession
               data-testid="session-time-input"
             />
           </div>
-          <div className="flex gap-2 justify-end mt-2">
+          <DialogFooter className="gap-2">
             <Button type="button" variant="outline" size="sm" onClick={onClose}>
               Cancel
             </Button>
@@ -71,9 +82,9 @@ export function CreateSessionModal({ onClose, onCreate, loading }: CreateSession
               {loading && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
               Create Session
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

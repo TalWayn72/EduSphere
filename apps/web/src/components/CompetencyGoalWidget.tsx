@@ -16,6 +16,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
@@ -128,6 +129,7 @@ export function CompetencyGoalWidget() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Learning Goal</DialogTitle>
+            <DialogDescription>Enter a concept name to track your learning progress.</DialogDescription>
           </DialogHeader>
           <div className="py-2">
             <Input

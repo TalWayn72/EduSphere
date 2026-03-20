@@ -2,6 +2,9 @@
  * UnsavedChangesDialog — modal shown when the user tries to navigate away
  * while a page has unsaved changes.
  *
+ * BUG-098: Converted from raw <div role="dialog"> to Radix Dialog for proper
+ * a11y (DialogTitle + DialogDescription + focus trapping + Escape handling).
+ *
  * Rendered by pages that use useUnsavedChangesGuard:
  *   const blocker = useUnsavedChangesGuard(isDirty, 'MyPage');
  *   <UnsavedChangesDialog
@@ -12,6 +15,14 @@
  */
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 interface Props {
   open: boolean;
@@ -22,28 +33,18 @@ interface Props {
 export function UnsavedChangesDialog({ open, onLeave, onStay }: Props) {
   const { t } = useTranslation('common');
 
-  if (!open) return null;
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="unsaved-changes-title"
-      data-testid="unsaved-changes-dialog"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-    >
-      <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 space-y-4">
-        <h2
-          id="unsaved-changes-title"
-          className="text-lg font-semibold"
-          data-testid="unsaved-changes-title"
-        >
-          {t('unsavedChanges.title')}
-        </h2>
-        <p className="text-sm text-muted-foreground" data-testid="unsaved-changes-message">
-          {t('unsavedChanges.message')}
-        </p>
-        <div className="flex gap-3 justify-end">
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onStay(); }}>
+      <DialogContent data-testid="unsaved-changes-dialog" className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle data-testid="unsaved-changes-title">
+            {t('unsavedChanges.title')}
+          </DialogTitle>
+          <DialogDescription data-testid="unsaved-changes-message">
+            {t('unsavedChanges.message')}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex gap-3 justify-end">
           <Button
             variant="outline"
             onClick={onStay}
@@ -58,8 +59,8 @@ export function UnsavedChangesDialog({ open, onLeave, onStay }: Props) {
           >
             {t('unsavedChanges.leave')}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   MY_FOLLOWERS_QUERY,
@@ -91,6 +92,9 @@ export function FollowersList({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {type === 'followers' ? 'Your followers list' : 'Users you follow'}
+          </DialogDescription>
         </DialogHeader>
         {fetching ? (
           <div className="flex justify-center py-8">

@@ -1,12 +1,23 @@
 /**
  * AddSourceModal — Modal for adding a new knowledge source (URL, text, YouTube, file).
+ *
+ * BUG-098: Converted from raw div overlay to Radix Dialog for accessibility
+ * compliance (DialogTitle + aria-describedby). Also adds auth pre-check
+ * so unauthenticated users see a clear login prompt instead of a 400 error.
  */
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import type { AddTab } from './types';
 import { TAB_KEYS, TAB_LABEL_KEYS } from './types';
-import { getSourceErrorKey } from './utils';
+import { getSourceErrorKey, hasValidAuth } from './utils';
 import {
   useAddUrlMutation,
   useAddTextMutation,
@@ -42,14 +53,12 @@ export function AddSourceModal({
     undefined,
   );
 
-  // Close modal on Escape key
+  // BUG-098: Pre-flight auth check — show error immediately if not logged in
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !success) onClose();
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose, success]);
+    if (!hasValidAuth()) {
+      setError(t('sources.errorUnauthorized'));
+    }
+  }, [t]);
 
   // Auto-close 1.5 s after success is shown
   useEffect(() => {
@@ -111,30 +120,31 @@ export function AddSourceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div
-        className="w-[520px] rounded-2xl bg-white shadow-2xl flex flex-col"
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent
+        className="w-[520px] max-w-[90vw] p-0 gap-0"
         dir={dir}
+        data-testid="add-source-modal"
+        onInteractOutside={(e) => { if (success) e.preventDefault(); }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">
+        <DialogHeader className="px-6 py-4 border-b">
+          <DialogTitle className="text-lg font-semibold">
             {t('sources.addSourceTitle')}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white text-xl"
-          >
-            &#x2715;
-          </button>
-        </div>
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {t('sources.addSourceDescription', 'Add a knowledge source to this course')}
+          </DialogDescription>
+        </DialogHeader>
 
         {/* Tabs -- hidden when success */}
         {!success && (
-          <div className="flex border-b px-6">
+          <div className="flex border-b px-6" role="tablist">
             {TAB_KEYS.map((tabKey) => (
               <button
                 key={tabKey}
+                role="tab"
+                aria-selected={tab === tabKey}
                 onClick={() => setTab(tabKey)}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
                   ${tab === tabKey ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white'}`}
@@ -146,7 +156,7 @@ export function AddSourceModal({
         )}
 
         {/* Body */}
-        <div className="p-6 flex flex-col gap-4">
+        <div className="p-6 flex flex-col gap-4" role="tabpanel">
           {success && (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
               <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
@@ -271,7 +281,11 @@ export function AddSourceModal({
           )}
 
           {!success && error && (
-            <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">
+            <p
+              className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2"
+              role="alert"
+              data-testid="source-error-message"
+            >
               {error}
             </p>
           )}
@@ -291,6 +305,7 @@ export function AddSourceModal({
               onClick={handleSubmit}
               disabled={busy}
               className="flex items-center gap-2 px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="add-source-submit"
             >
               {busy && (
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -299,7 +314,7 @@ export function AddSourceModal({
             </button>
           </div>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

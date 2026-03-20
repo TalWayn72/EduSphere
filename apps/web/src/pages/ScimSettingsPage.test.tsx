@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -29,6 +30,22 @@ vi.mock('@/components/Layout', () => ({
 
 vi.mock('@/hooks/useAuthRole', () => ({
   useAuthRole: vi.fn(() => 'ORG_ADMIN'),
+}));
+
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ open, children }: { open: boolean; children: React.ReactNode; onOpenChange?: (v: boolean) => void }) =>
+    open ? <div role="dialog">{children}</div> : null,
+  DialogContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="dialog-content" {...props}>{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p {...props}>{children}</p>
+  ),
+  DialogFooter: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>{children}</div>
+  ),
 }));
 
 vi.mock('@/lib/graphql/scim.queries', () => ({

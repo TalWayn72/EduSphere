@@ -35,6 +35,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useAuthRole } from '@/hooks/useAuthRole';
@@ -116,6 +117,7 @@ function EnrollUserDialog({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{t('enrollment.enrollUserTitle')}</DialogTitle>
+          <DialogDescription className="sr-only">Enroll a user in the selected course.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-2">
           <Input
@@ -190,6 +192,7 @@ function BulkEnrollDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t('enrollment.bulkEnrollTitle')}</DialogTitle>
+          <DialogDescription className="sr-only">Bulk enroll multiple users via CSV input.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-2">
           <p className="text-sm text-muted-foreground">
@@ -459,6 +462,7 @@ export function EnrollmentManagementPage() {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>{t('enrollment.confirmUnenrollTitle')}</DialogTitle>
+            <DialogDescription className="sr-only">Confirm removing enrollment for this user.</DialogDescription>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-2">
             {t('enrollment.confirmUnenrollDesc')}

@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { CREATE_LIVE_SESSION_MUTATION } from '@/lib/graphql/live-session.queries';
@@ -65,6 +66,9 @@ export function ScheduleLiveSessionModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('liveSession.scheduleTitle')}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Schedule a new live session for this content item.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4 py-2">

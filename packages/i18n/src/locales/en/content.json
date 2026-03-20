@@ -42,6 +42,7 @@
     "tabYoutube": "▶️ YouTube",
     "tabFile": "📄 File",
     "addSourceTitle": "Add Knowledge Source",
+    "addSourceDescription": "Attach a URL, text, YouTube video, or file as a knowledge source for this course.",
     "addedSuccess": "Source added successfully!",
     "addedProcessing": "Processing — will appear in the list shortly...",
     "urlLabel": "URL address",

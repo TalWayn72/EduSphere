@@ -9,7 +9,29 @@ vi.mock('@/components/ui/button', () => ({
     ...props
   }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
     children: React.ReactNode;
+    variant?: string;
+    size?: string;
   }) => <button {...props}>{children}</button>,
+}));
+
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
+    open !== false ? <>{children}</> : null,
+  DialogContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div role="dialog" aria-modal="true" {...props}>{children}</div>
+  ),
+  DialogHeader: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>{children}</div>
+  ),
+  DialogTitle: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h2 {...props}>{children}</h2>
+  ),
+  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p {...props}>{children}</p>
+  ),
+  DialogFooter: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>{children}</div>
+  ),
 }));
 
 const CONTENT = 'Maimonides uses the term "overflow" to bridge Neoplatonism and Aristotle.';
@@ -98,7 +120,7 @@ describe('AnnotationMergeRequestModal', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('has aria-modal and aria-labelledby for accessibility', () => {
+  it('has aria-modal for accessibility and displays title', () => {
     render(
       <AnnotationMergeRequestModal
         annotationContent={CONTENT}
@@ -108,7 +130,6 @@ describe('AnnotationMergeRequestModal', () => {
     );
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
-    expect(dialog).toHaveAttribute('aria-labelledby', 'merge-modal-title');
     expect(screen.getByText('Propose to Official Content')).toBeInTheDocument();
   });
 

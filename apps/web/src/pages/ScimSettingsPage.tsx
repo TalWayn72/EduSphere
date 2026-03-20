@@ -16,6 +16,14 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import {
   SCIM_TOKENS_QUERY,
@@ -278,104 +286,95 @@ export function ScimSettingsPage() {
           </CardContent>
         </Card>
       </PageShell>
-      {showModal && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          role="dialog"
-          aria-labelledby="scim-modal-title"
-          onKeyDown={(e) => {
-            if (e.key === 'Escape' && !generatedToken) setShowModal(false);
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !generatedToken)
-              setShowModal(false);
-          }}
-        >
-          <div
-            className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
-            aria-modal="true"
-          >
-            <h2 id="scim-modal-title" className="text-lg font-semibold">
-              Generate SCIM Token
-            </h2>
-            {generatedToken ? (
-              <div className="space-y-3">
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
-                  <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-amber-800">
-                    Save this token - it will not be shown again.
-                  </span>
-                </div>
-                <div className="p-3 bg-muted rounded-md font-mono text-xs break-all select-all">
-                  {generatedToken}
-                </div>
-                <Button
-                  className="w-full"
-                  onClick={() => {
-                    setShowModal(false);
-                    setDescription('');
-                    setExpiresInDays('');
-                    setGeneratedToken(null);
-                  }}
+      <Dialog open={showModal} onOpenChange={(isOpen) => {
+        if (!isOpen && !generatedToken) {
+          setShowModal(false);
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Generate SCIM Token</DialogTitle>
+            <DialogDescription className="sr-only">
+              Create a new SCIM provisioning token for HRIS integration.
+            </DialogDescription>
+          </DialogHeader>
+          {generatedToken ? (
+            <div className="space-y-3">
+              <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
+                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-amber-800">
+                  Save this token - it will not be shown again.
+                </span>
+              </div>
+              <div className="p-3 bg-muted rounded-md font-mono text-xs break-all select-all">
+                {generatedToken}
+              </div>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  setShowModal(false);
+                  setDescription('');
+                  setExpiresInDays('');
+                  setGeneratedToken(null);
+                }}
+              >
+                Done
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="scim-token-description"
+                  className="text-sm font-medium block mb-1"
                 >
-                  Done
+                  Description
+                </label>
+                <input
+                  id="scim-token-description"
+                  className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                  placeholder="e.g. Workday Production"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="scim-token-expires"
+                  className="text-sm font-medium block mb-1"
+                >
+                  Expires in days (optional)
+                </label>
+                <input
+                  id="scim-token-expires"
+                  className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 365"
+                  value={expiresInDays}
+                  onChange={(e) => setExpiresInDays(e.target.value)}
+                />
+              </div>
+              <DialogFooter className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
                 </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div>
-                  <label
-                    htmlFor="scim-token-description"
-                    className="text-sm font-medium block mb-1"
-                  >
-                    Description
-                  </label>
-                  <input
-                    id="scim-token-description"
-                    className="w-full border rounded-md px-3 py-2 text-sm"
-                    placeholder="e.g. Workday Production"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="scim-token-expires"
-                    className="text-sm font-medium block mb-1"
-                  >
-                    Expires in days (optional)
-                  </label>
-                  <input
-                    id="scim-token-expires"
-                    className="w-full border rounded-md px-3 py-2 text-sm"
-                    type="number"
-                    min="1"
-                    placeholder="e.g. 365"
-                    value={expiresInDays}
-                    onChange={(e) => setExpiresInDays(e.target.value)}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    disabled={!description.trim()}
-                    onClick={() => void handleGenerateToken()}
-                  >
-                    Generate
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                <Button
+                  className="flex-1"
+                  disabled={!description.trim()}
+                  onClick={() => void handleGenerateToken()}
+                >
+                  Generate
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

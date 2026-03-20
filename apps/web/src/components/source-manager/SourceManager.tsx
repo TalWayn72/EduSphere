@@ -29,12 +29,19 @@ import {
 import {
   IS_DEV_MODE,
   authHeaders,
+  hasValidAuth,
   getSourceErrorKey,
   getFriendlySourceErrorKey,
 } from './utils';
 import { devQueryFn, devRemoveSource } from './dev-mock';
 import { AddSourceModal } from './AddSourceModal';
 import { SourceDetailDrawer } from './SourceDetailDrawer';
+
+function requireAuth(): void {
+  if (!hasValidAuth()) {
+    throw new Error('Not authenticated — please log in');
+  }
+}
 
 export function SourceManager({ courseId }: { courseId: string }) {
   const { t, i18n } = useTranslation('content');
@@ -58,13 +65,15 @@ export function SourceManager({ courseId }: { courseId: string }) {
     queryKey: ['course-sources', courseId],
     queryFn: IS_DEV_MODE
       ? devQueryFn
-      : () =>
-          graphqlClient
+      : () => {
+          requireAuth();
+          return graphqlClient
             .request(COURSE_KNOWLEDGE_SOURCES, { courseId }, authHeaders())
             .then(
               (r: { courseKnowledgeSources: KnowledgeSource[] }) =>
                 r.courseKnowledgeSources,
-            ),
+            );
+        },
     refetchInterval: IS_DEV_MODE
       ? false
       : (query) => {
@@ -83,9 +92,14 @@ export function SourceManager({ courseId }: { courseId: string }) {
           devRemoveSource(id);
           return Promise.resolve();
         }
-      : (id: string) =>
-          graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders()),
+      : (id: string) => {
+          requireAuth();
+          return graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders());
+        },
     onSuccess: () => refetch(),
+    onError: (e: unknown) => {
+      window.alert(t(getSourceErrorKey(e)));
+    },
   });
 
   const handleDelete = useCallback(
@@ -104,7 +118,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
         <div>
-          <h3 className="font-semibold text-sm text-gray-800">
+          <h3 className="font-semibold text-sm text-gray-800" data-testid="sources-title">
             {t('sources.title')}
           </h3>
           <p className="text-xs text-gray-500">
@@ -118,6 +132,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
         <button
           onClick={() => setShowAdd(true)}
           className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          data-testid="add-source-btn"
         >
           <span className="text-base leading-none">+</span>
           {t('sources.addSource')}

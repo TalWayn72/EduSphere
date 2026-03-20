@@ -24,6 +24,9 @@ vi.mock('@/components/ui/dialog', () => ({
   DialogTitle: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
     <h2 {...props}>{children}</h2>
   ),
+  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p {...props}>{children}</p>
+  ),
 }));
 
 vi.mock('@/components/ui/tabs', () => ({

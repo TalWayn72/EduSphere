@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useAuthRole } from '@/hooks/useAuthRole';
 
 const ALL_PILOT_REQUESTS = `
@@ -156,7 +156,7 @@ export function PilotRequestsAdminPage() {
       {/* Approve Modal */}
       <Dialog open={!!approveTarget} onOpenChange={(open) => { if (!open) setApproveTarget(null); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Approve Pilot Request</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Approve Pilot Request</DialogTitle><DialogDescription className="sr-only">Set seat limit and approve pilot request.</DialogDescription></DialogHeader>
           <div className="space-y-3 py-2">
             <Label htmlFor="seatLimit">Seat Limit</Label>
             <Input id="seatLimit" type="number" min={1} value={seatLimit} onChange={(e) => setSeatLimit(Number(e.target.value))} />
@@ -171,7 +171,7 @@ export function PilotRequestsAdminPage() {
       {/* Reject Modal */}
       <Dialog open={!!rejectTarget} onOpenChange={(open) => { if (!open) setRejectTarget(null); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Reject Pilot Request</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Reject Pilot Request</DialogTitle><DialogDescription className="sr-only">Provide a reason for rejecting this request.</DialogDescription></DialogHeader>
           <div className="space-y-3 py-2">
             <Label htmlFor="rejectReason">Reason *</Label>
             <Textarea id="rejectReason" value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Please provide a reason..." className="min-h-[80px]" />

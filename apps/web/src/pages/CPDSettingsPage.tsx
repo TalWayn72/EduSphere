@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -130,6 +131,7 @@ export function CPDSettingsPage() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{t('cpd.createCreditTypeTitle')}</DialogTitle>
+                      <DialogDescription className="sr-only">Define a new CPD credit type and regulatory body.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCreate} className="space-y-4">
                       <div>
@@ -189,6 +191,7 @@ export function CPDSettingsPage() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{t('cpd.assignCpdTitle')}</DialogTitle>
+                      <DialogDescription className="sr-only">Assign CPD credits to a course.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleAssign} className="space-y-4">
                       <div>

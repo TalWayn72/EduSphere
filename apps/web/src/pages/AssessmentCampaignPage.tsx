@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -142,6 +143,7 @@ export function AssessmentCampaignPage() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t('assessmentCampaign.createTitle')}</DialogTitle>
+                <DialogDescription className="sr-only">Create a new 360° assessment campaign.</DialogDescription>
               </DialogHeader>
               <div className="space-y-3 pt-2">
                 <div>

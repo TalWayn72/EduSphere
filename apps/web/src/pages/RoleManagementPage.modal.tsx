@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -86,6 +87,9 @@ export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
           <DialogTitle>
             {initialRole?.id ? 'Edit Custom Role' : 'Create Custom Role'}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {initialRole?.id ? 'Edit role name and permissions.' : 'Create a new custom role with specific permissions.'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSave)} id="role-form">

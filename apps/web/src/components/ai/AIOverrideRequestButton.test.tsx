@@ -122,13 +122,12 @@ describe('AIOverrideRequestButton', () => {
     );
   });
 
-  it('dialog content has role="dialog" and aria-labelledby', () => {
+  it('dialog content has aria-labelledby (role="dialog" provided by Radix internally)', () => {
     render(<AIOverrideRequestButton assessmentId="assess-1" />);
     fireEvent.click(
       screen.getByRole('button', { name: /request human review/i })
     );
     const content = screen.getByTestId('dialog-content');
-    expect(content.getAttribute('role')).toBe('dialog');
     expect(content.getAttribute('aria-labelledby')).toBe('human-review-title');
   });
 

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
 import { KNOWLEDGE_SOURCE_DETAIL } from '@/lib/graphql/sources.queries';
 import type { KnowledgeSource } from './types';
-import { IS_DEV_MODE, authHeaders } from './utils';
+import { IS_DEV_MODE, authHeaders, hasValidAuth, getSourceErrorKey } from './utils';
 import { getDevSources } from './dev-mock';
 
 export function SourceDetailDrawer({
@@ -20,7 +20,7 @@ export function SourceDetailDrawer({
   const { t, i18n } = useTranslation('content');
   const dir = i18n.dir();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error: queryError } = useQuery({
     queryKey: ['knowledge-source', sourceId],
     queryFn: IS_DEV_MODE
       ? () => {
@@ -29,12 +29,16 @@ export function SourceDetailDrawer({
             devSources.find((s) => s.id === sourceId) ?? devSources[0],
           );
         }
-      : () =>
-          graphqlClient
+      : () => {
+          if (!hasValidAuth()) {
+            throw new Error('Not authenticated — please log in');
+          }
+          return graphqlClient
             .request(KNOWLEDGE_SOURCE_DETAIL, { id: sourceId }, authHeaders())
             .then(
               (r: { knowledgeSource: KnowledgeSource }) => r.knowledgeSource,
-            ),
+            );
+        },
   });
 
   const formattedDate = data?.createdAt
@@ -58,7 +62,15 @@ export function SourceDetailDrawer({
       <div className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
         {isLoading
           ? t('sources.loading')
-          : (data?.rawContent ?? t('sources.noContent'))}
+          : isError
+            ? (
+              <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                <p className="text-sm font-medium text-red-600">
+                  {t(getSourceErrorKey(queryError))}
+                </p>
+              </div>
+            )
+            : (data?.rawContent ?? t('sources.noContent'))}
       </div>
       <div className="px-4 py-2 border-t text-xs text-gray-400 dark:text-slate-400">
         {data &&

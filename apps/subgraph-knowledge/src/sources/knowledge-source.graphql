@@ -1,3 +1,6 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated", "@requiresScopes"])
+
 """
 KnowledgeSource — an information source attached to a course.
 Modelled after NotebookLM: users can attach DOCX, PDF, URLs, YouTube, or raw text.
@@ -68,8 +71,8 @@ input AddFileSourceInput {
 }
 
 extend type Query {
-  courseKnowledgeSources(courseId: ID!): [KnowledgeSource!]!
-  knowledgeSource(id: ID!): KnowledgeSource
+  courseKnowledgeSources(courseId: ID!): [KnowledgeSource!]! @authenticated
+  knowledgeSource(id: ID!): KnowledgeSource @authenticated
 }
 
 extend type Mutation {
@@ -78,17 +81,20 @@ extend type Mutation {
   The system fetches the page, extracts text, chunks it and embeds it.
   """
   addUrlSource(input: AddUrlSourceInput!): KnowledgeSource!
+    @authenticated @requiresScopes(scopes: [["course:write"]])
 
   """
   Add raw text as a knowledge source.
   """
   addTextSource(input: AddTextSourceInput!): KnowledgeSource!
+    @authenticated @requiresScopes(scopes: [["course:write"]])
 
   """
   Add a YouTube video as a knowledge source.
   The system fetches the auto-generated transcript and indexes it.
   """
   addYoutubeSource(input: AddYoutubeSourceInput!): KnowledgeSource!
+    @authenticated @requiresScopes(scopes: [["course:write"]])
 
   """
   Upload a local file (DOCX / PDF / TXT) as a knowledge source.
@@ -96,9 +102,11 @@ extend type Mutation {
   the GraphQL gateway without a multipart transport layer.
   """
   addFileSource(input: AddFileSourceInput!): KnowledgeSource!
+    @authenticated @requiresScopes(scopes: [["course:write"]])
 
   """
   Remove a knowledge source (and its embeddings).
   """
   deleteKnowledgeSource(id: ID!): Boolean!
+    @authenticated @requiresScopes(scopes: [["course:write"]])
 }

@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -83,15 +84,15 @@ export function AltTextModal({
             <Pencil className="h-4 w-4" />
             {t('altText.title', 'Review AI-Generated Alt-Text')}
           </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-3 py-2">
-          <p className="text-sm text-muted-foreground">
+          <DialogDescription>
             {t(
               'altText.description',
               'AI has generated a description for this image. Review and edit it to ensure accuracy and accessibility.'
             )}
-          </p>
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 py-2">
           <div className="space-y-1.5">
             <Label htmlFor="alt-text-input">
               {t('altText.label', 'Alt-text')}

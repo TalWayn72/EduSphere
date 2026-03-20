@@ -36,11 +36,44 @@ vi.mock('@/lib/graphql', () => ({
 // ── Mock auth ─────────────────────────────────────────────────────────────────
 vi.mock('@/lib/auth', () => ({
   getToken: vi.fn(() => 'mock-token'),
+  isAuthenticated: vi.fn(() => true),
   getCurrentUser: vi.fn(() => ({
     id: 'user-1',
     role: 'STUDENT',
     tenantId: 'tenant-1',
   })),
+}));
+
+// ── Mock Radix Dialog (BUG-098: AddSourceModal now uses Radix Dialog) ─────────
+// Use a module-level ref so DialogContent close button can call Dialog's onOpenChange
+const dialogOnOpenChangeRef: { current: ((v: boolean) => void) | undefined } = { current: undefined };
+
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ open, children, onOpenChange }: {
+    open: boolean; children: React.ReactNode;
+    onOpenChange?: (v: boolean) => void;
+  }) => {
+    dialogOnOpenChangeRef.current = onOpenChange;
+    return open ? <div data-testid="dialog-root" role="dialog">{children}</div> : null;
+  },
+  DialogContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="add-source-modal" {...props}>{children}
+      <button aria-label="Close" onClick={() => {
+        dialogOnOpenChangeRef.current?.(false);
+      }}>
+        <span className="sr-only">Close</span>
+      </button>
+    </div>
+  ),
+  DialogHeader: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>{children}</div>
+  ),
+  DialogTitle: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h2 {...props}>{children}</h2>
+  ),
+  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p {...props}>{children}</p>
+  ),
 }));
 
 // ── Mock GraphQL query modules ─────────────────────────────────────────────────
@@ -55,6 +88,7 @@ vi.mock('@/lib/graphql/sources.queries', () => ({
 }));
 
 import { SourceManager, parseSourceError, getSourceErrorKey, getFriendlySourceErrorKey } from './SourceManager';
+import { hasValidAuth } from './source-manager/utils';
 
 // ── QueryClient wrapper ───────────────────────────────────────────────────────
 
@@ -273,8 +307,8 @@ describe('SourceManager', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('Add source'));
     });
-    // The modal inner div must have dir="ltr"
-    const modal = document.querySelector('.fixed .rounded-2xl[dir]');
+    // BUG-098: Modal now uses Radix Dialog — find DialogContent by data-testid
+    const modal = document.querySelector('[data-testid="add-source-modal"]');
     expect(modal).not.toBeNull();
     expect(modal?.getAttribute('dir')).toBe('ltr');
     expect(modal?.getAttribute('dir')).not.toBe('rtl');
@@ -321,12 +355,13 @@ describe('SourceManager', () => {
     expect(screen.getByText('Add Knowledge Source')).toBeInTheDocument();
   });
 
-  it('closes the modal when ✕ is clicked', async () => {
+  it('closes the modal when Close button is clicked', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
     await act(async () => {
       fireEvent.click(screen.getByText('Add source'));
     });
-    const closeBtn = screen.getAllByText('✕').at(-1) as HTMLElement;
+    // BUG-098: Modal now uses Radix Dialog — close via sr-only "Close" button
+    const closeBtn = screen.getByRole('button', { name: /close/i });
     await act(async () => {
       fireEvent.click(closeBtn);
     });
@@ -458,5 +493,75 @@ describe('SourceManager', () => {
     fetchSpy.mockRestore();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).FileReader = originalFileReader;
+  });
+});
+
+// ── BUG-098 REGRESSION: getSourceErrorKey() catches 400 Bad Request and auth variants ─
+
+describe('getSourceErrorKey() — BUG-098 regression', () => {
+  it('returns sources.errorUnauthorized for "400 Bad Request" (gateway auth rejection)', () => {
+    expect(getSourceErrorKey(new Error('400 Bad Request'))).toBe('sources.errorUnauthorized');
+  });
+
+  it('returns sources.errorUnauthorized for "Not authenticated" errors', () => {
+    expect(getSourceErrorKey(new Error('Not authenticated — please log in'))).toBe(
+      'sources.errorUnauthorized'
+    );
+  });
+
+  it('returns sources.errorUnauthorized for "UNAUTHENTICATED" GraphQL error code', () => {
+    expect(getSourceErrorKey(new Error('UNAUTHENTICATED'))).toBe('sources.errorUnauthorized');
+  });
+});
+
+// ── BUG-098 REGRESSION: hasValidAuth() pre-flight check ─
+
+describe('hasValidAuth() — BUG-098 regression', () => {
+  it('returns true in DEV_MODE (IS_DEV_MODE=true in test env)', () => {
+    // In test env, IS_DEV_MODE is true because VITE_KEYCLOAK_URL is not set
+    expect(hasValidAuth()).toBe(true);
+  });
+});
+
+// ── BUG-098 REGRESSION: AddSourceModal uses Radix Dialog for accessibility ─
+
+describe('AddSourceModal — BUG-098 accessibility', () => {
+  it('renders with proper dialog role and accessible title', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add source'));
+    });
+    // BUG-098: Modal must have role="dialog" (from Radix)
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    // Must have DialogTitle for accessibility
+    expect(screen.getByText('Add Knowledge Source')).toBeInTheDocument();
+  });
+
+  it('renders tab buttons with role="tab" and aria-selected', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add source'));
+    });
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs.length).toBe(4);
+    // First tab (URL) is selected by default
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('shows error with role="alert" when submission fails', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add source'));
+    });
+    // Submit without entering a URL
+    const submitBtn = screen.getByTestId('add-source-submit');
+    await act(async () => {
+      fireEvent.click(submitBtn);
+    });
+    // Error should have role="alert" for screen readers
+    const errorEl = screen.getByTestId('source-error-message');
+    expect(errorEl).toHaveAttribute('role', 'alert');
   });
 });

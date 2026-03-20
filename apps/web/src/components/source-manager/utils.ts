@@ -3,7 +3,7 @@
  * Auth header builder + error parsers.
  */
 
-import { getToken } from '@/lib/auth';
+import { getToken, isAuthenticated } from '@/lib/auth';
 
 // ─── DEV_MODE flag ────────────────────────────────────────────────────────────
 
@@ -17,6 +17,16 @@ export function authHeaders(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+/**
+ * Pre-flight auth check. Returns true if the user has a valid token.
+ * Mutations that require @authenticated should call this before sending
+ * the request to avoid a 400 Bad Request from the gateway.
+ */
+export function hasValidAuth(): boolean {
+  if (IS_DEV_MODE) return true;
+  return isAuthenticated() && !!getToken();
+}
+
 // ─── Error parsers (exported for unit testing) ────────────────────────────────
 
 /**
@@ -26,7 +36,16 @@ export function authHeaders(): Record<string, string> {
 export function getSourceErrorKey(e: unknown): string {
   if (!e) return 'sources.errorUnknown';
   const msg = String(e);
-  if (msg.includes('Unauthorized') || msg.includes('Auth required')) {
+  // BUG-098: Catch auth failures broadly — including 400 from gateway when
+  // @authenticated directive rejects unauthenticated requests, and direct
+  // UnauthorizedException from subgraph resolvers.
+  if (
+    msg.includes('Unauthorized') ||
+    msg.includes('Auth required') ||
+    msg.includes('Not authenticated') ||
+    msg.includes('400 Bad Request') ||
+    msg.includes('UNAUTHENTICATED')
+  ) {
     return 'sources.errorUnauthorized';
   }
   if (msg.includes('DOWNSTREAM_SERVICE_ERROR')) {

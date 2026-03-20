@@ -8,6 +8,7 @@ export {
   getSourceErrorKey,
   getFriendlySourceErrorKey,
   parseSourceError,
+  hasValidAuth,
 } from './utils';
 export type {
   KnowledgeSource,

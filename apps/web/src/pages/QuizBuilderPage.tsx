@@ -19,6 +19,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { QuizBuilderForm } from '@/components/quiz-builder/QuizBuilderForm';
@@ -144,7 +145,8 @@ export function QuizBuilderPage() {
       <Dialog open={showGenerateModal} onOpenChange={setShowGenerateModal}>
         <DialogContent data-testid="generate-quiz-modal">
           <DialogHeader>
-            <DialogTitle>✨ Generate Quiz from Content</DialogTitle>
+            <DialogTitle>Generate Quiz from Content</DialogTitle>
+            <DialogDescription className="sr-only">Auto-generate quiz questions from course content using AI.</DialogDescription>
           </DialogHeader>
           <div className="py-4 text-sm text-slate-500 text-center">
             <p className="text-2xl mb-3">🚧</p>

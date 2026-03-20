@@ -1,6 +1,9 @@
 /**
  * AnnotationMergeRequestModal — Dialog for proposing a personal annotation
- * as official course content (PRD §4.3 — Annotation Merge Request).
+ * as official course content (PRD section 4.3 — Annotation Merge Request).
+ *
+ * BUG-098: Converted from raw <div role="dialog"> to Radix Dialog for proper
+ * a11y (DialogTitle + DialogDescription + focus trapping + Escape handling).
  *
  * The student fills in a short description of why this annotation should
  * be promoted. In production the form calls the `proposeAnnotation` GraphQL
@@ -8,6 +11,14 @@
  */
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 interface AnnotationMergeRequestModalProps {
   /** The annotation text being proposed */
@@ -30,17 +41,14 @@ export function AnnotationMergeRequestModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="merge-modal-title"
-      data-testid="merge-request-modal"
-    >
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6 space-y-4">
-        <h2 id="merge-modal-title" className="text-lg font-semibold">
-          Propose to Official Content
-        </h2>
+    <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onCancel(); }}>
+      <DialogContent data-testid="merge-request-modal" className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Propose to Official Content</DialogTitle>
+          <DialogDescription className="sr-only">
+            Submit a proposal to promote your annotation to official course content.
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="bg-muted/50 rounded-md p-3">
           <p className="text-xs text-muted-foreground mb-1 font-medium">
@@ -72,7 +80,7 @@ export function AnnotationMergeRequestModal({
             </p>
           </div>
 
-          <div className="flex gap-2 justify-end">
+          <DialogFooter className="gap-2">
             <Button type="button" variant="outline" size="sm" onClick={onCancel}>
               Cancel
             </Button>
@@ -84,9 +92,9 @@ export function AnnotationMergeRequestModal({
             >
               Submit Proposal
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

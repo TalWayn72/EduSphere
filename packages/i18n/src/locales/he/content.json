@@ -42,6 +42,7 @@
     "tabYoutube": "▶️ YouTube",
     "tabFile": "📄 קובץ",
     "addSourceTitle": "הוספת מקור מידע",
+    "addSourceDescription": "צרף קישור, טקסט, סרטון YouTube או קובץ כמקור מידע לקורס.",
     "addedSuccess": "המקור הוסף בהצלחה!",
     "addedProcessing": "מעובד ויוצג ברשימה בקרוב...",
     "urlLabel": "כתובת URL",

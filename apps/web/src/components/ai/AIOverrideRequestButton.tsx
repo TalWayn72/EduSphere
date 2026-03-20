@@ -72,7 +72,6 @@ export function AIOverrideRequestButton({
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          role="dialog"
           aria-labelledby="human-review-title"
           aria-describedby="human-review-description"
         >

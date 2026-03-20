@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { CREATE_VISUAL_ANCHOR } from './visual-anchor.graphql';
@@ -160,6 +161,9 @@ export default function AnchorEditor({
         <DialogContent className="max-w-2xl" data-testid="anchor-creation-modal">
           <DialogHeader>
             <DialogTitle>Create Visual Anchor</DialogTitle>
+            <DialogDescription className="sr-only">
+              Anchor selected text to an optional image asset.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
