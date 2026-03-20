@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 19 מרץ 2026
+**תאריך עדכון:** 20 מרץ 2026
 
 ---
 
@@ -78,17 +78,23 @@
 | BUG-094 | Consent save fails — consent resolver missing from Docker container dist | ✅ Fixed | (pending commit) |
 | BUG-095 | AI course creation fails end-to-end — no course created, redirects to /courses | ✅ Fixed | (pending commit) |
 | BUG-096 | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring) | ✅ Fixed | c04ded08..59cd59cc |
-| BUG-097 | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken | ✅ Fixed (4 rounds) | c04ded08..59cd59cc |
+| BUG-097 | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken | ✅ Fixed (8 rounds) | c04ded08..77d9931d |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 
 ---
 
 ## BUG-097 — Mixed Hebrew/English UI: i18n Not Applied to All Pages + RTL Layout Broken (19 Mar 2026)
 
-- **Status:** ✅ Fixed (4 rounds)
+- **Status:** ✅ Fixed (8 rounds)
 - **Severity:** 🟡 Medium
 - **Plan:** `docs/plans/bugs/BUG-097-i18n-rtl-mixed-languages.md`
-- **Commits:** `c04ded08`, `4bbd57b7`, `0dd1a953`, `2871d3b8`, `1d5acf94`, `59cd59cc`
+- **Commits:**
+  - `c04ded08`, `4bbd57b7`, `0dd1a953`, `2871d3b8`, `1d5acf94`, `59cd59cc` — Rounds 1-4: Social, Gamification, Dashboard, initial fixes
+  - `a0eb6188` — Round 5: Auth, settings, PublicNav Hebrew translations
+  - `74cc3f98` — Round 5.5: Login page Sign In button
+  - `a4d39535` — Round 6: Courses page (14 files)
+  - `479495c5` — Round 7: Public pages (About, FAQ, Terms, etc.) + 60 common keys
+  - `77d9931d` — Round 8: Landing page (13 components) + authenticated forms (16 pages) + 227 i18n keys
 
 ### Problem
 
@@ -96,17 +102,15 @@ When a user selects Hebrew as their language, many pages still display English t
 
 ### Root Cause
 
-1. **Hardcoded English strings** in 19+ React components bypassing the i18n `t()` function
-2. **Missing Hebrew translations** in 3 new namespaces (`social`, `gamification`, `profile`) — JSON files never created
-3. **Physical CSS properties** (`left`/`right`/`ml`/`mr`) not flipped for RTL layout
+Hardcoded English strings in JSX instead of using react-i18next `t()` calls. Found across ~65 TSX files spanning all application areas: pages, components, auth flows, public pages, landing page, and authenticated forms.
 
-### Discovery (3 Waves)
+### Discovery (3 Waves — all complete)
 
 - **Wave 1 (exact match):** Found 207+ hardcoded English strings across pages
-- **Wave 2 (similarity):** Checked all `pages/`, `hooks/`, `components/`, `admin/` for same pattern. Found 14 additional P1/P2 pages + 13 components with raw `error.message` exposed to UI
-- **Wave 3 (class of bug):** All components using physical CSS classes (522 violations across codebase); all TSX files missing `useTranslation` import (355 violations)
+- **Wave 2 (similarity — all pages/components):** Checked all `pages/`, `hooks/`, `components/`, `admin/` for same pattern. Found 14 additional P1/P2 pages + 13 components with raw `error.message` exposed to UI. Extended to auth pages, settings, courses, public pages, landing, and all authenticated forms.
+- **Wave 3 (class of bug — all JSX string literals):** All components using physical CSS classes (522 violations across codebase); all TSX files missing `useTranslation` import (355 violations). Scanned all JSX string literals across the entire codebase.
 
-### Fix Rounds (4 rounds)
+### Fix Rounds (8 rounds)
 
 | Round | Scope | Files Changed | Details |
 |-------|-------|---------------|---------|
@@ -114,29 +118,37 @@ When a user selects Hebrew as their language, many pages still display English t
 | R2 | P1/P2 pages + security hardening | 14 files + 13 components | Replaced hardcoded strings in 14 admin/feature pages; replaced raw `error.message` with i18n keys in 13 components |
 | R3 | Hebrew translations + test setup | Hebrew JSON files, test config | Added all Hebrew translations for 3 new namespaces; fixed test setup for i18n mocking; addressed remaining hardcoded strings |
 | R4 | Test fixes | AppSidebar, AIChatPanel, PublicNav, Settings | Fixed test failures in sidebar RTL logic, chat panel layout, public navigation, and settings page |
+| R5 | Auth, settings, PublicNav | Auth pages, settings, navigation | Hebrew translations for authentication flows, settings page, and public navigation bar |
+| R5.5 | Login page | Login page button | Fixed Sign In button text on login page |
+| R6 | Courses page | 14 files | Full i18n coverage for courses page and related components |
+| R7 | Public pages + common keys | About, FAQ, Terms, etc. + 60 common keys | Hebrew translations for all public-facing pages plus 60 shared common translation keys |
+| R8 | Landing page + authenticated forms | 13 landing components + 16 auth form pages + 227 i18n keys | Complete i18n coverage for landing page (all 13 components) and all authenticated form pages (16 pages), adding 227 new i18n keys |
 
-### Files Affected (~45 files)
+### Files Affected (~65 TSX files + 30 JSON locale files)
 
 Key files across `apps/web/` and `packages/i18n/`:
 - `apps/web/src/contexts/DirectionContext.tsx` (new)
-- `apps/web/src/pages/` — SocialFeedPage, GamificationPage, PublicProfilePage, MyProgressPage, 14 admin/feature pages
-- `apps/web/src/components/` — AppSidebar, AIChatPanel, PublicNav, Settings, 13 error-handling components
+- `apps/web/src/pages/` — SocialFeedPage, GamificationPage, PublicProfilePage, MyProgressPage, 14 admin/feature pages, courses pages, auth pages, settings, 16 authenticated form pages
+- `apps/web/src/components/` — AppSidebar, AIChatPanel, PublicNav, Settings, 13 error-handling components, 13 landing page components
+- `apps/web/src/pages/public/` — About, FAQ, Terms, Privacy, and other public pages
 - `packages/i18n/src/locales/*/social.json` (new, all 10 locales)
 - `packages/i18n/src/locales/*/gamification.json` (new, all 10 locales)
 - `packages/i18n/src/locales/*/profile.json` (new, all 10 locales)
+- ~30 JSON locale files updated across all rounds
 - `apps/web/scripts/lint-i18n-hardcoded.cjs` (new CI gate)
 - `apps/web/scripts/lint-physical-css.cjs` (new CI gate)
 
 ### Tests
 
-| File | Count | Purpose |
-|------|-------|---------|
-| Targeted i18n tests | 391 pass | Verify `t()` usage across all modified components |
-| i18n coverage tests (`bug097-i18n-coverage.test.ts`) | 213 pass | Static scan: all pages import `useTranslation` |
-| Coverage + regression tests | 153 pass | Verify no hardcoded English strings remain |
-| `apps/web/e2e/bug096-rtl-layout.spec.ts` | E2E | Sidebar flips to right in RTL, logical CSS verified |
-| `apps/web/e2e/bug096-hebrew-strings.spec.ts` | E2E | No English strings visible on Hebrew pages |
-| `apps/web/e2e/bug096-all-locales.spec.ts` | E2E | Parameterized smoke test for all 10 locales |
+| Metric | Result |
+|--------|--------|
+| Unit tests | 729 pass, 0 new failures |
+| TypeScript | 0 new errors |
+| i18n coverage tests (`bug097-i18n-coverage.test.ts`) | 213 pass — static scan: all pages import `useTranslation` |
+| Coverage + regression tests | 153 pass — verify no hardcoded English strings remain |
+| `apps/web/e2e/bug096-rtl-layout.spec.ts` | E2E — sidebar flips to right in RTL, logical CSS verified |
+| `apps/web/e2e/bug096-hebrew-strings.spec.ts` | E2E — no English strings visible on Hebrew pages |
+| `apps/web/e2e/bug096-all-locales.spec.ts` | E2E — parameterized smoke test for all 10 locales |
 
 ### CI Gate Scripts (Anti-Recurrence)
 
@@ -151,6 +163,7 @@ Key files across `apps/web/` and `packages/i18n/`:
 - **Static analysis test** (`bug097-i18n-coverage.test.ts`) scans all pages for `useTranslation` import
 - **Playwright E2E tests** verify RTL layout and Hebrew string rendering
 - **3 new i18n namespaces** with full Hebrew translations prevent future untranslated features
+- **227+ new i18n keys** added across 8 rounds covering landing, auth, courses, public pages, and all authenticated forms
 
 ---
 
