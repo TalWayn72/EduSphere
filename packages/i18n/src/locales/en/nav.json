@@ -49,5 +49,10 @@
   "groupTeaching": "Teaching",
   "groupAnalytics": "Analytics",
   "helpAndSupport": "Help & Support",
-  "poweredBy": "Powered by EduSphere"
+  "poweredBy": "Powered by EduSphere",
+  "features": "Features",
+  "pricing": "Pricing",
+  "pilot": "Pilot",
+  "startFreePilot": "Start Free Pilot",
+  "freePilot": "Free Pilot"
 }
