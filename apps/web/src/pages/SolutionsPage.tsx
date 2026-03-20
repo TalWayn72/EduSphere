@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { GraduationCap, Building2, Shield, BookOpen } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
@@ -38,14 +39,15 @@ const SOLUTIONS: Solution[] = [
 ];
 
 export function SolutionsPage() {
+  const { t } = useTranslation('common');
   return (
     <PublicLayout navVariant="minimal">
       <PageMeta title="Solutions | EduSphere" description="EduSphere solutions for universities, enterprises, government, and training companies." />
 
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <h1 className="mb-4 text-center text-4xl font-bold text-gray-900">Solutions for Every Sector</h1>
+        <h1 className="mb-4 text-center text-4xl font-bold text-gray-900">{t('solutionsPage.heading')}</h1>
         <p className="mx-auto mb-12 max-w-2xl text-center text-lg text-gray-600">
-          From higher education to defense — EduSphere adapts to your compliance, scale, and integration needs.
+          {t('solutionsPage.subtitle')}
         </p>
 
         <div className="grid gap-8 md:grid-cols-2">

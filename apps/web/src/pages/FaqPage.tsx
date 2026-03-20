@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { PageMeta, FAQSchema, BreadcrumbSchema, OrganizationSchema } from '@/components/seo';
 import { FAQ_ITEMS } from '@/lib/aeo-data';
 import { Input } from '@/components/ui/input';
 import { PublicLayout } from '@/components/PublicLayout';
 
-const CATEGORIES = [
-  { id: 'all', label: 'All Questions' },
-  { id: 'platform', label: 'Platform' },
-  { id: 'pricing', label: 'Pricing' },
-  { id: 'technical', label: 'Technical' },
-  { id: 'enterprise', label: 'Enterprise' },
-];
+const CATEGORY_IDS = ['all', 'platform', 'pricing', 'technical', 'enterprise'] as const;
 
 const CATEGORY_MAP: Record<string, number[]> = {
   platform: [0, 1, 2, 8, 9, 13, 15, 16],
@@ -76,6 +71,7 @@ function AccordionItem({ question, answer, isOpen, onToggle, index }: AccordionI
 }
 
 export function FaqPage() {
+  const { t } = useTranslation('common');
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -94,7 +90,7 @@ export function FaqPage() {
   return (
     <>
       <PageMeta
-        title="Frequently Asked Questions"
+        title={t('faq.pageTitle')}
         description="Find answers to common questions about EduSphere: AI tutoring, pricing plans, SCORM support, accessibility, enterprise features, and more."
         canonical="https://app.edusphere.dev/faq"
       />
@@ -113,10 +109,10 @@ export function FaqPage() {
         <div className="bg-indigo-700 text-white py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
-              Frequently Asked Questions
+              {t('faq.heading')}
             </h1>
             <p className="text-indigo-100 text-lg mb-8">
-              Everything you need to know about EduSphere.
+              {t('faq.subtitle')}
             </p>
             <div className="relative max-w-xl mx-auto">
               <Search
@@ -125,11 +121,11 @@ export function FaqPage() {
               />
               <Input
                 type="search"
-                placeholder="Search questions..."
+                placeholder={t('faq.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border-0"
-                aria-label="Search frequently asked questions"
+                aria-label={t('faq.searchLabel')}
               />
             </div>
           </div>
@@ -142,22 +138,22 @@ export function FaqPage() {
             aria-label="FAQ categories"
             className="flex flex-wrap gap-2 mb-8"
           >
-            {CATEGORIES.map((cat) => (
+            {CATEGORY_IDS.map((id) => (
               <button
-                key={cat.id}
+                key={id}
                 role="tab"
-                aria-selected={activeCategory === cat.id}
+                aria-selected={activeCategory === id}
                 onClick={() => {
-                  setActiveCategory(cat.id);
+                  setActiveCategory(id);
                   setOpenIndex(null);
                 }}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === cat.id
+                  activeCategory === id
                     ? 'bg-indigo-600 text-white'
                     : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
                 }`}
               >
-                {cat.label}
+                {t(`faq.categories.${id}`)}
               </button>
             ))}
           </div>
@@ -165,7 +161,7 @@ export function FaqPage() {
           {/* FAQ Accordion */}
           {filteredItems.length === 0 ? (
             <div className="text-center py-12 text-gray-500 dark:text-slate-400">
-              <p>No questions found matching &ldquo;{searchQuery}&rdquo;.</p>
+              <p>{t('faq.noResults', { query: searchQuery })}</p>
             </div>
           ) : (
             <div
@@ -189,16 +185,16 @@ export function FaqPage() {
           {/* Contact CTA */}
           <div className="mt-12 p-6 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl text-center">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Still have questions?
+              {t('faq.stillHaveQuestions')}
             </h2>
             <p className="text-gray-600 dark:text-slate-300 mb-4">
-              Our team is happy to help. Reach out and we&apos;ll respond within one business day.
+              {t('faq.contactCta')}
             </p>
             <a
               href="mailto:support@edusphere.dev"
               className="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
             >
-              Contact Support
+              {t('faq.contactSupport')}
             </a>
           </div>
         </main>

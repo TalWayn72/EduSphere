@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Briefcase, MapPin, Clock, Laptop, DollarSign, BookOpen, TrendingUp } from 'lucide-react';
 import { PageMeta } from '@/components/seo';
 import { PublicLayout } from '@/components/PublicLayout';
@@ -18,6 +19,7 @@ const benefits = [
 ];
 
 export function CareersPage() {
+  const { t } = useTranslation('common');
   return (
     <PublicLayout navVariant="minimal">
       <PageMeta title="Careers | EduSphere" description="Join the EduSphere team and help build the future of AI-powered education." />
@@ -25,15 +27,15 @@ export function CareersPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white py-24 text-center">
         <div className="mx-auto max-w-3xl px-6">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Join Our Team</h1>
-          <p className="mt-4 text-lg text-indigo-100">Help us build the future of AI-powered education</p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{t('careersPage.heading')}</h1>
+          <p className="mt-4 text-lg text-indigo-100">{t('careersPage.subtitle')}</p>
         </div>
       </section>
 
       {/* Benefits */}
       <section className="py-16 bg-slate-50">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-2xl font-bold text-center mb-10">Why EduSphere?</h2>
+          <h2 className="text-2xl font-bold text-center mb-10">{t('careersPage.whyJoin')}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((b) => (
               <div key={b.label} className="bg-white rounded-xl p-6 shadow-sm text-center">
@@ -49,7 +51,7 @@ export function CareersPage() {
       {/* Open Positions */}
       <section className="py-16">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-2xl font-bold text-center mb-10">Open Positions</h2>
+          <h2 className="text-2xl font-bold text-center mb-10">{t('careersPage.openPositions')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {positions.map((pos) => (
               <div key={pos.title} className="border rounded-xl p-6 hover:shadow-md transition-shadow">

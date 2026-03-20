@@ -101,5 +101,165 @@
       "validating": "正在验证...",
       "saving": "正在保存..."
     }
+  },
+  "unableToLoad": "Unable to load progress data",
+  "certificates": {
+    "title": "Certificates",
+    "description": "Your earned course completion certificates.",
+    "errorLoading": "Failed to load certificates. Please try again later.",
+    "empty": "No certificates yet — complete a course to earn one!"
+  },
+  "consentRequired": {
+    "message": "AI features require your consent.",
+    "linkText": "Enable in Privacy Settings"
+  },
+  "publish": "Publish",
+  "unpublish": "Unpublish",
+  "active": "Active",
+  "inactive": "Inactive",
+  "draft": "Draft",
+  "pending": "Pending",
+  "completed": "Completed",
+  "activate": "Activate",
+  "generate": "Generate",
+  "done": "Done",
+  "description": "Description",
+  "copy": "Copy",
+  "copied": "Copied!",
+  "revoked": "Revoked",
+  "created": "Created",
+  "lastUsed": "Last used",
+  "name": "Name",
+  "email": "Email",
+  "message": "Message",
+  "subject": "Subject",
+  "sendMessage": "Send Message",
+  "thankYouContact": "Thank you! We'll be in touch soon.",
+  "selectSubject": "Select a subject",
+  "announcements": "Announcements",
+  "title": "Title",
+  "body": "Body",
+  "priority": "Priority",
+  "targetAudience": "Target Audience",
+  "publishAt": "Publish At",
+  "expiresAt": "Expires At",
+  "newAnnouncement": "New Announcement",
+  "announcementTitle": "Announcement title",
+  "messageBody": "Message body...",
+  "createAnnouncement": "Create Announcement",
+  "creating": "Creating...",
+  "noAnnouncementsYet": "No announcements yet.",
+  "manageAnnouncements": "Manage platform-wide announcements",
+  "saving": "Saving...",
+  "saved": "Saved",
+  "readMore": "Read More",
+  "minRead": "{{count}} min read",
+  "saveChanges": "Save Changes",
+  "savedSuccessfully": "saved successfully",
+  "failedToSave": "Failed to save. Please try again.",
+  "about": {
+    "pageTitle": "About EduSphere",
+    "heading": "About EduSphere",
+    "heroSubtitle": "Building the future of learning with AI and Knowledge Graphs",
+    "missionHeading": "Our Mission",
+    "missionText": "EduSphere exists to democratize education through AI. We believe every learner deserves a personalised, adaptive experience.",
+    "teamHeading": "Leadership Team",
+    "valuesHeading": "Our Values",
+    "stats": {
+      "founded": "Founded",
+      "employees": "Employees",
+      "institutions": "Institutions",
+      "learners": "Learners"
+    },
+    "values": {
+      "innovation": "Innovation",
+      "innovationDesc": "Pushing boundaries with AI-driven pedagogy and knowledge graphs.",
+      "accessibility": "Accessibility",
+      "accessibilityDesc": "WCAG 2.2 AA compliant — learning for everyone, everywhere.",
+      "privacyFirst": "Privacy-First",
+      "privacyFirstDesc": "GDPR, SOC 2, and ISO 27001 by design — your data stays yours.",
+      "openStandards": "Open Standards",
+      "openStandardsDesc": "SCORM, LTI, Open Badges, and W3C Verifiable Credentials."
+    }
+  },
+  "accessibilityPage": {
+    "heading": "Accessibility Statement",
+    "badge": "WCAG 2.2 Level AA — Partial Conformance",
+    "intro": "EduSphere is committed to ensuring digital accessibility for people with disabilities.",
+    "lastUpdated": "Last updated: March 2026",
+    "conformanceTitle": "Conformance Status",
+    "featuresTitle": "Accessibility Features",
+    "limitationsTitle": "Known Limitations",
+    "feedbackTitle": "Feedback and Contact",
+    "feedbackIntro": "We welcome feedback on the accessibility of EduSphere.",
+    "responseTime": "We aim to respond within 2 business days.",
+    "technicalTitle": "Technical Approach",
+    "returnHome": "Return to home"
+  },
+  "faq": {
+    "pageTitle": "Frequently Asked Questions",
+    "heading": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about EduSphere.",
+    "searchPlaceholder": "Search questions...",
+    "searchLabel": "Search frequently asked questions",
+    "categories": {
+      "all": "All Questions",
+      "platform": "Platform",
+      "pricing": "Pricing",
+      "technical": "Technical",
+      "enterprise": "Enterprise"
+    },
+    "noResults": "No questions found matching \"{{query}}\".",
+    "stillHaveQuestions": "Still have questions?",
+    "contactCta": "Our team is happy to help.",
+    "contactSupport": "Contact Support"
+  },
+  "privacyPage": {
+    "heading": "Privacy Policy",
+    "lastUpdated": "Last Updated"
+  },
+  "termsPage": {
+    "heading": "Terms of Service"
+  },
+  "careersPage": {
+    "heading": "Careers at EduSphere",
+    "subtitle": "Join us in building the future of AI-powered education",
+    "openPositions": "Open Positions",
+    "whyJoin": "Why EduSphere?"
+  },
+  "solutionsPage": {
+    "heading": "Solutions",
+    "subtitle": "Tailored learning experiences for every organization"
+  },
+  "blogPage": {
+    "heading": "Blog",
+    "subtitle": "Insights on AI, education, and learning technology"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "preferences": "Notification Preferences"
+  },
+  "discussions": {
+    "title": "Discussions",
+    "newDiscussion": "New Discussion",
+    "noDiscussions": "No discussions yet.",
+    "replies": "{{count}} replies",
+    "reply": "Reply",
+    "postReply": "Post Reply"
+  },
+  "auditLog": {
+    "title": "Audit Log",
+    "description": "Review platform activity and security events",
+    "noEntries": "No audit entries found"
+  },
+  "userManagement": {
+    "title": "User Management",
+    "description": "Search, filter, and manage platform users"
+  },
+  "roleManagement": {
+    "title": "Role Management",
+    "description": "Manage roles and permissions"
   }
 }

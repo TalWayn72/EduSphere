@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { PublicLayout } from '@/components/PublicLayout';
 
@@ -37,6 +38,7 @@ const SECTIONS = [
 ] as const;
 
 export function PrivacyPage() {
+  const { t } = useTranslation('common');
   return (
     <PublicLayout navVariant="minimal">
       <PageMeta
@@ -46,8 +48,8 @@ export function PrivacyPage() {
 
       <div data-testid="privacy-page" className="mx-auto w-full max-w-3xl px-6 py-12">
         <article className="prose prose-gray dark:prose-invert max-w-none">
-          <h1>Privacy Policy</h1>
-          <p className="text-sm text-gray-500">Last Updated: March 2026</p>
+          <h1>{t('privacyPage.heading')}</h1>
+          <p className="text-sm text-gray-500">{t('privacyPage.lastUpdated')}: March 2026</p>
           <p>
             EduSphere (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is committed to protecting your
             privacy. This policy explains how we collect, use, and safeguard your personal

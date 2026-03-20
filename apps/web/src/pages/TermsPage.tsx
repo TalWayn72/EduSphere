@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { PublicLayout } from '@/components/PublicLayout';
 
@@ -13,6 +14,7 @@ const SECTIONS = [
 ] as const;
 
 export function TermsPage() {
+  const { t } = useTranslation('common');
   return (
     <PublicLayout navVariant="minimal">
       <PageMeta
@@ -22,7 +24,7 @@ export function TermsPage() {
 
       <div data-testid="terms-page" className="mx-auto max-w-3xl px-6 py-12">
         <article className="prose prose-gray dark:prose-invert max-w-none">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Terms of Service</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t('termsPage.heading')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Effective Date: March 2026
           </p>

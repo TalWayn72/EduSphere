@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '@/lib/blog-data';
 import { PageMeta, BreadcrumbSchema } from '@/components/seo';
@@ -15,6 +16,7 @@ function formatDate(iso: string): string {
 }
 
 export function BlogListPage() {
+  const { t } = useTranslation('common');
   return (
     <PublicLayout navVariant="minimal">
       <PageMeta
@@ -35,10 +37,10 @@ export function BlogListPage() {
         <div className="bg-indigo-700 text-white py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
-              EduSphere Blog
+              {t('blogPage.heading')}
             </h1>
             <p className="text-indigo-100 text-lg">
-              AI education insights, learning science, and platform updates.
+              {t('blogPage.subtitle')}
             </p>
           </div>
         </div>
@@ -64,7 +66,7 @@ export function BlogListPage() {
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 mt-auto pt-4 border-t border-gray-100 dark:border-slate-700">
                     <span>{post.author}</span>
-                    <span>{post.readingTimeMinutes} min read</span>
+                    <span>{t('minRead', { count: post.readingTimeMinutes })}</span>
                     <span>{formatDate(post.datePublished)}</span>
                   </div>
                   <Link
@@ -72,7 +74,7 @@ export function BlogListPage() {
                     className="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:underline"
                     aria-label={`Read: ${post.title}`}
                   >
-                    Read More →
+                    {t('readMore')} &rarr;
                   </Link>
                 </div>
               </article>

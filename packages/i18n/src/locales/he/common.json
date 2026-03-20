@@ -73,13 +73,193 @@
       "xpPoints": "נקודות XP"
     }
   },
+  "publish": "פרסם",
+  "unpublish": "בטל פרסום",
+  "active": "פעיל",
+  "inactive": "לא פעיל",
+  "draft": "טיוטה",
+  "pending": "ממתין",
+  "completed": "הושלם",
+  "activate": "הפעל",
+  "generate": "צור",
+  "done": "סיום",
+  "description": "תיאור",
+  "copy": "העתק",
+  "copied": "הועתק!",
+  "revoked": "בוטל",
+  "created": "נוצר",
+  "lastUsed": "שימוש אחרון",
+  "name": "שם",
+  "email": "אימייל",
+  "message": "הודעה",
+  "subject": "נושא",
+  "sendMessage": "שלח הודעה",
+  "thankYouContact": "תודה! ניצור איתך קשר בקרוב.",
+  "selectSubject": "בחר נושא",
+  "announcements": "הודעות",
+  "title": "כותרת",
+  "body": "גוף",
+  "priority": "עדיפות",
+  "targetAudience": "קהל יעד",
+  "publishAt": "פרסום ב",
+  "expiresAt": "פג תוקף ב",
+  "newAnnouncement": "הודעה חדשה",
+  "announcementTitle": "כותרת ההודעה",
+  "messageBody": "גוף ההודעה...",
+  "createAnnouncement": "צור הודעה",
+  "creating": "יוצר...",
+  "noAnnouncementsYet": "אין הודעות עדיין.",
+  "manageAnnouncements": "ניהול הודעות כלל-פלטפורמה",
+  "saving": "שומר...",
+  "saved": "נשמר",
+  "readMore": "קרא עוד",
+  "minRead": "{{count}} דקות קריאה",
+  "saveChanges": "שמור שינויים",
+  "savedSuccessfully": "נשמר בהצלחה",
+  "failedToSave": "השמירה נכשלה. אנא נסה שוב.",
+  "about": {
+    "pageTitle": "אודות EduSphere",
+    "heading": "אודות EduSphere",
+    "heroSubtitle": "בונים את עתיד הלמידה עם AI וגרפי ידע",
+    "missionHeading": "המשימה שלנו",
+    "missionText": "EduSphere קיימת כדי לדמוקרטיזציה של החינוך באמצעות AI.",
+    "teamHeading": "צוות ההנהלה",
+    "valuesHeading": "הערכים שלנו",
+    "stats": {
+      "founded": "נוסדה",
+      "employees": "עובדים",
+      "institutions": "מוסדות",
+      "learners": "לומדים"
+    },
+    "values": {
+      "innovation": "חדשנות",
+      "innovationDesc": "דוחפים גבולות עם פדגוגיה מבוססת AI.",
+      "accessibility": "נגישות",
+      "accessibilityDesc": "תואם WCAG 2.2 AA — למידה לכולם.",
+      "privacyFirst": "פרטיות קודם",
+      "privacyFirstDesc": "GDPR, SOC 2, ו-ISO 27001 מעצם התכנון.",
+      "openStandards": "תקנים פתוחים",
+      "openStandardsDesc": "SCORM, LTI, Open Badges, ו-W3C Verifiable Credentials."
+    }
+  },
+  "accessibilityPage": {
+    "heading": "הצהרת נגישות",
+    "badge": "WCAG 2.2 רמה AA — התאמה חלקית",
+    "intro": "EduSphere מחויבת להבטחת נגישות דיגיטלית.",
+    "lastUpdated": "עדכון אחרון: מרץ 2026",
+    "conformanceTitle": "מצב התאמה",
+    "featuresTitle": "תכונות נגישות",
+    "limitationsTitle": "מגבלות ידועות",
+    "feedbackTitle": "משוב ויצירת קשר",
+    "feedbackIntro": "אנו מקבלים בברכה משוב על הנגישות של EduSphere.",
+    "responseTime": "אנו שואפים להגיב תוך 2 ימי עסקים.",
+    "technicalTitle": "גישה טכנית",
+    "returnHome": "חזרה לדף הבית"
+  },
+  "faq": {
+    "pageTitle": "שאלות נפוצות",
+    "heading": "שאלות נפוצות",
+    "subtitle": "כל מה שצריך לדעת על EduSphere.",
+    "searchPlaceholder": "חפש שאלות...",
+    "searchLabel": "חיפוש בשאלות נפוצות",
+    "categories": {
+      "all": "כל השאלות",
+      "platform": "פלטפורמה",
+      "pricing": "מחירים",
+      "technical": "טכני",
+      "enterprise": "ארגוני"
+    },
+    "noResults": "לא נמצאו שאלות התואמות.",
+    "stillHaveQuestions": "עדיין יש שאלות?",
+    "contactCta": "הצוות שלנו ישמח לעזור.",
+    "contactSupport": "צור קשר עם התמיכה"
+  },
+  "privacyPage": {
+    "heading": "מדיניות פרטיות",
+    "lastUpdated": "עדכון אחרון"
+  },
+  "termsPage": {
+    "heading": "תנאי שימוש"
+  },
+  "careersPage": {
+    "heading": "קריירה ב-EduSphere",
+    "subtitle": "הצטרפו אלינו בבניית עתיד החינוך",
+    "openPositions": "משרות פתוחות",
+    "whyJoin": "למה להצטרף?"
+  },
+  "solutionsPage": {
+    "heading": "פתרונות",
+    "subtitle": "חוויות למידה מותאמות לכל ארגון"
+  },
+  "blogPage": {
+    "heading": "בלוג",
+    "subtitle": "תובנות על AI, חינוך וטכנולוגיית למידה"
+  },
+  "notifications": {
+    "title": "התראות",
+    "markAllRead": "סמן הכל כנקרא",
+    "noNotifications": "אין התראות",
+    "preferences": "העדפות התראות"
+  },
+  "discussions": {
+    "title": "דיונים",
+    "newDiscussion": "דיון חדש",
+    "noDiscussions": "אין דיונים עדיין.",
+    "replies": "{{count}} תגובות",
+    "reply": "תגובה",
+    "postReply": "פרסם תגובה"
+  },
+  "auditLog": {
+    "title": "יומן ביקורת",
+    "description": "סקירת פעילות פלטפורמה",
+    "noEntries": "לא נמצאו רשומות ביקורת"
+  },
+  "userManagement": {
+    "title": "ניהול משתמשים",
+    "description": "חיפוש, סינון וניהול משתמשי הפלטפורמה"
+  },
+  "roleManagement": {
+    "title": "ניהול תפקידים",
+    "description": "ניהול תפקידים והרשאות"
+  },
   "progress": {
-    "aiGen": { "analyzing": "מנתח את הנושא...", "buildingOutline": "בונה מתווה לקורס...", "creatingModules": "יוצר מודולים...", "almostReady": "כמעט מוכן..." },
-    "upload": { "preparing": "מכין העלאה...", "uploading": "מעלה קובץ...", "confirming": "מאשר העלאה...", "done": "הושלם!" },
-    "quiz": { "checkingAnswers": "בודק תשובות...", "calculatingScore": "מחשב ציון...", "preparingFeedback": "מכין משוב מפורט..." },
-    "import": { "connecting": "מתחבר למקור...", "importing": "מייבא תוכן...", "processingLessons": "מעבד שיעורים...", "almostDone": "כמעט סיימנו..." },
-    "chat": { "thinking": "חושב...", "composing": "מנסח תשובה...", "almostReady": "כמעט מוכן..." },
-    "page": { "loadingData": "טוען נתונים...", "processing": "מעבד...", "almostReady": "כמעט מוכן..." },
-    "assignment": { "submitting": "שולח מטלה...", "validating": "מאמת...", "saving": "שומר..." }
+    "aiGen": {
+      "analyzing": "מנתח את הנושא...",
+      "buildingOutline": "בונה מתווה לקורס...",
+      "creatingModules": "יוצר מודולים...",
+      "almostReady": "כמעט מוכן..."
+    },
+    "upload": {
+      "preparing": "מכין העלאה...",
+      "uploading": "מעלה קובץ...",
+      "confirming": "מאשר העלאה...",
+      "done": "הושלם!"
+    },
+    "quiz": {
+      "checkingAnswers": "בודק תשובות...",
+      "calculatingScore": "מחשב ציון...",
+      "preparingFeedback": "מכין משוב מפורט..."
+    },
+    "import": {
+      "connecting": "מתחבר למקור...",
+      "importing": "מייבא תוכן...",
+      "processingLessons": "מעבד שיעורים...",
+      "almostDone": "כמעט סיימנו..."
+    },
+    "chat": {
+      "thinking": "חושב...",
+      "composing": "מנסח תשובה...",
+      "almostReady": "כמעט מוכן..."
+    },
+    "page": {
+      "loadingData": "טוען נתונים...",
+      "processing": "מעבד...",
+      "almostReady": "כמעט מוכן..."
+    },
+    "assignment": {
+      "submitting": "שולח מטלה...",
+      "validating": "מאמת...",
+      "saving": "שומר..."
+    }
   }
 }

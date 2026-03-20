@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -96,32 +97,30 @@ const KNOWN_LIMITATIONS: KnownLimitation[] = [
 ];
 
 export function AccessibilityStatementPage() {
+  const { t } = useTranslation('common');
   return (
     <PublicLayout navVariant="minimal">
       <PageShell size="sm" spacing="relaxed" className="max-w-3xl py-10">
         {/* Header */}
         <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">Accessibility Statement</h1>
+          <h1 className="text-3xl font-bold">{t('accessibilityPage.heading')}</h1>
           <Badge variant="secondary" className="text-sm">
-            WCAG 2.2 Level AA — Partial Conformance
+            {t('accessibilityPage.badge')}
           </Badge>
         </div>
         <p className="text-muted-foreground">
-          EduSphere is committed to ensuring digital accessibility for people
-          with disabilities. We continually improve the user experience for
-          everyone and apply relevant accessibility standards across our
-          platform.
+          {t('accessibilityPage.intro')}
         </p>
         <p className="text-sm text-muted-foreground">
-          Last updated: March 2026
+          {t('accessibilityPage.lastUpdated')}
         </p>
       </div>
 
       {/* Conformance status */}
       <Card>
         <CardHeader>
-          <CardTitle>Conformance Status</CardTitle>
+          <CardTitle>{t('accessibilityPage.conformanceTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <p>
@@ -156,7 +155,7 @@ export function AccessibilityStatementPage() {
       {/* Implemented features */}
       <Card>
         <CardHeader>
-          <CardTitle>Accessibility Features</CardTitle>
+          <CardTitle>{t('accessibilityPage.featuresTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ul
@@ -184,7 +183,7 @@ export function AccessibilityStatementPage() {
       {/* Known limitations */}
       <Card>
         <CardHeader>
-          <CardTitle>Known Limitations</CardTitle>
+          <CardTitle>{t('accessibilityPage.limitationsTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ul
@@ -204,13 +203,11 @@ export function AccessibilityStatementPage() {
       {/* Contact */}
       <Card>
         <CardHeader>
-          <CardTitle>Feedback and Contact</CardTitle>
+          <CardTitle>{t('accessibilityPage.feedbackTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <p>
-            We welcome feedback on the accessibility of EduSphere. If you
-            experience barriers or wish to report an accessibility issue, please
-            contact us:
+            {t('accessibilityPage.feedbackIntro')}
           </p>
           <ul className="space-y-1 list-none">
             <li>
@@ -223,13 +220,13 @@ export function AccessibilityStatementPage() {
               </a>
             </li>
             <li>
-              <span className="font-medium">Response time:</span> We aim to
-              respond within 2 business days.
+              <span className="font-medium">Response time:</span>{' '}
+              {t('accessibilityPage.responseTime')}
             </li>
           </ul>
           <p className="text-muted-foreground">
             You may also escalate unresolved accessibility concerns to your
-            country's supervisory authority or enforcement body if we do not
+            country&apos;s supervisory authority or enforcement body if we do not
             respond adequately.
           </p>
         </CardContent>
@@ -238,7 +235,7 @@ export function AccessibilityStatementPage() {
       {/* Technical info */}
       <Card>
         <CardHeader>
-          <CardTitle>Technical Approach</CardTitle>
+          <CardTitle>{t('accessibilityPage.technicalTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
@@ -259,7 +256,7 @@ export function AccessibilityStatementPage() {
         {/* Back link */}
         <p className="text-sm">
           <Link to="/" className="underline text-primary">
-            Return to home
+            {t('accessibilityPage.returnHome')}
           </Link>
         </p>
       </PageShell>
