@@ -60,5 +60,15 @@
   "sessionsStartsIn": "מתחיל ב-{{time}}",
   "sessionsNoSessions": "אין סשנים מתוזמנים",
   "sessionsParticipants": "{{count}} משתתפים",
-  "sessionsChat": "צ'אט חי"
+  "sessionsChat": "צ'אט חי",
+  "chavrutaDebate": "דיון חברותא",
+  "chavrutaDescription": "שותף למידה דיאלקטי מבוסס AI — אתגר והתאתגר.",
+  "generatedWithAi": "נוצר בסיוע AI",
+  "newTopic": "נושא חדש",
+  "newTopicAria": "התחל נושא דיון חדש",
+  "consentTitle": "נדרשת הסכמה לעיבוד AI",
+  "consentDescription": "חברותא משתמשת בשירות AI של צד שלישי (OpenAI / Anthropic) ליצירת תגובות לדיון. הטיעונים שלך יעובדו על ידי שירות זה. אנא הסכם לפני שתמשיך. (EU AI Act Art. 50 / SI-10)",
+  "consentButton": "אני מסכים — התחל לדון",
+  "noDiscussions": "אין דיונים עדיין — הצטרף לקורס כדי להתחיל לדון!",
+  "messagesCount": "הודעות"
 }

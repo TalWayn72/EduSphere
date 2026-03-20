@@ -60,5 +60,15 @@
   "sessionsStartsIn": "Starts in {{time}}",
   "sessionsNoSessions": "No sessions scheduled",
   "sessionsParticipants": "{{count}} participants",
-  "sessionsChat": "Live Chat"
+  "sessionsChat": "Live Chat",
+  "chavrutaDebate": "Дебаты Хаврута",
+  "chavrutaDescription": "Диалектический AI-партнёр по обучению — бросайте вызов и принимайте вызовы.",
+  "generatedWithAi": "Создано с помощью ИИ",
+  "newTopic": "Новая Тема",
+  "newTopicAria": "Начать новую тему дебатов",
+  "consentTitle": "Требуется Согласие на Обработку ИИ",
+  "consentDescription": "Хаврута использует сторонний сервис ИИ для генерации ответов. Пожалуйста, дайте согласие перед продолжением.",
+  "consentButton": "Согласен — Начать Дебаты",
+  "noDiscussions": "Пока нет обсуждений — присоединитесь к курсу, чтобы начать!",
+  "messagesCount": "сообщений"
 }

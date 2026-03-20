@@ -40,6 +40,6 @@ describe('DiscussionsPage', () => {
   it('shows loading state', () => {
     vi.mocked(urql.useQuery).mockReturnValue([{ data: undefined, fetching: true, error: undefined }, vi.fn()] as never);
     render(<MemoryRouter><DiscussionsPage /></MemoryRouter>);
-    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
+    expect(screen.getByText(/Connecting/i)).toBeInTheDocument();
   });
 });

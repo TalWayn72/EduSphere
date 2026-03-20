@@ -3,6 +3,7 @@
  * Route: /discussions
  */
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
@@ -24,6 +25,7 @@ interface MyDiscussionsData {
 }
 
 export function DiscussionsPage() {
+  const { t } = useTranslation('collaboration');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -42,8 +44,8 @@ export function DiscussionsPage() {
     return (
       <Layout>
         <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-bold mb-6">Discussions</h1>
-          <p className="text-muted-foreground">Loading...</p>
+          <h1 className="text-3xl font-bold mb-6">{t('discussions')}</h1>
+          <p className="text-muted-foreground">{t('connecting')}</p>
         </div>
       </Layout>
     );
@@ -54,13 +56,13 @@ export function DiscussionsPage() {
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center gap-3">
           <MessageSquare className="h-8 w-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">Discussions</h1>
+          <h1 className="text-3xl font-bold">{t('discussions')}</h1>
         </div>
 
         {discussions.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              No discussions yet — join a course to start discussing!
+              {t('noDiscussions')}
             </CardContent>
           </Card>
         ) : (
@@ -75,11 +77,11 @@ export function DiscussionsPage() {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MessageSquare className="h-4 w-4" aria-hidden />
-                        {discussion.messagesCount} messages
+                        {discussion.messagesCount} {t('messagesCount')}
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="h-4 w-4" aria-hidden />
-                        {discussion.participantsCount} participants
+                        {t('participants', { count: discussion.participantsCount })}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">

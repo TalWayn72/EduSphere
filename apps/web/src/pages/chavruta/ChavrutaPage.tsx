@@ -9,6 +9,7 @@
  * AI message bubble and in the page header.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { RotateCcw, Bot, AlertCircle } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
@@ -33,21 +34,18 @@ function DebateSkeleton() {
 }
 
 // ── Consent gate ──────────────────────────────────────────────────────────────
-function ConsentPrompt({ onGrant }: { onGrant: () => void }) {
+function ConsentPrompt({ onGrant, labels }: { onGrant: () => void; labels: { title: string; description: string; button: string } }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4 px-6 text-center">
       <Bot className="h-10 w-10 text-primary opacity-70" />
       <div className="space-y-1">
-        <p className="font-semibold text-sm">AI Processing Consent Required</p>
+        <p className="font-semibold text-sm">{labels.title}</p>
         <p className="text-xs text-muted-foreground max-w-xs">
-          Chavruta uses a third-party AI service (OpenAI / Anthropic) to
-          generate debate responses. Your arguments will be processed by that
-          service. Please consent before continuing. (EU AI Act Art.&nbsp;50 /
-          SI-10)
+          {labels.description}
         </p>
       </div>
       <Button size="sm" onClick={onGrant}>
-        I Consent — Start Debating
+        {labels.button}
       </Button>
     </div>
   );
@@ -65,6 +63,7 @@ function ErrorBanner({ message }: { message: string }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function ChavrutaPage() {
+  const { t } = useTranslation('collaboration');
   const { topicId } = useParams<{ topicId?: string }>();
   const {
     messages,
@@ -85,27 +84,27 @@ export function ChavrutaPage() {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Bot className="h-6 w-6 text-primary" />
-              Chavruta Debate
+              {t('chavrutaDebate')}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Dialectical AI learning partner — challenge and be challenged.
+              {t('chavrutaDescription')}
             </p>
           </div>
           <div className="flex items-center gap-2">
             {/* EU AI Act Art.50 disclosure badge */}
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground border rounded-full px-2.5 py-1">
               <Bot className="h-3 w-3" aria-hidden="true" />
-              Generated with AI assistance
+              {t('generatedWithAi')}
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={startNewTopic}
               disabled={isLoading}
-              aria-label="Start a new debate topic"
+              aria-label={t('newTopicAria')}
             >
               <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-              New Topic
+              {t('newTopic')}
             </Button>
           </div>
         </div>
@@ -118,7 +117,7 @@ export function ChavrutaPage() {
           {error && <ErrorBanner message={error} />}
 
           {needsConsent ? (
-            <ConsentPrompt onGrant={grantConsent} />
+            <ConsentPrompt onGrant={grantConsent} labels={{ title: t('consentTitle'), description: t('consentDescription'), button: t('consentButton') }} />
           ) : messages.length === 0 && isLoading ? (
             <DebateSkeleton />
           ) : (

@@ -47,7 +47,7 @@ export function ChallengeDetailPage() {
     e.preventDefault();
     const parsed = parseInt(scoreInput, 10);
     if (isNaN(parsed) || parsed < 0) {
-      setSubmitError('Please enter a valid score');
+      setSubmitError(t('challenge.validScoreError'));
       return;
     }
     setSubmitError(null);
@@ -56,7 +56,7 @@ export function ChallengeDetailPage() {
       setShowScoreForm(false);
       setScoreInput('');
     } else {
-      setSubmitError('Failed to submit score. Please try again.');
+      setSubmitError(t('challenge.submitError'));
     }
   };
 
@@ -92,7 +92,7 @@ export function ChallengeDetailPage() {
             <div className="flex gap-2 items-end">
               <div className="flex-1">
                 <label htmlFor="score-input" className="text-xs text-muted-foreground block mb-1">
-                  Score
+                  {t('challenge.scoreLabel')}
                 </label>
                 <input
                   id="score-input"
@@ -131,10 +131,10 @@ export function ChallengeDetailPage() {
         )}
 
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-muted-foreground">{entries.length} participant{entries.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-muted-foreground">{entries.length === 1 ? t('challenge.participantCount', { count: entries.length }) : t('challenge.participantCountPlural', { count: entries.length })}</p>
           {id && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <span>Ends in:</span>
+              <span>{t('challenge.endsIn')}</span>
               <CountdownTimer endDate={new Date(Date.now() + 7 * 86400000).toISOString()} />
             </div>
           )}

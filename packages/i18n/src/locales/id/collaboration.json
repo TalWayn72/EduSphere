@@ -60,5 +60,15 @@
   "sessionsStartsIn": "Starts in {{time}}",
   "sessionsNoSessions": "No sessions scheduled",
   "sessionsParticipants": "{{count}} participants",
-  "sessionsChat": "Live Chat"
+  "sessionsChat": "Live Chat",
+  "chavrutaDebate": "Debat Chavruta",
+  "chavrutaDescription": "Mitra belajar dialektis AI — tantang dan ditantang.",
+  "generatedWithAi": "Dibuat dengan bantuan AI",
+  "newTopic": "Topik Baru",
+  "newTopicAria": "Mulai topik debat baru",
+  "consentTitle": "Persetujuan Pemrosesan AI Diperlukan",
+  "consentDescription": "Chavruta menggunakan layanan AI pihak ketiga untuk menghasilkan respons debat. Harap setujui sebelum melanjutkan.",
+  "consentButton": "Saya Setuju — Mulai Berdebat",
+  "noDiscussions": "Belum ada diskusi — bergabunglah dengan kursus untuk mulai berdiskusi!",
+  "messagesCount": "pesan"
 }

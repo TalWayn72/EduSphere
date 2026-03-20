@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
 import { useParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
@@ -17,6 +18,7 @@ interface MentorMatch {
 }
 
 export function MentorDiscoveryPage() {
+  const { t } = useTranslation('social');
   const { courseId = '' } = useParams<{ courseId: string }>();
   const [mounted, setMounted] = useState(false);
 
@@ -50,29 +52,29 @@ export function MentorDiscoveryPage() {
     <Layout>
       <div className="mx-auto max-w-2xl space-y-6 p-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Find a Mentor</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('findMentor')}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Connect with learners who have already traversed your learning path.
+            {t('findMentorDescription')}
           </p>
         </div>
 
         {!courseId && (
           <p className="text-sm text-muted-foreground">
-            No course selected. Navigate here from a course page to find mentors.
+            {t('noCourseSelected')}
           </p>
         )}
 
         {fetching && (
-          <p className="text-sm text-muted-foreground">Finding mentors...</p>
+          <p className="text-sm text-muted-foreground">{t('findingMentors')}</p>
         )}
         {error && (
           <p className="text-sm text-destructive" role="alert">
-            Failed to load mentors.
+            {t('mentorLoadError')}
           </p>
         )}
         {!fetching && !error && courseId && mentors.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            No mentors found yet. Be the first to complete this path!
+            {t('noMentorsFound')}
           </p>
         )}
 
@@ -81,9 +83,9 @@ export function MentorDiscoveryPage() {
             <Card key={mentor.mentorId} role="listitem">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
-                  <span>Mentor {mentor.mentorId.slice(0, 8)}</span>
+                  <span>{t('mentorLabel', { id: mentor.mentorId.slice(0, 8) })}</span>
                   <Badge variant="secondary">
-                    {Math.round(mentor.pathOverlapScore * 100)}% path overlap
+                    {t('pathOverlap', { percent: Math.round(mentor.pathOverlapScore * 100) })}
                   </Badge>
                 </CardTitle>
               </CardHeader>
@@ -103,7 +105,7 @@ export function MentorDiscoveryPage() {
                   disabled={requesting}
                   aria-label={`Request mentoring from ${mentor.mentorId}`}
                 >
-                  {requesting ? 'Requesting...' : 'Request Mentoring'}
+                  {requesting ? t('requesting') : t('requestMentoring')}
                 </Button>
               </CardContent>
             </Card>

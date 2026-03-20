@@ -27,5 +27,12 @@
   "thisWeek": "This Week",
   "badges": "Badges",
   "pts": "pts",
-  "yourRank": "Your Rank"
+  "yourRank": "Your Rank",
+  "groupChallenges": "Desafios em Grupo",
+  "createChallenge": "Criar Desafio",
+  "myParticipations": "Minhas Participações",
+  "loadingChallenges": "Carregando desafios...",
+  "loadingParticipations": "Carregando suas participações...",
+  "noParticipations": "Você ainda não participou de nenhum desafio",
+  "challengeLabel": "Desafio {{id}}"
 }

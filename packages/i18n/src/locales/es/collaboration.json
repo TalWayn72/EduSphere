@@ -60,5 +60,15 @@
   "sessionsStartsIn": "Starts in {{time}}",
   "sessionsNoSessions": "No sessions scheduled",
   "sessionsParticipants": "{{count}} participants",
-  "sessionsChat": "Live Chat"
+  "sessionsChat": "Live Chat",
+  "chavrutaDebate": "Debate Chavruta",
+  "chavrutaDescription": "Compañero de aprendizaje dialéctico con IA — desafía y sé desafiado.",
+  "generatedWithAi": "Generado con asistencia de IA",
+  "newTopic": "Nuevo Tema",
+  "newTopicAria": "Iniciar un nuevo tema de debate",
+  "consentTitle": "Se Requiere Consentimiento para Procesamiento de IA",
+  "consentDescription": "Chavruta utiliza un servicio de IA de terceros para generar respuestas de debate. Por favor, consienta antes de continuar.",
+  "consentButton": "Acepto — Comenzar a Debatir",
+  "noDiscussions": "Aún no hay discusiones — ¡únete a un curso para empezar!",
+  "messagesCount": "mensajes"
 }

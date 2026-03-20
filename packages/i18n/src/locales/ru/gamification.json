@@ -27,5 +27,12 @@
   "thisWeek": "This Week",
   "badges": "Badges",
   "pts": "pts",
-  "yourRank": "Your Rank"
+  "yourRank": "Your Rank",
+  "groupChallenges": "Групповые Испытания",
+  "createChallenge": "Создать Испытание",
+  "myParticipations": "Мои Участия",
+  "loadingChallenges": "Загрузка испытаний...",
+  "loadingParticipations": "Загрузка ваших участий...",
+  "noParticipations": "Вы ещё не присоединились ни к одному испытанию",
+  "challengeLabel": "Испытание {{id}}"
 }

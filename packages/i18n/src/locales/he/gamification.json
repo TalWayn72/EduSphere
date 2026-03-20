@@ -27,5 +27,12 @@
   "thisWeek": "השבוע",
   "badges": "תגים",
   "pts": "נק׳",
-  "yourRank": "הדירוג שלך:"
+  "yourRank": "הדירוג שלך:",
+  "groupChallenges": "אתגרים קבוצתיים",
+  "createChallenge": "צור אתגר",
+  "myParticipations": "ההשתתפויות שלי",
+  "loadingChallenges": "טוען אתגרים...",
+  "loadingParticipations": "טוען את ההשתתפויות שלך...",
+  "noParticipations": "עדיין לא הצטרפת לאף אתגר",
+  "challengeLabel": "אתגר {{id}}"
 }

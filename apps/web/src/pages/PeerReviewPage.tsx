@@ -3,6 +3,7 @@
  * Route: /peer-review
  */
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -51,6 +52,7 @@ function statusVariant(status: string): 'default' | 'secondary' | 'outline' {
 }
 
 export function PeerReviewPage() {
+  const { t } = useTranslation('social');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export function PeerReviewPage() {
       <div className="container mx-auto p-6 space-y-8">
         <div className="flex items-center gap-3">
           <Star className="h-8 w-8 text-indigo-500" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">Peer Review</h1>
+          <h1 className="text-3xl font-bold">{t('peerReview')}</h1>
         </div>
 
         {/* ── Assignments to Review ──────────────────────────────────────── */}
@@ -86,7 +88,7 @@ export function PeerReviewPage() {
             id="assignments-heading"
             className="text-xl font-semibold mb-4"
           >
-            Assignments to Review
+            {t('assignmentsToReview')}
           </h2>
 
           {!mounted || fetchingAssignments ? (
@@ -98,7 +100,7 @@ export function PeerReviewPage() {
           ) : assignments.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                No pending review assignments
+                {t('noPendingAssignments')}
               </CardContent>
             </Card>
           ) : (
@@ -109,7 +111,7 @@ export function PeerReviewPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">{a.contentItemTitle}</p>
                       <p className="text-xs text-muted-foreground">
-                        By: {a.submitterDisplayName ?? 'Anonymous'}
+                        {t('by')}: {a.submitterDisplayName ?? t('anonymous')}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -118,7 +120,7 @@ export function PeerReviewPage() {
                         to={`/peer-review/${a.id}`}
                         className="text-sm font-medium text-primary underline-offset-2 hover:underline"
                       >
-                        Start Review
+                        {t('startReview')}
                       </Link>
                     </div>
                   </CardContent>
@@ -134,7 +136,7 @@ export function PeerReviewPage() {
             id="submissions-heading"
             className="text-xl font-semibold mb-4"
           >
-            My Submissions
+            {t('mySubmissions')}
           </h2>
 
           {!mounted || fetchingSubmissions ? (
@@ -146,7 +148,7 @@ export function PeerReviewPage() {
           ) : submissions.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                You haven&apos;t submitted any work for peer review yet
+                {t('noSubmissions')}
               </CardContent>
             </Card>
           ) : (
@@ -162,7 +164,7 @@ export function PeerReviewPage() {
                   <CardContent>
                     {s.score !== undefined && s.score !== null && (
                       <p className="text-xs text-muted-foreground">
-                        Score: <span className="font-semibold">{s.score}</span>
+                        {t('scoreLabel')}: <span className="font-semibold">{s.score}</span>
                       </p>
                     )}
                   </CardContent>

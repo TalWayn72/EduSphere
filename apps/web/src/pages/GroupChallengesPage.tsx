@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
@@ -37,6 +38,7 @@ interface Participation {
 type Tab = 'active' | 'mine';
 
 export function GroupChallengesPage() {
+  const { t } = useTranslation('gamification');
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('active');
   const [joiningId, setJoiningId] = useState<string | null>(null);
@@ -75,12 +77,12 @@ export function GroupChallengesPage() {
     <Layout>
       <PageShell size="md" className="py-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Group Challenges</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('groupChallenges')}</h1>
           <Link
             to="/challenges/new"
             className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Create Challenge
+            {t('createChallenge')}
           </Link>
         </div>
 
@@ -97,7 +99,7 @@ export function GroupChallengesPage() {
                 : 'border-transparent text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            Active Challenges
+            {t('activeChallenges')}
           </button>
           <button
             role="tab"
@@ -110,7 +112,7 @@ export function GroupChallengesPage() {
                 : 'border-transparent text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            My Participations
+            {t('myParticipations')}
           </button>
         </div>
 
@@ -118,11 +120,11 @@ export function GroupChallengesPage() {
         {activeTab === 'active' && (
           <div>
             {activeChallengesResult.fetching && (
-              <p className="text-sm text-muted-foreground">Loading challenges...</p>
+              <p className="text-sm text-muted-foreground">{t('loadingChallenges')}</p>
             )}
             {!activeChallengesResult.fetching && challenges.length === 0 && (
               <div className="rounded-lg border border-border bg-card p-8 text-center">
-                <p className="text-sm text-muted-foreground">No active challenges yet</p>
+                <p className="text-sm text-muted-foreground">{t('noActiveChallenges')}</p>
               </div>
             )}
             {challenges.length > 0 && (
@@ -144,11 +146,11 @@ export function GroupChallengesPage() {
         {activeTab === 'mine' && (
           <div>
             {myParticipationsResult.fetching && (
-              <p className="text-sm text-muted-foreground">Loading your participations...</p>
+              <p className="text-sm text-muted-foreground">{t('loadingParticipations')}</p>
             )}
             {!myParticipationsResult.fetching && participations.length === 0 && (
               <div className="rounded-lg border border-border bg-card p-8 text-center">
-                <p className="text-sm text-muted-foreground">You have not joined any challenges yet</p>
+                <p className="text-sm text-muted-foreground">{t('noParticipations')}</p>
               </div>
             )}
             {participations.length > 0 && (
@@ -160,9 +162,9 @@ export function GroupChallengesPage() {
                     className="rounded-lg border border-border bg-card p-4 flex items-center justify-between hover:bg-muted/30 transition-colors"
                   >
                     <div>
-                      <p className="text-sm font-medium text-foreground">Challenge {p.challengeId.slice(0, 8)}</p>
+                      <p className="text-sm font-medium text-foreground">{t('challengeLabel', { id: p.challengeId.slice(0, 8) })}</p>
                       <p className="text-xs text-muted-foreground">
-                        Score: {p.score} {p.rank != null ? `· Rank #${p.rank}` : ''}
+                        {t('score')}: {p.score} {p.rank != null ? `· ${t('rank')} #${p.rank}` : ''}
                       </p>
                     </div>
                     <span className="text-xs text-muted-foreground">

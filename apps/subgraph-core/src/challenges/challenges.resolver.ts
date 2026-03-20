@@ -9,6 +9,31 @@ interface GqlContext {
   authContext?: AuthContext;
 }
 
+/** Safely convert a Date or string to ISO string for GraphQL String! fields. */
+function toISOString(value: unknown): string {
+  if (value instanceof Date) return value.toISOString();
+  return String(value ?? '');
+}
+
+/** Serialize Drizzle challenge row (Date→String) for GroupChallenge GraphQL type. */
+function serializeChallenge(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...row,
+    startDate: toISOString(row.startDate),
+    endDate: toISOString(row.endDate),
+    createdBy: String(row.createdBy ?? ''),
+  };
+}
+
+/** Serialize Drizzle participant row (Date→String) for ChallengeParticipant GraphQL type. */
+function serializeParticipant(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...row,
+    joinedAt: toISOString(row.joinedAt),
+    completedAt: row.completedAt ? toISOString(row.completedAt) : null,
+  };
+}
+
 @Resolver('GroupChallenge')
 export class ChallengesResolver {
   constructor(
@@ -35,7 +60,26 @@ export class ChallengesResolver {
     @Context() ctx: GqlContext,
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    return this.challengeService.getActiveChallenges(tenantId, userId, courseId, first, after);
+    const challenges = await this.challengeService.getActiveChallenges(tenantId, userId, courseId, first, after);
+
+    // Wrap flat array into Relay-style GroupChallengeConnection
+    const nodes = challenges.map((c: Record<string, unknown>) => serializeChallenge(c));
+
+    const edges = nodes.map((node: Record<string, unknown>) => ({
+      node,
+      cursor: Buffer.from(String(node.id)).toString('base64'),
+    }));
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: !!after,
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      },
+      totalCount: edges.length,
+    };
   }
 
   @Query('challengeLeaderboard')
@@ -44,13 +88,15 @@ export class ChallengesResolver {
     @Context() ctx: GqlContext,
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    return this.leaderboardService.getChallengeLeaderboard(tenantId, userId, challengeId);
+    const rows = await this.leaderboardService.getChallengeLeaderboard(tenantId, userId, challengeId);
+    return (rows as Record<string, unknown>[]).map(serializeParticipant);
   }
 
   @Query('myChallengePariticipations')
   async myChallengePariticipations(@Context() ctx: GqlContext) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    return this.challengeService.getMyParticipations(tenantId, userId);
+    const rows = await this.challengeService.getMyParticipations(tenantId, userId);
+    return (rows as Record<string, unknown>[]).map(serializeParticipant);
   }
 
   @Mutation('createChallenge')
@@ -68,7 +114,8 @@ export class ChallengesResolver {
     @Context() ctx: GqlContext,
   ) {
     const { tenantId, userId, role } = this.requireAuth(ctx);
-    return this.challengeService.createChallenge(tenantId, userId, role, input);
+    const row = await this.challengeService.createChallenge(tenantId, userId, role, input);
+    return serializeChallenge(row as unknown as Record<string, unknown>);
   }
 
   @Mutation('joinChallenge')
@@ -77,7 +124,8 @@ export class ChallengesResolver {
     @Context() ctx: GqlContext,
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    return this.challengeService.joinChallenge(tenantId, userId, challengeId);
+    const row = await this.challengeService.joinChallenge(tenantId, userId, challengeId);
+    return serializeParticipant(row as unknown as Record<string, unknown>);
   }
 
   @Mutation('submitChallengeScore')
@@ -87,6 +135,7 @@ export class ChallengesResolver {
     @Context() ctx: GqlContext,
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    return this.leaderboardService.submitChallengeScore(tenantId, userId, challengeId, score);
+    const row = await this.leaderboardService.submitChallengeScore(tenantId, userId, challengeId, score);
+    return serializeParticipant(row as unknown as Record<string, unknown>);
   }
 }

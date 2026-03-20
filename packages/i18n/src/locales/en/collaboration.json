@@ -60,5 +60,15 @@
   "sessionsStartsIn": "Starts in {{time}}",
   "sessionsNoSessions": "No sessions scheduled",
   "sessionsParticipants": "{{count}} participants",
-  "sessionsChat": "Live Chat"
+  "sessionsChat": "Live Chat",
+  "chavrutaDebate": "Chavruta Debate",
+  "chavrutaDescription": "Dialectical AI learning partner — challenge and be challenged.",
+  "generatedWithAi": "Generated with AI assistance",
+  "newTopic": "New Topic",
+  "newTopicAria": "Start a new debate topic",
+  "consentTitle": "AI Processing Consent Required",
+  "consentDescription": "Chavruta uses a third-party AI service (OpenAI / Anthropic) to generate debate responses. Your arguments will be processed by that service. Please consent before continuing. (EU AI Act Art. 50 / SI-10)",
+  "consentButton": "I Consent — Start Debating",
+  "noDiscussions": "No discussions yet — join a course to start discussing!",
+  "messagesCount": "messages"
 }

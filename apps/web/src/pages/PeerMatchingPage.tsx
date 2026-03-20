@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
@@ -28,6 +29,7 @@ interface MatchRequest {
 }
 
 export function PeerMatchingPage() {
+  const { t } = useTranslation('social');
   const [mounted, setMounted] = useState(false);
   const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
@@ -70,21 +72,21 @@ export function PeerMatchingPage() {
   return (
     <Layout>
       <PageShell size="md" className="py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Peer Matching</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">{t('peerMatching')}</h1>
 
         {/* Suggested Matches */}
         <section className="mb-8">
           <h2 className="text-base font-semibold text-foreground mb-3">
-            Suggested Matches
-            <span className="ml-2 text-xs font-normal text-muted-foreground">(AI-powered)</span>
+            {t('suggestedMatches')}
+            <span className="ml-2 text-xs font-normal text-muted-foreground">({t('aiPowered')})</span>
           </h2>
 
           {peerMatchesResult.fetching && (
-            <p className="text-sm text-muted-foreground">Finding matches...</p>
+            <p className="text-sm text-muted-foreground">{t('findingMatches')}</p>
           )}
           {!peerMatchesResult.fetching && peerMatches.length === 0 && (
             <div className="rounded-lg border border-border bg-card p-6 text-center">
-              <p className="text-sm text-muted-foreground">No suggested matches available yet</p>
+              <p className="text-sm text-muted-foreground">{t('noSuggestedMatches')}</p>
             </div>
           )}
           {peerMatches.length > 0 && (
@@ -106,22 +108,22 @@ export function PeerMatchingPage() {
 
         {/* Match Requests */}
         <section>
-          <h2 className="text-base font-semibold text-foreground mb-3">Match Requests</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3">{t('matchRequests')}</h2>
 
           {myRequestsResult.fetching && (
-            <p className="text-sm text-muted-foreground">Loading requests...</p>
+            <p className="text-sm text-muted-foreground">{t('loadingRequests')}</p>
           )}
 
           {!myRequestsResult.fetching && matchRequests.length === 0 && (
             <div className="rounded-lg border border-border bg-card p-6 text-center">
-              <p className="text-sm text-muted-foreground">No match requests yet</p>
+              <p className="text-sm text-muted-foreground">{t('noMatchRequests')}</p>
             </div>
           )}
 
           {incomingRequests.length > 0 && (
             <div className="mb-4">
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                Incoming
+                {t('incoming')}
               </h3>
               <div className="flex flex-col gap-2">
                 {incomingRequests.map((req) => (
@@ -131,7 +133,7 @@ export function PeerMatchingPage() {
                   >
                     <div>
                       <p className="text-sm font-medium text-foreground">
-                        Learner {req.requesterId.slice(0, 6)}
+                        {t('learnerLabel', { id: req.requesterId.slice(0, 6) })}
                       </p>
                       <p className="text-xs text-muted-foreground">{req.matchReason}</p>
                     </div>
@@ -141,14 +143,14 @@ export function PeerMatchingPage() {
                         disabled={respondingId === req.id}
                         className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
                       >
-                        Accept
+                        {t('accept')}
                       </button>
                       <button
                         onClick={() => handleRespond(req.id, false)}
                         disabled={respondingId === req.id}
                         className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50 transition-colors"
                       >
-                        Decline
+                        {t('decline')}
                       </button>
                     </div>
                   </div>
@@ -160,7 +162,7 @@ export function PeerMatchingPage() {
           {outgoingRequests.length > 0 && (
             <div>
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                Sent
+                {t('sent')}
               </h3>
               <div className="flex flex-col gap-2">
                 {outgoingRequests.map((req) => (
@@ -170,7 +172,7 @@ export function PeerMatchingPage() {
                   >
                     <div>
                       <p className="text-sm font-medium text-foreground">
-                        Learner {req.matchedUserId.slice(0, 6)}
+                        {t('learnerLabel', { id: req.matchedUserId.slice(0, 6) })}
                       </p>
                       <p className="text-xs text-muted-foreground">{req.matchReason}</p>
                     </div>

@@ -82,7 +82,62 @@
 | BUG-098 | Adding course source fails — 400 Bad Request when auth token missing | ✅ Fixed | (pending commit) |
 | BUG-099 | i18n English content on Hebrew locale — 7 social/collab pages hardcoded English | ✅ Fixed | (pending commit) |
 | BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection | ✅ Fixed | (pending commit) |
+| BUG-101 | Delete Course — 400 Bad Request + accessibility console errors | 🟡 In Progress | (pending verification) |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+
+---
+
+## BUG-101 — Delete Course: 400 Bad Request + Accessibility Console Errors (20 Mar 2026)
+
+- **Status:** 🟡 In Progress (fixes applied, verification pending)
+- **Severity:** 🔴 Critical (core CRUD operation broken)
+- **Reported:** 20 March 2026
+
+### Problem
+
+Clicking "מחק קורס" (delete course) sends a GraphQL mutation that returns 400 Bad Request. Additionally, browser console shows accessibility errors: "DialogContent requires a DialogTitle" and "Missing Description or aria-describedby". Keycloak auth timeout warning also present.
+
+### Root Cause
+
+1. **Frontend (DeleteCourseDialog.tsx):** Manual aria attributes (`role="alertdialog"`, `aria-modal="true"`, `aria-labelledby`) conflicted with Radix Dialog v1.1.15's automatic context-based aria wiring, causing the accessibility errors and broken dialog behavior.
+2. **Backend (course.resolver.spec.ts):** Assertion mismatches — resolver passes `(id, tenantCtx)` but tests asserted only `(id)`. Constructor mock had 3 dependencies but the resolver requires 5, causing test failures that masked the real issue.
+3. **Gateway (supergraph.graphql):** Missing `courseEnrollmentCount` query, `courseReadiness` query, `CourseReadiness` and `CourseReadinessCheck` types that were added to subgraph SDL but never composed into the supergraph — causing 400 Bad Request on any mutation referencing these types.
+
+### Discovery (3 Waves)
+
+- **Wave 1 (exact match):** DeleteCourseDialog.tsx manual aria attributes conflicting with Radix
+- **Wave 2 (similarity):** course.resolver.spec.ts assertion mismatches and missing mock dependencies
+- **Wave 3 (class of bug):** supergraph.graphql out of sync with subgraph SDL — missing queries and types
+
+### Fix
+
+- Removed conflicting manual aria attributes from `DeleteCourseDialog.tsx` — let Radix Dialog handle accessibility automatically
+- Fixed `course.resolver.spec.ts` assertions to match actual resolver signature `(id, tenantCtx)`, added missing constructor mocks (5 dependencies), added 3 new test cases
+- Updated `supergraph.graphql` with missing `courseEnrollmentCount`, `courseReadiness` queries and `CourseReadiness`, `CourseReadinessCheck` types
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/course/DeleteCourseDialog.tsx` | Removed conflicting manual aria attributes (`role`, `aria-modal`, `aria-labelledby`) |
+| `apps/subgraph-content/src/course/course.resolver.spec.ts` | Fixed assertion signatures, added 2 missing constructor mocks, added 3 new tests |
+| `apps/gateway/supergraph.graphql` | Added `courseEnrollmentCount` query, `courseReadiness` query, `CourseReadiness` and `CourseReadinessCheck` types |
+
+### Tests
+
+| Test Type | Count | Status |
+|-----------|-------|--------|
+| Backend unit (course.resolver.spec.ts) | 27 | ✅ All passing |
+| Frontend unit (DeleteCourseDialog.test.tsx) | 11 | ✅ All passing |
+| Frontend unit (DeleteCourseButton.test.tsx) | 4 | ✅ All passing |
+| E2E (Playwright) | — | ⏳ Pending |
+| **Total** | **42** | **✅ 42/42 pass (E2E pending)** |
+
+### Anti-Recurrence
+
+- Backend tests now assert full resolver signature `(id, tenantCtx)` — any future signature change will break tests
+- Frontend tests verify Radix Dialog accessibility without manual aria overrides
+- Supergraph composition should be run after every subgraph SDL change (`pnpm --filter @edusphere/gateway compose`)
 
 ---
 

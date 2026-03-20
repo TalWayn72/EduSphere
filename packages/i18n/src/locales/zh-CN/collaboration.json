@@ -60,5 +60,15 @@
   "sessionsStartsIn": "Starts in {{time}}",
   "sessionsNoSessions": "No sessions scheduled",
   "sessionsParticipants": "{{count}} participants",
-  "sessionsChat": "Live Chat"
+  "sessionsChat": "Live Chat",
+  "chavrutaDebate": "哈夫鲁塔辩论",
+  "chavrutaDescription": "辩证式AI学习伙伴——挑战与被挑战。",
+  "generatedWithAi": "由AI辅助生成",
+  "newTopic": "新话题",
+  "newTopicAria": "开始新的辩论话题",
+  "consentTitle": "需要AI处理同意",
+  "consentDescription": "哈夫鲁塔使用第三方AI服务生成辩论回复。请在继续之前同意。",
+  "consentButton": "我同意——开始辩论",
+  "noDiscussions": "还没有讨论——加入课程开始讨论吧！",
+  "messagesCount": "条消息"
 }

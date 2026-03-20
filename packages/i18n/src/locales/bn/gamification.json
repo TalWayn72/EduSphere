@@ -27,5 +27,12 @@
   "thisWeek": "This Week",
   "badges": "Badges",
   "pts": "pts",
-  "yourRank": "Your Rank"
+  "yourRank": "Your Rank",
+  "groupChallenges": "গ্রুপ চ্যালেঞ্জ",
+  "createChallenge": "চ্যালেঞ্জ তৈরি করুন",
+  "myParticipations": "আমার অংশগ্রহণ",
+  "loadingChallenges": "চ্যালেঞ্জ লোড হচ্ছে...",
+  "loadingParticipations": "আপনার অংশগ্রহণ লোড হচ্ছে...",
+  "noParticipations": "আপনি এখনো কোনো চ্যালেঞ্জে যোগ দেননি",
+  "challengeLabel": "চ্যালেঞ্জ {{id}}"
 }

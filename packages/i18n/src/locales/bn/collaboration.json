@@ -60,5 +60,15 @@
   "sessionsStartsIn": "Starts in {{time}}",
   "sessionsNoSessions": "No sessions scheduled",
   "sessionsParticipants": "{{count}} participants",
-  "sessionsChat": "Live Chat"
+  "sessionsChat": "Live Chat",
+  "chavrutaDebate": "চাভরুতা বিতর্ক",
+  "chavrutaDescription": "দ্বান্দ্বিক AI শেখার সঙ্গী — চ্যালেঞ্জ করুন এবং চ্যালেঞ্জ পান।",
+  "generatedWithAi": "AI সহায়তায় তৈরি",
+  "newTopic": "নতুন বিষয়",
+  "newTopicAria": "নতুন বিতর্কের বিষয় শুরু করুন",
+  "consentTitle": "AI প্রসেসিং সম্মতি প্রয়োজন",
+  "consentDescription": "চাভরুতা তৃতীয়-পক্ষের AI পরিষেবা ব্যবহার করে বিতর্কের উত্তর তৈরি করতে। অনুগ্রহ করে চালিয়ে যাওয়ার আগে সম্মতি দিন।",
+  "consentButton": "আমি সম্মত — বিতর্ক শুরু করুন",
+  "noDiscussions": "এখনো কোনো আলোচনা নেই — আলোচনা শুরু করতে একটি কোর্সে যোগ দিন!",
+  "messagesCount": "বার্তা"
 }

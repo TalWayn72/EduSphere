@@ -27,5 +27,12 @@
   "thisWeek": "This Week",
   "badges": "Badges",
   "pts": "pts",
-  "yourRank": "Your Rank"
+  "yourRank": "Your Rank",
+  "groupChallenges": "小组挑战",
+  "createChallenge": "创建挑战",
+  "myParticipations": "我的参与",
+  "loadingChallenges": "正在加载挑战...",
+  "loadingParticipations": "正在加载您的参与记录...",
+  "noParticipations": "您还没有参加任何挑战",
+  "challengeLabel": "挑战 {{id}}"
 }

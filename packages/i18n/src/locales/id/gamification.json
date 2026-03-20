@@ -27,5 +27,12 @@
   "thisWeek": "This Week",
   "badges": "Badges",
   "pts": "pts",
-  "yourRank": "Your Rank"
+  "yourRank": "Your Rank",
+  "groupChallenges": "Tantangan Kelompok",
+  "createChallenge": "Buat Tantangan",
+  "myParticipations": "Partisipasi Saya",
+  "loadingChallenges": "Memuat tantangan...",
+  "loadingParticipations": "Memuat partisipasi Anda...",
+  "noParticipations": "Anda belum mengikuti tantangan apa pun",
+  "challengeLabel": "Tantangan {{id}}"
 }
