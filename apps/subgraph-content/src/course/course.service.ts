@@ -3,6 +3,7 @@ import {
   Logger,
   OnModuleDestroy,
   BadRequestException,
+  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -15,6 +16,7 @@ import {
   and,
   isNull,
   count,
+  sql,
   closeAllPools,
   withReadReplica,
 } from '@edusphere/db';
@@ -89,7 +91,9 @@ export class CourseService implements OnModuleDestroy {
 
   async findById(id: string) {
     const [course] = await withReadReplica((db) =>
-      db.select().from(schema.courses).where(eq(schema.courses.id, id)).limit(1)
+      db.select().from(schema.courses).where(
+        and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at))
+      ).limit(1)
     );
     return this.mapCourse(course as Record<string, unknown>) || null;
   }
@@ -100,6 +104,7 @@ export class CourseService implements OnModuleDestroy {
         db
           .select()
           .from(schema.courses)
+          .where(isNull(schema.courses.deleted_at))
           .orderBy(desc(schema.courses.created_at))
           .limit(limit)
           .offset(offset)
@@ -120,9 +125,12 @@ export class CourseService implements OnModuleDestroy {
           .select()
           .from(schema.courses)
           .where(
-            or(
-              ilike(schema.courses.title, pattern),
-              ilike(schema.courses.description, pattern)
+            and(
+              isNull(schema.courses.deleted_at),
+              or(
+                ilike(schema.courses.title, pattern),
+                ilike(schema.courses.description, pattern)
+              )
             )
           )
           .orderBy(desc(schema.courses.created_at))
@@ -281,19 +289,41 @@ export class CourseService implements OnModuleDestroy {
     }
   }
 
-  async delete(id: string): Promise<boolean> {
-    try {
-      const [course] = await this.db
-        .update(schema.courses)
-        .set({ deleted_at: new Date() })
-        .where(eq(schema.courses.id, id))
-        .returning();
-      this.logger.log(`Course soft-deleted: ${id}`);
-      return !!course;
-    } catch (err) {
-      this.logger.error(`Failed to delete course "${id}": ${String(err)}`);
-      throw new BadRequestException('Failed to delete course.');
+  async delete(id: string, tenantCtx: { userId: string; userRole: string }): Promise<boolean> {
+    // 1. Fetch course (bypass soft-delete filter for this lookup)
+    const [course] = await this.db
+      .select()
+      .from(schema.courses)
+      .where(and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at)));
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
     }
+
+    // 2. Authorization: INSTRUCTOR can only delete own courses
+    const rawCourse = course as Record<string, unknown>;
+    if (tenantCtx.userRole === 'INSTRUCTOR' && rawCourse['instructor_id'] !== tenantCtx.userId) {
+      throw new ForbiddenException('You do not have permission to delete this course');
+    }
+
+    // 3. Soft delete
+    await this.db
+      .update(schema.courses)
+      .set({ deleted_at: new Date() })
+      .where(eq(schema.courses.id, id));
+
+    this.logger.log(`Course soft-deleted: ${id} by user ${tenantCtx.userId}`);
+    return true;
+  }
+
+  async getEnrollmentCount(courseId: string): Promise<number> {
+    const result = await withReadReplica((db) =>
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(schema.userCourses)
+        .where(eq(schema.userCourses.courseId, courseId))
+    );
+    return Number(result[0]?.count ?? 0);
   }
 
   async update(id: string, input: UpdateCourseInput) {

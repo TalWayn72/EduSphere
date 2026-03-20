@@ -70,6 +70,7 @@ export function isPollVoteEvent(e: unknown): e is PollVotePayload {
 
 export const NatsSubjects = {
   POLL_VOTED: 'EDUSPHERE.poll.voted',
+  COURSE_DELETED: 'EDUSPHERE.course.deleted',
   COURSE_ENROLLED: 'EDUSPHERE.course.enrolled',
   BADGE_ISSUED: 'EDUSPHERE.badge.issued',
   BADGE_REVOKED: 'EDUSPHERE.badge.revoked',

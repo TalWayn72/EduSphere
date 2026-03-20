@@ -25,6 +25,7 @@ import { CourseEditMetadata } from './CourseEditPage.metadata';
 import { CourseEditModules } from './CourseEditPage.modules';
 import { SourceManager } from '@/components/SourceManager';
 import { PageShell } from '@/components/PageShell';
+import { DeleteCourseButton } from '@/components/course/DeleteCourseButton';
 
 const EDITOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
@@ -207,22 +208,30 @@ export function CourseEditPage() {
               {isCurrentlyPublished ? t('published') : t('draft')}
             </span>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 shrink-0"
-            onClick={handleTogglePublish}
-            disabled={isToggling}
-          >
-            {isToggling ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : isCurrentlyPublished ? (
-              <EyeOff className="h-3.5 w-3.5" />
-            ) : (
-              <Globe className="h-3.5 w-3.5" />
-            )}
-            {isCurrentlyPublished ? t('unpublishCourse') : t('publishCourse')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <DeleteCourseButton
+              courseId={courseId}
+              courseTitle={course.title}
+              isPublished={isCurrentlyPublished}
+              onDeleted={() => navigate('/courses', { replace: true })}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 shrink-0"
+              onClick={handleTogglePublish}
+              disabled={isToggling}
+            >
+              {isToggling ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : isCurrentlyPublished ? (
+                <EyeOff className="h-3.5 w-3.5" />
+              ) : (
+                <Globe className="h-3.5 w-3.5" />
+              )}
+              {isCurrentlyPublished ? t('unpublishCourse') : t('publishCourse')}
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}

@@ -143,8 +143,8 @@ export class CourseResolver {
 
   @Mutation('deleteCourse')
   async deleteCourse(@Args('id') id: string, @Context() ctx: GqlContext) {
-    requireAuth(ctx);
-    return this.courseService.delete(id);
+    const tenantCtx = requireAuth(ctx);
+    return this.courseService.delete(id, tenantCtx);
   }
 
   @Mutation('forkCourse')
@@ -158,6 +158,15 @@ export class CourseResolver {
       tenantCtx.userId,
       tenantCtx.tenantId
     );
+  }
+
+  @Query('courseEnrollmentCount')
+  async courseEnrollmentCount(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
+    requireAuth(ctx);
+    return this.courseService.getEnrollmentCount(courseId);
   }
 
   // ── Enrollment ───────────────────────────────────────────────

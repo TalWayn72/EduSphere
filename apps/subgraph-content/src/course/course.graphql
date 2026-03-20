@@ -80,12 +80,13 @@ extend type Query {
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   complianceCourses: [ComplianceCourse!]! @authenticated
   courseReadiness(courseId: ID!): CourseReadiness! @authenticated
+  courseEnrollmentCount(courseId: ID!): Int! @authenticated
 }
 
 extend type Mutation {
   createCourse(input: CreateCourseInput!): Course! @authenticated
   updateCourse(id: ID!, input: UpdateCourseInput!): Course! @authenticated
-  deleteCourse(id: ID!): Boolean! @authenticated
+  deleteCourse(id: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   publishCourse(id: ID!): Course! @authenticated @requiresScopes(scopes: [["course:publish"]])
   unpublishCourse(id: ID!): Course! @authenticated
   enrollCourse(courseId: ID!): UserCourse! @authenticated

@@ -29,6 +29,7 @@ vi.mock('@edusphere/db', () => ({
       instructorId: 'instructor_id',
       createdAt: 'created_at',
       updatedAt: 'updated_at',
+      deleted_at: 'deleted_at',
     },
     lessons: {
       id: 'id',
@@ -334,38 +335,48 @@ describe('CourseService', () => {
   });
 
   describe('delete()', () => {
+    const tenantCtx = { userId: 'user-1', userRole: 'INSTRUCTOR' };
+    // DB returns snake_case; the service reads rawCourse['instructor_id']
+    const MOCK_DB_COURSE = { ...MOCK_COURSE, instructor_id: 'user-1' };
+
     beforeEach(() => {
-      mockReturning.mockResolvedValue([MOCK_COURSE]);
-      mockWhere.mockReturnValue({ returning: mockReturning });
-      mockSet.mockReturnValue({ where: mockWhere });
+      // select().from().where() chain for course lookup
+      mockWhere.mockResolvedValue([MOCK_DB_COURSE]);
+      mockFrom.mockReturnValue({ where: mockWhere });
+      mockSelect.mockReturnValue({ from: mockFrom });
+      // update().set().where() chain for soft delete
+      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
+      mockSet.mockReturnValue({ where: mockUpdateWhere });
       mockUpdate.mockReturnValue({ set: mockSet });
     });
 
     it('sets deleted_at to a Date (soft delete)', async () => {
       let cap: Record<string, unknown> = {};
+      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
       mockSet.mockImplementation((v: Record<string, unknown>) => {
         cap = v;
-        return { where: mockWhere };
+        return { where: mockUpdateWhere };
       });
-      await service.delete('course-1');
+      await service.delete('course-1', tenantCtx);
       expect(cap['deleted_at']).toBeInstanceOf(Date);
     });
 
     it('uses eq() with the provided id', async () => {
       const { eq } = await import('@edusphere/db');
-      await service.delete('course-99');
+      await service.delete('course-99', tenantCtx);
       expect(eq).toHaveBeenCalledWith(expect.anything(), 'course-99');
     });
 
     it('returns true when course was found and soft-deleted', async () => {
-      const result = await service.delete('course-1');
+      const result = await service.delete('course-1', tenantCtx);
       expect(result).toBe(true);
     });
 
-    it('returns false when no course matched', async () => {
-      mockReturning.mockResolvedValue([]);
-      const result = await service.delete('nonexistent');
-      expect(result).toBe(false);
+    it('throws NotFoundException when course is not found', async () => {
+      mockWhere.mockResolvedValue([]);
+      await expect(service.delete('nonexistent', tenantCtx)).rejects.toThrow(
+        'Course not found'
+      );
     });
   });
 

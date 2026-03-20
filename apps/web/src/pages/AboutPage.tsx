@@ -78,7 +78,7 @@ export function AboutPage() {
             <h2 id="values-heading" className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">{t('about.valuesHeading')}</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {VALUE_KEYS.map((key, i) => {
-                const Icon = VALUE_ICONS[i];
+                const Icon = VALUE_ICONS[i] as typeof VALUE_ICONS[number];
                 return (
                   <div key={key} className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
                     <Icon className="h-8 w-8 text-indigo-600 mb-3" aria-hidden="true" />

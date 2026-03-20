@@ -56,6 +56,7 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   COURSE_DETAIL_QUERY: 'COURSE_DETAIL_QUERY',
   PUBLISH_COURSE_MUTATION: 'PUBLISH_COURSE_MUTATION',
   UNPUBLISH_COURSE_MUTATION: 'UNPUBLISH_COURSE_MUTATION',
+  DELETE_COURSE_MUTATION: 'DELETE_COURSE_MUTATION',
 }));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
