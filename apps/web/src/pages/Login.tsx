@@ -32,7 +32,7 @@ export function Login() {
 
   return (
     <PublicLayout navVariant="minimal" showFooter={false}>
-    <h1 className="sr-only">Sign In</h1>
+    <h1 className="sr-only">{t('signIn')}</h1>
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
@@ -75,7 +75,7 @@ export function Login() {
                 onClick={handleLogin}
                 data-testid="dev-login-btn"
               >
-                Sign In (Dev Mode)
+                {t('signInDevMode')}
               </Button>
             </div>
           ) : (
