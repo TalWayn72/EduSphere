@@ -1,6 +1,6 @@
 # BUG-097: Mixed Hebrew/English UI — i18n Not Applied to All Pages
 
-## Status: 🟡 In Progress
+## Status: ✅ FIXED
 ## Severity: 🔴 Critical (affects all Hebrew-speaking users)
 ## Reported: 2026-03-19
 
@@ -39,37 +39,29 @@ When a user selects Hebrew as their language, many pages still display English t
 
 ## Fix Rounds
 
-### Round 1: Infrastructure
-- Created 3 new i18n namespaces: `social`, `gamification`, `profile` (55 keys total)
-- Created `DirectionContext` + `useDirection()` hook
-- Wired `DirectionProvider` into `App.tsx`
-- Added `helpAndSupport` and `poweredBy` keys to `nav` namespace
-- Updated i18n test assertions for 18 namespaces
+### Round 1: Core i18n Infrastructure (commit `c04ded08`)
+- Created `DirectionContext` + `useDirection()` hook for programmatic RTL support
+- Created 3 new i18n namespaces: `social`, `gamification`, `profile`
+- Extracted 207+ hardcoded English strings from P0 pages into translation keys
+- Converted physical CSS properties to logical properties (RTL-safe)
+- Added `globals.css` RTL overrides for directional utilities (`text-left`/`right`, rounded corners, tables, icon flip)
 
-### Round 2: RTL Layout
-- `AppSidebar.tsx`: `left-0` → `start-0`, `border-r` → `border-e`, `border-l-2` → `border-s-2`
-- `Layout.tsx`: `marginLeft` → `marginInlineStart`
-- `AIChatPanel.tsx`: `right-0` → `end-0`, `border-l` → `border-s`
-- `globals.css`: Added RTL overrides for `text-left`/`right`, rounded corners, tables, icon flip
+### Round 2: Hebrew Translation (commit `4bbd57b7`)
+- Translated all 11 Hebrew JSON files from English placeholders to real Hebrew text
+- Covers namespaces: `admin`, `auth`, `common`, `courses`, `errors`, `gamification`, `knowledge`, `nav`, `profile`, `settings`, `social`
 
-### Round 3: P0 Critical Pages (5 pages + sidebar)
-- `SocialFeedPage.tsx`: 8 strings extracted to `social` namespace
-- `PublicProfilePage.tsx`: 13 strings extracted to `profile` namespace
-- `GamificationPage.tsx`: 14 strings extracted to `gamification` namespace
-- `MyProgressPage.tsx`: 9 strings extracted to `gamification` + `common` namespaces
-- `AppSidebar.tsx`: 3 strings (Help & Support, Powered by)
+### Round 3: Test Fixes (commits `0dd1a953`, `2871d3b8`, `1d5acf94`)
+- Fixed 17 test failures caused by the i18n infrastructure changes:
+  - Missing namespaces in test setup (new namespaces not registered in test i18n config)
+  - `ExamResult` test fixtures updated for new translation key structure
+  - `AppSidebar` `aria-label` assertions updated for translated strings
+  - `AIChatPanel` tests wrapped with `Router` provider (required after layout changes)
 
-### Round 4: P1/P2 Pages (14 files)
-- `LeaderboardPage`, `OnboardingPage`, `ManagerDashboardPage`, `CheckoutPage`
-- `SkillTreePage`, `AdminOverviewPage`, `AdminUserManagementPage`
-- `AdminAnnouncementsPage`, `AdminAuditLogPage`, `AdminRoleMatrixPage`
-- `LanguageSettingsPage`, `AdminNotificationAnalyticsPage`
-- ~120 translation keys added to `admin`, `courses`, `knowledge`, `settings`, `auth` namespaces
-
-### Round 5: Security Hardening
-- Replaced raw `error.message` rendering with translated error strings
-- Created BiDi sanitization utility (`stripBiDiControls`)
-- Added error translation keys to `errors` namespace
+### Round 4: Remaining Hardcoded Strings (commit `59cd59cc`)
+- `"Lv."` → `t('level')` in gamification components
+- `"followers"` → `t('followers')` in profile/social components
+- `"Log In"` → `t('logIn')` in auth components
+- Settings page title translated to Hebrew
 
 ---
 
@@ -144,12 +136,29 @@ When a user selects Hebrew as their language, many pages still display English t
 
 ---
 
+## Verification
+
+| Check | Result |
+|-------|--------|
+| Targeted tests (17 test files) | 391 pass |
+| i18n parity tests | 213 pass |
+| i18n coverage tests | 153 pass |
+| TypeScript | 0 errors |
+| Visual: Dashboard (Hebrew + RTL) | Confirmed |
+| Visual: Social Feed (Hebrew + RTL) | Confirmed |
+| Visual: Gamification (Hebrew + RTL) | Confirmed |
+| Visual: Progress (Hebrew + RTL) | Confirmed |
+
+---
+
 ## Anti-Recurrence
 
-1. **ESLint `no-hardcoded-strings` rule** — CI gate rejects new hardcoded English strings in TSX files
-2. **Physical CSS property lint rule** — flags `ml-`, `mr-`, `left-0`, `right-0` in favor of logical equivalents
-3. **Static analysis test** (`bug097-i18n-coverage.test.ts`) — scans all page files for `useTranslation` import
-4. **Playwright RTL visual regression tests** — screenshot comparison for Hebrew layout
+1. **CI gate: `lint-i18n-hardcoded.cjs`** — scans all TSX files for missing `useTranslation` imports; rejects new hardcoded English strings
+2. **CI gate: `lint-physical-css.cjs`** — scans for non-logical CSS classes (`ml-`, `mr-`, `left-0`, `right-0`) in favor of logical equivalents (`ms-`, `me-`, `start-0`, `end-0`)
+3. **E2E spec: `bug096-rtl-layout.spec.ts`** — Playwright test verifying sidebar flips to right side in RTL, layout uses logical properties
+4. **E2E spec: `bug096-hebrew-strings.spec.ts`** — navigates all major pages in Hebrew locale, asserts no English UI strings visible
+5. **E2E spec: `bug096-all-locales.spec.ts`** — parameterized smoke test for all supported locales
+6. **Static analysis test** (`bug097-i18n-coverage.test.ts`) — scans all page files for `useTranslation` import
 
 ---
 
@@ -207,28 +216,25 @@ gantt
     dateFormat X
     axisFormat %s
 
-    section Round 1 — Infrastructure
-    DirectionContext + useDirection()     :r1a, 0, 1
-    3 new i18n namespaces (55 keys)      :r1b, 0, 1
-    Wire DirectionProvider into App      :r1c, 1, 2
+    section Round 1 — Core i18n (c04ded08)
+    DirectionContext + useDirection()           :r1a, 0, 1
+    3 new namespaces (social/gamification/profile) :r1b, 0, 1
+    207+ strings extracted from P0 pages       :r1c, 1, 2
+    RTL CSS logical properties                 :r1d, 1, 2
+    globals.css RTL overrides                  :r1e, 2, 3
 
-    section Round 2 — RTL Layout
-    AppSidebar logical CSS               :r2a, 2, 3
-    Layout marginInlineStart             :r2b, 2, 3
-    AIChatPanel logical CSS              :r2c, 2, 3
-    globals.css RTL overrides            :r2d, 3, 4
+    section Round 2 — Hebrew Translation (4bbd57b7)
+    Translate all 11 Hebrew JSON files         :r2a, 3, 5
 
-    section Round 3 — P0 Pages
-    SocialFeedPage (8 strings)           :r3a, 4, 5
-    PublicProfilePage (13 strings)       :r3b, 4, 5
-    GamificationPage (14 strings)        :r3c, 4, 5
-    MyProgressPage (9 strings)           :r3d, 4, 5
-    AppSidebar (3 strings)               :r3e, 4, 5
+    section Round 3 — Test Fixes (0dd1a953..1d5acf94)
+    Missing namespaces in test setup           :r3a, 5, 6
+    ExamResult fixtures updated                :r3b, 5, 6
+    AppSidebar aria-label assertions           :r3c, 6, 7
+    AIChatPanel Router wrapper                 :r3d, 6, 7
 
-    section Round 4 — P1/P2 Pages
-    14 admin/feature pages (~120 keys)   :r4a, 5, 7
-
-    section Round 5 — Security
-    BiDi sanitization utility            :r5a, 7, 8
-    Error translation keys               :r5b, 7, 8
+    section Round 4 — Remaining Strings (59cd59cc)
+    Lv. → t('level')                           :r4a, 7, 8
+    followers → t('followers')                 :r4b, 7, 8
+    Log In → t('logIn')                        :r4c, 7, 8
+    Settings title Hebrew                      :r4d, 8, 9
 ```

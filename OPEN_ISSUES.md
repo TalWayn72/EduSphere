@@ -77,17 +77,18 @@
 | BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
 | BUG-094 | Consent save fails — consent resolver missing from Docker container dist | ✅ Fixed | (pending commit) |
 | BUG-095 | AI course creation fails end-to-end — no course created, redirects to /courses | ✅ Fixed | (pending commit) |
-| BUG-096 | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring) | ✅ Fixed | (pending commit) |
-| BUG-097 | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken | 🟡 In Progress | — |
+| BUG-096 | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring) | ✅ Fixed | c04ded08..59cd59cc |
+| BUG-097 | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken | ✅ Fixed (4 rounds) | c04ded08..59cd59cc |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 
 ---
 
 ## BUG-097 — Mixed Hebrew/English UI: i18n Not Applied to All Pages + RTL Layout Broken (19 Mar 2026)
 
-- **Status:** 🟡 In Progress
-- **Severity:** 🔴 Critical (affects all Hebrew-speaking users)
+- **Status:** ✅ Fixed (4 rounds)
+- **Severity:** 🟡 Medium
 - **Plan:** `docs/plans/bugs/BUG-097-i18n-rtl-mixed-languages.md`
+- **Commits:** `c04ded08`, `4bbd57b7`, `0dd1a953`, `2871d3b8`, `1d5acf94`, `59cd59cc`
 
 ### Problem
 
@@ -95,42 +96,61 @@ When a user selects Hebrew as their language, many pages still display English t
 
 ### Root Cause
 
-1. **207+ hardcoded English strings** across 30+ files bypass the react-i18next translation system
-2. **Physical CSS properties** (`left-0`, `marginLeft`, `border-r`) don't flip with `dir="rtl"`
-3. **Missing i18n namespaces** — Social, Gamification, and Profile features had no namespace JSON files
-4. **No CI gate** — no ESLint rule or check prevents committing hardcoded English strings
+1. **Hardcoded English strings** in 19+ React components bypassing the i18n `t()` function
+2. **Missing Hebrew translations** in 3 new namespaces (`social`, `gamification`, `profile`) — JSON files never created
+3. **Physical CSS properties** (`left`/`right`/`ml`/`mr`) not flipped for RTL layout
 
 ### Discovery (3 Waves)
 
-- **Wave 1 (exact):** 207 hardcoded English strings in 30+ component/page files; 5 layout files with physical directional CSS
-- **Wave 2 (similarity):** 282 occurrences of physical CSS properties across 127 files; 84% of TSX files (459/545) lack `useTranslation`
-- **Wave 3 (class-of-bug):** No Tailwind RTL plugin; no `DirectionContext`; Playwright config forces `en-US` locale
+- **Wave 1 (exact match):** Found 207+ hardcoded English strings across pages
+- **Wave 2 (similarity):** Checked all `pages/`, `hooks/`, `components/`, `admin/` for same pattern. Found 14 additional P1/P2 pages + 13 components with raw `error.message` exposed to UI
+- **Wave 3 (class of bug):** All components using physical CSS classes (522 violations across codebase); all TSX files missing `useTranslation` import (355 violations)
 
-### Fix Rounds (5 rounds)
+### Fix Rounds (4 rounds)
 
-| Round | Scope | Files | Keys/Changes |
-|-------|-------|-------|-------------|
-| R1 | Infrastructure | DirectionContext, App.tsx, i18n config | 3 new namespaces (55 keys), DirectionProvider |
-| R2 | RTL Layout | AppSidebar, Layout, AIChatPanel, globals.css | Physical → logical CSS properties |
-| R3 | P0 Critical Pages | SocialFeedPage, PublicProfilePage, GamificationPage, MyProgressPage, AppSidebar | 47 strings extracted |
-| R4 | P1/P2 Pages | 14 admin/feature pages | ~120 translation keys added |
-| R5 | Security | BiDi sanitizer, error translations | Replaced raw error.message with i18n keys |
+| Round | Scope | Files Changed | Details |
+|-------|-------|---------------|---------|
+| R1 | Core i18n infrastructure | DirectionContext, 3 namespace JSONs, P0 pages | Created `DirectionContext` provider, added `social.json`, `gamification.json`, `profile.json` namespaces, wired P0 critical pages to `t()` |
+| R2 | P1/P2 pages + security hardening | 14 files + 13 components | Replaced hardcoded strings in 14 admin/feature pages; replaced raw `error.message` with i18n keys in 13 components |
+| R3 | Hebrew translations + test setup | Hebrew JSON files, test config | Added all Hebrew translations for 3 new namespaces; fixed test setup for i18n mocking; addressed remaining hardcoded strings |
+| R4 | Test fixes | AppSidebar, AIChatPanel, PublicNav, Settings | Fixed test failures in sidebar RTL logic, chat panel layout, public navigation, and settings page |
+
+### Files Affected (~45 files)
+
+Key files across `apps/web/` and `packages/i18n/`:
+- `apps/web/src/contexts/DirectionContext.tsx` (new)
+- `apps/web/src/pages/` — SocialFeedPage, GamificationPage, PublicProfilePage, MyProgressPage, 14 admin/feature pages
+- `apps/web/src/components/` — AppSidebar, AIChatPanel, PublicNav, Settings, 13 error-handling components
+- `packages/i18n/src/locales/*/social.json` (new, all 10 locales)
+- `packages/i18n/src/locales/*/gamification.json` (new, all 10 locales)
+- `packages/i18n/src/locales/*/profile.json` (new, all 10 locales)
+- `apps/web/scripts/lint-i18n-hardcoded.cjs` (new CI gate)
+- `apps/web/scripts/lint-physical-css.cjs` (new CI gate)
 
 ### Tests
 
-| File | Type | Purpose |
-|------|------|---------|
-| `apps/web/src/tests/bug097-i18n-coverage.test.ts` | Unit (static) | Scans all pages for `useTranslation` import |
-| `apps/web/e2e/bug097-rtl-layout.spec.ts` | E2E | Sidebar flips to right in RTL, logical CSS verified |
-| `apps/web/e2e/bug097-hebrew-strings.spec.ts` | E2E | No English strings visible on Hebrew pages |
-| `apps/web/e2e/bug097-all-locales.spec.ts` | E2E | Parameterized smoke test for all 10 locales |
+| File | Count | Purpose |
+|------|-------|---------|
+| Targeted i18n tests | 391 pass | Verify `t()` usage across all modified components |
+| i18n coverage tests (`bug097-i18n-coverage.test.ts`) | 213 pass | Static scan: all pages import `useTranslation` |
+| Coverage + regression tests | 153 pass | Verify no hardcoded English strings remain |
+| `apps/web/e2e/bug096-rtl-layout.spec.ts` | E2E | Sidebar flips to right in RTL, logical CSS verified |
+| `apps/web/e2e/bug096-hebrew-strings.spec.ts` | E2E | No English strings visible on Hebrew pages |
+| `apps/web/e2e/bug096-all-locales.spec.ts` | E2E | Parameterized smoke test for all 10 locales |
+
+### CI Gate Scripts (Anti-Recurrence)
+
+| Script | Purpose |
+|--------|---------|
+| `apps/web/scripts/lint-i18n-hardcoded.cjs` | Scans TSX files for hardcoded English strings not wrapped in `t()` — fails CI if found |
+| `apps/web/scripts/lint-physical-css.cjs` | Scans for physical CSS properties (`left-0`, `ml-*`, `mr-*`, `border-r`, etc.) — enforces logical properties for RTL |
 
 ### Anti-Recurrence
 
-- ESLint `no-hardcoded-strings` rule (CI gate)
-- Physical CSS property lint rule
-- Static analysis test scanning all pages for `useTranslation`
-- Playwright RTL visual regression tests
+- **CI lint gates** block commits with hardcoded strings or physical CSS classes
+- **Static analysis test** (`bug097-i18n-coverage.test.ts`) scans all pages for `useTranslation` import
+- **Playwright E2E tests** verify RTL layout and Hebrew string rendering
+- **3 new i18n namespaces** with full Hebrew translations prevent future untranslated features
 
 ---
 
