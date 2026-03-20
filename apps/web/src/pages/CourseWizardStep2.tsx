@@ -68,7 +68,7 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
                     onClick={() => moveModule(i, 'up')}
                     disabled={i === 0}
                     className="p-0.5 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
-                    aria-label="Move up"
+                    aria-label={t('wizard.moveUpAriaLabel')}
                   >
                     <ChevronUp className="h-4 w-4" />
                   </button>
@@ -77,7 +77,7 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
                     onClick={() => moveModule(i, 'down')}
                     disabled={i === modules.length - 1}
                     className="p-0.5 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
-                    aria-label="Move down"
+                    aria-label={t('wizard.moveDownAriaLabel')}
                   >
                     <ChevronDown className="h-4 w-4" />
                   </button>
@@ -103,7 +103,7 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
                   type="button"
                   onClick={() => removeModule(mod.id)}
                   className="p-1 rounded hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0"
-                  aria-label="Remove module"
+                  aria-label={t('wizard.removeModuleAriaLabel')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const STEPS = [
-  { num: 1, text: 'Enter a topic or upload a syllabus' },
-  { num: 2, text: 'AI generates course outline in seconds' },
-  { num: 3, text: 'Modules and lessons auto-populated' },
-  { num: 4, text: 'Quizzes auto-generated from content' },
-  { num: 5, text: 'Review, customize, and publish' },
+const STEP_KEYS = [
+  { num: 1, key: 'step1' },
+  { num: 2, key: 'step2' },
+  { num: 3, key: 'step3' },
+  { num: 4, key: 'step4' },
+  { num: 5, key: 'step5' },
 ];
 
 // 5 instructors × 8 hrs/week × 52 weeks × 60% reduction
@@ -40,6 +41,7 @@ function useCountUp(target: number, duration = 2000) {
 }
 
 export function AICourseBuildSection() {
+  const { t } = useTranslation('common');
   const count = useCountUp(ANNUAL_HOURS_SAVED);
 
   return (
@@ -53,20 +55,20 @@ export function AICourseBuildSection() {
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-100 mb-6">
             <Zap className="h-4 w-4" aria-hidden="true" />
-            AI Course Builder
+            {t('landing.aiCourseBuild.badge')}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Build a Complete Course in 10 Minutes
+            {t('landing.aiCourseBuild.title')}
           </h2>
           <p className="mt-4 text-slate-300 text-lg max-w-2xl mx-auto">
-            AI generates modules, lessons, quizzes, and assessments — you review and publish.
+            {t('landing.aiCourseBuild.subtitle')}
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Steps */}
           <ol className="space-y-4" aria-label="AI Course Builder steps">
-            {STEPS.map((step) => (
+            {STEP_KEYS.map((step) => (
               <li
                 key={step.num}
                 className="flex items-center gap-4 bg-white/5 border border-white/20 rounded-xl px-5 py-4"
@@ -77,7 +79,7 @@ export function AICourseBuildSection() {
                 >
                   {step.num}
                 </span>
-                <span className="text-slate-200 text-sm font-medium">{step.text}</span>
+                <span className="text-slate-200 text-sm font-medium">{t(`landing.aiCourseBuild.${step.key}`)}</span>
               </li>
             ))}
           </ol>
@@ -86,18 +88,18 @@ export function AICourseBuildSection() {
           <div className="text-center lg:text-left">
             <div className="bg-white/5 border border-white/20 rounded-2xl p-8">
               <p className="text-sm text-slate-300 font-medium mb-2 uppercase tracking-wider">
-                Estimated instructor hours saved
+                {t('landing.aiCourseBuild.estimatedHoursSaved')}
               </p>
               <div
                 className="text-6xl font-extrabold text-indigo-400 mb-1"
                 aria-live="polite"
-                aria-label={`${count} hours per year`}
+                aria-label={`${count} ${t('landing.aiCourseBuild.hoursPerYear')}`}
               >
                 {count.toLocaleString()}
               </div>
-              <p className="text-slate-300 text-sm">hours/year</p>
+              <p className="text-slate-300 text-sm">{t('landing.aiCourseBuild.hoursPerYear')}</p>
               <p className="mt-4 text-xs text-slate-300">
-                Based on 5 instructors × 8 hrs/week × 60% reduction in course creation time
+                {t('landing.aiCourseBuild.basedOn')}
               </p>
             </div>
             <div className="mt-6">
@@ -106,7 +108,7 @@ export function AICourseBuildSection() {
                 className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold w-full lg:w-auto"
                 asChild
               >
-                <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>See AI Course Builder Demo</Link>
+                <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>{t('landing.aiCourseBuild.seeDemo')}</Link>
               </Button>
             </div>
           </div>

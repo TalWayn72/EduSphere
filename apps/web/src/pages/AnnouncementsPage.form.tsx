@@ -2,6 +2,7 @@
  * AnnouncementsPage.form — Create/edit announcement form section.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +35,7 @@ export function AnnouncementForm({
   submitting,
   onCancel,
 }: Props) {
+  const { t } = useTranslation('admin');
   const set =
     (key: keyof AnnouncementFormValues) =>
     (
@@ -46,32 +48,32 @@ export function AnnouncementForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">New Announcement</CardTitle>
+        <CardTitle className="text-base">{t('announcementForm.newAnnouncement')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <Label htmlFor="ann-title">Title</Label>
+          <Label htmlFor="ann-title">{t('announcementForm.titleLabel')}</Label>
           <Input
             id="ann-title"
             value={values.title}
             onChange={set('title')}
-            placeholder="Announcement title"
+            placeholder={t('announcementForm.titlePlaceholder')}
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="ann-body">Body</Label>
+          <Label htmlFor="ann-body">{t('announcementForm.bodyLabel')}</Label>
           <textarea
             id="ann-body"
             value={values.body}
             onChange={set('body')}
             rows={4}
-            placeholder="Message body..."
+            placeholder={t('announcementForm.bodyPlaceholder')}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <Label htmlFor="ann-priority">Priority</Label>
+            <Label htmlFor="ann-priority">{t('announcementForm.priorityLabel')}</Label>
             <select
               id="ann-priority"
               value={values.priority}
@@ -86,7 +88,7 @@ export function AnnouncementForm({
             </select>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="ann-audience">Target Audience</Label>
+            <Label htmlFor="ann-audience">{t('announcementForm.targetAudienceLabel')}</Label>
             <select
               id="ann-audience"
               value={values.targetAudience}
@@ -101,7 +103,7 @@ export function AnnouncementForm({
             </select>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="ann-publish">Publish At</Label>
+            <Label htmlFor="ann-publish">{t('announcementForm.publishAtLabel')}</Label>
             <Input
               id="ann-publish"
               type="datetime-local"
@@ -110,7 +112,7 @@ export function AnnouncementForm({
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="ann-expires">Expires At</Label>
+            <Label htmlFor="ann-expires">{t('announcementForm.expiresAtLabel')}</Label>
             <Input
               id="ann-expires"
               type="datetime-local"
@@ -122,14 +124,14 @@ export function AnnouncementForm({
         <div className="flex gap-2 justify-end">
           {onCancel && (
             <Button variant="outline" onClick={onCancel} disabled={submitting}>
-              Cancel
+              {t('announcementForm.cancel')}
             </Button>
           )}
           <Button
             onClick={onSubmit}
             disabled={submitting || !values.title.trim()}
           >
-            {submitting ? 'Creating...' : 'Create Announcement'}
+            {submitting ? t('announcementForm.creating') : t('announcementForm.createAnnouncement')}
           </Button>
         </div>
       </CardContent>

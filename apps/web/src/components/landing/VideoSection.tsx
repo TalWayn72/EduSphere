@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Player } from '@remotion/player';
 import { useReducedMotion } from '@/providers/ReducedMotionProvider';
 import { LiveCollab } from '@/remotion/LiveCollab';
 
 export function VideoSection() {
+  const { t } = useTranslation('common');
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -13,17 +15,16 @@ export function VideoSection() {
       aria-label="Product demo"
     >
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-4">See EduSphere in Action</h2>
+        <h2 className="text-3xl font-bold mb-4">{t('landing.video.title')}</h2>
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Watch students and instructors collaborate in real-time — highlights, annotations, and
-          knowledge graph connections sync instantly.
+          {t('landing.video.subtitle')}
         </p>
         <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-[#0f1117]">
           {prefersReducedMotion ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-              <p className="text-slate-200 text-sm">Live Collaboration Demo</p>
+              <p className="text-slate-200 text-sm">{t('landing.video.demoLabel')}</p>
               <p className="text-xs text-slate-300">
-                Motion reduced — enable animations to watch the demo
+                {t('landing.video.motionReduced')}
               </p>
             </div>
           ) : (

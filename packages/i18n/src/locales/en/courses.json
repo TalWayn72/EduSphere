@@ -79,6 +79,8 @@
   "description": "Description",
   "describeWhatStudentsLearn": "Describe what students will learn",
   "thumbnailEmojiOrUrl": "Thumbnail (emoji or URL)",
+  "thumbnailPlaceholder": "e.g. 📚 or https://...",
+  "estimatedHoursEditPlaceholder": "e.g. 8",
   "saveChanges": "Save Changes",
   "saveFailed": "Save failed. Please try again.",
   "courseInfoSaved": "Course info saved!",
@@ -159,6 +161,9 @@
     "addModuleDescriptionLabel": "Description (optional)",
     "addModuleDescriptionPlaceholder": "What will this module cover?",
     "moduleNumber": "Module {{n}}",
+    "moveUpAriaLabel": "Move up",
+    "moveDownAriaLabel": "Move down",
+    "removeModuleAriaLabel": "Remove module",
     "noModulesYet": "No modules yet. Add your first module below.",
     "reviewText": "Review your course before publishing. You can always edit it later.",
     "noTitle": "(No title)",
@@ -179,7 +184,13 @@
     "failedUploadUrl": "Failed to get upload URL",
     "retryUpload": "Retry",
     "networkError": "Network error during upload",
-    "failedConfirm": "Failed to confirm upload"
+    "failedConfirm": "Failed to confirm upload",
+    "createRichDocument": "Create Rich Document",
+    "richDocTitlePlaceholder": "Document title...",
+    "richDocAdded": "Added",
+    "addRichDocument": "Add Rich Document",
+    "removeAriaLabel": "Remove",
+    "selectFilesAriaLabel": "Select files to upload"
   },
   "checkout": {
     "payNow": "Pay Now",

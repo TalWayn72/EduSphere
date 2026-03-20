@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -16,6 +17,7 @@ function formatCurrency(n: number): string {
 }
 
 export function ROICalculatorSection() {
+  const { t } = useTranslation('common');
   const [instructors, setInstructors] = useState(10);
   const [hoursPerWeek, setHoursPerWeek] = useState(8);
   const [hourlyRate, setHourlyRate] = useState(85);
@@ -36,10 +38,10 @@ export function ROICalculatorSection() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-            Calculate Your ROI
+            {t('landing.roi.title')}
           </h2>
           <p className="mt-4 text-lg text-slate-500">
-            See how EduSphere pays for itself — usually within the first quarter.
+            {t('landing.roi.subtitle')}
           </p>
         </div>
 
@@ -47,10 +49,10 @@ export function ROICalculatorSection() {
           {/* Sliders */}
           <div className="space-y-8">
             {[
-              { label: 'Number of Instructors', value: instructors, min: 1, max: 50, step: 1, set: setInstructors, format: (v: number) => `${v}` },
-              { label: 'Hours/week on course creation', value: hoursPerWeek, min: 1, max: 20, step: 1, set: setHoursPerWeek, format: (v: number) => `${v} hrs` },
-              { label: 'Hourly instructor cost', value: hourlyRate, min: 50, max: 200, step: 5, set: setHourlyRate, format: (v: number) => `$${v}/hr` },
-              { label: 'Number of students', value: students, min: 100, max: 50000, step: 100, set: setStudents, format: (v: number) => v.toLocaleString() },
+              { label: t('landing.roi.instructors'), value: instructors, min: 1, max: 50, step: 1, set: setInstructors, format: (v: number) => `${v}` },
+              { label: t('landing.roi.hoursPerWeek'), value: hoursPerWeek, min: 1, max: 20, step: 1, set: setHoursPerWeek, format: (v: number) => `${v} hrs` },
+              { label: t('landing.roi.hourlyCost'), value: hourlyRate, min: 50, max: 200, step: 5, set: setHourlyRate, format: (v: number) => `$${v}/hr` },
+              { label: t('landing.roi.students'), value: students, min: 100, max: 50000, step: 100, set: setStudents, format: (v: number) => v.toLocaleString() },
             ].map(({ label, value, min, max, step, set, format }) => (
               <div key={label}>
                 <div className="flex justify-between items-center mb-3">
@@ -73,9 +75,9 @@ export function ROICalculatorSection() {
           {/* Results */}
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 flex flex-col gap-6">
             {[
-              { label: 'Instructor hours saved/year', value: `${hoursSaved.toLocaleString()} hrs` },
-              { label: 'Dollar value saved', value: formatCurrency(valueSaved), highlight: true },
-              { label: 'EduSphere annual cost', value: formatCurrency(annualCost) },
+              { label: t('landing.roi.hoursSavedYear'), value: `${hoursSaved.toLocaleString()} hrs` },
+              { label: t('landing.roi.dollarValueSaved'), value: formatCurrency(valueSaved), highlight: true },
+              { label: t('landing.roi.annualCost'), value: formatCurrency(annualCost) },
             ].map(({ label, value, highlight }) => (
               <div key={label} className={`rounded-xl px-5 py-4 ${highlight ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200'}`}>
                 <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${highlight ? 'text-indigo-100' : 'text-slate-500'}`}>{label}</p>
@@ -83,11 +85,11 @@ export function ROICalculatorSection() {
               </div>
             ))}
             <div className="rounded-xl bg-green-50 border border-green-200 px-5 py-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1">Net ROI</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1">{t('landing.roi.netRoi')}</p>
               <p className="text-3xl font-extrabold text-green-700">{netROI > 0 ? '+' : ''}{netROI}%</p>
             </div>
             <Button className="bg-indigo-600 hover:bg-indigo-500 text-white w-full" asChild>
-              <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>Get Your Custom ROI Report</Link>
+              <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>{t('landing.roi.getReport')}</Link>
             </Button>
           </div>
         </div>

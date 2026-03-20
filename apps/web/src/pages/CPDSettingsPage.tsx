@@ -23,6 +23,7 @@ import {
   CREATE_CPD_CREDIT_TYPE_MUTATION,
   ASSIGN_CPD_CREDITS_MUTATION,
 } from '@/lib/graphql/cpd.queries';
+import { useTranslation } from 'react-i18next';
 import { Settings, Plus, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
@@ -36,6 +37,7 @@ interface CpdCreditType {
 }
 
 export function CPDSettingsPage() {
+  const { t } = useTranslation('admin');
   const [createOpen, setCreateOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [name, setName] = useState('');
@@ -99,16 +101,16 @@ export function CPDSettingsPage() {
       <PageShell size="lg" className="p-6">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'CPD' },
+            { label: t('cpd.breadcrumbAdmin'), href: '/admin' },
+            { label: t('cpd.breadcrumbCpd') },
           ]}
         />
         <div className="flex items-center gap-3">
           <Settings className="h-7 w-7 text-blue-600" />
           <div>
-            <h1 className="text-2xl font-bold">CPD Settings</h1>
+            <h1 className="text-2xl font-bold">{t('cpd.pageTitle')}</h1>
             <p className="text-muted-foreground text-sm">
-              Manage credit types and course CPD assignments
+              {t('cpd.pageDescription')}
             </p>
           </div>
         </div>
@@ -116,42 +118,42 @@ export function CPDSettingsPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Credit Types</CardTitle>
+              <CardTitle>{t('cpd.creditTypes')}</CardTitle>
               <div className="flex gap-2">
                 <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm">
                       <Plus className="h-4 w-4 mr-1" />
-                      New Credit Type
+                      {t('cpd.newCreditType')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Create Credit Type</DialogTitle>
+                      <DialogTitle>{t('cpd.createCreditTypeTitle')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreate} className="space-y-4">
                       <div>
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('cpd.nameLabel')}</Label>
                         <Input
                           id="name"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="NASBA CPE"
+                          placeholder={t('cpd.namePlaceholder')}
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="regBody">Regulatory Body</Label>
+                        <Label htmlFor="regBody">{t('cpd.regulatoryBodyLabel')}</Label>
                         <Input
                           id="regBody"
                           value={regulatoryBody}
                           onChange={(e) => setRegulatoryBody(e.target.value)}
-                          placeholder="NASBA"
+                          placeholder={t('cpd.regulatoryBodyPlaceholder')}
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="ratio">Credit Hours per Hour</Label>
+                        <Label htmlFor="ratio">{t('cpd.creditHoursPerHourLabel')}</Label>
                         <Input
                           id="ratio"
                           type="number"
@@ -172,7 +174,7 @@ export function CPDSettingsPage() {
                         {submitting ? (
                           <Loader2 className="h-4 w-4 animate-spin mr-2" />
                         ) : null}
-                        Create
+                        {t('cpd.create')}
                       </Button>
                     </form>
                   </DialogContent>
@@ -181,26 +183,26 @@ export function CPDSettingsPage() {
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline">
                       <Plus className="h-4 w-4 mr-1" />
-                      Assign to Course
+                      {t('cpd.assignToCourse')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Assign CPD Credits to Course</DialogTitle>
+                      <DialogTitle>{t('cpd.assignCpdTitle')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleAssign} className="space-y-4">
                       <div>
-                        <Label htmlFor="courseId">Course ID</Label>
+                        <Label htmlFor="courseId">{t('cpd.courseIdLabel')}</Label>
                         <Input
                           id="courseId"
                           value={courseId}
                           onChange={(e) => setCourseId(e.target.value)}
-                          placeholder="UUID"
+                          placeholder={t('cpd.courseIdPlaceholder')}
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="creditType">Credit Type</Label>
+                        <Label htmlFor="creditType">{t('cpd.creditTypeLabel')}</Label>
                         <select
                           id="creditType"
                           value={selectedCreditTypeId}
@@ -210,7 +212,7 @@ export function CPDSettingsPage() {
                           className="w-full border rounded px-3 py-2 text-sm"
                           required
                         >
-                          <option value="">Select credit type...</option>
+                          <option value="">{t('cpd.selectCreditType')}</option>
                           {creditTypes.map((ct) => (
                             <option key={ct.id} value={ct.id}>
                               {ct.name}
@@ -219,7 +221,7 @@ export function CPDSettingsPage() {
                         </select>
                       </div>
                       <div>
-                        <Label htmlFor="hours">Credit Hours</Label>
+                        <Label htmlFor="hours">{t('cpd.creditHoursLabel')}</Label>
                         <Input
                           id="hours"
                           type="number"
@@ -238,7 +240,7 @@ export function CPDSettingsPage() {
                         {submitting ? (
                           <Loader2 className="h-4 w-4 animate-spin mr-2" />
                         ) : null}
-                        Assign
+                        {t('cpd.assign')}
                       </Button>
                     </form>
                   </DialogContent>
@@ -249,22 +251,22 @@ export function CPDSettingsPage() {
           <CardContent>
             {fetching ? (
               <div className="flex items-center gap-2 text-muted-foreground py-4">
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading...
+                <Loader2 className="h-4 w-4 animate-spin" /> {t('cpd.loading')}
               </div>
             ) : creditTypes.length === 0 ? (
               <p className="text-muted-foreground text-sm py-4 text-center">
-                No credit types defined yet.
+                {t('cpd.noCreditTypes')}
               </p>
             ) : (
               <table className="w-full text-sm">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left p-2 font-medium">Name</th>
+                    <th className="text-left p-2 font-medium">{t('cpd.colName')}</th>
                     <th className="text-left p-2 font-medium">
-                      Regulatory Body
+                      {t('cpd.colRegulatoryBody')}
                     </th>
-                    <th className="text-left p-2 font-medium">Hours/Hour</th>
-                    <th className="text-left p-2 font-medium">Status</th>
+                    <th className="text-left p-2 font-medium">{t('cpd.colHoursPerHour')}</th>
+                    <th className="text-left p-2 font-medium">{t('cpd.colStatus')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -279,7 +281,7 @@ export function CPDSettingsPage() {
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full ${ct.isActive ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}
                         >
-                          {ct.isActive ? 'Active' : 'Inactive'}
+                          {ct.isActive ? t('cpd.statusActive') : t('cpd.statusInactive')}
                         </span>
                       </td>
                     </tr>

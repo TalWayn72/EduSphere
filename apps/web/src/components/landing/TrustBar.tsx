@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Shield } from 'lucide-react';
 
 const BADGES = [
@@ -11,15 +12,11 @@ const BADGES = [
   'GDPR',
 ];
 
-const PLACEHOLDERS = [
-  'University Partner',
-  'University Partner',
-  'University Partner',
-  'University Partner',
-  'University Partner',
-];
+const PLACEHOLDER_COUNT = 5;
 
 export function TrustBar() {
+  const { t } = useTranslation('common');
+
   return (
     <section
       data-testid="trust-bar"
@@ -28,7 +25,7 @@ export function TrustBar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <p className="text-center text-sm font-semibold text-slate-500 uppercase tracking-wider mb-6">
-          Trusted by universities, enterprises &amp; government agencies
+          {t('landing.trustBar.tagline')}
         </p>
         {/* Compliance mini-badges */}
         <div className="flex flex-wrap justify-center gap-2 mb-8" role="list" aria-label="Compliance certifications">
@@ -49,14 +46,14 @@ export function TrustBar() {
           role="list"
           aria-label="Partner organizations"
         >
-          {PLACEHOLDERS.map((label, i) => (
+          {Array.from({ length: PLACEHOLDER_COUNT }).map((_, i) => (
             <div
               key={i}
               role="listitem"
               className="w-32 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-medium"
-              aria-label={label}
+              aria-label={t('landing.trustBar.universityPartner')}
             >
-              {label}
+              {t('landing.trustBar.universityPartner')}
             </div>
           ))}
         </div>

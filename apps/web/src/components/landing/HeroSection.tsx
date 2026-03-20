@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Player } from '@remotion/player';
 import { Button } from '@/components/ui/button';
 import { KnowledgeGraphGrow } from '@/remotion/KnowledgeGraphGrow';
 import { useReducedMotion } from '@/providers/ReducedMotionProvider';
 
 export function HeroSection() {
+  const { t } = useTranslation('common');
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -53,16 +55,16 @@ export function HeroSection() {
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center w-full">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-100 mb-8">
           <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" aria-hidden="true" />
-          AI-Native LMS — Now Replacing Canvas, D2L &amp; Blackboard
+          {t('landing.hero.badge')}
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-          The AI-Native LMS<br className="hidden sm:block" /> That Replaces Canvas
+          {t('landing.hero.title')}<br className="hidden sm:block" /> {t('landing.hero.titleBreak')}
         </h1>
         <p className="text-lg sm:text-xl text-indigo-100 mb-4 max-w-3xl mx-auto leading-relaxed">
-          Knowledge Graph intelligence. Visual Anchoring. Built-in AI Tutor. True white-label included.
+          {t('landing.hero.subtitle')}
         </p>
         <p className="text-sm text-indigo-300 mb-10 font-medium">
-          Starting at <span className="text-white font-bold">$12,000/year</span> for up to 500 active users
+          {t('landing.hero.startingAtText', { price: t('landing.hero.price') })}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
@@ -70,17 +72,17 @@ export function HeroSection() {
             className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-xl shadow-indigo-900/40 px-8"
             asChild
           >
-            <Link to="/pilot">Request Demo</Link>
+            <Link to="/pilot">{t('landing.hero.requestDemo')}</Link>
           </Button>
           <Link
             to="/pilot"
             className="inline-flex items-center justify-center whitespace-nowrap rounded-md h-11 px-8 border border-white/50 text-white hover:bg-white/15 font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            Start 90-Day Pilot
+            {t('landing.hero.startPilot')}
           </Link>
         </div>
         <p className="mt-6 text-xs text-indigo-300">
-          No credit card required &middot; Full feature access &middot; Dedicated onboarding specialist
+          {t('landing.hero.noCreditCard')}
         </p>
       </div>
     </section>

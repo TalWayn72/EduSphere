@@ -4,6 +4,7 @@
  * Phase 36: replaced mock data with real listAtRiskLearners GraphQL query.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from 'urql';
 import { gql } from 'urql';
@@ -131,6 +132,7 @@ function toTableRow(r: {
 }
 
 export function AtRiskDashboardPage() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const role = useAuthRole();
   const [, resolveFlag] = useMutation(RESOLVE_AT_RISK);
@@ -184,31 +186,31 @@ export function AtRiskDashboardPage() {
     setResolving(key);
     await resolveFlag({ flagId: key });
     setResolving(null);
-    toast.success('Learner flag resolved');
+    toast.success(t('atRisk.flagResolved'));
   }
 
   const statCards = [
     {
       icon: AlertTriangle,
-      label: 'Total At-Risk',
+      label: t('atRisk.totalAtRisk'),
       value: fetching ? '…' : stats.total,
       color: 'text-orange-500',
     },
     {
       icon: TrendingDown,
-      label: 'High Risk (>70%)',
+      label: t('atRisk.highRisk'),
       value: fetching ? '…' : stats.high,
       color: 'text-red-500',
     },
     {
       icon: Clock,
-      label: 'Avg Days Inactive',
+      label: t('atRisk.avgDaysInactive'),
       value: fetching ? '…' : stats.avgInactive + 'd',
       color: 'text-yellow-500',
     },
     {
       icon: BookOpen,
-      label: 'Courses Affected',
+      label: t('atRisk.coursesAffected'),
       value: fetching ? '…' : stats.courses,
       color: 'text-blue-500',
     },
@@ -243,7 +245,7 @@ export function AtRiskDashboardPage() {
             role="alert"
             className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
-            Unable to load at-risk learners. Please try again.
+            {t('atRisk.loadError')}
           </div>
         )}
 
@@ -253,25 +255,25 @@ export function AtRiskDashboardPage() {
             onValueChange={(v) => setFilter(v as RiskFilter)}
           >
             <SelectTrigger className="w-44">
-              <SelectValue placeholder="Risk level" />
+              <SelectValue placeholder={t('atRisk.riskLevelPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Risk Levels</SelectItem>
-              <SelectItem value="high">High (&gt;70%)</SelectItem>
-              <SelectItem value="medium">Medium (50-70%)</SelectItem>
-              <SelectItem value="low">Low (&lt;50%)</SelectItem>
+              <SelectItem value="all">{t('atRisk.allRiskLevels')}</SelectItem>
+              <SelectItem value="high">{t('atRisk.highRiskLabel')}</SelectItem>
+              <SelectItem value="medium">{t('atRisk.mediumRiskLabel')}</SelectItem>
+              <SelectItem value="low">{t('atRisk.lowRiskLabel')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
             <SelectTrigger className="w-52">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t('atRisk.sortByPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="risk">Risk Score (highest first)</SelectItem>
+              <SelectItem value="risk">{t('atRisk.sortRisk')}</SelectItem>
               <SelectItem value="inactive">
-                Days Inactive (most first)
+                {t('atRisk.sortInactive')}
               </SelectItem>
-              <SelectItem value="progress">Progress (lowest first)</SelectItem>
+              <SelectItem value="progress">{t('atRisk.sortProgress')}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -281,7 +283,7 @@ export function AtRiskDashboardPage() {
             onClick={() => exportCsv(visible)}
           >
             <Download className="h-4 w-4 mr-2" />
-            Export CSV
+            {t('atRisk.exportCsv')}
           </Button>
         </div>
 
@@ -292,7 +294,7 @@ export function AtRiskDashboardPage() {
                 data-testid="empty-state"
                 className="text-sm text-muted-foreground py-4 text-center"
               >
-                No at-risk learners detected. Great work!
+                {t('atRisk.emptyState')}
               </p>
             ) : (
               <AtRiskLearnersTable

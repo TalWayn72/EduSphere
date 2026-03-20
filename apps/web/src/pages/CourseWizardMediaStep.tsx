@@ -268,7 +268,7 @@ export function CourseWizardMediaStep({
                   type="button"
                   onClick={() => removeEntry(i)}
                   className="p-1 rounded hover:bg-destructive/10 hover:text-destructive"
-                  aria-label="Remove"
+                  aria-label={t('wizard.removeAriaLabel')}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -360,18 +360,18 @@ export function CourseWizardMediaStep({
           accept={ACCEPTED_TYPES}
           className="hidden"
           onChange={handleFileSelect}
-          aria-label="Select files to upload"
+          aria-label={t('wizard.selectFilesAriaLabel')}
         />
       </div>
 
       {/* Rich Document section */}
       <div className="mt-6 border-t pt-4 space-y-3">
         <p className="text-sm font-medium flex items-center gap-2">
-          <PenLine className="h-4 w-4" /> Create Rich Document
+          <PenLine className="h-4 w-4" /> {t('wizard.createRichDocument')}
         </p>
         <input
           className="w-full text-sm px-3 py-2 border rounded-md bg-background"
-          placeholder="Document title..."
+          placeholder={t('wizard.richDocTitlePlaceholder')}
           value={richDocTitle}
           onChange={(e) => setRichDocTitle(e.target.value)}
         />
@@ -379,7 +379,7 @@ export function CourseWizardMediaStep({
         <div className="flex items-center gap-2 justify-end">
           {richDocSaved && (
             <span className="text-sm text-green-600 flex items-center gap-1">
-              <CheckCircle2 className="h-4 w-4" /> Added
+              <CheckCircle2 className="h-4 w-4" /> {t('wizard.richDocAdded')}
             </span>
           )}
           <button
@@ -388,7 +388,7 @@ export function CourseWizardMediaStep({
             disabled={!richDocTitle.trim()}
             className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground disabled:opacity-50"
           >
-            Add Rich Document
+            {t('wizard.addRichDocument')}
           </button>
         </div>
       </div>

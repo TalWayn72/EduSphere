@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -21,6 +22,7 @@ interface LeaderboardEntry {
 }
 
 export function ChallengeDetailPage() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const [mounted, setMounted] = useState(false);
   const [showScoreForm, setShowScoreForm] = useState(false);
@@ -64,19 +66,19 @@ export function ChallengeDetailPage() {
         <Breadcrumbs
           className="mb-6"
           items={[
-            { label: 'Challenges', href: '/challenges' },
-            { label: 'Challenge Leaderboard' },
+            { label: t('challenge.breadcrumbChallenges'), href: '/challenges' },
+            { label: t('challenge.breadcrumbLeaderboard') },
           ]}
         />
 
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-foreground">Challenge Leaderboard</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('challenge.pageTitle')}</h1>
           {!showScoreForm && (
             <button
               onClick={() => setShowScoreForm(true)}
               className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Submit Score
+              {t('challenge.submitScore')}
             </button>
           )}
         </div>
@@ -86,7 +88,7 @@ export function ChallengeDetailPage() {
             onSubmit={handleSubmitScore}
             className="mb-6 rounded-lg border border-border bg-card p-4 flex flex-col gap-3"
           >
-            <h2 className="text-sm font-semibold text-foreground">Submit Your Score</h2>
+            <h2 className="text-sm font-semibold text-foreground">{t('challenge.submitYourScore')}</h2>
             <div className="flex gap-2 items-end">
               <div className="flex-1">
                 <label htmlFor="score-input" className="text-xs text-muted-foreground block mb-1">
@@ -98,7 +100,7 @@ export function ChallengeDetailPage() {
                   min={0}
                   value={scoreInput}
                   onChange={(e) => setScoreInput(e.target.value)}
-                  placeholder="Enter score..."
+                  placeholder={t('challenge.scorePlaceholder')}
                   className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   required
                 />
@@ -108,14 +110,14 @@ export function ChallengeDetailPage() {
                 disabled={submitResult.fetching}
                 className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {submitResult.fetching ? 'Submitting...' : 'Submit'}
+                {submitResult.fetching ? t('challenge.submitting') : t('challenge.submit')}
               </button>
               <button
                 type="button"
                 onClick={() => { setShowScoreForm(false); setSubmitError(null); }}
                 className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
               >
-                Cancel
+                {t('challenge.cancel')}
               </button>
             </div>
             {submitError && (
@@ -125,7 +127,7 @@ export function ChallengeDetailPage() {
         )}
 
         {leaderboardResult.fetching && (
-          <p className="text-sm text-muted-foreground mb-4">Loading leaderboard...</p>
+          <p className="text-sm text-muted-foreground mb-4">{t('challenge.loadingLeaderboard')}</p>
         )}
 
         <div className="flex items-center justify-between mb-3">

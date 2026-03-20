@@ -1,55 +1,61 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Brain } from 'lucide-react';
 import { SocialLinksBar, DEFAULT_SOCIAL_LINKS } from '@/components/social';
 
-const COLUMNS = [
-  {
-    heading: 'Product',
-    links: [
-      { label: 'Features', href: '/#features' },
-      { label: 'Pricing', href: '/#pricing' },
-      { label: 'AI Course Builder', href: '/features/ai-course-builder' },
-      { label: 'Visual Anchoring', href: '/features/visual-anchoring' },
-      { label: 'Knowledge Graph', href: '/features/knowledge-graph' },
-    ],
-  },
-  {
-    heading: 'Solutions',
-    links: [
-      { label: 'Universities', href: '/solutions/universities' },
-      { label: 'Enterprises', href: '/solutions/enterprises' },
-      { label: 'Government & Defense', href: '/solutions/government' },
-      { label: 'Training Companies', href: '/solutions/training' },
-    ],
-  },
-  {
-    heading: 'Compliance',
-    links: [
-      { label: 'FERPA', href: '/compliance#ferpa' },
-      { label: 'WCAG 2.2 AA', href: '/compliance#wcag' },
-      { label: 'SCORM', href: '/compliance#scorm' },
-      { label: 'GDPR', href: '/compliance#gdpr' },
-      { label: 'Air-Gapped', href: '/compliance#air-gapped' },
-      { label: 'Security', href: '/compliance#security' },
-    ],
-  },
-  {
-    heading: 'Company',
-    links: [
-      { label: 'About', href: '/about' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Contact', href: '/contact' },
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms', href: '/terms' },
-      { label: 'Accessibility Statement', href: '/accessibility' },
-    ],
-  },
-];
+function useFooterColumns() {
+  const { t } = useTranslation('common');
+  return [
+    {
+      heading: t('landing.footer.product'),
+      links: [
+        { label: t('landing.footer.features'), href: '/#features' },
+        { label: t('landing.footer.pricing'), href: '/#pricing' },
+        { label: t('landing.footer.aiCourseBuilder'), href: '/features/ai-course-builder' },
+        { label: t('landing.footer.visualAnchoring'), href: '/features/visual-anchoring' },
+        { label: t('landing.footer.knowledgeGraph'), href: '/features/knowledge-graph' },
+      ],
+    },
+    {
+      heading: t('landing.footer.solutions'),
+      links: [
+        { label: t('landing.footer.universities'), href: '/solutions/universities' },
+        { label: t('landing.footer.enterprises'), href: '/solutions/enterprises' },
+        { label: t('landing.footer.governmentDefense'), href: '/solutions/government' },
+        { label: t('landing.footer.trainingCompanies'), href: '/solutions/training' },
+      ],
+    },
+    {
+      heading: t('landing.footer.compliance'),
+      links: [
+        { label: 'FERPA', href: '/compliance#ferpa' },
+        { label: 'WCAG 2.2 AA', href: '/compliance#wcag' },
+        { label: 'SCORM', href: '/compliance#scorm' },
+        { label: 'GDPR', href: '/compliance#gdpr' },
+        { label: t('landing.footer.airGapped'), href: '/compliance#air-gapped' },
+        { label: t('landing.footer.security'), href: '/compliance#security' },
+      ],
+    },
+    {
+      heading: t('landing.footer.company'),
+      links: [
+        { label: t('landing.footer.about'), href: '/about' },
+        { label: t('landing.footer.blog'), href: '/blog' },
+        { label: t('landing.footer.careers'), href: '/careers' },
+        { label: t('landing.footer.contact'), href: '/contact' },
+        { label: t('landing.footer.privacyPolicy'), href: '/privacy' },
+        { label: t('landing.footer.terms'), href: '/terms' },
+        { label: t('landing.footer.accessibilityStatement'), href: '/accessibility' },
+      ],
+    },
+  ];
+}
 
 export function LandingFooter() {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
+  const COLUMNS = useFooterColumns();
 
   const handleHashLink = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -113,14 +119,14 @@ export function LandingFooter() {
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm">
-            &copy; 2026 EduSphere. Built for institutions that take learning seriously.
+            {t('landing.footer.copyright')}
           </p>
           <div className="flex items-center gap-4 text-xs text-slate-400">
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">{t('landing.footer.privacy')}</Link>
             <span aria-hidden="true">&middot;</span>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">{t('landing.footer.terms')}</Link>
             <span aria-hidden="true">&middot;</span>
-            <Link to="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
+            <Link to="/accessibility" className="hover:text-white transition-colors">{t('landing.footer.accessibility')}</Link>
           </div>
         </div>
       </div>

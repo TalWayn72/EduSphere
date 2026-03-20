@@ -121,7 +121,7 @@ export function CourseEditMetadata({
             <Input
               id="edit-thumbnail"
               {...register('thumbnailUrl')}
-              placeholder="e.g. 📚 or https://..."
+              placeholder={t('thumbnailPlaceholder')}
             />
           </div>
 
@@ -133,7 +133,7 @@ export function CourseEditMetadata({
               type="number"
               min={1}
               {...register('estimatedHours', { valueAsNumber: true })}
-              placeholder="e.g. 8"
+              placeholder={t('estimatedHoursEditPlaceholder')}
               className="w-32"
             />
           </div>

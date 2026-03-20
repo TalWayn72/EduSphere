@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { useAuthRole } from '@/hooks/useAuthRole';
@@ -14,6 +15,7 @@ import { CONTENT_IMPORT_MESSAGES } from '@/lib/progress-messages';
 type ImportSource = 'youtube' | 'website' | 'folder' | 'drive' | null;
 
 export function ContentImportPage() {
+  const { t } = useTranslation('admin');
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const role = useAuthRole();
@@ -44,9 +46,9 @@ export function ContentImportPage() {
   return (
     <Layout>
       <PageShell size="sm" className="max-w-3xl p-6" spacing="normal">
-        <h1 className="text-3xl font-bold mb-2">Import Content</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('contentImport.pageTitle')}</h1>
         <p className="text-muted-foreground mb-8">
-          Bulk-import lessons from YouTube playlists, websites, or local files.
+          {t('contentImport.pageDescription')}
         </p>
 
         {!importJob ? (
@@ -59,14 +61,14 @@ export function ContentImportPage() {
             {selectedSource === 'youtube' && (
               <div>
                 <label htmlFor="youtube-url" className="block text-sm font-medium mb-1">
-                  YouTube Playlist URL
+                  {t('contentImport.youtubeLabel')}
                 </label>
                 <input
                   id="youtube-url"
                   type="url"
                   value={youtubeUrl}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
-                  placeholder="https://www.youtube.com/playlist?list=..."
+                  placeholder={t('contentImport.youtubePlaceholder')}
                   className="w-full border rounded px-3 py-2 text-sm"
                   required
                 />
@@ -76,14 +78,14 @@ export function ContentImportPage() {
             {selectedSource === 'website' && (
               <div>
                 <label htmlFor="website-url" className="block text-sm font-medium mb-1">
-                  Website / Blog URL
+                  {t('contentImport.websiteLabel')}
                 </label>
                 <input
                   id="website-url"
                   type="url"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
-                  placeholder="https://your-course-site.com"
+                  placeholder={t('contentImport.websitePlaceholder')}
                   className="w-full border rounded px-3 py-2 text-sm"
                   required
                 />
@@ -116,7 +118,7 @@ export function ContentImportPage() {
                   disabled={isImporting}
                   className="bg-primary text-primary-foreground px-6 py-2 rounded font-medium disabled:opacity-50"
                 >
-                  {isImporting ? 'Importing…' : 'Start Import'}
+                  {isImporting ? t('contentImport.importing') : t('contentImport.startImport')}
                 </button>
                 <ProgressStatus
                   messages={[...CONTENT_IMPORT_MESSAGES]}

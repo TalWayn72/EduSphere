@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -22,6 +23,7 @@ interface ChavrutaMatch {
 }
 
 export function ChavrutaPartnerPage() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -84,38 +86,37 @@ export function ChavrutaPartnerPage() {
     <Layout>
       <div className="mx-auto max-w-2xl space-y-6 p-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Find a Chavruta Partner</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('chavruta.pageTitle')}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Find a debate partner with complementary knowledge to deepen your understanding
-            through Socratic dialogue.
+            {t('chavruta.pageDescription')}
           </p>
         </div>
 
         <div className="flex gap-2">
           <Input
-            placeholder="Enter course ID..."
+            placeholder={t('chavruta.courseIdPlaceholder')}
             value={courseId}
             onChange={(e) => setCourseId(e.target.value)}
             className="flex-1"
-            aria-label="Course ID"
+            aria-label={t('chavruta.courseIdAriaLabel')}
           />
         </div>
 
         {fetching && (
-          <p className="text-sm text-muted-foreground">Searching for partners...</p>
+          <p className="text-sm text-muted-foreground">{t('chavruta.searching')}</p>
         )}
         {error && (
           <p className="text-sm text-destructive" role="alert">
-            Failed to load partners. Please try again.
+            {t('chavruta.loadError')}
           </p>
         )}
         {!fetching && !error && courseId.length >= 3 && matches.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            No partners found for this course yet.
+            {t('chavruta.noPartners')}
           </p>
         )}
 
-        <div className="space-y-4" role="list" aria-label="Chavruta partner candidates">
+        <div className="space-y-4" role="list" aria-label={t('chavruta.partnersAriaLabel')}>
           {matches.map((match) => (
             <Card key={match.partnerId} role="listitem">
               <CardHeader className="pb-2">
@@ -129,17 +130,17 @@ export function ChavrutaPartnerPage() {
               <CardContent>
                 <p className="mb-1 text-sm text-muted-foreground">{match.matchReason}</p>
                 <p className="mb-3 text-sm">
-                  <span className="font-medium">Suggested topic:</span> {match.topic}
+                  <span className="font-medium">{t('chavruta.suggestedTopic')}</span> {match.topic}
                 </p>
                 <Button
                   size="sm"
                   onClick={() => handleRequestPartner(match.partnerId, match.topic)}
                   disabled={creating && selectedPartnerId === match.partnerId}
-                  aria-label={`Request Chavruta session with ${match.partnerName}`}
+                  aria-label={t('chavruta.requestAriaLabel', { name: match.partnerName })}
                 >
                   {creating && selectedPartnerId === match.partnerId
-                    ? 'Sending...'
-                    : 'Request Session'}
+                    ? t('chavruta.sending')
+                    : t('chavruta.requestSession')}
                 </Button>
               </CardContent>
             </Card>

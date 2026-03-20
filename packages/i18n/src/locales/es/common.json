@@ -261,5 +261,298 @@
   "roleManagement": {
     "title": "Role Management",
     "description": "Manage roles and permissions"
+  },
+  "landing": {
+    "hero": {
+      "badge": "AI-Native LMS — Now Replacing Canvas, D2L & Blackboard",
+      "title": "The AI-Native LMS",
+      "titleBreak": "That Replaces Canvas",
+      "subtitle": "Knowledge Graph intelligence. Visual Anchoring. Built-in AI Tutor. True white-label included.",
+      "startingAtText": "Starting at {{price}} for up to 500 active users",
+      "price": "$12,000/year",
+      "requestDemo": "Request Demo",
+      "startPilot": "Start 90-Day Pilot",
+      "noCreditCard": "No credit card required · Full feature access · Dedicated onboarding specialist"
+    },
+    "footer": {
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "aiCourseBuilder": "AI Course Builder",
+      "visualAnchoring": "Visual Anchoring",
+      "knowledgeGraph": "Knowledge Graph",
+      "solutions": "Solutions",
+      "universities": "Universities",
+      "enterprises": "Enterprises",
+      "governmentDefense": "Government & Defense",
+      "trainingCompanies": "Training Companies",
+      "compliance": "Compliance",
+      "airGapped": "Air-Gapped",
+      "security": "Security",
+      "company": "Company",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "privacyPolicy": "Privacy Policy",
+      "terms": "Terms",
+      "accessibilityStatement": "Accessibility Statement",
+      "copyright": "© 2026 EduSphere. Built for institutions that take learning seriously.",
+      "privacy": "Privacy",
+      "accessibility": "Accessibility"
+    },
+    "features": {
+      "title": "Three Capabilities No Other LMS Offers",
+      "subtitle": "Not incremental improvements — architectural breakthroughs that change how learning works.",
+      "knowledgeGraph": {
+        "title": "Knowledge Graph Intelligence",
+        "desc": "Multi-hop reasoning across your entire knowledge base. Students explore concept relationships instead of linear content.",
+        "detail": "45–71% fewer AI hallucinations vs standard RAG",
+        "badge": "GraphRAG Native"
+      },
+      "visualAnchoring": {
+        "title": "Visual Anchoring Sidebar",
+        "desc": "Auto-semantic anchors on images, diagrams, and documents. Every visual element becomes an interactive knowledge node.",
+        "detail": "+30% knowledge retention in visual-heavy subjects",
+        "badge": "Patent Pending"
+      },
+      "aiCourseBuilder": {
+        "title": "AI Course Builder",
+        "desc": "Build a complete course in 10 minutes from a prompt, syllabus, or URL. AI generates modules, lessons, and quizzes automatically.",
+        "detail": "60% instructor time savings on course creation",
+        "badge": "Unique in LMS Market"
+      }
+    },
+    "aiCourseBuild": {
+      "badge": "AI Course Builder",
+      "title": "Build a Complete Course in 10 Minutes",
+      "subtitle": "AI generates modules, lessons, quizzes, and assessments — you review and publish.",
+      "step1": "Enter a topic or upload a syllabus",
+      "step2": "AI generates course outline in seconds",
+      "step3": "Modules and lessons auto-populated",
+      "step4": "Quizzes auto-generated from content",
+      "step5": "Review, customize, and publish",
+      "estimatedHoursSaved": "Estimated instructor hours saved",
+      "hoursPerYear": "hours/year",
+      "basedOn": "Based on 5 instructors × 8 hrs/week × 60% reduction in course creation time",
+      "seeDemo": "See AI Course Builder Demo"
+    },
+    "video": {
+      "title": "See EduSphere in Action",
+      "subtitle": "Watch students and instructors collaborate in real-time — highlights, annotations, and knowledge graph connections sync instantly.",
+      "demoLabel": "Live Collaboration Demo",
+      "motionReduced": "Motion reduced — enable animations to watch the demo"
+    },
+    "competitors": {
+      "title": "Why Switch from Canvas, D2L, or Blackboard?",
+      "subtitle": "EduSphere leads on every dimension that matters to modern institutions.",
+      "feature": "Feature",
+      "knowledgeGraphAI": "Knowledge Graph AI",
+      "visualAnchoringSidebar": "Visual Anchoring Sidebar",
+      "airGappedOnPremise": "Air-Gapped / On-Premise",
+      "aiChavruta": "AI Chavruta Tutor",
+      "aiCourseBuilder10min": "AI Course Builder (10 min)",
+      "graphRAG": "GraphRAG (45–71% fewer hallucinations)",
+      "whiteLabelIncluded": "White-label Included",
+      "ferpaGdprAirGapped": "FERPA + GDPR + Air-Gapped",
+      "yauPricing": "YAU-based pricing",
+      "openSourceCore": "Open-source core",
+      "offlineFirstMobile": "Offline-first mobile",
+      "b2b2cPartnerApi": "B2B2C Partner API",
+      "legend": "✅ Yes  ⚠️ Partial / Add-on cost  ❌ Not available — Based on publicly available documentation, Q1 2026"
+    },
+    "testimonials": {
+      "title": "Trusted by Institutions That Take Learning Seriously",
+      "subtitle": "From research universities to defense agencies.",
+      "chen": {
+        "quote": "As a department chair, we needed a system that could handle our graduate seminar annotations and visual research. EduSphere's Visual Anchoring transformed how our students engage with primary sources.",
+        "name": "Dr. Sarah Chen",
+        "role": "Dept. of History",
+        "org": "Research University"
+      },
+      "torres": {
+        "quote": "Our L&D team cut course creation time by 65%. The AI Course Builder lets our SMEs focus on content, not formatting.",
+        "name": "Michael Torres",
+        "role": "VP Learning & Development",
+        "org": "Global Corporation"
+      },
+      "defense": {
+        "quote": "For our sensitive defense training content, the air-gapped deployment was non-negotiable. EduSphere is the only LMS that offered this without a 6-month custom build.",
+        "name": "[Name redacted]",
+        "role": "Training Director",
+        "org": "Defense Agency"
+      }
+    },
+    "trustBar": {
+      "tagline": "Trusted by universities, enterprises & government agencies",
+      "universityPartner": "University Partner"
+    },
+    "complianceBadges": {
+      "title": "Built for Institutional Compliance —",
+      "titleBreak": "Not an Afterthought",
+      "subtitle": "Every standard your procurement team will ask for, built in from day one.",
+      "ferpa": "Full student education records privacy compliance",
+      "wcag": "Web Content Accessibility Guidelines — fully audited",
+      "scorm": "Standard LMS content import and tracking support",
+      "lti": "Deep integration with Canvas, Moodle, and any LTI host",
+      "xapi": "Extended learning activity tracking across systems",
+      "saml": "Enterprise single sign-on with any identity provider",
+      "gdpr": "EU data protection: consent, erasure, and portability",
+      "airGapped": "Full on-premise deployment with no external calls",
+      "soc2": "SOC 2 Type II",
+      "soc2Status": "In progress (Roadmap Q3 2026)",
+      "downloadVpat": "Download VPAT / HECVAT"
+    },
+    "pricing": {
+      "title": "Transparent B2B Pricing — No Per-Module Fees",
+      "subtitle": "YAU-based pricing: only pay for users who actually learn.",
+      "whatIsYau": "What is YAU?",
+      "yauTooltip": "YAU = Yearly Active User. A user who logs in at least once during your contract year.",
+      "annualBilling": "Annual billing · All plans include White-label INCLUDED",
+      "mostPopular": "Most Popular",
+      "perYear": "/year",
+      "whiteLabelIncluded": "White-label INCLUDED",
+      "faqTitle": "Pricing FAQs",
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "price": "$12,000",
+          "yau": "500 YAU",
+          "desc": "For small departments and pilot programs",
+          "cta": "Start Pilot"
+        },
+        "growth": {
+          "name": "Growth",
+          "price": "$32,000",
+          "yau": "2,000 YAU",
+          "desc": "For growing institutions and enterprises",
+          "cta": "Start Pilot"
+        },
+        "university": {
+          "name": "University",
+          "price": "$65,000",
+          "yau": "10,000 YAU",
+          "desc": "For universities and large enterprises",
+          "cta": "Request Demo"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Custom",
+          "yau": "Unlimited",
+          "desc": "Air-Gapped, on-premise, or hybrid",
+          "cta": "Contact Sales"
+        }
+      },
+      "planFeatures": {
+        "allCoreFeatures": "All core features",
+        "knowledgeGraphAI": "Knowledge Graph AI",
+        "visualAnchoring": "Visual Anchoring",
+        "aiCourseBuilder": "AI Course Builder",
+        "scormLti": "SCORM + LTI 1.3",
+        "samlSso": "SAML SSO",
+        "whiteLabelIncl": "White-label INCLUDED",
+        "emailSupport": "Email support",
+        "everythingInStarter": "Everything in Starter",
+        "advancedAnalytics": "Advanced analytics",
+        "customAiModels": "Custom AI models",
+        "apiAccess": "API access",
+        "xapiTinCan": "xAPI / Tin Can",
+        "dedicatedCsm": "Dedicated CSM",
+        "sla999": "SLA 99.9%",
+        "prioritySupport": "Priority support",
+        "everythingInGrowth": "Everything in Growth",
+        "multiCampus": "Multi-campus deployment",
+        "ferpaGdpr": "FERPA + GDPR compliance pack",
+        "vpatHecvat": "VPAT / HECVAT documentation",
+        "trainingOnboarding": "Training & onboarding",
+        "sla9995": "Priority SLA 99.95%",
+        "quarterlyReviews": "Quarterly business reviews",
+        "everythingInUniversity": "Everything in University",
+        "airGappedDeployment": "Air-Gapped deployment",
+        "onPremise": "On-premise option",
+        "customIntegrations": "Custom integrations",
+        "dedicatedInfra": "Dedicated infrastructure",
+        "whiteGloveOnboarding": "White-glove onboarding",
+        "customSla": "Custom SLA"
+      },
+      "faqs": {
+        "whatIsYau": {
+          "q": "What counts as a YAU?",
+          "a": "A Yearly Active User is any user who logs in at least once during your contract year."
+        },
+        "exceedLimit": {
+          "q": "What happens if I exceed my YAU limit?",
+          "a": "We notify you at 80% and 100% usage. Overages are billed at a prorated rate, never a surprise."
+        },
+        "upgradeMidYear": {
+          "q": "Can I upgrade mid-year?",
+          "a": "Yes. You can upgrade at any time and we pro-rate the difference."
+        }
+      }
+    },
+    "pilotCta": {
+      "title": "Ready to Transform Your Learning Experience?",
+      "subtitle": "Apply for your free 90-day pilot and see why institutions choose EduSphere.",
+      "applicationReceived": "Application received!",
+      "respondWithin24h": "We'll respond within 24 hours with your pilot details.",
+      "orgName": "Organization Name *",
+      "orgNamePlaceholder": "University of...",
+      "orgType": "Organization Type *",
+      "selectType": "Select type",
+      "orgTypeUniversity": "University",
+      "orgTypeCollege": "College",
+      "orgTypeCorporate": "Corporate",
+      "orgTypeGovernment": "Government",
+      "orgTypeDefense": "Defense",
+      "contactName": "Contact Name *",
+      "contactNamePlaceholder": "Dr. Jane Smith",
+      "emailLabel": "Email *",
+      "emailPlaceholder": "jane@university.edu",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "estimatedUsers": "Estimated Users *",
+      "estimatedUsersPlaceholder": "500",
+      "useCase": "Use Case *",
+      "useCasePlaceholder": "Describe your learning goals...",
+      "submitting": "Submitting…",
+      "applyForPilot": "Apply for Free Pilot",
+      "whyPilot": "Why pilot with EduSphere?",
+      "benefit1": "90 days free — no credit card",
+      "benefit2": "Full feature access including Air-Gapped option",
+      "benefit3": "Dedicated onboarding specialist",
+      "benefit4": "Data migration assistance",
+      "benefit5": "Custom white-label domain setup"
+    },
+    "howPilotWorks": {
+      "title": "Start Your 90-Day Pilot — No Credit Card Required",
+      "subtitle": "Full feature access. Your own white-labeled domain. Up to 500 users.",
+      "step": "Step {{num}}",
+      "step01": {
+        "title": "Register Your Organization",
+        "desc": "Fill out a short form with your institution details and use case. Takes less than 3 minutes."
+      },
+      "step02": {
+        "title": "Approval in 24 Hours",
+        "desc": "Our team reviews your application and sets up a dedicated environment with your branding."
+      },
+      "step03": {
+        "title": "Launch with Full Access",
+        "desc": "All features unlocked: Knowledge Graph, Visual Anchoring, AI Course Builder, and more."
+      },
+      "startYourPilot": "Start Your Pilot"
+    },
+    "roi": {
+      "title": "Calculate Your ROI",
+      "subtitle": "See how EduSphere pays for itself — usually within the first quarter.",
+      "instructors": "Number of Instructors",
+      "hoursPerWeek": "Hours/week on course creation",
+      "hourlyCost": "Hourly instructor cost",
+      "students": "Number of students",
+      "hoursSavedYear": "Instructor hours saved/year",
+      "dollarValueSaved": "Dollar value saved",
+      "annualCost": "EduSphere annual cost",
+      "netRoi": "Net ROI",
+      "getReport": "Get Your Custom ROI Report"
+    }
   }
 }

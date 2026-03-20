@@ -4,6 +4,7 @@
  * Admin dashboard to manage campaigns: create, activate, complete.
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -50,14 +51,15 @@ function CampaignRow({
   onActivate: (id: string) => void;
   onComplete: (id: string) => void;
 }) {
+  const { t } = useTranslation('admin');
   return (
     <div className="py-3 flex items-center justify-between">
       <div>
         <p className="font-medium text-sm">{c.title}</p>
         <p className="text-xs text-muted-foreground">
-          Target: {c.targetUserId} · {c.criteriaCount} criteria
+          {t('assessmentCampaign.target')} {c.targetUserId} · {c.criteriaCount} {t('assessmentCampaign.criteria')}
           {c.dueDate
-            ? ` · Due: ${new Date(c.dueDate).toLocaleDateString()}`
+            ? ` · ${t('assessmentCampaign.due')} ${new Date(c.dueDate).toLocaleDateString()}`
             : ''}
         </p>
       </div>
@@ -67,7 +69,7 @@ function CampaignRow({
         </Badge>
         {c.status === 'DRAFT' && (
           <Button size="sm" variant="outline" onClick={() => onActivate(c.id)}>
-            Activate
+            {t('assessmentCampaign.activate')}
           </Button>
         )}
         {c.status === 'ACTIVE' && (
@@ -76,7 +78,7 @@ function CampaignRow({
             variant="destructive"
             onClick={() => onComplete(c.id)}
           >
-            Close & Generate
+            {t('assessmentCampaign.closeAndGenerate')}
           </Button>
         )}
       </div>
@@ -85,6 +87,7 @@ function CampaignRow({
 }
 
 export function AssessmentCampaignPage() {
+  const { t } = useTranslation('admin');
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [targetUserId, setTargetUserId] = useState('');
@@ -127,39 +130,39 @@ export function AssessmentCampaignPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Users className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">360 Assessment Campaigns</h1>
+            <h1 className="text-2xl font-bold">{t('assessmentCampaign.pageTitle')}</h1>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                New Campaign
+                {t('assessmentCampaign.newCampaign')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Assessment Campaign</DialogTitle>
+                <DialogTitle>{t('assessmentCampaign.createTitle')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-3 pt-2">
                 <div>
-                  <label className="text-sm font-medium">Campaign Title</label>
+                  <label className="text-sm font-medium">{t('assessmentCampaign.campaignTitleLabel')}</label>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Q1 Performance Review"
+                    placeholder={t('assessmentCampaign.campaignTitlePlaceholder')}
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Target User ID</label>
+                  <label className="text-sm font-medium">{t('assessmentCampaign.targetUserIdLabel')}</label>
                   <Input
                     value={targetUserId}
                     onChange={(e) => setTargetUserId(e.target.value)}
-                    placeholder="uuid-of-user"
+                    placeholder={t('assessmentCampaign.targetUserIdPlaceholder')}
                   />
                 </div>
                 <div>
                   <label className="text-sm font-medium">
-                    Due Date (optional)
+                    {t('assessmentCampaign.dueDateLabel')}
                   </label>
                   <Input
                     type="date"
@@ -175,7 +178,7 @@ export function AssessmentCampaignPage() {
                   {creating ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : null}
-                  Create Campaign
+                  {t('assessmentCampaign.createCampaign')}
                 </Button>
               </div>
             </DialogContent>
@@ -184,18 +187,18 @@ export function AssessmentCampaignPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>All Campaigns</CardTitle>
+            <CardTitle>{t('assessmentCampaign.allCampaigns')}</CardTitle>
           </CardHeader>
           <CardContent>
             {fetching && (
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin h-4 w-4" />
-                <span>Loading...</span>
+                <span>{t('assessmentCampaign.loading')}</span>
               </div>
             )}
             {!fetching && campaigns.length === 0 && (
               <p className="text-muted-foreground text-sm">
-                No campaigns yet. Create one to get started.
+                {t('assessmentCampaign.noCampaigns')}
               </p>
             )}
             <div className="divide-y">

@@ -3,6 +3,7 @@
  * Route: /admin/audit
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -34,6 +35,7 @@ interface AuditLogResult {
 }
 
 export function AuditLogPage() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const role = useAuthRole();
   const [page, setPage] = useState(0);
@@ -80,7 +82,7 @@ export function AuditLogPage() {
           <CardContent>
             <div className="flex flex-wrap gap-3">
               <Input
-                placeholder="Filter by action..."
+                placeholder={t('auditLogPage.filterByAction')}
                 value={actionFilter}
                 onChange={(e) => {
                   setActionFilter(e.target.value);
@@ -96,7 +98,7 @@ export function AuditLogPage() {
                   setPage(0);
                 }}
                 className="w-44"
-                aria-label="Since date"
+                aria-label={t('auditLogPage.sinceDate')}
               />
               <Input
                 type="date"
@@ -106,7 +108,7 @@ export function AuditLogPage() {
                   setPage(0);
                 }}
                 className="w-44"
-                aria-label="Until date"
+                aria-label={t('auditLogPage.untilDate')}
               />
               <Button
                 variant="outline"
@@ -117,7 +119,7 @@ export function AuditLogPage() {
                   setPage(0);
                 }}
               >
-                Clear
+                {t('auditLogPage.clear')}
               </Button>
             </div>
           </CardContent>
@@ -126,16 +128,16 @@ export function AuditLogPage() {
         <Card>
           <CardContent className="p-0">
             {result.fetching && (
-              <p className="p-6 text-sm text-muted-foreground">Loading...</p>
+              <p className="p-6 text-sm text-muted-foreground">{t('auditLogPage.loading')}</p>
             )}
             {result.error && (
               <p className="p-6 text-sm text-destructive">
-                Failed to load audit log.
+                {t('auditLogPage.loadError')}
               </p>
             )}
             {!result.fetching && entries.length === 0 && (
               <p className="p-6 text-sm text-muted-foreground text-center">
-                No audit entries found.
+                {t('auditLogPage.noEntries')}
               </p>
             )}
             {entries.length > 0 && (
@@ -143,21 +145,21 @@ export function AuditLogPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="px-4 py-3 text-left font-medium">Time</th>
+                      <th className="px-4 py-3 text-left font-medium">{t('auditLogPage.timeHeader')}</th>
                       <th className="px-4 py-3 text-left font-medium">
-                        Action
+                        {t('auditLogPage.actionHeader')}
                       </th>
                       <th className="px-4 py-3 text-left font-medium">
-                        User ID
+                        {t('auditLogPage.userIdHeader')}
                       </th>
                       <th className="px-4 py-3 text-left font-medium">
-                        Resource
+                        {t('auditLogPage.resourceHeader')}
                       </th>
                       <th className="px-4 py-3 text-left font-medium">
-                        Status
+                        {t('auditLogPage.statusHeader')}
                       </th>
                       <th className="px-4 py-3 text-left font-medium">
-                        IP Address
+                        {t('auditLogPage.ipAddressHeader')}
                       </th>
                     </tr>
                   </thead>
@@ -205,7 +207,7 @@ export function AuditLogPage() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {total} total entries — page {page + 1} of {totalPages}
+              {t('auditLogPage.totalEntries', { total, page: page + 1, totalPages })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -214,7 +216,7 @@ export function AuditLogPage() {
                 disabled={page === 0}
                 onClick={() => setPage((p) => p - 1)}
               >
-                Previous
+                {t('auditLogPage.previous')}
               </Button>
               <Button
                 variant="outline"
@@ -222,7 +224,7 @@ export function AuditLogPage() {
                 disabled={page >= totalPages - 1}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next
+                {t('auditLogPage.next')}
               </Button>
             </div>
           </div>

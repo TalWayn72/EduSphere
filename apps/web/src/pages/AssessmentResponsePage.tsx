@@ -3,6 +3,7 @@
  * Route: /assessments/:id/respond
  */
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -25,6 +26,7 @@ const CRITERIA = [
 ];
 
 export function AssessmentResponsePage() {
+  const { t } = useTranslation('admin');
   const { id: campaignId } = useParams<{ id: string }>();
   const [mounted, setMounted] = useState(false);
   const [raterRole, setRaterRole] = useState<RaterRole>('PEER');
@@ -67,7 +69,7 @@ export function AssessmentResponsePage() {
             <CardContent className="py-12 text-center space-y-3">
               <ClipboardList className="h-12 w-12 text-primary mx-auto" aria-hidden="true" />
               <p className="text-lg font-semibold">
-                Thank you — your assessment has been submitted.
+                {t('assessmentResponse.thankYou')}
               </p>
             </CardContent>
           </Card>
@@ -81,21 +83,21 @@ export function AssessmentResponsePage() {
       <div className="container mx-auto p-6 max-w-xl space-y-6">
         <Breadcrumbs
           items={[
-            { label: 'Assessments', href: '/assessments' },
-            { label: 'Assessment', href: `/assessments/${campaignId}` },
-            { label: 'Respond' },
+            { label: t('assessmentResponse.breadcrumbAssessments'), href: '/assessments' },
+            { label: t('assessmentResponse.breadcrumbAssessment'), href: `/assessments/${campaignId}` },
+            { label: t('assessmentResponse.breadcrumbRespond') },
           ]}
         />
         <div className="flex items-center gap-3">
           <ClipboardList className="h-8 w-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">Submit Assessment</h1>
+          <h1 className="text-3xl font-bold">{t('assessmentResponse.pageTitle')}</h1>
         </div>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
           {/* Role selector */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Your Role</CardTitle>
+              <CardTitle className="text-base">{t('assessmentResponse.yourRole')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
@@ -121,7 +123,7 @@ export function AssessmentResponsePage() {
           {/* Criteria sliders */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Criteria Scores (1–5)</CardTitle>
+              <CardTitle className="text-base">{t('assessmentResponse.criteriaScores')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {CRITERIA.map((c) => (
@@ -162,16 +164,16 @@ export function AssessmentResponsePage() {
           {/* Narrative */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Narrative (optional)</CardTitle>
+              <CardTitle className="text-base">{t('assessmentResponse.narrativeTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <textarea
                 value={narrative}
                 onChange={(e) => setNarrative(e.target.value)}
-                placeholder="Share additional context or feedback…"
+                placeholder={t('assessmentResponse.narrativePlaceholder')}
                 rows={4}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                aria-label="Narrative feedback"
+                aria-label={t('assessmentResponse.narrativeAriaLabel')}
               />
             </CardContent>
           </Card>
@@ -180,7 +182,7 @@ export function AssessmentResponsePage() {
             {fetching ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
             ) : null}
-            Submit Assessment
+            {t('assessmentResponse.submitAssessment')}
           </Button>
         </form>
       </div>

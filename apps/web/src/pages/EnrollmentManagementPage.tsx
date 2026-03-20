@@ -5,6 +5,7 @@
  * users per course.
  */
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -83,19 +84,20 @@ function EnrollUserDialog({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const { t } = useTranslation('admin');
   const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const [, enrollUser] = useMutation(ADMIN_ENROLL_USER_MUTATION);
 
   const handleEnroll = async () => {
     if (!userId.trim()) {
-      setError('User ID is required');
+      setError(t('enrollment.userIdRequired'));
       return;
     }
     const result = await enrollUser({ courseId, userId: userId.trim() });
     if (result.error) {
       console.error('[EnrollmentManagement] Enroll failed:', result.error.message);
-      setError('Failed to enroll user. Please try again.');
+      setError(t('enrollment.enrollFailed'));
     } else {
       setUserId('');
       setError('');
@@ -113,11 +115,11 @@ function EnrollUserDialog({
     >
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Enroll User</DialogTitle>
+          <DialogTitle>{t('enrollment.enrollUserTitle')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3 py-2">
           <Input
-            placeholder="User ID (UUID)"
+            placeholder={t('enrollment.userIdPlaceholder')}
             value={userId}
             onChange={(e) => {
               setUserId(e.target.value);
@@ -128,9 +130,9 @@ function EnrollUserDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('enrollment.cancel')}
           </Button>
-          <Button onClick={handleEnroll}>Enroll</Button>
+          <Button onClick={handleEnroll}>{t('enrollment.enroll')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -150,6 +152,7 @@ function BulkEnrollDialog({
   onClose: () => void;
   onSuccess: (count: number) => void;
 }) {
+  const { t } = useTranslation('admin');
   const [rawInput, setRawInput] = useState('');
   const [error, setError] = useState('');
   const [, bulkEnroll] = useMutation(ADMIN_BULK_ENROLL_MUTATION);
@@ -160,13 +163,13 @@ function BulkEnrollDialog({
       .map((s) => s.trim())
       .filter(Boolean);
     if (userIds.length === 0) {
-      setError('Enter at least one User ID');
+      setError(t('enrollment.bulkEnrollMin'));
       return;
     }
     const result = await bulkEnroll({ courseId, userIds });
     if (result.error) {
       console.error('[EnrollmentManagement] Bulk enroll failed:', result.error.message);
-      setError('Failed to enroll users. Please try again.');
+      setError(t('enrollment.bulkEnrollFailed'));
     } else {
       const count =
         (result.data as { adminBulkEnroll: number })?.adminBulkEnroll ?? 0;
@@ -186,15 +189,15 @@ function BulkEnrollDialog({
     >
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Bulk Enroll Users</DialogTitle>
+          <DialogTitle>{t('enrollment.bulkEnrollTitle')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3 py-2">
           <p className="text-sm text-muted-foreground">
-            Enter one User ID (UUID) per line, or comma-separated.
+            {t('enrollment.bulkEnrollDesc')}
           </p>
           <textarea
             className="w-full h-32 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            placeholder={'user-uuid-1\nuser-uuid-2\nuser-uuid-3'}
+            placeholder={t('enrollment.bulkEnrollPlaceholder')}
             value={rawInput}
             onChange={(e) => {
               setRawInput(e.target.value);
@@ -205,9 +208,9 @@ function BulkEnrollDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('enrollment.cancel')}
           </Button>
-          <Button onClick={handleBulkEnroll}>Enroll All</Button>
+          <Button onClick={handleBulkEnroll}>{t('enrollment.enrollAll')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -217,6 +220,7 @@ function BulkEnrollDialog({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export function EnrollmentManagementPage() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const role = useAuthRole();
   const [selectedCourseId, setSelectedCourseId] = useState('');
@@ -272,14 +276,14 @@ export function EnrollmentManagementPage() {
 
   const handleEnrollSuccess = () => {
     reexecuteEnrollments({ requestPolicy: 'network-only' });
-    setSuccessMessage('User enrolled successfully');
+    setSuccessMessage(t('enrollment.enrollSuccess'));
     if (successTimerRef.current) clearTimeout(successTimerRef.current);
     successTimerRef.current = setTimeout(() => setSuccessMessage(''), SAVED_CONFIRMATION_MS);
   };
 
   const handleBulkSuccess = (count: number) => {
     reexecuteEnrollments({ requestPolicy: 'network-only' });
-    setSuccessMessage(`${count} user(s) enrolled successfully`);
+    setSuccessMessage(t('enrollment.bulkEnrollSuccess', { count }));
     if (successTimerRef.current) clearTimeout(successTimerRef.current);
     successTimerRef.current = setTimeout(() => setSuccessMessage(''), SAVED_CONFIRMATION_MS);
   };
@@ -294,15 +298,15 @@ export function EnrollmentManagementPage() {
     <AdminLayout>
       <PageShell size="xl">
         <PageHeader
-          title="Enrollment"
-          description="Manage course enrollments and learning paths"
-          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Enrollment' }]}
+          title={t('enrollment.pageTitle')}
+          description={t('enrollment.pageDescription')}
+          breadcrumbs={[{ label: t('enrollment.breadcrumbAdmin'), href: '/admin' }, { label: t('enrollment.breadcrumbEnrollment') }]}
         />
       {/* Course selector + actions */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Select a course…" />
+            <SelectValue placeholder={t('enrollment.selectCoursePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {courses.map((c) => (
@@ -310,7 +314,7 @@ export function EnrollmentManagementPage() {
                 {c.title}
                 {!c.isPublished && (
                   <span className="ml-2 text-xs text-muted-foreground">
-                    (draft)
+                    {t('enrollment.draft')}
                   </span>
                 )}
               </SelectItem>
@@ -321,14 +325,14 @@ export function EnrollmentManagementPage() {
         {selectedCourseId && (
           <>
             <Button onClick={() => setShowEnroll(true)} size="sm">
-              Enroll User
+              {t('enrollment.enrollUser')}
             </Button>
             <Button
               variant="outline"
               onClick={() => setShowBulk(true)}
               size="sm"
             >
-              Bulk Enroll
+              {t('enrollment.bulkEnroll')}
             </Button>
           </>
         )}
@@ -345,15 +349,15 @@ export function EnrollmentManagementPage() {
         <div className="flex gap-6 mb-4 text-sm text-muted-foreground">
           <span>
             <strong className="text-foreground">{enrollments.length}</strong>{' '}
-            enrolled
+            {t('enrollment.enrolledCount')}
           </span>
           <span>
             <strong className="text-foreground">{completedCount}</strong>{' '}
-            completed
+            {t('enrollment.completedCount')}
           </span>
           <span>
             <strong className="text-foreground">{completionRate}%</strong>{' '}
-            completion rate
+            {t('enrollment.completionRate')}
           </span>
         </div>
       )}
@@ -361,29 +365,29 @@ export function EnrollmentManagementPage() {
       {/* Enrollments table */}
       {!selectedCourseId ? (
         <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-          Select a course above to view and manage enrollments
+          {t('enrollment.selectCoursePrompt')}
         </div>
       ) : enrollmentsResult.fetching ? (
         <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-          Loading enrollments…
+          {t('enrollment.loadingEnrollments')}
         </div>
       ) : enrollmentsResult.error ? (
         <div className="flex items-center justify-center h-48 text-destructive text-sm">
-          Error loading enrollments. Please try again.
+          {t('enrollment.loadError')}
         </div>
       ) : enrollments.length === 0 ? (
         <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-          No enrollments yet for this course
+          {t('enrollment.noEnrollments')}
         </div>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Enrolled</TableHead>
-              <TableHead>Completed</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('enrollment.colUserId')}</TableHead>
+              <TableHead>{t('enrollment.colStatus')}</TableHead>
+              <TableHead>{t('enrollment.colEnrolled')}</TableHead>
+              <TableHead>{t('enrollment.colCompleted')}</TableHead>
+              <TableHead className="text-right">{t('enrollment.colActions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -399,7 +403,7 @@ export function EnrollmentManagementPage() {
                         : 'bg-blue-50 text-blue-700 border-blue-200'
                     }
                   >
-                    {e.completedAt ? 'Completed' : e.status}
+                    {e.completedAt ? t('enrollment.completedStatus') : e.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm">
@@ -420,7 +424,7 @@ export function EnrollmentManagementPage() {
                       })
                     }
                   >
-                    Unenroll
+                    {t('enrollment.unenroll')}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -454,18 +458,17 @@ export function EnrollmentManagementPage() {
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Confirm Unenroll</DialogTitle>
+            <DialogTitle>{t('enrollment.confirmUnenrollTitle')}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-2">
-            Remove this user from the course? Their progress data will be
-            preserved.
+            {t('enrollment.confirmUnenrollDesc')}
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmUnenroll(null)}>
-              Cancel
+              {t('enrollment.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleUnenroll}>
-              Unenroll
+              {t('enrollment.unenroll')}
             </Button>
           </DialogFooter>
         </DialogContent>

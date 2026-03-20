@@ -222,6 +222,75 @@
     "title": "ניהול תפקידים",
     "description": "ניהול תפקידים והרשאות"
   },
+  "features": {
+    "pageHeading": "כל מה שצריך כדי ללמוד חכם יותר",
+    "pageSubheading": "EduSphere משלבת הדרכת AI, גרפי ידע, גיימיפיקציה ותכונות LMS ארגוני בפלטפורמה אחת.",
+    "getStartedFree": "התחל בחינם",
+    "viewFaq": "שאלות נפוצות",
+    "howItWorks": "איך זה עובד",
+    "ctaHeading": "מוכנים לשנות את הלמידה?",
+    "ctaSubtext": "התחל בחינם. שדרג בכל עת. ללא כרטיס אשראי.",
+    "aiTutor": {
+      "title": "הדרכת AI (חברותא)",
+      "tagline": "ה-AI שחושב איתך",
+      "description": "מורה ה-AI של EduSphere משתמש בדיאלוג סוקרטי כדי לאתגר את החשיבה שלך ולבנות הבנה עמוקה.",
+      "benefits": ["מתאים לקצב הלמידה שלך", "שאילת שאלות סוקרטית", "מושגים מקושרים אוטומטית לגרף הידע", "הקשר נשמר בין מעברי נושא", "זמין 24/7 ב-Pro"],
+      "steps": [
+        { "title": "הערכה", "desc": "AI מעריך את רמת הידע שלך" },
+        { "title": "חידון", "desc": "שאלות ממוקדות מזהות פערים" },
+        { "title": "הסבר", "desc": "AI מסביר בדרך מותאמת" },
+        { "title": "דיון", "desc": "דיאלוג סוקרטי מעמיק הבנה" }
+      ]
+    },
+    "knowledgeGraph": {
+      "title": "גרף ידע",
+      "tagline": "מפת המושגים האישית שלך",
+      "description": "EduSphere בונה מפה ויזואלית של כל מה שלמדת ואיך מושגים מתחברים.",
+      "benefits": ["הצגת קשרים בין מושגים", "AI מציע נושאים קשורים", "זיהוי פערי ידע במבט", "חיפוש סמנטי", "ייצוא גרף הידע"],
+      "steps": [
+        { "title": "למד", "desc": "השלם שיעורים ועבוד עם מורה ה-AI" },
+        { "title": "מפה", "desc": "מושגים נוספים אוטומטית לגרף" },
+        { "title": "חבר", "desc": "AI מקשר מושגים קשורים" },
+        { "title": "חקור", "desc": "נווט ברשת הידע שלך" }
+      ]
+    },
+    "gamification": {
+      "title": "גיימיפיקציה",
+      "tagline": "למידה שמחזירה אותך שוב ושוב",
+      "description": "מערכת 5 רמות, רצפי ימים ותגים דיגיטליים מוסמכי OpenBadges 3.0.",
+      "benefits": ["התקדמות 5 רמות מומחיות", "רצפי ימים ונקודות XP", "תגי OpenBadges 3.0", "לוחות מובילים", "התראות הישגים"],
+      "steps": [
+        { "title": "למד", "desc": "השלם שיעורים לצבירת XP" },
+        { "title": "עלה רמה", "desc": "התקדם דרך 5 רמות" },
+        { "title": "צבור תגים", "desc": "קבל תגים ניתנים לאימות" },
+        { "title": "שתף", "desc": "הצג תגים ב-LinkedIn" }
+      ]
+    },
+    "enterprise": {
+      "title": "דרג ארגוני",
+      "tagline": "בנוי לקנה מידה וציות",
+      "description": "מולטי-טננט, SSO/SAML/SCIM, GDPR, WCAG 2.2 AA, SCORM, xAPI, LTI 1.3.",
+      "benefits": ["מולטי-טננט עם RLS", "SSO דרך SAML 2.0, OIDC, LDAP", "SCIM 2.0", "GDPR + FERPA", "WCAG 2.2 AA", "SLA 99.9%"],
+      "steps": [
+        { "title": "הקצאה", "desc": "SSO ו-SCIM יוצרים חשבונות אוטומטית" },
+        { "title": "התאמה", "desc": "מיתוג לבן עם הלוגו שלך" },
+        { "title": "ניהול", "desc": "לוח בקרה לכל המשתמשים" },
+        { "title": "דוחות", "desc": "דיווח ציות מובנה" }
+      ]
+    },
+    "multilingual": {
+      "title": "רב-לשוני",
+      "tagline": "50+ שפות עם תמיכה מלאה ב-RTL",
+      "description": "תמיכה ב-50+ שפות עם RTL מקורי לעברית וערבית.",
+      "benefits": ["50+ שפות", "RTL מלא לעברית וערבית", "זיהוי שפה אוטומטי", "הגדרת שפה לפי ארגון", "אימייל מותאם לשפה"]
+    },
+    "liveSessions": {
+      "title": "סשנים חיים",
+      "tagline": "למידה שיתופית בזמן אמת",
+      "description": "תזמן והפעל סשנים מונחי מרצה בזמן אמת.",
+      "benefits": ["תזמון והתראות בזמן אמת", "מעקב נוכחות", "הקלטת סשנים", "אינטרנט ונייד", "מעקב השלמת קורסים"]
+    }
+  },
   "progress": {
     "aiGen": {
       "analyzing": "מנתח את הנושא...",
@@ -260,6 +329,299 @@
       "submitting": "שולח מטלה...",
       "validating": "מאמת...",
       "saving": "שומר..."
+    }
+  },
+  "landing": {
+    "hero": {
+      "badge": "LMS מבוסס AI — מחליף את Canvas, D2L ו-Blackboard",
+      "title": "ה-LMS מבוסס AI",
+      "titleBreak": "שמחליף את Canvas",
+      "subtitle": "אינטליגנציית גרף ידע. עיגון ויזואלי. מורה AI מובנה. White-label מלא כלול.",
+      "startingAtText": "החל מ-{{price}} עד 500 משתמשים פעילים",
+      "price": "$12,000/שנה",
+      "requestDemo": "בקשו הדגמה",
+      "startPilot": "התחילו פיילוט 90 יום",
+      "noCreditCard": "ללא כרטיס אשראי · גישה לכל התכונות · מלווה ייעודי לקליטה"
+    },
+    "footer": {
+      "product": "מוצר",
+      "features": "תכונות",
+      "pricing": "מחירים",
+      "aiCourseBuilder": "בונה קורסים AI",
+      "visualAnchoring": "עיגון ויזואלי",
+      "knowledgeGraph": "גרף ידע",
+      "solutions": "פתרונות",
+      "universities": "אוניברסיטאות",
+      "enterprises": "ארגונים",
+      "governmentDefense": "ממשל וביטחון",
+      "trainingCompanies": "חברות הדרכה",
+      "compliance": "תאימות",
+      "airGapped": "סביבה מבודדת",
+      "security": "אבטחה",
+      "company": "חברה",
+      "about": "אודות",
+      "blog": "בלוג",
+      "careers": "קריירה",
+      "contact": "צור קשר",
+      "privacyPolicy": "מדיניות פרטיות",
+      "terms": "תנאי שימוש",
+      "accessibilityStatement": "הצהרת נגישות",
+      "copyright": "© 2026 EduSphere. נבנה עבור מוסדות שלוקחים למידה ברצינות.",
+      "privacy": "פרטיות",
+      "accessibility": "נגישות"
+    },
+    "features": {
+      "title": "שלוש יכולות שאף LMS אחר לא מציע",
+      "subtitle": "לא שיפורים הדרגתיים — פריצות דרך ארכיטקטוניות שמשנות את אופן הלמידה.",
+      "knowledgeGraph": {
+        "title": "אינטליגנציית גרף ידע",
+        "desc": "היסק רב-שלבי על פני כל מאגר הידע שלכם. הסטודנטים חוקרים קשרי מושגים במקום תוכן ליניארי.",
+        "detail": "45–71% פחות הזיות AI לעומת RAG רגיל",
+        "badge": "GraphRAG מובנה"
+      },
+      "visualAnchoring": {
+        "title": "סרגל עיגון ויזואלי",
+        "desc": "עוגנים סמנטיים אוטומטיים על תמונות, תרשימים ומסמכים. כל רכיב ויזואלי הופך לצומת ידע אינטראקטיבי.",
+        "detail": "+30% שימור ידע במקצועות עתירי-ויזואל",
+        "badge": "פטנט בהליך רישום"
+      },
+      "aiCourseBuilder": {
+        "title": "בונה קורסים AI",
+        "desc": "בנו קורס מלא ב-10 דקות מנושא, סילבוס או כתובת URL. ה-AI מייצר מודולים, שיעורים ומבחנים אוטומטית.",
+        "detail": "60% חיסכון בזמן מרצים ביצירת קורסים",
+        "badge": "ייחודי בשוק ה-LMS"
+      }
+    },
+    "aiCourseBuild": {
+      "badge": "בונה קורסים AI",
+      "title": "בנו קורס מלא ב-10 דקות",
+      "subtitle": "ה-AI מייצר מודולים, שיעורים, מבחנים והערכות — אתם בודקים ומפרסמים.",
+      "step1": "הזינו נושא או העלו סילבוס",
+      "step2": "ה-AI מייצר מתווה קורס בשניות",
+      "step3": "מודולים ושיעורים מאוכלסים אוטומטית",
+      "step4": "מבחנים נוצרים אוטומטית מהתוכן",
+      "step5": "סקרו, התאימו ופרסמו",
+      "estimatedHoursSaved": "שעות מרצים שנחסכות (הערכה)",
+      "hoursPerYear": "שעות/שנה",
+      "basedOn": "מבוסס על 5 מרצים × 8 שעות/שבוע × 60% הפחתה בזמן יצירת קורסים",
+      "seeDemo": "צפו בהדגמת בונה הקורסים AI"
+    },
+    "video": {
+      "title": "ראו את EduSphere בפעולה",
+      "subtitle": "צפו בסטודנטים ומרצים משתפים פעולה בזמן אמת — הדגשות, הערות וקשרי גרף ידע מסתנכרנים מיידית.",
+      "demoLabel": "הדגמת שיתוף פעולה חי",
+      "motionReduced": "אנימציות מופחתות — הפעילו אנימציות כדי לצפות בהדגמה"
+    },
+    "competitors": {
+      "title": "למה לעבור מ-Canvas, D2L או Blackboard?",
+      "subtitle": "EduSphere מוביל בכל מימד שחשוב למוסדות מודרניים.",
+      "feature": "תכונה",
+      "knowledgeGraphAI": "גרף ידע AI",
+      "visualAnchoringSidebar": "סרגל עיגון ויזואלי",
+      "airGappedOnPremise": "סביבה מבודדת / מקומית",
+      "aiChavruta": "מורה AI חברותא",
+      "aiCourseBuilder10min": "בונה קורסים AI (10 דק')",
+      "graphRAG": "GraphRAG (45–71% פחות הזיות)",
+      "whiteLabelIncluded": "White-label כלול",
+      "ferpaGdprAirGapped": "FERPA + GDPR + סביבה מבודדת",
+      "yauPricing": "תמחור מבוסס YAU",
+      "openSourceCore": "ליבה בקוד פתוח",
+      "offlineFirstMobile": "מובייל Offline-first",
+      "b2b2cPartnerApi": "B2B2C Partner API",
+      "legend": "✅ כן  ⚠️ חלקי / בתוספת עלות  ❌ לא זמין — מבוסס על תיעוד פומבי, Q1 2026"
+    },
+    "testimonials": {
+      "title": "מוסדות שלוקחים למידה ברצינות סומכים עלינו",
+      "subtitle": "מאוניברסיטאות מחקר ועד סוכנויות ביטחון.",
+      "chen": {
+        "quote": "כראש חוג, היינו צריכים מערכת שתתמוך בהערות סמינר מתקדמות ומחקר ויזואלי. העיגון הויזואלי של EduSphere שינה את האופן שבו הסטודנטים שלנו מתקשרים עם מקורות ראשוניים.",
+        "name": "ד\"ר שרה צ'ן",
+        "role": "החוג להיסטוריה",
+        "org": "אוניברסיטת מחקר"
+      },
+      "torres": {
+        "quote": "צוות ה-L&D שלנו קיצר את זמן יצירת הקורסים ב-65%. בונה הקורסים AI מאפשר למומחי התוכן שלנו להתמקד בתוכן, לא בעיצוב.",
+        "name": "מייקל טורס",
+        "role": "סמנכ\"ל למידה ופיתוח",
+        "org": "תאגיד גלובלי"
+      },
+      "defense": {
+        "quote": "עבור תוכן ההדרכה הביטחוני הרגיש שלנו, פריסה בסביבה מבודדת הייתה הכרחית. EduSphere היא ה-LMS היחיד שהציע זאת ללא פרויקט מותאם של 6 חודשים.",
+        "name": "[שם חסוי]",
+        "role": "מנהל הדרכה",
+        "org": "סוכנות ביטחון"
+      }
+    },
+    "trustBar": {
+      "tagline": "אוניברסיטאות, ארגונים וגופי ממשל סומכים עלינו",
+      "universityPartner": "שותף אוניברסיטאי"
+    },
+    "complianceBadges": {
+      "title": "נבנה לתאימות מוסדית —",
+      "titleBreak": "לא כמחשבה שלאחר מעשה",
+      "subtitle": "כל תקן שצוות הרכש שלכם ידרוש, מובנה מהיום הראשון.",
+      "ferpa": "תאימות מלאה לפרטיות רשומות חינוך",
+      "wcag": "הנחיות נגישות תוכן אינטרנט — נבדק באופן מלא",
+      "scorm": "תמיכה בייבוא תוכן LMS ומעקב סטנדרטי",
+      "lti": "אינטגרציה עמוקה עם Canvas, Moodle וכל מארח LTI",
+      "xapi": "מעקב מורחב אחר פעילויות למידה בין מערכות",
+      "saml": "כניסה יחידה ארגונית עם כל ספק זהויות",
+      "gdpr": "הגנת מידע באיחוד האירופי: הסכמה, מחיקה וניידות",
+      "airGapped": "פריסה מקומית מלאה ללא קריאות חיצוניות",
+      "soc2": "SOC 2 Type II",
+      "soc2Status": "בתהליך (מפת דרכים Q3 2026)",
+      "downloadVpat": "הורדת VPAT / HECVAT"
+    },
+    "pricing": {
+      "title": "תמחור B2B שקוף — ללא עלויות למודול",
+      "subtitle": "תמחור מבוסס YAU: שלמו רק עבור משתמשים שבאמת לומדים.",
+      "whatIsYau": "מהו YAU?",
+      "yauTooltip": "YAU = משתמש שנתי פעיל. משתמש שנכנס לפחות פעם אחת במהלך שנת החוזה שלכם.",
+      "annualBilling": "חיוב שנתי · כל התוכניות כוללות White-label",
+      "mostPopular": "הפופולרי ביותר",
+      "perYear": "/שנה",
+      "whiteLabelIncluded": "White-label כלול",
+      "faqTitle": "שאלות נפוצות על מחירים",
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "price": "$12,000",
+          "yau": "500 YAU",
+          "desc": "למחלקות קטנות ותוכניות פיילוט",
+          "cta": "התחילו פיילוט"
+        },
+        "growth": {
+          "name": "Growth",
+          "price": "$32,000",
+          "yau": "2,000 YAU",
+          "desc": "למוסדות וארגונים בצמיחה",
+          "cta": "התחילו פיילוט"
+        },
+        "university": {
+          "name": "University",
+          "price": "$65,000",
+          "yau": "10,000 YAU",
+          "desc": "לאוניברסיטאות וארגונים גדולים",
+          "cta": "בקשו הדגמה"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "מותאם אישית",
+          "yau": "ללא הגבלה",
+          "desc": "סביבה מבודדת, מקומית או היברידית",
+          "cta": "צרו קשר עם המכירות"
+        }
+      },
+      "planFeatures": {
+        "allCoreFeatures": "כל תכונות הליבה",
+        "knowledgeGraphAI": "גרף ידע AI",
+        "visualAnchoring": "עיגון ויזואלי",
+        "aiCourseBuilder": "בונה קורסים AI",
+        "scormLti": "SCORM + LTI 1.3",
+        "samlSso": "SAML SSO",
+        "whiteLabelIncl": "White-label כלול",
+        "emailSupport": "תמיכה באימייל",
+        "everythingInStarter": "הכל מתוכנית Starter",
+        "advancedAnalytics": "אנליטיקה מתקדמת",
+        "customAiModels": "מודלי AI מותאמים",
+        "apiAccess": "גישה ל-API",
+        "xapiTinCan": "xAPI / Tin Can",
+        "dedicatedCsm": "מנהל לקוח ייעודי",
+        "sla999": "SLA 99.9%",
+        "prioritySupport": "תמיכה עדיפה",
+        "everythingInGrowth": "הכל מתוכנית Growth",
+        "multiCampus": "פריסה רב-קמפוסית",
+        "ferpaGdpr": "חבילת תאימות FERPA + GDPR",
+        "vpatHecvat": "תיעוד VPAT / HECVAT",
+        "trainingOnboarding": "הדרכה וקליטה",
+        "sla9995": "SLA עדיף 99.95%",
+        "quarterlyReviews": "סקירות עסקיות רבעוניות",
+        "everythingInUniversity": "הכל מתוכנית University",
+        "airGappedDeployment": "פריסה בסביבה מבודדת",
+        "onPremise": "אפשרות מקומית",
+        "customIntegrations": "אינטגרציות מותאמות",
+        "dedicatedInfra": "תשתית ייעודית",
+        "whiteGloveOnboarding": "קליטה אישית מלאה",
+        "customSla": "SLA מותאם"
+      },
+      "faqs": {
+        "whatIsYau": {
+          "q": "מהו YAU?",
+          "a": "משתמש שנתי פעיל הוא כל משתמש שנכנס לפחות פעם אחת במהלך שנת החוזה."
+        },
+        "exceedLimit": {
+          "q": "מה קורה אם אחרוג ממגבלת ה-YAU?",
+          "a": "נודיע לכם ב-80% וב-100% מהשימוש. חריגות מחויבות לפי יחס, ללא הפתעות."
+        },
+        "upgradeMidYear": {
+          "q": "אפשר לשדרג באמצע השנה?",
+          "a": "כן. ניתן לשדרג בכל עת ואנחנו מחשבים את ההפרש באופן יחסי."
+        }
+      }
+    },
+    "pilotCta": {
+      "title": "מוכנים לשנות את חוויית הלמידה שלכם?",
+      "subtitle": "הגישו בקשה לפיילוט 90 יום בחינם וגלו למה מוסדות בוחרים ב-EduSphere.",
+      "applicationReceived": "הבקשה התקבלה!",
+      "respondWithin24h": "נחזור אליכם תוך 24 שעות עם פרטי הפיילוט.",
+      "orgName": "שם הארגון *",
+      "orgNamePlaceholder": "אוניברסיטת...",
+      "orgType": "סוג הארגון *",
+      "selectType": "בחרו סוג",
+      "orgTypeUniversity": "אוניברסיטה",
+      "orgTypeCollege": "מכללה",
+      "orgTypeCorporate": "ארגון עסקי",
+      "orgTypeGovernment": "ממשל",
+      "orgTypeDefense": "ביטחון",
+      "contactName": "שם איש קשר *",
+      "contactNamePlaceholder": "ד\"ר ישראל ישראלי",
+      "emailLabel": "אימייל *",
+      "emailPlaceholder": "jane@university.edu",
+      "phone": "טלפון",
+      "phonePlaceholder": "+972 (50) 000-0000",
+      "estimatedUsers": "מספר משתמשים משוער *",
+      "estimatedUsersPlaceholder": "500",
+      "useCase": "תרחיש שימוש *",
+      "useCasePlaceholder": "תארו את מטרות הלמידה שלכם...",
+      "submitting": "שולח…",
+      "applyForPilot": "הגישו בקשה לפיילוט חינם",
+      "whyPilot": "למה פיילוט עם EduSphere?",
+      "benefit1": "90 יום בחינם — ללא כרטיס אשראי",
+      "benefit2": "גישה לכל התכונות כולל סביבה מבודדת",
+      "benefit3": "מלווה ייעודי לקליטה",
+      "benefit4": "סיוע בהעברת נתונים",
+      "benefit5": "הגדרת דומיין White-label מותאם"
+    },
+    "howPilotWorks": {
+      "title": "התחילו פיילוט 90 יום — ללא כרטיס אשראי",
+      "subtitle": "גישה לכל התכונות. דומיין White-label משלכם. עד 500 משתמשים.",
+      "step": "שלב {{num}}",
+      "step01": {
+        "title": "רשמו את הארגון שלכם",
+        "desc": "מלאו טופס קצר עם פרטי המוסד ותרחיש השימוש. לוקח פחות מ-3 דקות."
+      },
+      "step02": {
+        "title": "אישור תוך 24 שעות",
+        "desc": "הצוות שלנו בודק את הבקשה ומקים סביבה ייעודית עם המיתוג שלכם."
+      },
+      "step03": {
+        "title": "השקה עם גישה מלאה",
+        "desc": "כל התכונות פתוחות: גרף ידע, עיגון ויזואלי, בונה קורסים AI ועוד."
+      },
+      "startYourPilot": "התחילו את הפיילוט"
+    },
+    "roi": {
+      "title": "חשבו את ההחזר על ההשקעה",
+      "subtitle": "ראו כיצד EduSphere מחזיר את ההשקעה — בדרך כלל כבר ברבעון הראשון.",
+      "instructors": "מספר מרצים",
+      "hoursPerWeek": "שעות/שבוע ליצירת קורסים",
+      "hourlyCost": "עלות שעתית של מרצה",
+      "students": "מספר סטודנטים",
+      "hoursSavedYear": "שעות מרצים שנחסכות/שנה",
+      "dollarValueSaved": "ערך כספי שנחסך",
+      "annualCost": "עלות EduSphere שנתית",
+      "netRoi": "ROI נטו",
+      "getReport": "קבלו דוח ROI מותאם אישית"
     }
   }
 }

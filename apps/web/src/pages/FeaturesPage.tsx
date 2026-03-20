@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Brain, Network, Trophy, Shield, Globe, Zap, Check } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -21,6 +22,7 @@ interface HowToStep {
 interface Feature {
   id: string;
   Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+  i18nKey: string;
   title: string;
   tagline: string;
   description: string;
@@ -28,127 +30,38 @@ interface Feature {
   howItWorks: HowToStep[];
 }
 
-const FEATURES: Feature[] = [
-  {
-    id: 'ai-tutor',
-    Icon: Brain,
-    title: 'AI Tutoring (Chavruta)',
-    tagline: 'The AI that thinks with you',
-    description:
-      "EduSphere's AI tutor uses Socratic dialogue to challenge your reasoning and build deep understanding. Powered by LangGraph.js with a 4-stage learning loop: assess → quiz → explain → debate.",
-    benefits: [
-      'Adapts to your learning pace and knowledge gaps',
-      'Socratic questioning that builds critical thinking',
-      'Concepts auto-linked to your personal knowledge graph',
-      'Context preserved across topic switches',
-      'Available 24/7 with no message limits on Pro',
-    ],
-    howItWorks: [
-      { step: 1, title: 'Assessment', desc: 'AI assesses your current knowledge level' },
-      { step: 2, title: 'Quiz', desc: 'Targeted questions identify specific gaps' },
-      { step: 3, title: 'Explain', desc: 'AI explains in a way adapted to your level' },
-      { step: 4, title: 'Debate', desc: 'Socratic dialogue deepens understanding' },
-    ],
-  },
-  {
-    id: 'knowledge-graph',
-    Icon: Network,
-    title: 'Knowledge Graph',
-    tagline: 'Your personal concept map',
-    description:
-      "Powered by Apache AGE (graph database) and pgvector semantic search, EduSphere builds a visual map of everything you've learned and how concepts interconnect.",
-    benefits: [
-      'Visualize relationships between concepts',
-      'AI suggests related topics based on your graph',
-      'Identify knowledge gaps at a glance',
-      'Semantic search across all your learning',
-      'Export your knowledge graph as a learning portfolio',
-    ],
-    howItWorks: [
-      { step: 1, title: 'Learn', desc: 'Complete lessons and interact with AI tutor' },
-      { step: 2, title: 'Map', desc: 'Concepts are automatically added to your graph' },
-      { step: 3, title: 'Connect', desc: 'AI links related concepts as you learn' },
-      { step: 4, title: 'Explore', desc: 'Navigate your personal knowledge network' },
-    ],
-  },
-  {
-    id: 'gamification',
-    Icon: Trophy,
-    title: 'Gamification',
-    tagline: 'Learning that keeps you coming back',
-    description:
-      "EduSphere's 5-level mastery system, daily streaks, and OpenBadges 3.0-certified digital badges increase completion rates by 40-60% compared to traditional LMS platforms.",
-    benefits: [
-      '5-level mastery progression (Novice → Expert)',
-      'Daily streaks and XP points',
-      'OpenBadges 3.0-certified verifiable badges',
-      'Leaderboards for teams and cohorts',
-      'Push notifications for achievements and reminders',
-    ],
-    howItWorks: [
-      { step: 1, title: 'Learn', desc: 'Complete lessons to earn XP points' },
-      { step: 2, title: 'Level Up', desc: 'Progress through 5 mastery levels' },
-      { step: 3, title: 'Earn Badges', desc: 'Receive verifiable OpenBadges on milestones' },
-      { step: 4, title: 'Share', desc: 'Display badges on LinkedIn and portfolios' },
-    ],
-  },
-  {
-    id: 'enterprise',
-    Icon: Shield,
-    title: 'Enterprise Grade',
-    tagline: 'Built for scale and compliance',
-    description:
-      'Multi-tenant architecture, SSO/SAML/SCIM, GDPR compliance, WCAG 2.2 AA accessibility, SCORM 1.2/2004, xAPI, LTI 1.3, and custom white-labeling for your organization.',
-    benefits: [
-      'Multi-tenant with row-level security (RLS)',
-      'SSO via SAML 2.0, OIDC, LDAP',
-      'SCIM 2.0 user provisioning',
-      'GDPR + FERPA compliant',
-      'WCAG 2.2 AA accessibility certified',
-      'SLA: 99.9% uptime guarantee',
-    ],
-    howItWorks: [
-      { step: 1, title: 'Provision', desc: 'SSO and SCIM auto-create user accounts' },
-      { step: 2, title: 'Customize', desc: 'White-label with your branding and domain' },
-      { step: 3, title: 'Manage', desc: 'Admin dashboard for all users and courses' },
-      { step: 4, title: 'Report', desc: 'Compliance and CPD reporting built-in' },
-    ],
-  },
-  {
-    id: 'multilingual',
-    Icon: Globe,
-    title: 'Multi-Language',
-    tagline: '50+ languages with full RTL support',
-    description:
-      'EduSphere supports 50+ languages with native RTL support for Hebrew and Arabic. Automatic locale detection, localized content delivery, and per-tenant language configuration.',
-    benefits: [
-      '50+ languages supported',
-      'Full RTL support for Hebrew and Arabic',
-      'Automatic locale detection',
-      'Per-tenant language configuration',
-      'Localized email notifications',
-    ],
-    howItWorks: [],
-  },
-  {
-    id: 'live-sessions',
-    Icon: Zap,
-    title: 'Live Sessions',
-    tagline: 'Real-time collaborative learning',
-    description:
-      'Schedule and run live instructor-led sessions. Real-time attendance tracking, session recording, and NATS-powered event streaming for instant notifications.',
-    benefits: [
-      'Real-time session scheduling and notifications',
-      'Attendance tracking and reporting',
-      'Session recording for later review',
-      'Works on web and mobile',
-      'Integrated with course completion tracking',
-    ],
-    howItWorks: [],
-  },
-];
+const FEATURE_DEFS = [
+  { id: 'ai-tutor', Icon: Brain, i18nKey: 'aiTutor' },
+  { id: 'knowledge-graph', Icon: Network, i18nKey: 'knowledgeGraph' },
+  { id: 'gamification', Icon: Trophy, i18nKey: 'gamification' },
+  { id: 'enterprise', Icon: Shield, i18nKey: 'enterprise' },
+  { id: 'multilingual', Icon: Globe, i18nKey: 'multilingual' },
+  { id: 'live-sessions', Icon: Zap, i18nKey: 'liveSessions' },
+] as const;
+
+function useFeatures(): Feature[] {
+  const { t } = useTranslation('common');
+  return FEATURE_DEFS.map((def) => {
+    const steps = t(`features.${def.i18nKey}.steps`, { returnObjects: true, defaultValue: [] });
+    const benefits = t(`features.${def.i18nKey}.benefits`, { returnObjects: true, defaultValue: [] });
+    return {
+      id: def.id,
+      Icon: def.Icon,
+      i18nKey: def.i18nKey,
+      title: t(`features.${def.i18nKey}.title`),
+      tagline: t(`features.${def.i18nKey}.tagline`),
+      description: t(`features.${def.i18nKey}.description`),
+      benefits: Array.isArray(benefits) ? benefits as string[] : [],
+      howItWorks: Array.isArray(steps)
+        ? (steps as { title: string; desc: string }[]).map((s, i) => ({ step: i + 1, title: s.title, desc: s.desc }))
+        : [],
+    };
+  });
+}
 
 export function FeaturesPage() {
+  const { t } = useTranslation('common');
+  const FEATURES = useFeatures();
   const howToSchemas = FEATURES.filter((f) => f.howItWorks.length > 0).map((feature) => ({
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -191,18 +104,17 @@ export function FeaturesPage() {
         <div className="bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
-              Everything You Need to Learn Smarter
+              {t('features.pageHeading')}
             </h1>
             <p className="text-lg text-gray-500 dark:text-slate-300 max-w-2xl mx-auto mb-8">
-              EduSphere combines AI tutoring, knowledge graphs, gamification, and enterprise LMS
-              features into a single platform built for 100,000+ concurrent users.
+              {t('features.pageSubheading')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button asChild>
-                <Link to="/login">Get Started Free</Link>
+                <Link to="/login">{t('features.getStartedFree')}</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/faq">View FAQ</Link>
+                <Link to="/faq">{t('features.viewFaq')}</Link>
               </Button>
             </div>
           </div>
@@ -261,7 +173,7 @@ export function FeaturesPage() {
                 {feature.howItWorks.length > 0 && (
                   <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
                     <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-4">
-                      How it works
+                      {t('features.howItWorks')}
                     </h3>
                     <ol className="space-y-4">
                       {feature.howItWorks.map((s) => (
@@ -290,16 +202,16 @@ export function FeaturesPage() {
         {/* CTA */}
         <div className="bg-indigo-700 py-16 text-center text-white">
           <div className="max-w-2xl mx-auto px-4">
-            <h2 className="text-3xl font-extrabold mb-4">Ready to Transform Learning?</h2>
+            <h2 className="text-3xl font-extrabold mb-4">{t('features.ctaHeading')}</h2>
             <p className="text-indigo-100 mb-8">
-              Start free. Upgrade anytime. No credit card required.
+              {t('features.ctaSubtext')}
             </p>
             <Button
               size="lg"
               className="bg-white text-indigo-700 hover:bg-indigo-50"
               asChild
             >
-              <Link to="/login">Get Started Free</Link>
+              <Link to="/login">{t('features.getStartedFree')}</Link>
             </Button>
           </div>
         </div>

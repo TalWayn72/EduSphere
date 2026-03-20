@@ -2,6 +2,7 @@
  * BrandingSettingsPage.form.tsx — Form field components for BrandingSettingsPage.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface BrandingFormState {
@@ -70,15 +71,16 @@ function ColorField({
 }
 
 export function BrandingIdentityCard({ form, onChange }: Props) {
+  const { t } = useTranslation('admin');
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Organization Identity</CardTitle>
+        <CardTitle>{t('branding.organizationIdentity')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm font-medium">
-            Organization Name <span className="text-destructive">*</span>
+            {t('branding.organizationNameLabel')} <span className="text-destructive">{t('branding.organizationNameRequired')}</span>
           </label>
           <input
             type="text"
@@ -89,23 +91,23 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Tagline</label>
+          <label className="text-sm font-medium">{t('branding.taglineLabel')}</label>
           <input
             type="text"
             value={form.tagline}
             onChange={(e) => onChange('tagline', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
-            placeholder="Your learning platform tagline"
+            placeholder={t('branding.taglinePlaceholder')}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Support Email</label>
+          <label className="text-sm font-medium">{t('branding.supportEmailLabel')}</label>
           <input
             type="email"
             value={form.supportEmail}
             onChange={(e) => onChange('supportEmail', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
-            placeholder="support@example.com"
+            placeholder={t('branding.supportEmailPlaceholder')}
           />
         </div>
       </CardContent>
@@ -114,26 +116,27 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
 }
 
 export function BrandingLogosCard({ form, onChange }: Props) {
+  const { t } = useTranslation('admin');
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Logos &amp; Favicon</CardTitle>
+        <CardTitle>{t('branding.logosFavicon')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <label className="text-sm font-medium">Logo URL</label>
+          <label className="text-sm font-medium">{t('branding.logoUrlLabel')}</label>
           <div className="flex items-center gap-3">
             <input
               type="text"
               value={form.logoUrl}
               onChange={(e) => onChange('logoUrl', e.target.value)}
               className="flex-1 border rounded px-3 py-2 text-sm"
-              placeholder="https://..."
+              placeholder={t('branding.logoUrlPlaceholder')}
             />
             {form.logoUrl && (
               <img
                 src={form.logoUrl}
-                alt="Logo preview"
+                alt={t('branding.logoPreviewAlt')}
                 className="h-8 max-w-[80px] object-contain rounded border"
               />
             )}
@@ -141,25 +144,25 @@ export function BrandingLogosCard({ form, onChange }: Props) {
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium">
-            Logo Mark URL{' '}
-            <span className="text-muted-foreground text-xs">(optional)</span>
+            {t('branding.logoMarkUrlLabel')}{' '}
+            <span className="text-muted-foreground text-xs">{t('branding.logoMarkUrlOptional')}</span>
           </label>
           <input
             type="text"
             value={form.logoMarkUrl}
             onChange={(e) => onChange('logoMarkUrl', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
-            placeholder="https://... (square icon version)"
+            placeholder={t('branding.logoMarkUrlPlaceholder')}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Favicon URL</label>
+          <label className="text-sm font-medium">{t('branding.faviconUrlLabel')}</label>
           <input
             type="text"
             value={form.faviconUrl}
             onChange={(e) => onChange('faviconUrl', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
-            placeholder="https://..."
+            placeholder={t('branding.faviconUrlPlaceholder')}
           />
         </div>
       </CardContent>
@@ -168,34 +171,35 @@ export function BrandingLogosCard({ form, onChange }: Props) {
 }
 
 export function BrandingColorsCard({ form, onChange }: Props) {
+  const { t } = useTranslation('admin');
   const handleColor = (field: keyof BrandingFormState, value: string) =>
     onChange(field, value);
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Colors</CardTitle>
+        <CardTitle>{t('branding.colorsTitle')}</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-4">
         <ColorField
-          label="Primary Color"
+          label={t('branding.primaryColor')}
           field="primaryColor"
           value={form.primaryColor}
           onChange={handleColor}
         />
         <ColorField
-          label="Secondary Color"
+          label={t('branding.secondaryColor')}
           field="secondaryColor"
           value={form.secondaryColor}
           onChange={handleColor}
         />
         <ColorField
-          label="Accent Color"
+          label={t('branding.accentColor')}
           field="accentColor"
           value={form.accentColor}
           onChange={handleColor}
         />
         <ColorField
-          label="Background Color"
+          label={t('branding.backgroundColor')}
           field="backgroundColor"
           value={form.backgroundColor}
           onChange={handleColor}
@@ -206,14 +210,15 @@ export function BrandingColorsCard({ form, onChange }: Props) {
 }
 
 export function BrandingMiscCard({ form, onChange }: Props) {
+  const { t } = useTranslation('admin');
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Typography, Policies &amp; Branding</CardTitle>
+        <CardTitle>{t('branding.typographyTitle')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <label className="text-sm font-medium">Font Family</label>
+          <label className="text-sm font-medium">{t('branding.fontFamilyLabel')}</label>
           <select
             value={form.fontFamily}
             onChange={(e) => onChange('fontFamily', e.target.value)}
@@ -227,23 +232,23 @@ export function BrandingMiscCard({ form, onChange }: Props) {
           </select>
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Privacy Policy URL</label>
+          <label className="text-sm font-medium">{t('branding.privacyPolicyUrlLabel')}</label>
           <input
             type="text"
             value={form.privacyPolicyUrl}
             onChange={(e) => onChange('privacyPolicyUrl', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
-            placeholder="https://..."
+            placeholder={t('branding.privacyPolicyUrlPlaceholder')}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Terms of Service URL</label>
+          <label className="text-sm font-medium">{t('branding.termsOfServiceUrlLabel')}</label>
           <input
             type="text"
             value={form.termsOfServiceUrl}
             onChange={(e) => onChange('termsOfServiceUrl', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
-            placeholder="https://..."
+            placeholder={t('branding.termsOfServiceUrlPlaceholder')}
           />
         </div>
         <div className="flex items-center gap-3 pt-2">
@@ -260,10 +265,10 @@ export function BrandingMiscCard({ form, onChange }: Props) {
             htmlFor="hide-branding"
             className="text-sm font-medium cursor-pointer"
           >
-            Hide EduSphere Branding
+            {t('branding.hideEduSphereBranding')}
           </label>
           <span className="text-xs text-muted-foreground">
-            Remove "Powered by EduSphere" footer
+            {t('branding.hideEduSphereBrandingDesc')}
           </span>
         </div>
       </CardContent>

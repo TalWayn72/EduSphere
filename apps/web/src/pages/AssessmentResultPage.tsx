@@ -3,6 +3,7 @@
  * Route: /assessments/:id/results
  */
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -34,6 +35,7 @@ interface AssessmentResultData {
 }
 
 export function AssessmentResultPage() {
+  const { t } = useTranslation('admin');
   const { id: campaignId } = useParams<{ id: string }>();
   const [mounted, setMounted] = useState(false);
 
@@ -75,20 +77,20 @@ export function AssessmentResultPage() {
       <div className="container mx-auto p-6 space-y-6 max-w-3xl">
         <Breadcrumbs
           items={[
-            { label: 'Assessments', href: '/assessments' },
-            { label: 'Assessment', href: `/assessments/${campaignId}` },
-            { label: 'Results' },
+            { label: t('assessmentResponse.breadcrumbAssessments'), href: '/assessments' },
+            { label: t('assessmentResponse.breadcrumbAssessment'), href: `/assessments/${campaignId}` },
+            { label: t('assessmentResult.breadcrumbResults') },
           ]}
         />
         <div className="flex items-center gap-3">
           <ClipboardList className="h-8 w-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">Assessment Results</h1>
+          <h1 className="text-3xl font-bold">{t('assessmentResult.pageTitle')}</h1>
         </div>
 
         {!result ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              No results yet. The campaign may still be in progress.
+              {t('assessmentResult.noResults')}
             </CardContent>
           </Card>
         ) : (
@@ -97,12 +99,12 @@ export function AssessmentResultPage() {
             {radarCriteria.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Score Overview</CardTitle>
+                  <CardTitle className="text-base">{t('assessmentResult.scoreOverview')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <AssessmentRadarChart
                     criteria={radarCriteria}
-                    ariaLabel="Assessment results radar chart"
+                    ariaLabel={t('assessmentResult.radarAriaLabel')}
                   />
                 </CardContent>
               </Card>
@@ -112,17 +114,17 @@ export function AssessmentResultPage() {
             {result.aggregatedScores.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Detailed Scores</CardTitle>
+                  <CardTitle className="text-base">{t('assessmentResult.detailedScores')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <table className="w-full text-sm" aria-label="Assessment score breakdown">
+                  <table className="w-full text-sm" aria-label={t('assessmentResult.tableAriaLabel')}>
                     <thead>
                       <tr className="border-b text-left text-muted-foreground">
-                        <th className="p-4">Criterion</th>
-                        <th className="p-4 text-right">Self</th>
-                        <th className="p-4 text-right">Peers</th>
-                        <th className="p-4 text-right">Manager</th>
-                        <th className="p-4 text-right font-semibold text-foreground">Overall</th>
+                        <th className="p-4">{t('assessmentResult.criterionHeader')}</th>
+                        <th className="p-4 text-right">{t('assessmentResult.selfHeader')}</th>
+                        <th className="p-4 text-right">{t('assessmentResult.peersHeader')}</th>
+                        <th className="p-4 text-right">{t('assessmentResult.managerHeader')}</th>
+                        <th className="p-4 text-right font-semibold text-foreground">{t('assessmentResult.overallHeader')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -147,12 +149,12 @@ export function AssessmentResultPage() {
             {result.summary && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">AI Summary</CardTitle>
+                  <CardTitle className="text-base">{t('assessmentResult.aiSummary')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed">{result.summary}</p>
                   <p className="text-xs text-muted-foreground mt-3">
-                    Generated: {new Date(result.generatedAt).toLocaleString()}
+                    {t('assessmentResult.generated')} {new Date(result.generatedAt).toLocaleString()}
                   </p>
                 </CardContent>
               </Card>
