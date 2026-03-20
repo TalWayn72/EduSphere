@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export function EmptyState({ query }: { query: string }) {
+  const { t } = useTranslation('courses');
   return (
     <div
       className="col-span-full flex flex-col items-center justify-center py-20 gap-4 text-center"
@@ -22,12 +25,11 @@ export function EmptyState({ query }: { query: string }) {
       </div>
       <div>
         <p className="text-lg font-semibold text-foreground">
-          No courses found
+          {t('noCoursesFound')}
         </p>
         {query && (
           <p className="text-sm text-muted-foreground mt-1">
-            No results for &ldquo;{query}&rdquo;. Try a different search term or
-            remove filters.
+            {t('noResultsForQuery', { query })}
           </p>
         )}
       </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import type { SortOption, TabOption } from './types';
 
@@ -21,6 +22,7 @@ export const CourseFilters = React.memo(function CourseFilters({
   onTabChange,
   isInstructor,
 }: CourseFiltersProps) {
+  const { t } = useTranslation('courses');
   return (
     <div className="flex flex-col sm:flex-row gap-3">
       <div className="relative flex-1">
@@ -29,8 +31,8 @@ export const CourseFilters = React.memo(function CourseFilters({
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search courses..."
-          aria-label="Search courses"
+          placeholder={t('searchCourses')}
+          aria-label={t('searchCoursesLabel')}
           className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
@@ -38,7 +40,7 @@ export const CourseFilters = React.memo(function CourseFilters({
         <div
           className="flex rounded-md border overflow-hidden shrink-0"
           role="tablist"
-          aria-label="Course filter"
+          aria-label={t('courseFilter')}
         >
           <button
             role="tab"
@@ -50,7 +52,7 @@ export const CourseFilters = React.memo(function CourseFilters({
                 : 'bg-background text-muted-foreground hover:bg-muted'
             }`}
           >
-            All
+            {t('all')}
           </button>
           <button
             role="tab"
@@ -62,19 +64,19 @@ export const CourseFilters = React.memo(function CourseFilters({
                 : 'bg-background text-muted-foreground hover:bg-muted'
             }`}
           >
-            My Courses
+            {t('myCourses')}
           </button>
         </div>
       )}
       <select
         value={sort}
         onChange={(e) => onSortChange(e.target.value as SortOption)}
-        aria-label="Sort courses"
+        aria-label={t('sortBy')}
         className="px-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring shrink-0"
       >
-        <option value="newest">Newest</option>
-        <option value="title">{`A \u2192 Z`}</option>
-        <option value="duration">Duration</option>
+        <option value="newest">{t('newest')}</option>
+        <option value="title">{t('titleSort')}</option>
+        <option value="duration">{t('duration')}</option>
       </select>
     </div>
   );

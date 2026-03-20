@@ -365,10 +365,10 @@ describe('CoursesDiscoveryPage', () => {
     expect(screen.getByTestId('level-filter-group')).toBeInTheDocument();
   });
 
-  it('sort select trigger has aria-label="Sort courses"', () => {
+  it('sort select trigger has aria-label="Sort by"', () => {
     renderPage();
     const sortSelect = screen.getByTestId('sort-select');
-    expect(sortSelect).toHaveAttribute('aria-label', 'Sort courses');
+    expect(sortSelect).toHaveAttribute('aria-label', 'Sort by');
   });
 
   it('level filter "Intermediate" button has aria-pressed=true after click', () => {

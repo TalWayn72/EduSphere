@@ -2,6 +2,7 @@
  * Card form for creating a new module, with toggle button.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +14,7 @@ interface AddModuleFormProps {
 }
 
 export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
+  const { t } = useTranslation('courses');
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<NewModuleForm>({
     title: '',
@@ -35,7 +37,7 @@ export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
         onClick={() => setShowForm(true)}
       >
         <Plus className="h-4 w-4" />
-        Add Module
+        {t('addModule')}
       </Button>
     );
   }
@@ -43,9 +45,9 @@ export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
   return (
     <Card className="border-dashed">
       <CardContent className="pt-4 pb-4 space-y-3">
-        <p className="text-sm font-medium">New Module</p>
+        <p className="text-sm font-medium">{t('newModule')}</p>
         <Input
-          placeholder="Module title *"
+          placeholder={t('moduleTitlePlaceholder')}
           value={form.title}
           onChange={(e) =>
             setForm((f) => ({ ...f, title: e.target.value }))
@@ -57,7 +59,7 @@ export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
           autoFocus
         />
         <Input
-          placeholder="Description (optional)"
+          placeholder={t('moduleDescriptionPlaceholder')}
           value={form.description}
           onChange={(e) =>
             setForm((f) => ({ ...f, description: e.target.value }))
@@ -69,7 +71,7 @@ export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
             onClick={handleSubmit}
             disabled={!form.title.trim()}
           >
-            Create Module
+            {t('createModule')}
           </Button>
           <Button
             size="sm"
@@ -79,7 +81,7 @@ export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
               setForm({ title: '', description: '' });
             }}
           >
-            Cancel
+            {t('cancel')}
           </Button>
         </div>
       </CardContent>

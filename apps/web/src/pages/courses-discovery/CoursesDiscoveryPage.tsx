@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { EmptyState } from './EmptyState';
 import { ErrorBanner } from './ErrorBanner';
 
 export function CoursesDiscoveryPage() {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const {
     searchValue,
@@ -45,11 +47,12 @@ export function CoursesDiscoveryPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
-            Discover Courses
+            {t('discoverCourses')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Explore {fetching ? '...' : `${allCourses.length}`} courses across
-            all subjects
+            {fetching
+              ? t('exploreCoursesCounting')
+              : t('exploreCoursesCount', { count: allCourses.length })}
           </p>
         </div>
 
@@ -72,11 +75,11 @@ export function CoursesDiscoveryPage() {
             </svg>
             <Input
               className="pl-9"
-              placeholder="Search courses, instructors..."
+              placeholder={t('searchCoursesInstructors')}
               value={searchValue}
               onChange={handleSearchChange}
               data-testid="course-search-input"
-              aria-label="Search courses"
+              aria-label={t('searchCoursesLabel')}
             />
           </div>
 
@@ -84,7 +87,7 @@ export function CoursesDiscoveryPage() {
             className="flex items-center rounded-lg border border-border overflow-hidden"
             data-testid="view-toggle"
             role="group"
-            aria-label="View mode"
+            aria-label={t('viewMode')}
           >
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -92,7 +95,7 @@ export function CoursesDiscoveryPage() {
               className="rounded-none h-9 w-9"
               onClick={() => setViewMode('grid')}
               aria-pressed={viewMode === 'grid'}
-              aria-label="Grid view"
+              aria-label={t('gridView')}
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
@@ -102,7 +105,7 @@ export function CoursesDiscoveryPage() {
               className="rounded-none h-9 w-9"
               onClick={() => setViewMode('list')}
               aria-pressed={viewMode === 'list'}
-              aria-label="List view"
+              aria-label={t('listView')}
             >
               <List className="h-4 w-4" />
             </Button>
@@ -125,10 +128,10 @@ export function CoursesDiscoveryPage() {
         {/* Results summary */}
         <p className="text-sm text-muted-foreground mb-4">
           {fetching
-            ? 'Loading courses...'
+            ? t('loadingCourses')
             : filtered.length === 0 && !error
-              ? 'No courses match your filters'
-              : `Showing ${Math.min(visible.length, filtered.length)} of ${filtered.length} course${filtered.length !== 1 ? 's' : ''}`}
+              ? t('noCoursesMatchFilters')
+              : t('showingOfCount', { showing: Math.min(visible.length, filtered.length), total: filtered.length, plural: filtered.length !== 1 ? 's' : '' })}
         </p>
 
         {/* Courses grid / list */}
@@ -175,7 +178,7 @@ export function CoursesDiscoveryPage() {
               onClick={loadMore}
               data-testid="load-more-button"
             >
-              Load More ({filtered.length - visible.length} remaining)
+              {t('loadMore', { remaining: filtered.length - visible.length })}
             </Button>
           </div>
         )}

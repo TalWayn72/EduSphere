@@ -1,6 +1,7 @@
 /**
  * Renders a sorted list of content items within a module.
  */
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import type { ContentItemSummary } from './types';
 import { typeBadgeVariant, TYPE_EMOJI } from './utils';
@@ -10,10 +11,12 @@ interface ContentItemListProps {
 }
 
 export function ContentItemList({ items }: ContentItemListProps) {
+  const { t } = useTranslation('courses');
+
   if (items.length === 0) {
     return (
       <p className="text-xs text-muted-foreground pl-2">
-        No content items yet.
+        {t('noContentItems')}
       </p>
     );
   }

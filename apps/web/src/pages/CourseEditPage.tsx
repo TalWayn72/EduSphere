@@ -7,6 +7,7 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
 import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import { Layout } from '@/components/Layout';
@@ -54,6 +55,7 @@ interface CourseDetailResult {
 }
 
 export function CourseEditPage() {
+  const { t } = useTranslation('courses');
   const { courseId = '' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const user = getCurrentUser();
@@ -124,21 +126,21 @@ export function CourseEditPage() {
       const { error: err } = await executeUnpublish({ id: courseId });
       if (err) {
         showToast(
-          `Failed to unpublish: ${err.graphQLErrors?.[0]?.message ?? err.message}`
+          t('failedToUnpublish', { message: err.graphQLErrors?.[0]?.message ?? err.message })
         );
       } else {
         setPublished(false);
-        showToast('Course unpublished — now draft only');
+        showToast(t('unpublishedToast'));
       }
     } else {
       const { error: err } = await executePublish({ id: courseId });
       if (err) {
         showToast(
-          `Failed to publish: ${err.graphQLErrors?.[0]?.message ?? err.message}`
+          t('failedToPublish', { message: err.graphQLErrors?.[0]?.message ?? err.message })
         );
       } else {
         setPublished(true);
-        showToast('Course published successfully!');
+        showToast(t('publishedToast'));
       }
     }
   };
@@ -148,7 +150,7 @@ export function CourseEditPage() {
       <Layout>
         <div className="flex items-center gap-2 text-muted-foreground p-6">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Loading course editor…</span>
+          <span>{t('loadingEditor')}</span>
         </div>
       </Layout>
     );
@@ -158,7 +160,7 @@ export function CourseEditPage() {
     return (
       <Layout>
         <div className="p-6 text-destructive text-sm">
-          {error ? 'Failed to load course. Please try again.' : 'Course not found.'}
+          {error ? t('failedToLoadCourse') : t('courseNotFound')}
         </div>
       </Layout>
     );
@@ -180,9 +182,9 @@ export function CourseEditPage() {
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
-            { label: 'Courses', href: '/courses' },
+            { label: t('title'), href: '/courses' },
             { label: course.title, href: `/courses/${courseId}` },
-            { label: 'Edit' },
+            { label: t('edit') },
           ]}
         />
 
@@ -196,13 +198,13 @@ export function CourseEditPage() {
               onClick={() => navigate(`/courses/${courseId}`)}
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t('back')}
             </Button>
             <h1 className="text-xl font-semibold truncate">{course.title}</h1>
             <span
               className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${isCurrentlyPublished ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}`}
             >
-              {isCurrentlyPublished ? 'Published' : 'Draft'}
+              {isCurrentlyPublished ? t('published') : t('draft')}
             </span>
           </div>
           <Button
@@ -219,16 +221,16 @@ export function CourseEditPage() {
             ) : (
               <Globe className="h-3.5 w-3.5" />
             )}
-            {isCurrentlyPublished ? 'Unpublish' : 'Publish'}
+            {isCurrentlyPublished ? t('unpublishCourse') : t('publishCourse')}
           </Button>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="info">
           <TabsList>
-            <TabsTrigger value="info">Basic Info</TabsTrigger>
-            <TabsTrigger value="modules">Modules &amp; Content</TabsTrigger>
-            <TabsTrigger value="sources">מקורות מידע</TabsTrigger>
+            <TabsTrigger value="info">{t('basicInfo')}</TabsTrigger>
+            <TabsTrigger value="modules">{t('modulesAndContent')}</TabsTrigger>
+            <TabsTrigger value="sources">{t('knowledgeSources')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="info" className="mt-4">

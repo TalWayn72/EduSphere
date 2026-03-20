@@ -127,7 +127,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                 {course.estimatedHours != null && (
                   <span className="flex items-center gap-1.5">
                     <Clock className="h-4 w-4" />
-                    {course.estimatedHours}h estimated
+                    {t('hoursEstimated', { hours: course.estimatedHours })}
                   </span>
                 )}
                 <span className="flex items-center gap-1.5">
@@ -160,7 +160,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                   }}
                 >
                   <Pencil className="h-3.5 w-3.5" />
-                  Edit Course
+                  {t('editCourse')}
                 </Button>
               )}
               {canEdit && editMode && (
@@ -171,7 +171,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                     onClick={() => onEditModeChange(false)}
                     data-testid="cancel-edit-btn"
                   >
-                    ביטול
+                    {t('cancelEdit')}
                   </Button>
                   <Button
                     size="sm"
@@ -183,7 +183,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                     {isSavingTitle && (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     )}
-                    שמור שינויים
+                    {t('saveTitle')}
                   </Button>
                 </>
               )}

@@ -2,6 +2,7 @@
  * A single module card with reorder, rename, delete, and content items.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,6 +43,7 @@ export function ModuleCard({
   onSaveTitle,
   onAddContentItem,
 }: ModuleCardProps) {
+  const { t } = useTranslation('courses');
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingTitle, setEditingTitle] = useState('');
@@ -126,7 +128,7 @@ export function ModuleCard({
                 />
                 {mod.title}
                 <Badge variant="outline" className="ml-1 text-xs font-normal">
-                  {mod.contentItems.length} items
+                  {mod.contentItems.length} {t('items')}
                 </Badge>
               </span>
             </CardTitle>
@@ -183,7 +185,7 @@ export function ModuleCard({
               onClick={() => setIsAddingItem(true)}
             >
               <Plus className="h-3 w-3" />
-              Add Content Item
+              {t('addContentItem')}
             </Button>
           )}
         </CardContent>

@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export function ErrorBanner() {
+  const { t } = useTranslation('courses');
   return (
     <div
       className="col-span-full flex flex-col items-center justify-center py-20 gap-4 text-center"
@@ -6,7 +9,7 @@ export function ErrorBanner() {
       role="alert"
     >
       <p className="text-lg font-semibold text-destructive">
-        Unable to load courses. Please try again.
+        {t('unableToLoadCourses')}
       </p>
     </div>
   );

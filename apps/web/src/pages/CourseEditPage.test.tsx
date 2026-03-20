@@ -154,13 +154,13 @@ describe('CourseEditPage', () => {
     expect(screen.getByText('Published')).toBeInTheDocument();
   });
 
-  it('renders "Basic Info", "Modules & Content", and "מקורות מידע" tabs', () => {
+  it('renders "Basic Info", "Modules & Content", and "Knowledge Sources" tabs', () => {
     render(<CourseEditPage />);
     expect(
       screen.getByRole('tab', { name: /basic info/i })
     ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /modules/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /מקורות מידע/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /knowledge sources/i })).toBeInTheDocument();
   });
 
   it('shows "Publish" button for a draft course', () => {
@@ -170,13 +170,13 @@ describe('CourseEditPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows "Unpublish" button for a published course', () => {
+  it('shows "Unpublish Course" button for a published course', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { course: { ...MOCK_COURSE, isPublished: true } } })
     );
     render(<CourseEditPage />);
     expect(
-      screen.getByRole('button', { name: /^unpublish$/i })
+      screen.getByRole('button', { name: /unpublish course/i })
     ).toBeInTheDocument();
   });
 
@@ -186,9 +186,9 @@ describe('CourseEditPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
   });
 
-  it('renders a Sources tab ("מקורות מידע") for knowledge source management', () => {
+  it('renders a Sources tab ("Knowledge Sources") for knowledge source management', () => {
     render(<CourseEditPage />);
-    const sourcesTab = screen.getByRole('tab', { name: /מקורות מידע/i });
+    const sourcesTab = screen.getByRole('tab', { name: /knowledge sources/i });
     expect(sourcesTab).toBeInTheDocument();
     // The associated panel should exist in the DOM
     const sourcesPanel = document.querySelector('[role="tabpanel"][id$="-content-sources"]');

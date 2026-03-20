@@ -3,6 +3,7 @@
  * Allows editing title, description, thumbnail (emoji/URL), and estimated hours.
  */
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from 'urql';
@@ -49,6 +50,7 @@ export function CourseEditMetadata({
   initialValues,
   onSaved,
 }: Props) {
+  const { t } = useTranslation('courses');
   const [{ fetching }, executeUpdate] = useMutation<UpdateCourseResult>(
     UPDATE_COURSE_MUTATION
   );
@@ -79,11 +81,9 @@ export function CourseEditMetadata({
 
     const { error } = await executeUpdate({ id: courseId, input });
     if (error) {
-      onSaved(
-        'Save failed. Please try again.'
-      );
+      onSaved(t('saveFailed'));
     } else {
-      onSaved('Course info saved!');
+      onSaved(t('courseInfoSaved'));
     }
   };
 
@@ -93,11 +93,11 @@ export function CourseEditMetadata({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Title */}
           <div className="space-y-1.5">
-            <Label htmlFor="edit-title">Course Title *</Label>
+            <Label htmlFor="edit-title">{t('courseTitleRequired')}</Label>
             <Input
               id="edit-title"
               {...register('title')}
-              placeholder="Enter course title"
+              placeholder={t('enterCourseTitle')}
             />
             {errors.title && (
               <p className="text-xs text-destructive">{errors.title.message}</p>
@@ -106,18 +106,18 @@ export function CourseEditMetadata({
 
           {/* Description */}
           <div className="space-y-1.5">
-            <Label htmlFor="edit-description">Description</Label>
+            <Label htmlFor="edit-description">{t('description')}</Label>
             <Textarea
               id="edit-description"
               {...register('description')}
-              placeholder="Describe what students will learn"
+              placeholder={t('describeWhatStudentsLearn')}
               rows={4}
             />
           </div>
 
           {/* Thumbnail */}
           <div className="space-y-1.5">
-            <Label htmlFor="edit-thumbnail">Thumbnail (emoji or URL)</Label>
+            <Label htmlFor="edit-thumbnail">{t('thumbnailEmojiOrUrl')}</Label>
             <Input
               id="edit-thumbnail"
               {...register('thumbnailUrl')}
@@ -127,7 +127,7 @@ export function CourseEditMetadata({
 
           {/* Estimated hours */}
           <div className="space-y-1.5">
-            <Label htmlFor="edit-hours">Estimated Hours</Label>
+            <Label htmlFor="edit-hours">{t('estimatedHours')}</Label>
             <Input
               id="edit-hours"
               type="number"
@@ -148,7 +148,7 @@ export function CourseEditMetadata({
             ) : (
               <Save className="h-4 w-4" />
             )}
-            Save Changes
+            {t('saveChanges')}
           </Button>
         </form>
       </CardContent>

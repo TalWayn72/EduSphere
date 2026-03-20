@@ -255,7 +255,7 @@ describe('CourseDetailPage', () => {
   it('shows lessons section for student (not gated by canEdit)', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
     render(<CourseDetailPage />);
-    expect(screen.getByText('🎓 שיעורים')).toBeInTheDocument();
+    expect(screen.getByText(/Lessons/i)).toBeInTheDocument();
   });
 
   it('shows lesson titles for student', () => {
@@ -265,19 +265,19 @@ describe('CourseDetailPage', () => {
     expect(screen.getByText('שיעור מתקדם')).toBeInTheDocument();
   });
 
-  it('hides "+ הוסף שיעור" button from student', () => {
+  it('hides "+ Add Lesson" button from student', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
     render(<CourseDetailPage />);
     expect(
-      screen.queryByRole('button', { name: /הוסף שיעור/i })
+      screen.queryByRole('button', { name: /Add Lesson/i })
     ).not.toBeInTheDocument();
   });
 
-  it('shows "+ הוסף שיעור" button to instructor', () => {
+  it('shows "+ Add Lesson" button to instructor', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
     render(<CourseDetailPage />);
     expect(
-      screen.getByRole('button', { name: /הוסף שיעור/i })
+      screen.getByRole('button', { name: /Add Lesson/i })
     ).toBeInTheDocument();
   });
 
@@ -301,7 +301,7 @@ describe('CourseDetailPage', () => {
     );
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
     render(<CourseDetailPage />);
-    expect(screen.getByText(/אין שיעורים זמינים/i)).toBeInTheDocument();
+    expect(screen.getByText(/No lessons available yet/i)).toBeInTheDocument();
   });
 
   describe('Inline title editing', () => {
@@ -322,14 +322,14 @@ describe('CourseDetailPage', () => {
       expect((screen.getByTestId('course-title-input') as HTMLInputElement).value).toBe('Test Course');
     });
 
-    it('shows "שמור שינויים" button in edit mode (not "Edit Course")', async () => {
+    it('shows "Save Changes" button in edit mode (not "Edit Course")', async () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
       render(<CourseDetailPage />);
       await act(async () => {
         fireEvent.click(screen.getByTestId('edit-course-btn'));
       });
       expect(screen.getByTestId('save-course-btn')).toBeInTheDocument();
-      expect(screen.getByText('שמור שינויים')).toBeInTheDocument();
+      expect(screen.getByText('Save Changes')).toBeInTheDocument();
     });
 
     it('"Edit Course" button hidden in edit mode (regression guard)', async () => {

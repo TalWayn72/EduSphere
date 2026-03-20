@@ -2,6 +2,7 @@
  * CourseSourcesPanel — collapsible knowledge sources panel.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookMarked } from 'lucide-react';
 import { SourceManager } from '@/components/SourceManager';
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function CourseSourcesPanel({ courseId }: Props) {
+  const { t } = useTranslation('courses');
   const [showSources, setShowSources] = useState(false);
 
   return (
@@ -22,10 +24,10 @@ export function CourseSourcesPanel({ courseId }: Props) {
       >
         <span className="flex items-center gap-2">
           <BookMarked className="h-4 w-4 text-blue-600" />
-          מקורות מידע
+          {t('knowledgeSources')}
         </span>
         <span className="text-muted-foreground">
-          {showSources ? '▲' : '▼'}
+          {showSources ? '\u25B2' : '\u25BC'}
         </span>
       </button>
       {showSources && (

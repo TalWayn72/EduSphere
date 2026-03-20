@@ -2,6 +2,7 @@
  * Inline form for adding a content item to a module.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,6 +26,7 @@ export function AddContentItemForm({
   onSubmit,
   onCancel,
 }: AddContentItemFormProps) {
+  const { t } = useTranslation('courses');
   const [form, setForm] = useState<NewItemForm>({
     title: '',
     contentType: 'MARKDOWN',
@@ -41,9 +43,9 @@ export function AddContentItemForm({
 
   return (
     <div className="border rounded-lg p-3 space-y-3 bg-muted/30">
-      <p className="text-xs font-medium">Add Content Item</p>
+      <p className="text-xs font-medium">{t('addContentItem')}</p>
       <Input
-        placeholder="Title *"
+        placeholder={t('contentItemTitle')}
         value={form.title}
         onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
         className="h-8 text-sm"
@@ -58,15 +60,15 @@ export function AddContentItemForm({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {CONTENT_TYPES.map((t) => (
-            <SelectItem key={t} value={t}>
-              {TYPE_EMOJI[t]} {t}
+          {CONTENT_TYPES.map((ct) => (
+            <SelectItem key={ct} value={ct}>
+              {TYPE_EMOJI[ct]} {ct}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       <Input
-        placeholder="Body text / URL (optional)"
+        placeholder={t('contentItemBodyPlaceholder')}
         value={form.body}
         onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
         className="h-8 text-sm"
@@ -77,10 +79,10 @@ export function AddContentItemForm({
           onClick={handleSubmit}
           disabled={!form.title.trim()}
         >
-          Add
+          {t('add')}
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>
-          Cancel
+          {t('cancel')}
         </Button>
       </div>
     </div>

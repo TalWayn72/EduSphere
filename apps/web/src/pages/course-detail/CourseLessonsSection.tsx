@@ -2,6 +2,7 @@
  * CourseLessonsSection — list of lessons for a course with status badges.
  */
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import type { LessonSummary } from './types';
 
@@ -25,13 +26,14 @@ function statusClasses(status: string): string {
 }
 
 export function CourseLessonsSection({ courseId, lessons, canEdit }: Props) {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
   return (
     <div className="border rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 bg-card border-b">
         <span className="text-sm font-medium flex items-center gap-2">
-          🎓 שיעורים
+          🎓 {t('lessons')}
         </span>
         {canEdit && (
           <Button
@@ -39,7 +41,7 @@ export function CourseLessonsSection({ courseId, lessons, canEdit }: Props) {
             variant="outline"
             onClick={() => navigate(`/courses/${courseId}/lessons/new`)}
           >
-            + הוסף שיעור
+            + {t('addLesson')}
           </Button>
         )}
       </div>
@@ -65,8 +67,8 @@ export function CourseLessonsSection({ courseId, lessons, canEdit }: Props) {
       ) : (
         <div className="px-4 py-6 text-center text-sm text-muted-foreground">
           {canEdit
-            ? 'אין שיעורים עדיין — לחץ "+ הוסף שיעור" כדי להתחיל'
-            : 'אין שיעורים זמינים עדיין'}
+            ? t('noLessonsYetInstructor')
+            : t('noLessonsYetStudent')}
         </div>
       )}
     </div>

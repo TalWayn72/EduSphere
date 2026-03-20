@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Select,
   SelectContent,
@@ -36,11 +37,12 @@ export function DiscoveryFilters({
   onSortChange,
   onResetPagination,
 }: DiscoveryFiltersProps) {
+  const { t } = useTranslation('courses');
   return (
     <div
       className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide"
       data-testid="filter-bar"
-      aria-label="Course filters"
+      aria-label={t('courseFilter')}
     >
       {/* Category pills */}
       <div className="flex gap-1.5 shrink-0">
@@ -119,7 +121,7 @@ export function DiscoveryFilters({
           htmlFor="sort-select"
           className="text-xs text-muted-foreground whitespace-nowrap"
         >
-          Sort by
+          {t('sortBy')}
         </label>
         <Select
           value={selectedSort}
@@ -128,7 +130,7 @@ export function DiscoveryFilters({
           <SelectTrigger
             id="sort-select"
             className="h-7 text-xs min-w-[130px]"
-            aria-label="Sort courses"
+            aria-label={t('sortBy')}
             data-testid="sort-select"
           >
             <SelectValue />
