@@ -1,6 +1,8 @@
 /**
- * GdprAnonymizeDialog — WCAG-compliant alertdialog for irreversible GDPR anonymization.
- * Uses role="alertdialog" with typed confirmation to prevent accidental data erasure.
+ * GdprAnonymizeDialog — WCAG-compliant dialog for irreversible GDPR anonymization.
+ * Uses typed confirmation to prevent accidental data erasure.
+ * Accessibility: relies on Radix DialogTitle + DialogDescription for screen readers.
+ * BUG-099: Removed manual role/aria-modal/aria-labelledby that conflicted with Radix Dialog.
  */
 import React, { useState, useRef, useEffect } from 'react';
 import {
@@ -54,17 +56,13 @@ export function GdprAnonymizeDialog({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="gdpr-anonymize-title"
-        aria-describedby="gdpr-anonymize-desc"
         data-testid="gdpr-anonymize-dialog"
       >
         <DialogHeader>
-          <DialogTitle id="gdpr-anonymize-title">
+          <DialogTitle>
             Permanently Anonymize User Data
           </DialogTitle>
-          <DialogDescription id="gdpr-anonymize-desc">
+          <DialogDescription>
             This action is <strong>irreversible</strong>. All personal data
             {userName ? ` for ${userName}` : ''} will be permanently anonymized
             in compliance with GDPR Article 17 (Right to Erasure). This cannot

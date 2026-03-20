@@ -1,6 +1,7 @@
 /**
- * DeleteCourseDialog — WCAG-compliant alertdialog for irreversible course deletion.
- * Uses role="alertdialog" with typed confirmation (course title) to prevent accidents.
+ * DeleteCourseDialog — WCAG-compliant dialog for irreversible course deletion.
+ * Uses typed confirmation (course title) to prevent accidents.
+ * Accessibility: relies on Radix DialogTitle + DialogDescription for screen readers.
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -74,17 +75,13 @@ export function DeleteCourseDialog({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="delete-course-title"
-        aria-describedby="delete-course-desc"
         data-testid="delete-course-dialog"
       >
         <DialogHeader>
-          <DialogTitle id="delete-course-title">
+          <DialogTitle>
             {t('deleteCourseDialogTitle')}
           </DialogTitle>
-          <DialogDescription id="delete-course-desc">
+          <DialogDescription>
             {t('deleteCourseDialogDescription', { title: courseTitle })}
           </DialogDescription>
         </DialogHeader>

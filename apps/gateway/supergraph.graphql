@@ -249,6 +249,8 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   myEnrollments: [UserCourse!]! @join__field(graph: CONTENT)  @authenticated
   myCourseProgress(courseId: ID!) : CourseProgress! @join__field(graph: CONTENT)  @authenticated
   adminCourseEnrollments(courseId: ID!) : [AdminEnrollmentRecord!]! @join__field(graph: CONTENT)  @authenticated
+  courseReadiness(courseId: ID!) : CourseReadiness! @join__field(graph: CONTENT)  @authenticated
+  courseEnrollmentCount(courseId: ID!) : Int! @join__field(graph: CONTENT)  @authenticated
   myCpdReport(startDate: String, endDate: String) : CpdReport! @join__field(graph: CONTENT)  @authenticated
   cpdCreditTypes: [CpdCreditType!]! @join__field(graph: CONTENT)  @authenticated
   getDocumentVersions(mediaAssetId: ID!) : [DocumentVersion!]! @join__field(graph: CONTENT)  @authenticated
@@ -1368,6 +1370,17 @@ type AdminEnrollmentRecord @join__type(graph: CONTENT)  {
   status: String!
   enrolledAt: String!
   completedAt: String
+}
+
+type CourseReadinessCheck @join__type(graph: CONTENT)  {
+  name: String!
+  passed: Boolean!
+  message: String
+}
+
+type CourseReadiness @join__type(graph: CONTENT)  {
+  ready: Boolean!
+  checks: [CourseReadinessCheck!]!
 }
 
 type CpdCreditType @join__type(graph: CONTENT)  {

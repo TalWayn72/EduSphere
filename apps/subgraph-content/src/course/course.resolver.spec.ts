@@ -9,6 +9,7 @@ const mockCourseService = {
   update: vi.fn(),
   setPublished: vi.fn(),
   delete: vi.fn(),
+  getEnrollmentCount: vi.fn(),
 };
 
 const mockEnrollmentService = {
@@ -19,8 +20,20 @@ const mockEnrollmentService = {
   markContentViewed: vi.fn(),
 };
 
-const mockModuleService = {
-  findByCourse: vi.fn(),
+const mockAdminEnrollmentService = {
+  getEnrollments: vi.fn(),
+  enrollUser: vi.fn(),
+  unenrollUser: vi.fn(),
+  bulkEnroll: vi.fn(),
+};
+
+const mockComplianceLibraryService = {
+  getComplianceCourses: vi.fn(),
+  cloneComplianceCourse: vi.fn(),
+};
+
+const mockModuleLoader = {
+  byCourseId: { load: vi.fn() },
 };
 
 const MOCK_COURSE = {
@@ -65,7 +78,9 @@ describe('CourseResolver', () => {
     resolver = new CourseResolver(
       mockCourseService as any,
       mockEnrollmentService as any,
-      mockModuleService as any
+      mockAdminEnrollmentService as any,
+      mockComplianceLibraryService as any,
+      mockModuleLoader as any
     );
     /* eslint-enable @typescript-eslint/no-explicit-any */
   });
@@ -176,16 +191,34 @@ describe('CourseResolver', () => {
   });
 
   describe('deleteCourse()', () => {
-    it('calls service.delete and returns true', async () => {
+    it('calls service.delete with id and tenantCtx and returns true', async () => {
       mockCourseService.delete.mockResolvedValue(true);
       const result = await resolver.deleteCourse('course-1', AUTH_CTX);
-      expect(mockCourseService.delete).toHaveBeenCalledWith('course-1');
+      expect(mockCourseService.delete).toHaveBeenCalledWith(
+        'course-1',
+        expect.objectContaining({ userId: 'user-1', tenantId: 'tenant-1', userRole: 'STUDENT' })
+      );
       expect(result).toBe(true);
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
       await expect(
         resolver.deleteCourse('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('courseEnrollmentCount()', () => {
+    it('delegates to service.getEnrollmentCount', async () => {
+      mockCourseService.getEnrollmentCount.mockResolvedValue(5);
+      const result = await resolver.courseEnrollmentCount('course-1', AUTH_CTX);
+      expect(mockCourseService.getEnrollmentCount).toHaveBeenCalledWith('course-1');
+      expect(result).toBe(5);
+    });
+
+    it('throws UnauthorizedException when unauthenticated', async () => {
+      await expect(
+        resolver.courseEnrollmentCount('course-1', NO_AUTH_CTX)
       ).rejects.toThrow(UnauthorizedException);
     });
   });

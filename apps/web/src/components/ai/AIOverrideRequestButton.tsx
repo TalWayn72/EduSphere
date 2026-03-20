@@ -71,15 +71,12 @@ export function AIOverrideRequestButton({
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent
-          aria-labelledby="human-review-title"
-          aria-describedby="human-review-description"
-        >
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle id="human-review-title">
+            <DialogTitle>
               Request Human Review
             </DialogTitle>
-            <DialogDescription id="human-review-description">
+            <DialogDescription>
               You have the right to request a human review of any AI-generated
               assessment or recommendation. A qualified educator will review
               your case and respond within 2 business days.
@@ -110,7 +107,6 @@ export function AIOverrideRequestButton({
                 onChange={(e) => setReason(e.target.value)}
                 rows={4}
                 maxLength={1000}
-                aria-describedby="human-review-description"
               />
             </div>
           )}

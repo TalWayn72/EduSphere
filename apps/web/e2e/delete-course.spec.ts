@@ -1,5 +1,5 @@
 /**
- * Delete Course E2E Tests
+ * Delete Course E2E Tests — BUG-101 regression guard
  *
  * Tests the complete delete course flow:
  * - Instructor sees delete button on their course edit page
@@ -10,12 +10,20 @@
  * - Deleted course no longer appears in course list
  * - Visual regression for confirmation dialog
  *
+ * BUG-101 specific checks:
+ * - No console.error about missing DialogTitle (Radix a11y)
+ * - Screenshots saved to docs/screenshots/bug101-*.png
+ *
  * All tests use GraphQL route interception (no live backend required).
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type ConsoleMessage } from '@playwright/test';
 import { loginInDevMode } from './auth.helpers';
 import { routeGraphQL } from './graphql-mock.helpers';
+import fs from 'fs';
+import path from 'path';
+
+const SCREENSHOTS_DIR = path.resolve(process.cwd(), '../../docs/screenshots');
 
 const COURSE_ID = '00000000-0000-0000-0000-delete000001';
 
@@ -52,6 +60,12 @@ const MOCK_COURSES_LIST = [
     slug: 'advanced-python',
   },
 ];
+
+test.beforeAll(() => {
+  if (!fs.existsSync(SCREENSHOTS_DIR)) {
+    fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
+  }
+});
 
 async function loginAndNavigate(page: Page, path: string) {
   await loginInDevMode(page);
@@ -308,6 +322,108 @@ test.describe('delete-course — Delete Course Flow', () => {
 
     await expect(page).toHaveScreenshot('delete-course-confirmation-dialog.png', {
       maxDiffPixelRatio: 0.05,
+    });
+  });
+});
+
+// ─── Test Suite: BUG-101 — DialogTitle accessibility (no console errors) ────
+
+test.describe('delete-course — BUG-101: Dialog accessibility', () => {
+
+  test('DeleteCourseDialog does not produce console errors about DialogTitle', async ({ page }) => {
+    const consoleErrors: ConsoleMessage[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg);
+      }
+    });
+
+    await setupEditPageMocks(page);
+    await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
+
+    const deleteBtn = page.getByRole('button', { name: /delete/i }).first();
+    await deleteBtn.waitFor({ timeout: 10_000 });
+    await deleteBtn.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+
+    // Wait a beat for any async console errors to flush
+    await page.waitForTimeout(500);
+
+    // BUG-101 regression guard: no console errors about missing DialogTitle
+    const dialogTitleErrors = consoleErrors.filter(
+      (e) => e.text().includes('DialogTitle') || e.text().includes('DialogDescription')
+    );
+    expect(dialogTitleErrors).toHaveLength(0);
+  });
+
+  test('BUG-101: screenshot — dialog open state', async ({ page }) => {
+    await setupEditPageMocks(page);
+    await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
+
+    const deleteBtn = page.getByRole('button', { name: /delete/i }).first();
+    await deleteBtn.waitFor({ timeout: 10_000 });
+    await deleteBtn.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+
+    await page.screenshot({
+      path: `${SCREENSHOTS_DIR}/bug101-dialog-open.png`,
+      fullPage: false,
+    });
+  });
+
+  test('BUG-101: screenshot — course name typed state', async ({ page }) => {
+    await setupEditPageMocks(page);
+    await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
+
+    const deleteBtn = page.getByRole('button', { name: /delete/i }).first();
+    await deleteBtn.waitFor({ timeout: 10_000 });
+    await deleteBtn.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+
+    // Fill in the confirmation input with the course title
+    const confirmInput = dialog.locator('input').first();
+    await confirmInput.fill(MOCK_COURSE.title);
+
+    // Confirm button should now be enabled
+    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    await expect(confirmBtn).toBeEnabled({ timeout: 3_000 });
+
+    await page.screenshot({
+      path: `${SCREENSHOTS_DIR}/bug101-course-name-typed.png`,
+      fullPage: false,
+    });
+  });
+
+  test('BUG-101: screenshot — after delete click state', async ({ page }) => {
+    await setupEditPageMocks(page);
+    await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
+
+    const deleteBtn = page.getByRole('button', { name: /delete/i }).first();
+    await deleteBtn.waitFor({ timeout: 10_000 });
+    await deleteBtn.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+
+    const confirmInput = dialog.locator('input').first();
+    await confirmInput.fill(MOCK_COURSE.title);
+
+    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    await expect(confirmBtn).toBeEnabled({ timeout: 3_000 });
+    await confirmBtn.click();
+
+    // Wait for the redirect or error state
+    await page.waitForLoadState('domcontentloaded');
+
+    await page.screenshot({
+      path: `${SCREENSHOTS_DIR}/bug101-after-delete-click.png`,
+      fullPage: false,
     });
   });
 });

@@ -29,10 +29,10 @@ export function ShareBadgeDialog({ open, onOpenChange, badge }: ShareBadgeDialog
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby="share-badge-desc">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Share Badge</DialogTitle>
-          <DialogDescription id="share-badge-desc">
+          <DialogDescription>
             Share your achievement with your network
           </DialogDescription>
         </DialogHeader>
