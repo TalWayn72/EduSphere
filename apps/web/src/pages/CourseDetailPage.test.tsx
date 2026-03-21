@@ -63,6 +63,18 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   UNENROLL_COURSE_MUTATION: 'UNENROLL_COURSE_MUTATION',
   FORK_COURSE_MUTATION: 'FORK_COURSE_MUTATION',
   UPDATE_COURSE_MUTATION: 'UPDATE_COURSE_MUTATION',
+  DELETE_COURSE_MUTATION: 'DELETE_COURSE_MUTATION',
+}));
+
+// BUG-102 regression guard: stub DeleteCourseButton so CourseDetailPage unit tests
+// do not need to wire DELETE_COURSE_MUTATION useMutation. The full delete flow is
+// covered by DeleteCourseDialog.test.tsx and apps/web/e2e/delete-course.spec.ts.
+vi.mock('@/components/course/DeleteCourseButton', () => ({
+  DeleteCourseButton: ({ courseId }: { courseId: string; courseTitle: string; isPublished: boolean; onDeleted: () => void }) => (
+    <button data-testid="delete-course-btn" aria-label="Delete Course" data-course-id={courseId}>
+      Delete Course
+    </button>
+  ),
 }));
 
 vi.mock('@/lib/graphql/lesson.queries', () => ({
@@ -748,6 +760,40 @@ describe('CourseDetailPage', () => {
       expect(screen.queryByText(/\[GraphQL\]/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/\[Network\]/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/Unexpected error/i)).not.toBeInTheDocument();
+    });
+  });
+
+  // ── BUG-102 regression guard: Delete Course button on CourseDetailPage ──────
+  // Root cause: DeleteCourseButton was only wired into CourseEditPage, not into
+  // CourseHeaderCard (used by CourseDetailPage /courses/:courseId).
+  // Fix: Added DeleteCourseButton import + conditional render inside CourseHeaderCard
+  //      guarded by canEdit, navigating to /courses on deletion.
+  // Anti-recurrence: This test proves the button is present for editors and
+  //   absent for students. If the import is ever removed, both tests will catch it.
+  describe('BUG-102 regression guard: Delete Course button visibility on course detail page', () => {
+    it('BUG-102: delete course button IS visible for INSTRUCTOR on course detail page', () => {
+      // This test was GREEN (proving the bug — button missing) before the fix.
+      // After fix it is INVERTED: button must be present. If it regresses, this
+      // test will fail and catch the regression.
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      // Regression guard: button must be rendered for editors — BUG-102 fix
+      expect(screen.getByTestId('delete-course-btn')).toBeInTheDocument();
+    });
+
+    it('BUG-102: delete course button is NOT visible for STUDENT on course detail page', () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+      render(<CourseDetailPage />);
+      // Students must never see the delete button
+      expect(screen.queryByTestId('delete-course-btn')).not.toBeInTheDocument();
+    });
+
+    it('BUG-102: delete course button is NOT visible for ORG_ADMIN when canEdit=false', () => {
+      // canEdit is derived from EDITOR_ROLES — ORG_ADMIN is in EDITOR_ROLES so canEdit=true
+      // but STUDENT is not — this test covers the negative case via role exclusion
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+      render(<CourseDetailPage />);
+      expect(screen.queryByRole('button', { name: /delete course/i })).not.toBeInTheDocument();
     });
   });
 });

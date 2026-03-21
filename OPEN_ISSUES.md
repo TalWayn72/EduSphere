@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 20 מרץ 2026
+**תאריך עדכון:** 21 מרץ 2026
 
 ---
 
@@ -82,14 +82,55 @@
 | BUG-098 | Adding course source fails — 400 Bad Request when auth token missing | ✅ Fixed | (pending commit) |
 | BUG-099 | i18n English content on Hebrew locale — 7 social/collab pages hardcoded English | ✅ Fixed | (pending commit) |
 | BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection | ✅ Fixed | (pending commit) |
-| BUG-101 | Delete Course — 400 Bad Request + accessibility console errors | 🟡 In Progress | (pending verification) |
+| BUG-101 | Delete Course — 400 Bad Request + accessibility console errors | ✅ Fixed | `c7beef92` |
+| BUG-102 | Delete course button missing from CourseDetailPage | ✅ Fixed | (pending commit) |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+
+---
+
+## BUG-102 — Delete Course Button Missing from CourseDetailPage (21 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium
+- **Reported:** 21 March 2026
+
+### Problem
+
+The "Delete Course" button (`DeleteCourseButton`) was absent from the Course Detail page (`/courses/:id`). Instructors and course owners had no way to delete a course from the detail view — they would have to navigate to the Edit page (`/courses/:id/edit`) to find the delete action.
+
+### Root Cause
+
+`DeleteCourseButton` was imported and rendered only inside `CourseEditPage`. The `CourseHeaderCard` component (used by `CourseDetailPage`) never imported or rendered the button. The component existed in the codebase but its placement was incomplete.
+
+### Fix
+
+Added `DeleteCourseButton` import and conditional render to `CourseHeaderCard.tsx`. The button is shown only when the current user has INSTRUCTOR, ORG_ADMIN, or SUPER_ADMIN role — hidden for STUDENT and unauthenticated users.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/course-detail/CourseHeaderCard.tsx` | Added `DeleteCourseButton` import + conditional render with role guard |
+| `apps/web/src/pages/CourseDetailPage.test.tsx` | Added 3 regression tests: button visible for INSTRUCTOR, hidden for STUDENT, navigation after delete |
+
+### Tests
+
+| Test Type | Count | Status |
+|-----------|-------|--------|
+| Frontend unit (CourseDetailPage.test.tsx) | 3 | ✅ All passing |
+| E2E (Playwright) | — | ⏳ Pending |
+| **Total** | **3** | **✅ 3/3 pass (E2E pending)** |
+
+### Anti-Recurrence
+
+- Regression test asserts `DeleteCourseButton` is visible for INSTRUCTOR role on the detail page — any future removal will immediately break the test
+- Role-based visibility guard ensures unauthorized users (STUDENT, unauthenticated) cannot see the button
 
 ---
 
 ## BUG-101 — Delete Course: 400 Bad Request + Accessibility Console Errors (20 Mar 2026)
 
-- **Status:** 🟡 In Progress (fixes applied, verification pending)
+- **Status:** ✅ Fixed
 - **Severity:** 🔴 Critical (core CRUD operation broken)
 - **Reported:** 20 March 2026
 

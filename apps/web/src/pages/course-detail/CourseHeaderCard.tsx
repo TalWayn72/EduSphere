@@ -3,6 +3,7 @@
  */
 import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import {
 import type { CourseDetailData } from './types';
 import { EDITOR_ROLES } from './types';
 import { CoursePublishSheet } from '@/components/course/CoursePublishSheet';
+import { DeleteCourseButton } from '@/components/course/DeleteCourseButton';
 import { useAuthRole } from '@/hooks/useAuthRole';
 
 interface Props {
@@ -61,6 +63,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
   onDismissForkError,
 }: Props) {
   const { t } = useTranslation('courses');
+  const navigate = useNavigate();
   const role = useAuthRole();
   const [publishOpen, setPublishOpen] = useState(false);
   const canPublish = canEdit && !course.isPublished && EDITOR_ROLES.has(role ?? '');
@@ -214,6 +217,14 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                   <Send className="h-3.5 w-3.5" />
                   {t('publishCourse', 'פרסם קורס')}
                 </Button>
+              )}
+              {canEdit && (
+                <DeleteCourseButton
+                  courseId={courseId}
+                  courseTitle={course.title}
+                  isPublished={course.isPublished}
+                  onDeleted={() => navigate('/courses', { replace: true })}
+                />
               )}
               <Button
                 variant={optimisticEnrolled ? 'secondary' : 'default'}
