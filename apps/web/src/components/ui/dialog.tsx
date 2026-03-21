@@ -24,20 +24,29 @@ const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 /**
- * BUG-098: Default aria-describedby={undefined} suppresses the Radix console
- * warning "Missing Description or aria-describedby for DialogContent" when
- * a consumer does not include <DialogDescription>. Consumers that DO include
- * <DialogDescription> override this via Radix's internal mechanism.
+ * BUG-103: Defensive a11y wrapper for Radix DialogContent.
+ *
+ * Radix emits a console warning when DialogContent lacks <DialogDescription>:
+ *   "Missing Description or aria-describedby={undefined} for {DialogContent}"
+ *
+ * Fix: We pass aria-describedby={undefined} which removes the attribute from
+ * the DOM entirely, preventing Radix's DescriptionWarning check from firing.
+ * Consumers that include <DialogDescription> still get proper semantics
+ * because Radix's internal id binding takes precedence via the context.
+ *
+ * For the "DialogContent requires a DialogTitle" warning: all consumers MUST
+ * include a <DialogTitle> descendant inside <DialogContent>. If the title
+ * should be invisible, wrap it: <DialogTitle className="sr-only">...</DialogTitle>
  */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, 'aria-describedby': ariaDescribedBy, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
-      aria-describedby={ariaDescribedBy ?? undefined}
+      aria-describedby={undefined}
       className={cn(
         'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg',
         className

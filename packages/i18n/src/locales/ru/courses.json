@@ -17,6 +17,7 @@
   "deleteCourseNotFound": "\u041a\u0443\u0440\u0441 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d. \u0412\u043e\u0437\u043c\u043e\u0436\u043d\u043e, \u043e\u043d \u0443\u0436\u0435 \u0431\u044b\u043b \u0443\u0434\u0430\u043b\u0451\u043d.",
   "deleteCourseConfirm": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043a\u0443\u0440\u0441",
   "deletingCourse": "\u0423\u0434\u0430\u043b\u0435\u043d\u0438\u0435...",
+  "courseDeletedSuccess": "\u041a\u0443\u0440\u0441 \"{{title}}\" \u0431\u044b\u043b \u0443\u0434\u0430\u043b\u0451\u043d.",
   "publishCourse": "Publish",
   "unpublishCourse": "Unpublish Course",
   "courseDetails": "Course Details",

@@ -35,6 +35,11 @@ vi.mock('urql', () => ({
     { data: undefined, fetching: false, error: undefined },
     vi.fn(),
   ]),
+  // These exports are required by urql-client.ts (transitively imported by components).
+  createClient: vi.fn(() => ({})),
+  fetchExchange: {},
+  subscriptionExchange: vi.fn(() => ({})),
+  errorExchange: vi.fn(() => ({})),
 }));
 
 const mockGetCurrentUser = vi.fn();
@@ -547,13 +552,13 @@ describe('CourseList', () => {
   it('renders sort dropdown', () => {
     renderCourseList();
     expect(
-      screen.getByRole('combobox', { name: /sort courses/i })
+      screen.getByRole('combobox', { name: /sort by/i })
     ).toBeInTheDocument();
   });
 
   it('sorts courses A→Z by title when title sort selected', () => {
     renderCourseList();
-    const select = screen.getByRole('combobox', { name: /sort courses/i });
+    const select = screen.getByRole('combobox', { name: /sort by/i });
     fireEvent.change(select, { target: { value: 'title' } });
     const titles = screen
       .getAllByRole('heading', { level: 3 })
@@ -577,5 +582,37 @@ describe('CourseList', () => {
     expect(
       screen.queryByRole('tab', { name: /my courses/i })
     ).not.toBeInTheDocument();
+  });
+
+  // ── BUG-103 regression guard: deleted state triggers refetch ───────────────
+  it('refetches courses when navigated to with deleted state', () => {
+    const mockReexecute = vi.fn();
+    vi.mocked(useQuery).mockReturnValue([
+      { data: { courses: MOCK_COURSES }, fetching: false, error: undefined } as ReturnType<typeof useQuery>[0],
+      mockReexecute,
+    ]);
+    vi.mocked(useMutation).mockReturnValue([
+      { fetching: false } as ReturnType<typeof useMutation>[0],
+      vi.fn().mockResolvedValue({ error: null }),
+    ]);
+    mockGetCurrentUser.mockReturnValue(INSTRUCTOR_USER);
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          { pathname: '/courses', state: { deleted: true, message: 'Course deleted' } },
+        ]}
+      >
+        <Routes>
+          <Route path="/courses" element={<CourseList />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    // BUG-103: The hook should call reexecuteCourses with network-only
+    // when location.state.deleted is true, bypassing urql cache.
+    expect(mockReexecute).toHaveBeenCalledWith(
+      expect.objectContaining({ requestPolicy: 'network-only' })
+    );
   });
 });

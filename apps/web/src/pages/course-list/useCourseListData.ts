@@ -82,14 +82,22 @@ export function useCourseListData() {
     };
   }, []);
 
-  // Show success message from CourseCreatePage navigation state
+  // Show success message from navigation state (CourseCreatePage, DeleteCourse, etc.)
+  // BUG-103: When a course is deleted, the navigation state includes `deleted: true`
+  // which triggers a network-only refetch to bypass the urql cache that still
+  // contains the stale (now soft-deleted) course.
   useEffect(() => {
-    const state = location.state as { message?: string } | null;
+    const state = location.state as { message?: string; deleted?: boolean } | null;
+    if (state?.deleted) {
+      reexecuteCourses({ requestPolicy: 'network-only' });
+    }
     if (state?.message) {
       showToast(state.message);
+    }
+    if (state?.message || state?.deleted) {
       window.history.replaceState({}, '');
     }
-  }, [location.state]);
+  }, [location.state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const showToast = (msg: string) => {
     setToast(msg);

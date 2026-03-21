@@ -9,11 +9,16 @@
  *
  * Security: clientSecret is NOT stored in localStorage. It lives only in
  * memory (React state) for the lifetime of this page.
+ *
+ * BUG-103: Stripe.js is now lazily loaded via dynamic import() to avoid
+ * injecting a <script> tag for js.stripe.com in environments where the
+ * VITE_STRIPE_PUBLISHABLE_KEY env var is not configured. This eliminates the
+ * "Failed to load Stripe.js" console error that previously appeared on every
+ * page load when the Stripe CDN was unreachable (corporate proxy, dev env).
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -28,10 +33,23 @@ import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 const STRIPE_PUBLISHABLE_KEY =
   (import.meta.env['VITE_STRIPE_PUBLISHABLE_KEY'] as string | undefined) ?? '';
 
-// Lazily initialised so the key can be set at runtime via env
-const stripePromise = STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(STRIPE_PUBLISHABLE_KEY)
-  : null;
+/**
+ * BUG-103: Lazily load Stripe.js only when the publishable key is configured.
+ * Uses dynamic import() so that `@stripe/stripe-js` (which injects a <script>
+ * tag on module evaluation) is never loaded in environments without the key.
+ * The promise is cached so subsequent calls return the same instance.
+ */
+let _stripePromise: Promise<import('@stripe/stripe-js').Stripe | null> | null = null;
+
+function getStripePromise() {
+  if (!STRIPE_PUBLISHABLE_KEY) return null;
+  if (!_stripePromise) {
+    _stripePromise = import('@stripe/stripe-js').then(({ loadStripe }) =>
+      loadStripe(STRIPE_PUBLISHABLE_KEY)
+    );
+  }
+  return _stripePromise;
+}
 
 // ── Inner form (must be a child of <Elements>) ────────────────────────────────
 
@@ -162,6 +180,8 @@ export function CheckoutPage() {
       </Layout>
     );
   }
+
+  const stripePromise = getStripePromise();
 
   // Stripe not configured — show user-friendly fallback
   if (!STRIPE_PUBLISHABLE_KEY || !stripePromise) {

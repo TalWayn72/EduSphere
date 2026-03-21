@@ -17,6 +17,7 @@
   "deleteCourseNotFound": "\u8bfe\u7a0b\u672a\u627e\u5230\u3002\u53ef\u80fd\u5df2\u88ab\u5220\u9664\u3002",
   "deleteCourseConfirm": "\u5220\u9664\u8bfe\u7a0b",
   "deletingCourse": "\u5220\u9664\u4e2d...",
+  "courseDeletedSuccess": "\u8bfe\u7a0b\u201c{{title}}\u201d\u5df2\u88ab\u5220\u9664\u3002",
   "publishCourse": "Publish",
   "unpublishCourse": "Unpublish Course",
   "courseDetails": "Course Details",

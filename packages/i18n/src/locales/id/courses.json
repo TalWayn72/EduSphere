@@ -17,6 +17,7 @@
   "deleteCourseNotFound": "Kursus tidak ditemukan. Mungkin sudah dihapus.",
   "deleteCourseConfirm": "Hapus Kursus",
   "deletingCourse": "Menghapus...",
+  "courseDeletedSuccess": "Kursus \"{{title}}\" telah dihapus.",
   "publishCourse": "Publish",
   "unpublishCourse": "Unpublish Course",
   "courseDetails": "Course Details",

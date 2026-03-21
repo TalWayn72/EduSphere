@@ -138,6 +138,20 @@ export const urqlClient = createClient({
         CourseProgress: (data) =>
           (data as { courseId?: string }).courseId ?? null,
       },
+      updates: {
+        Mutation: {
+          // BUG-103: Invalidate the courses list cache after a course is deleted
+          // so the soft-deleted course no longer appears in the UI.
+          deleteCourse(_result, _args, cache) {
+            cache.invalidate('Query', 'courses', { limit: 50, offset: 0 });
+            cache.invalidate('Query', 'courses');
+          },
+          createCourse(_result, _args, cache) {
+            cache.invalidate('Query', 'courses', { limit: 50, offset: 0 });
+            cache.invalidate('Query', 'courses');
+          },
+        },
+      },
     }),
     authErrorExchange,
     subscriptionExchange({

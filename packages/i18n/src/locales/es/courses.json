@@ -17,6 +17,7 @@
   "deleteCourseNotFound": "Curso no encontrado. Es posible que ya haya sido eliminado.",
   "deleteCourseConfirm": "Eliminar curso",
   "deletingCourse": "Eliminando...",
+  "courseDeletedSuccess": "El curso \"{{title}}\" ha sido eliminado.",
   "publishCourse": "Publish",
   "unpublishCourse": "Unpublish Course",
   "courseDetails": "Course Details",

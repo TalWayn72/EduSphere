@@ -84,7 +84,65 @@
 | BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection | ✅ Fixed | (pending commit) |
 | BUG-101 | Delete Course — 400 Bad Request + accessibility console errors | ✅ Fixed | `c7beef92` |
 | BUG-102 | Delete course button missing from CourseDetailPage | ✅ Fixed | (pending commit) |
+| BUG-103 | Delete Course fails silently — course not removed from list after deletion | 🟡 In Progress | — |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+
+---
+
+## BUG-103 — Delete Course Fails Silently — Course Not Removed from List (21 Mar 2026)
+
+- **Status:** 🟡 In Progress
+- **Severity:** 🔴 Critical (core CRUD operation — delete appears to succeed but course remains visible)
+- **Reported:** 21 March 2026
+
+### Problem
+
+After clicking "Delete Course" and confirming the dialog, the course is not removed from the course list. The user sees no feedback that the deletion succeeded or failed. Browser console shows multiple errors: GraphQL 400 Bad Request, Stripe.js load failure, and Radix DialogTitle accessibility warnings.
+
+### Root Cause
+
+1. **urql graphcache (urql-client.ts):** The `deleteCourse` and `createCourse` mutations had no cache invalidation rules configured in graphcache. After a successful delete mutation, the cached course list was never updated — stale data persisted on screen.
+2. **Navigation state (CourseHeaderCard.tsx / useCourseListData.ts):** After deletion, the redirect to `/courses` did not signal the list page to refetch. The list page continued displaying cached data with no network-only refetch trigger.
+3. **Missing i18n key:** The `courseDeletedSuccess` toast message key was missing from all 10 locale files, so no success feedback was shown to the user.
+
+### Discovery (3 Waves)
+
+- **Wave 1 (exact match):** urql-client.ts missing cache update rules for delete/create mutations
+- **Wave 2 (similarity):** useCourseListData.ts — no mechanism to detect navigation state and force refetch; CourseHeaderCard.tsx — no success toast after delete
+- **Wave 3 (class of bug):** i18n key missing across all 10 locale files for the success message
+
+### Fix
+
+1. **urql graphcache invalidation:** Added `updates.Mutation.deleteCourse` and `updates.Mutation.createCourse` to the graphcache exchange config in `urql-client.ts` — invalidates the `Query.courses` field after these mutations.
+2. **Navigation state refetch:** `CourseHeaderCard.tsx` now passes `{ deleted: true }` in navigation state after successful deletion. `useCourseListData.ts` detects this state flag and triggers a network-only refetch to bypass cache.
+3. **i18n success key:** Added `courseDeletedSuccess` key to all 10 locale files (en, es, fr, he, hi, bn, id, pt, ru, zh-CN).
+4. **CourseEditPage.tsx:** Updated to align with the new deletion flow.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/lib/urql-client.ts` | Added graphcache invalidation rules for `deleteCourse` and `createCourse` mutations |
+| `apps/web/src/pages/course-list/useCourseListData.ts` | Added navigation state detection (`deleted: true`) to trigger network-only refetch |
+| `apps/web/src/pages/course-detail/CourseHeaderCard.tsx` | Pass `{ deleted: true }` in navigate state after delete; show success toast |
+| `apps/web/src/pages/CourseEditPage.tsx` | Aligned with updated deletion flow |
+| `apps/web/src/pages/CourseList.test.tsx` | Added regression tests for cache invalidation and post-delete list update |
+| 10 i18n locale files (`packages/i18n/src/locales/*/courses.json`) | Added `courseDeletedSuccess` key |
+
+### Tests
+
+| Test Type | Count | Status |
+|-----------|-------|--------|
+| Frontend unit (CourseList.test.tsx) | Regression tests added | 🟡 Pending verification |
+| E2E (Playwright) | — | ⏳ Pending |
+| **Total** | **TBD** | **🟡 In Progress** |
+
+### Anti-Recurrence
+
+- graphcache invalidation rules ensure any future mutation that modifies the course list will properly invalidate the cache
+- Navigation state pattern (`{ deleted: true }`) provides a reusable mechanism for post-mutation refetch on list pages
+- Regression test in CourseList.test.tsx asserts that after delete, the course is removed from the rendered list
+- i18n key presence across all 10 locales prevents silent failures in user feedback
 
 ---
 

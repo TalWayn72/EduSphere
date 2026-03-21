@@ -213,7 +213,10 @@ export function CourseEditPage() {
               courseId={courseId}
               courseTitle={course.title}
               isPublished={isCurrentlyPublished}
-              onDeleted={() => navigate('/courses', { replace: true })}
+              onDeleted={() => navigate('/courses', {
+                replace: true,
+                state: { deleted: true, message: t('courseDeletedSuccess', { title: course.title }) },
+              })}
             />
             <Button
               variant="outline"

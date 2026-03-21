@@ -17,6 +17,7 @@
   "deleteCourseNotFound": "הקורס לא נמצא. ייתכן שכבר נמחק.",
   "deleteCourseConfirm": "מחק קורס",
   "deletingCourse": "מוחק...",
+  "courseDeletedSuccess": "הקורס \"{{title}}\" נמחק בהצלחה.",
   "publishCourse": "פרסום",
   "unpublishCourse": "ביטול פרסום",
   "courseDetails": "פרטי קורס",
