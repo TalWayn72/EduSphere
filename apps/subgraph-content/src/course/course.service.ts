@@ -19,7 +19,9 @@ import {
   sql,
   closeAllPools,
   withReadReplica,
+  withTenantContext,
 } from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 
 interface CourseReadinessCheck {
   name: string;
@@ -289,31 +291,33 @@ export class CourseService implements OnModuleDestroy {
     }
   }
 
-  async delete(id: string, tenantCtx: { userId: string; userRole: string }): Promise<boolean> {
-    // 1. Fetch course (bypass soft-delete filter for this lookup)
-    const [course] = await this.db
-      .select()
-      .from(schema.courses)
-      .where(and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at)));
+  async delete(id: string, tenantCtx: TenantContext): Promise<boolean> {
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      // 1. Fetch course within tenant RLS context
+      const [course] = await db
+        .select()
+        .from(schema.courses)
+        .where(and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at)));
 
-    if (!course) {
-      throw new NotFoundException('Course not found');
-    }
+      if (!course) {
+        throw new NotFoundException('Course not found');
+      }
 
-    // 2. Authorization: INSTRUCTOR can only delete own courses
-    const rawCourse = course as Record<string, unknown>;
-    if (tenantCtx.userRole === 'INSTRUCTOR' && rawCourse['instructor_id'] !== tenantCtx.userId) {
-      throw new ForbiddenException('You do not have permission to delete this course');
-    }
+      // 2. Authorization: INSTRUCTOR can only delete own courses
+      const rawCourse = course as Record<string, unknown>;
+      if (tenantCtx.userRole === 'INSTRUCTOR' && rawCourse['instructor_id'] !== tenantCtx.userId) {
+        throw new ForbiddenException('You do not have permission to delete this course');
+      }
 
-    // 3. Soft delete
-    await this.db
-      .update(schema.courses)
-      .set({ deleted_at: new Date() })
-      .where(eq(schema.courses.id, id));
+      // 3. Soft delete within same RLS transaction
+      await db
+        .update(schema.courses)
+        .set({ deleted_at: new Date() })
+        .where(eq(schema.courses.id, id));
 
-    this.logger.log(`Course soft-deleted: ${id} by user ${tenantCtx.userId}`);
-    return true;
+      this.logger.log(`[CourseService] Course soft-deleted: ${id} by user ${tenantCtx.userId} in tenant ${tenantCtx.tenantId}`);
+      return true;
+    });
   }
 
   async getEnrollmentCount(courseId: string): Promise<number> {

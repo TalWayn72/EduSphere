@@ -20,6 +20,7 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   withReadReplica: vi.fn((fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
+  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
   schema: {
     courses: {
       id: 'id',
@@ -117,6 +118,8 @@ describe('CourseService', () => {
       mockOffset.mockResolvedValue([MOCK_COURSE]);
       mockLimit.mockReturnValue({ offset: mockOffset });
       mockOrderBy.mockReturnValue({ limit: mockLimit });
+      // findAll chain: select().from().where().orderBy().limit().offset()
+      mockWhere.mockReturnValue({ orderBy: mockOrderBy });
       mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
       mockSelect.mockReturnValue({ from: mockFrom });
     });
@@ -335,7 +338,7 @@ describe('CourseService', () => {
   });
 
   describe('delete()', () => {
-    const tenantCtx = { userId: 'user-1', userRole: 'INSTRUCTOR' };
+    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'INSTRUCTOR' as const };
     // DB returns snake_case; the service reads rawCourse['instructor_id']
     const MOCK_DB_COURSE = { ...MOCK_COURSE, instructor_id: 'user-1' };
 
