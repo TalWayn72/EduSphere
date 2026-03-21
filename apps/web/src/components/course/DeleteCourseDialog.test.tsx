@@ -136,9 +136,20 @@ describe('DeleteCourseDialog', () => {
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it('successful mutation calls onDeleted', async () => {
+  it('successful mutation triggers hard navigation to /courses (BUG-103)', async () => {
     const mockExecute = vi.fn().mockResolvedValue({ data: true, error: undefined });
     mockMutation(mockExecute);
+
+    // Mock window.location.href setter to verify hard navigation
+    const locationSpy = vi.spyOn(window, 'location', 'get').mockReturnValue({
+      ...window.location,
+      href: '',
+    } as Location);
+    const hrefSetter = vi.fn();
+    Object.defineProperty(window.location, 'href', {
+      set: hrefSetter,
+      configurable: true,
+    });
 
     render(<DeleteCourseDialog {...defaultProps} />);
 
@@ -150,7 +161,11 @@ describe('DeleteCourseDialog', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith({ id: 'course-123' });
-    expect(defaultProps.onDeleted).toHaveBeenCalled();
+    // BUG-103: onDeleted is no longer called — instead window.location.href
+    // triggers a hard navigation to bypass urql graphcache stale data
+    expect(hrefSetter).toHaveBeenCalledWith('/courses');
+
+    locationSpy.mockRestore();
   });
 
   it('error displays inline in dialog', async () => {

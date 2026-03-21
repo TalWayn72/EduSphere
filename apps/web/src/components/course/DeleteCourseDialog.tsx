@@ -69,7 +69,13 @@ export function DeleteCourseDialog({
       }
       return;
     }
-    onDeleted();
+    // BUG-103: The urql graphcache cacheExchange does not reliably invalidate
+    // the courses list after deleteCourse (which returns a scalar boolean, not
+    // a Course entity).  Neither cache.invalidate(), reexecuteQuery with
+    // network-only, nor client.query with network-only bypass graphcache's
+    // normalized cache.  A hard navigation (window.location) guarantees the
+    // courses page fetches fresh data from the server.
+    window.location.href = '/courses';
   };
 
   return (
