@@ -133,7 +133,7 @@ export function BrandedLoginPage() {
               </div>
             )}
           </div>
-          <CardTitle className="text-3xl">{branding.orgName}</CardTitle>
+          <h1 className="text-3xl font-semibold leading-none tracking-tight">{branding.orgName}</h1>
           {branding.welcomeMessage && (
             <CardDescription data-testid="branded-welcome-message">
               {branding.welcomeMessage}

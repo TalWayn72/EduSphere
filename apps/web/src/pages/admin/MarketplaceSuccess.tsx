@@ -2,6 +2,7 @@
  * MarketplaceSuccess — Checkout success landing page.
  * Route: /admin/marketplace/success?session_id=...
  */
+/* eslint-disable edusphere-design-system/require-page-header -- h1 rendered by AdminLayout */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, Link } from 'react-router-dom';

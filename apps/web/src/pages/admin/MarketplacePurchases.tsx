@@ -5,6 +5,7 @@
  * Shows a table of purchases with status badges.
  * Refund button appears only within 14-day window for COMPLETED purchases.
  */
+/* eslint-disable edusphere-design-system/require-page-header -- h1 rendered by AdminLayout */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
