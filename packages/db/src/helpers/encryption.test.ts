@@ -79,25 +79,27 @@ describe('encryptField / decryptField', () => {
     expect(encrypted).not.toBe(plaintext);
   });
 
-  it('encrypted format has three colon-separated parts', () => {
+  it('encrypted format has four colon-separated parts (v1:iv:tag:data)', () => {
     const encrypted = encryptField('test', tenantKey);
     const parts = encrypted.split(':');
-    expect(parts).toHaveLength(3);
+    expect(parts).toHaveLength(4);
+    // Version prefix
+    expect(parts[0]).toBe('v1');
     // IV: 12 bytes = 24 hex chars
-    expect(parts[0]).toHaveLength(24);
+    expect(parts[1]).toHaveLength(24);
     // Auth tag: 16 bytes = 32 hex chars
-    expect(parts[1]).toHaveLength(32);
+    expect(parts[2]).toHaveLength(32);
   });
 
   it('throws on tampered ciphertext (auth tag failure)', () => {
     const encrypted = encryptField('sensitive-data', tenantKey);
     const parts = encrypted.split(':');
-    // XOR the last byte with 0xff to guarantee the byte value changes
-    const hex = parts[2]!;
+    // XOR the last byte of the ciphertext (parts[3]) with 0xff to guarantee the byte value changes
+    const hex = parts[3]!;
     const lastByte = parseInt(hex.slice(-2), 16) ^ 0xff;
     const tamperedHex =
       hex.slice(0, -2) + lastByte.toString(16).padStart(2, '0');
-    const tampered = `${parts[0]}:${parts[1]}:${tamperedHex}`;
+    const tampered = `${parts[0]}:${parts[1]}:${parts[2]}:${tamperedHex}`;
     expect(() => decryptField(tampered, tenantKey)).toThrow();
   });
 
