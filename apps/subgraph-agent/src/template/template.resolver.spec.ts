@@ -50,26 +50,22 @@ describe('TemplateResolver', () => {
     });
   });
 
-  // ── getAgentTemplates ─────────────────────────────────────────────────────
+  // ── resolveTemplateType (ResolveField) ────────────────────────────────────
 
-  describe('getAgentTemplates()', () => {
-    it('delegates to templateService.findAll with limit and offset', async () => {
-      mockTemplateService.findAll.mockResolvedValue([MOCK_TEMPLATE]);
-      const result = await resolver.getAgentTemplates(10, 0);
-      expect(mockTemplateService.findAll).toHaveBeenCalledWith(10, 0);
-      expect(result).toEqual([MOCK_TEMPLATE]);
+  describe('resolveTemplateType()', () => {
+    it('returns templateType when present on parent', () => {
+      const result = resolver.resolveTemplateType({ templateType: 'TUTOR', template: 'OTHER' });
+      expect(result).toBe('TUTOR');
     });
 
-    it('returns paginated results with custom limit', async () => {
-      mockTemplateService.findAll.mockResolvedValue([MOCK_TEMPLATE]);
-      await resolver.getAgentTemplates(25, 50);
-      expect(mockTemplateService.findAll).toHaveBeenCalledWith(25, 50);
+    it('falls back to template column when templateType is missing', () => {
+      const result = resolver.resolveTemplateType({ template: 'CHAVRUTA_DEBATE' });
+      expect(result).toBe('CHAVRUTA_DEBATE');
     });
 
-    it('returns empty array when no templates exist', async () => {
-      mockTemplateService.findAll.mockResolvedValue([]);
-      const result = await resolver.getAgentTemplates(10, 0);
-      expect(result).toEqual([]);
+    it('returns CUSTOM when neither templateType nor template is present', () => {
+      const result = resolver.resolveTemplateType({});
+      expect(result).toBe('CUSTOM');
     });
   });
 
