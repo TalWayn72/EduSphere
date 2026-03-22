@@ -16,7 +16,7 @@ export function buildPushTopics(tenantSlug: string): string[] {
 
 /** Register for push notifications with tenant-scoped topics. */
 export async function registerForPushNotifications(
-  tenantSlug: string
+  _tenantSlug: string
 ): Promise<string | null> {
   if (!Device.isDevice) return null;
 
