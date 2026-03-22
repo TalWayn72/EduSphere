@@ -73,7 +73,7 @@ describe('AnalyticsExportController', () => {
 
     it('should reject revoked API key', async () => {
       const testKey = 'esk_live_test1234567890123456789012';
-      const keyHash = createHash('sha256').update(testKey).digest('hex');
+      const _keyHash = createHash('sha256').update(testKey).digest('hex');
       mockExecute.mockResolvedValueOnce({
         rows: [{
           id: 'key-1',

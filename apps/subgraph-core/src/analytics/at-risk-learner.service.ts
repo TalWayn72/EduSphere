@@ -55,7 +55,7 @@ export interface ActivityEntryResult {
   description: string;
 }
 
-const INACTIVE_DAYS_THRESHOLD = 14;
+const _INACTIVE_DAYS_THRESHOLD = 14;
 const QUIZ_PASS_RATE_THRESHOLD = 50;
 const COMPLETION_RATE_THRESHOLD = 20;
 const BORDERLINE_FACTOR = 0.2; // within 20% of threshold = LOW risk

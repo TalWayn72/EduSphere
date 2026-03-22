@@ -18,7 +18,6 @@ import {
   schema,
   eq,
   and,
-  sql,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import { z } from 'zod';

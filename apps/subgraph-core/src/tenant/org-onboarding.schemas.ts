@@ -129,6 +129,7 @@ export const RequestDomainVerificationSchema = z.object({
     .min(4)
     .max(255)
     .regex(
+      // eslint-disable-next-line security/detect-unsafe-regex -- RFC 1035 domain label pattern, bounded quantifiers
       /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/,
       'Must be a valid domain name (e.g., learn.example.com)'
     ),

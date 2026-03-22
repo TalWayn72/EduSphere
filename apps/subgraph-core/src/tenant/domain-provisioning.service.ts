@@ -24,6 +24,7 @@ import { withTenantContext } from '@edusphere/db';
 import type { DnsProvider } from '@edusphere/dns-provider';
 import { MockDnsProvider } from '@edusphere/dns-provider';
 
+// eslint-disable-next-line security/detect-unsafe-regex -- RFC 1035 domain label pattern, bounded quantifiers
 const DOMAIN_REGEX = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
 
 @Injectable()
