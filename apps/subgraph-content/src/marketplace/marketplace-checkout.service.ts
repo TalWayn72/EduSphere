@@ -23,7 +23,8 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
-import { sql } from 'drizzle-orm';
+// sql import available for future raw queries
+// import { sql } from 'drizzle-orm';
 import { StripeClient } from './stripe.client.js';
 
 export interface CheckoutSessionResult {

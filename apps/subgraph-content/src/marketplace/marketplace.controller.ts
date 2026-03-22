@@ -151,7 +151,7 @@ export class MarketplaceController {
       return;
     }
 
-    const session = event.data.object as unknown as {
+    const _session = event.data.object as unknown as {
       payment_intent: string;
       amount_total: number;
     };
