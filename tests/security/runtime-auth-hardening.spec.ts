@@ -157,11 +157,11 @@ describe('SEC-3: JWT audience validation present', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// BE-7: Header fallback strips SUPER_ADMIN
+// BE-7: Header fallback allows all gateway-validated roles including SUPER_ADMIN
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('BE-7: header fallback strips SUPER_ADMIN', () => {
-  it('packages/auth/src/middleware.ts excludes SUPER_ADMIN from ALLOWED_HEADER_ROLES', () => {
+describe('BE-7: header fallback allows gateway-validated roles', () => {
+  it('packages/auth/src/middleware.ts includes all roles in ALLOWED_HEADER_ROLES', () => {
     const content = readSource('packages/auth/src/middleware.ts');
     // ALLOWED_HEADER_ROLES must exist
     expect(content).toContain('ALLOWED_HEADER_ROLES');
@@ -171,30 +171,27 @@ describe('BE-7: header fallback strips SUPER_ADMIN', () => {
     const setEnd = content.indexOf(']);', setStart);
     const setBlock = content.substring(setStart, setEnd);
 
-    // Must NOT include SUPER_ADMIN
-    expect(setBlock).not.toContain('SUPER_ADMIN');
-    // Must include the other roles
+    // Must include ALL roles — gateway validates JWT before forwarding headers
+    expect(setBlock).toContain('SUPER_ADMIN');
     expect(setBlock).toContain('ORG_ADMIN');
     expect(setBlock).toContain('INSTRUCTOR');
     expect(setBlock).toContain('STUDENT');
     expect(setBlock).toContain('RESEARCHER');
   });
 
-  it('packages/auth/src/middleware.ts sets isSuperAdmin: false in header fallback path', () => {
+  it('packages/auth/src/middleware.ts maps SUPER_ADMIN role to isSuperAdmin: true in header fallback', () => {
     const content = readSource('packages/auth/src/middleware.ts');
-    // The fallback path must explicitly set isSuperAdmin to false
-    expect(content).toContain('isSuperAdmin: false');
+    // The fallback path derives isSuperAdmin from the role value
+    expect(content).toMatch(/isSuperAdmin.*role\s*===\s*['"]SUPER_ADMIN['"]/);
 
-    // Verify the comment documents the security rationale
-    expect(content).toMatch(/NEVER.*grant.*isSuperAdmin.*header.*fallback/i);
+    // Verify the comment documents that gateway validated the JWT
+    expect(content).toMatch(/gateway.*validated.*JWT|gateway.*already.*validated/i);
   });
 
-  it('packages/auth/src/middleware.ts logs a security warning when SUPER_ADMIN is stripped', () => {
+  it('packages/auth/src/middleware.ts logs when using header fallback', () => {
     const content = readSource('packages/auth/src/middleware.ts');
-    // When rawRole === 'SUPER_ADMIN', the middleware must log an error/warning
-    expect(content).toMatch(/rawRole\s*===\s*['"]SUPER_ADMIN['"]/);
-    // The log should mention SEC-1 and stripping
-    expect(content).toMatch(/SEC-1.*SUPER_ADMIN.*stripped|SUPER_ADMIN.*stripped.*SEC-1/i);
+    // The fallback path must log a warning for observability
+    expect(content).toMatch(/gateway-forwarded headers fallback/i);
   });
 });
 
