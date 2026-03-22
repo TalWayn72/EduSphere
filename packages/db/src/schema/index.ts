@@ -216,3 +216,9 @@ export * from './course-licenses';
 export * from './api-keys';
 export * from './webhook-endpoints';
 export * from './gamification-config';
+
+// F-12: Per-org customizable badges with auto-award criteria
+export * from './org-badges';
+
+// F-10: Tenant Audit Log (per-tenant fine-grained audit trail)
+export * from './tenant-audit-log';

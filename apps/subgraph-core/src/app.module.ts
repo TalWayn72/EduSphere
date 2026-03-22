@@ -23,6 +23,7 @@ import { PartnerModule } from './partners/partner.module.js';
 import { ChallengesModule } from './challenges/challenges.module';
 import { ConsentModule } from './consent/consent.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
+import { OrgAnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
     ChallengesModule,
     ConsentModule,
     WhatsAppModule,
+    OrgAnalyticsModule,
   ],
 })
 export class AppModule {}

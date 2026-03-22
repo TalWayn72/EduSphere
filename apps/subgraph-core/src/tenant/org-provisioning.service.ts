@@ -3,7 +3,7 @@
  *
  * Pipeline steps:
  *   1. Validate slug uniqueness
- *   2. Insert tenant record (plan: FREE, trial: 14 days)
+ *   2. Insert tenant record (plan: FREE, trial: 90 days)
  *   3. Create Keycloak group via KeycloakAdminService
  *   4. Create admin user in Keycloak
  *   5. Create MinIO bucket (placeholder — emits event for infra)
@@ -63,7 +63,7 @@ interface ProvisioningSteps {
 
 const ORG_PROVISIONED_SUBJECT = 'EDUSPHERE.org.provisioned';
 const NOTIFICATION_SUBJECT = 'EDUSPHERE.notification.dispatch';
-const TRIAL_DAYS = 14;
+const TRIAL_DAYS = 90;
 
 @Injectable()
 export class OrgProvisioningService implements OnModuleDestroy {

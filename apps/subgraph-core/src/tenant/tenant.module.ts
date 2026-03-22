@@ -9,7 +9,9 @@ import { TrialService } from './trial.service';
 import { OrgLicensingService } from './org-licensing.service';
 import { OrgOnboardingResolver } from './org-onboarding.resolver';
 import { OrgAnalyticsService } from '../analytics/org-analytics.service';
+import { AtRiskLearnerService } from '../analytics/at-risk-learner.service';
 import { OrgGamificationService } from '../gamification/org-gamification.service';
+import { OrgBadgeService } from '../gamification/org-badge.service';
 import { ApiKeyService } from '../api-keys/api-key.service';
 import { WebhookService } from '../webhooks/webhook.service';
 import { KeycloakAdminService } from '../auth/keycloak-admin.service';
@@ -26,7 +28,9 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     OrgLicensingService,
     OrgOnboardingResolver,
     OrgAnalyticsService,
+    AtRiskLearnerService,
     OrgGamificationService,
+    OrgBadgeService,
     ApiKeyService,
     WebhookService,
     KeycloakAdminService,
@@ -40,7 +44,9 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     TrialService,
     OrgLicensingService,
     OrgAnalyticsService,
+    AtRiskLearnerService,
     OrgGamificationService,
+    OrgBadgeService,
     ApiKeyService,
     WebhookService,
     KeycloakAdminService,

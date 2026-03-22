@@ -88,6 +88,41 @@ export const LicenseCourseSchema = z.object({
   durationMonths: z.number().int().min(1).max(120).optional(),
 });
 
+export const CreateOrgBadgeSchema = z.object({
+  name: z.string().min(2).max(200),
+  description: z.string().max(1000).optional().nullable(),
+  iconUrl: z.string().url().optional().nullable().or(z.literal('')),
+  xpRequired: z.number().int().min(0),
+  autoAwardCriteria: z
+    .object({
+      type: z.enum(['COURSE_COMPLETE', 'XP_THRESHOLD', 'STREAK_DAYS', 'QUIZ_SCORE']),
+      courseId: z.string().uuid().optional(),
+      amount: z.number().int().min(0).optional(),
+      count: z.number().int().min(1).optional(),
+      minScore: z.number().min(0).max(100).optional(),
+    })
+    .optional()
+    .nullable(),
+});
+
+export const UpdateOrgBadgeSchema = z.object({
+  name: z.string().min(2).max(200).optional(),
+  description: z.string().max(1000).optional().nullable(),
+  iconUrl: z.string().url().optional().nullable().or(z.literal('')),
+  xpRequired: z.number().int().min(0).optional(),
+  autoAwardCriteria: z
+    .object({
+      type: z.enum(['COURSE_COMPLETE', 'XP_THRESHOLD', 'STREAK_DAYS', 'QUIZ_SCORE']),
+      courseId: z.string().uuid().optional(),
+      amount: z.number().int().min(0).optional(),
+      count: z.number().int().min(1).optional(),
+      minScore: z.number().min(0).max(100).optional(),
+    })
+    .optional()
+    .nullable(),
+  isActive: z.boolean().optional(),
+});
+
 export const UpdateGamificationConfigSchema = z.object({
   enabled: z.boolean().optional(),
   showLeaderboard: z.boolean().optional(),

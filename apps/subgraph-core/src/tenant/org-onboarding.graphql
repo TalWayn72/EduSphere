@@ -141,6 +141,41 @@ type ExportResult {
   format: ExportFormat!
 }
 
+# ─── At-Risk Learners ────────────────────────────────────────
+
+enum RiskLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+type AtRiskLearnerItem {
+  userId: ID!
+  email: String!
+  name: String!
+  lastActive: DateTime
+  quizPassRate: Float!
+  completionRate: Float!
+  riskLevel: RiskLevel!
+}
+
+type LearnerAnalyticsDetail {
+  userId: ID!
+  email: String!
+  name: String!
+  coursesEnrolled: Int!
+  coursesCompleted: Int!
+  avgQuizScore: Float!
+  totalLearningHours: Float!
+  activityTimeline: [ActivityEntry!]!
+}
+
+type ActivityEntry {
+  date: DateTime!
+  type: String!
+  description: String!
+}
+
 # ─── Gamification Config ─────────────────────────────────────
 
 enum LeaderboardScope {
@@ -167,6 +202,36 @@ input UpdateGamificationConfigInput {
   showStreaks: Boolean
   xpRules: JSON
   leaderboardScope: LeaderboardScope
+}
+
+# ─── Org Badges (F-12) ────────────────────────────────────────
+
+type OrgBadge {
+  id: ID!
+  name: String!
+  description: String
+  iconUrl: String
+  xpRequired: Int!
+  autoAwardCriteria: JSON
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+input CreateOrgBadgeInput {
+  name: String!
+  description: String
+  iconUrl: String
+  xpRequired: Int!
+  autoAwardCriteria: JSON
+}
+
+input UpdateOrgBadgeInput {
+  name: String
+  description: String
+  iconUrl: String
+  xpRequired: Int
+  autoAwardCriteria: JSON
+  isActive: Boolean
 }
 
 # ─── API Keys ─────────────────────────────────────────────────
@@ -274,7 +339,11 @@ extend type Query {
     @authenticated
   courseLicenses: [CourseLicense!]! @authenticated
   gamificationConfig: GamificationConfig! @authenticated
+  orgBadges: [OrgBadge!]! @authenticated
   orgAnalytics(dateRange: DateRangeInput!): OrgAnalytics! @authenticated
+  atRiskLearners(limit: Int = 20, offset: Int = 0): [AtRiskLearnerItem!]!
+    @authenticated
+  learnerDetail(userId: ID!): LearnerAnalyticsDetail @authenticated
 }
 
 # ─── Mutations ────────────────────────────────────────────────
@@ -313,6 +382,10 @@ extend type Mutation {
 
   updateGamificationConfig(input: UpdateGamificationConfigInput!): GamificationConfig!
     @authenticated
+
+  createOrgBadge(input: CreateOrgBadgeInput!): OrgBadge! @authenticated
+  updateOrgBadge(id: ID!, input: UpdateOrgBadgeInput!): OrgBadge! @authenticated
+  deleteOrgBadge(id: ID!): Boolean! @authenticated
 
   exportAnalytics(input: ExportAnalyticsInput!): ExportResult!
     @authenticated

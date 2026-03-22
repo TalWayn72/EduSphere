@@ -1,16 +1,21 @@
 /**
- * AnalyticsDashboard — KPI cards + Recharts charts for org analytics.
+ * AnalyticsDashboard — KPI cards + Recharts charts + At-Risk Learners for org analytics.
  * Route: /admin/org-analytics
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import { LearnerDetailPanel } from './LearnerDetailPanel';
 
 const ANALYTICS_QUERY = `
   query OrgAnalytics($period: String!) {
@@ -19,6 +24,20 @@ const ANALYTICS_QUERY = `
       engagementTrend { date value }
       completionRates { course rate }
       topCourses { title enrollments completions }
+    }
+  }
+`;
+
+const AT_RISK_QUERY = `
+  query AtRiskLearners($limit: Int, $offset: Int) {
+    atRiskLearners(limit: $limit, offset: $offset) {
+      userId
+      email
+      name
+      lastActive
+      quizPassRate
+      completionRate
+      riskLevel
     }
   }
 `;
@@ -39,6 +58,16 @@ interface AnalyticsData {
   engagementTrend: TrendPoint[];
   completionRates: Array<{ course: string; rate: number }>;
   topCourses: Array<{ title: string; enrollments: number; completions: number }>;
+}
+
+interface AtRiskLearner {
+  userId: string;
+  email: string;
+  name: string;
+  lastActive: string | null;
+  quizPassRate: number;
+  completionRate: number;
+  riskLevel: 'HIGH' | 'MEDIUM' | 'LOW';
 }
 
 function KpiCard({ kpi }: { kpi: KPI }) {
@@ -83,10 +112,25 @@ function SimpleTrendChart({ data, t }: { data: TrendPoint[]; t: (k: string) => s
   );
 }
 
+function RiskBadge({ level }: { level: AtRiskLearner['riskLevel'] }) {
+  const variantMap: Record<string, 'destructive' | 'default' | 'secondary'> = {
+    HIGH: 'destructive',
+    MEDIUM: 'default',
+    LOW: 'secondary',
+  };
+  return (
+    <Badge variant={variantMap[level]} data-testid={`risk-badge-${level.toLowerCase()}`}>
+      {level}
+    </Badge>
+  );
+}
+
 export function AnalyticsDashboard() {
   const { t } = useTranslation('orgAnalytics');
   const [period, setPeriod] = useState('30d');
   const [mounted, setMounted] = useState(false);
+  const [selectedLearnerId, setSelectedLearnerId] = useState<string | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching }] = useQuery<{ orgAnalytics: AnalyticsData }>({
@@ -95,7 +139,26 @@ export function AnalyticsDashboard() {
     pause: !mounted,
   });
 
+  const [{ data: atRiskData, fetching: atRiskFetching }] = useQuery<{
+    atRiskLearners: AtRiskLearner[];
+  }>({
+    query: AT_RISK_QUERY,
+    variables: { limit: 20, offset: 0 },
+    pause: !mounted,
+  });
+
   const analytics = data?.orgAnalytics;
+  const atRiskLearners = atRiskData?.atRiskLearners ?? [];
+
+  const handleRowClick = useCallback((userId: string) => {
+    setSelectedLearnerId(userId);
+    setDetailOpen(true);
+  }, []);
+
+  const handleDetailClose = useCallback(() => {
+    setDetailOpen(false);
+    setSelectedLearnerId(null);
+  }, []);
 
   return (
     <AdminLayout title={t('analytics.title')} description={t('analytics.description')}>
@@ -153,7 +216,65 @@ export function AnalyticsDashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* At-Risk Learners Section */}
+        <Card data-testid="at-risk-section">
+          <CardHeader>
+            <CardTitle className="text-base">
+              {t('analytics.atRiskLearners', 'At-Risk Learners')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {atRiskFetching ? (
+              <Skeleton className="h-32 w-full" />
+            ) : atRiskLearners.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                {t('analytics.noAtRisk', 'No at-risk learners detected')}
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('analytics.name', 'Name')}</TableHead>
+                    <TableHead>{t('analytics.lastActive', 'Last Active')}</TableHead>
+                    <TableHead>{t('analytics.quizRate', 'Quiz Rate')}</TableHead>
+                    <TableHead>{t('analytics.completion', 'Completion')}</TableHead>
+                    <TableHead>{t('analytics.riskLevel', 'Risk Level')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {atRiskLearners.map((learner) => (
+                    <TableRow
+                      key={learner.userId}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleRowClick(learner.userId)}
+                      data-testid={`at-risk-row-${learner.userId}`}
+                    >
+                      <TableCell className="font-medium">{learner.name}</TableCell>
+                      <TableCell>
+                        {learner.lastActive
+                          ? new Date(learner.lastActive).toLocaleDateString()
+                          : t('analytics.never', 'Never')}
+                      </TableCell>
+                      <TableCell>{learner.quizPassRate.toFixed(1)}%</TableCell>
+                      <TableCell>{learner.completionRate.toFixed(1)}%</TableCell>
+                      <TableCell>
+                        <RiskBadge level={learner.riskLevel} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      <LearnerDetailPanel
+        userId={selectedLearnerId}
+        open={detailOpen}
+        onClose={handleDetailClose}
+      />
     </AdminLayout>
   );
 }

@@ -13,7 +13,12 @@ import { OrgInvitationService } from './org-invitation.service';
 import { TrialService } from './trial.service';
 import { TenantService } from './tenant.service';
 import { OrgAnalyticsService } from '../analytics/org-analytics.service';
+import { AtRiskLearnerService } from '../analytics/at-risk-learner.service';
 import { OrgGamificationService } from '../gamification/org-gamification.service';
+import {
+  OrgBadgeService,
+  type CreateOrgBadgeInput,
+} from '../gamification/org-badge.service';
 import { ApiKeyService } from '../api-keys/api-key.service';
 import { WebhookService } from '../webhooks/webhook.service';
 import { OrgLicensingService } from './org-licensing.service';
@@ -42,7 +47,9 @@ export class OrgOnboardingResolver {
     private readonly trialService: TrialService,
     private readonly tenantService: TenantService,
     private readonly analyticsService: OrgAnalyticsService,
+    private readonly atRiskService: AtRiskLearnerService,
     private readonly gamificationService: OrgGamificationService,
+    private readonly orgBadgeService: OrgBadgeService,
     private readonly apiKeyService: ApiKeyService,
     private readonly webhookService: WebhookService,
     private readonly licensingService: OrgLicensingService
@@ -306,6 +313,51 @@ export class OrgOnboardingResolver {
     return this.gamificationService.updateConfig(tenantCtx, input);
   }
 
+  // ─── Org Badges (F-12) ──────────────────────────────────────
+
+  @Query('orgBadges')
+  async getOrgBadges(@Context() ctx: GqlContext) {
+    const tenantCtx = requireAuth(ctx);
+    return this.orgBadgeService.listBadges(tenantCtx);
+  }
+
+  @Mutation('createOrgBadge')
+  async createOrgBadge(
+    @Args('input') input: {
+      name: string;
+      description?: string;
+      iconUrl?: string;
+      xpRequired: number;
+      autoAwardCriteria?: unknown;
+    },
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.orgBadgeService.createBadge(
+      tenantCtx,
+      input as CreateOrgBadgeInput
+    );
+  }
+
+  @Mutation('updateOrgBadge')
+  async updateOrgBadge(
+    @Args('id') id: string,
+    @Args('input') input: Record<string, unknown>,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.orgBadgeService.updateBadge(tenantCtx, id, input);
+  }
+
+  @Mutation('deleteOrgBadge')
+  async deleteOrgBadge(
+    @Args('id') id: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.orgBadgeService.deleteBadge(tenantCtx, id);
+  }
+
   // ─── Analytics ────────────────────────────────────────────
 
   @Query('orgAnalytics')
@@ -318,6 +370,25 @@ export class OrgOnboardingResolver {
       from: new Date(dateRange.from),
       to: new Date(dateRange.to),
     });
+  }
+
+  @Query('atRiskLearners')
+  async getAtRiskLearners(
+    @Args('limit') limit: number,
+    @Args('offset') offset: number,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.atRiskService.getAtRiskLearners(tenantCtx, limit ?? 20, offset ?? 0);
+  }
+
+  @Query('learnerDetail')
+  async getLearnerDetail(
+    @Args('userId') userId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.atRiskService.getLearnerDetail(tenantCtx, userId);
   }
 
   @Mutation('exportAnalytics')

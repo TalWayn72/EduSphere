@@ -9,6 +9,12 @@ import {
 } from '@/lib/graphql/gamification.queries';
 import { getCurrentUser } from '@/lib/auth';
 
+const GAMIFICATION_CONFIG_QUERY = `
+  query GamificationConfigForLeaderboard {
+    gamificationConfig { showLeaderboard }
+  }
+`;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface LeaderboardEntry {
@@ -46,17 +52,39 @@ export function LeaderboardPage() {
   const localUser = getCurrentUser();
   const [period, setPeriod] = useState<Period>('all');
 
+  const [{ data: configData }] = useQuery<{
+    gamificationConfig: { showLeaderboard: boolean };
+  }>({ query: GAMIFICATION_CONFIG_QUERY });
+
+  const showLeaderboard = configData?.gamificationConfig?.showLeaderboard ?? true;
+
   const [{ data, fetching }] = useQuery<LeaderboardResult>({
     query: LEADERBOARD_QUERY,
     variables: { limit: 50 },
+    pause: !showLeaderboard,
   });
 
   const [{ data: rankData }] = useQuery<MyRankResult>({
     query: MY_RANK_QUERY,
+    pause: !showLeaderboard,
   });
 
   const entries = data?.leaderboard ?? [];
   const myRank = rankData?.myRank;
+
+  if (!showLeaderboard) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
+          <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h1 className="text-xl font-semibold mb-2">{t('leaderboardDisabled')}</h1>
+          <p className="text-muted-foreground">
+            {t('leaderboardDisabledByOrg')}
+          </p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

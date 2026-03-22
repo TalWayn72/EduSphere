@@ -6,6 +6,8 @@ import { XpService } from './xp.service.js';
 import { StreakService } from './streak.service.js';
 import { ChallengesService } from './challenges.service.js';
 import { LeaderboardService } from './leaderboard.service.js';
+import { OrgBadgeService } from './org-badge.service.js';
+import { BadgeAutoAwardService } from './badge-auto-award.service.js';
 
 @Module({
   providers: [
@@ -16,7 +18,18 @@ import { LeaderboardService } from './leaderboard.service.js';
     StreakService,
     ChallengesService,
     LeaderboardService,
+    OrgBadgeService,
+    BadgeAutoAwardService,
   ],
-  exports: [BadgeService, OpenBadgesService, XpService, StreakService, ChallengesService, LeaderboardService],
+  exports: [
+    BadgeService,
+    OpenBadgesService,
+    XpService,
+    StreakService,
+    ChallengesService,
+    LeaderboardService,
+    OrgBadgeService,
+    BadgeAutoAwardService,
+  ],
 })
 export class GamificationModule {}
