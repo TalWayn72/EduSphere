@@ -192,7 +192,7 @@ export function LessonPipelineBuilderPage() {
             )}
           </div>
           {planStatus && (
-            <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
+            <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
               {planStatus}
             </span>
           )}
@@ -243,7 +243,7 @@ export function LessonPipelineBuilderPage() {
                 {displayedSteps.map((stepType, idx) => (
                   <li
                     key={idx}
-                    className="flex items-center gap-3 p-2 rounded-lg border bg-white"
+                    className="flex items-center gap-3 p-2 rounded-lg border bg-white dark:bg-gray-900"
                     data-testid={`step-item-${idx}`}
                   >
                     <span className="flex-none w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">

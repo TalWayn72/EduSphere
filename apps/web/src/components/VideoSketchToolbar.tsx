@@ -82,7 +82,7 @@ export function VideoSketchToolbar({
         </Button>
         <Button
           size="sm"
-          className="h-7 px-2 text-[11px] bg-green-600 hover:bg-green-700 text-white"
+          className="h-7 px-2 text-[11px] bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:text-white"
           onClick={onSave}
           disabled={saving}
           aria-label="Save sketch annotation"
@@ -94,7 +94,7 @@ export function VideoSketchToolbar({
         <Button
           size="sm"
           variant="ghost"
-          className="h-7 px-2 text-[11px] bg-black/60 text-white hover:bg-black/80"
+          className="h-7 px-2 text-[11px] bg-black/60 text-white hover:bg-black/80 dark:text-white"
           onClick={onCancel}
           aria-label="Cancel sketch"
           data-testid="sketch-cancel-btn"

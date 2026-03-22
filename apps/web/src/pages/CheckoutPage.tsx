@@ -112,7 +112,7 @@ function CheckoutForm({ courseId }: CheckoutFormProps) {
         role="status"
         aria-live="polite"
       >
-        <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+        <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4 dark:text-green-400" />
         <h2 className="text-xl font-semibold mb-2">{t('checkout.paymentSuccessful')}</h2>
         <p className="text-muted-foreground">
           {t('checkout.redirecting')}
@@ -171,7 +171,7 @@ export function CheckoutPage() {
     return (
       <Layout>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
-          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4 dark:text-amber-400" />
           <h1 className="text-2xl font-bold mb-2">{t('checkout.noSession')}</h1>
           <p className="text-muted-foreground">
             {t('checkout.selectCourse')}
@@ -188,7 +188,7 @@ export function CheckoutPage() {
     return (
       <Layout>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
-          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4 dark:text-amber-400" />
           <h1 className="text-2xl font-bold mb-2">{t('checkout.unavailable')}</h1>
           <p className="text-muted-foreground">
             {t('checkout.unavailableDesc')}

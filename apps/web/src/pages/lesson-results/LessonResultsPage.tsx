@@ -83,9 +83,9 @@ export function LessonResultsPage() {
         {/* Run status badge */}
         {runStatus && (
           <div className="flex items-center gap-2 mb-4 text-sm" data-testid="run-status-badge">
-            {runStatus === 'COMPLETED' && <span className="text-green-600 font-medium">✅ הושלם</span>}
-            {runStatus === 'RUNNING'   && <span className="text-blue-600 font-medium">⏳ מריץ...</span>}
-            {runStatus === 'FAILED'    && <span className="text-red-600 font-medium">❌ נכשל</span>}
+            {runStatus === 'COMPLETED' && <span className="text-green-600 font-medium dark:text-green-400">✅ הושלם</span>}
+            {runStatus === 'RUNNING'   && <span className="text-blue-600 font-medium dark:text-blue-400">⏳ מריץ...</span>}
+            {runStatus === 'FAILED'    && <span className="text-red-600 font-medium dark:text-red-400">❌ נכשל</span>}
             {runStatus === 'CANCELLED' && <span className="text-muted-foreground font-medium">⛔ בוטל</span>}
             {completedAt && (
               <span className="text-muted-foreground text-xs">
@@ -93,7 +93,7 @@ export function LessonResultsPage() {
               </span>
             )}
             <button
-              className="ml-auto text-xs text-blue-600 hover:underline"
+              className="ml-auto text-xs text-blue-600 hover:underline dark:text-blue-400"
               onClick={() => navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)}
               data-testid="open-pipeline-btn"
             >

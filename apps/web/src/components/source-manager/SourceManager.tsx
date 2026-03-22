@@ -112,16 +112,16 @@ export function SourceManager({ courseId }: { courseId: string }) {
 
   return (
     <div
-      className="relative flex flex-col h-full bg-gray-50 border-r"
+      className="relative flex flex-col h-full bg-gray-50 border-r dark:bg-gray-800"
       dir={dir}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
+      <div className="flex items-center justify-between px-4 py-3 border-b bg-white dark:bg-gray-900">
         <div>
-          <h3 className="font-semibold text-sm text-gray-800" data-testid="sources-title">
+          <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-100" data-testid="sources-title">
             {t('sources.title')}
           </h3>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             {data
               ? t('sources.count', { count: data.length })
               : isError
@@ -131,7 +131,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors dark:bg-blue-500 dark:text-white"
           data-testid="add-source-btn"
         >
           <span className="text-base leading-none">+</span>
@@ -141,7 +141,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
 
       {/* Added-source banner */}
       {addedBanner && (
-        <div className="mx-2 mt-2 flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-sm text-green-700 animate-in slide-in-from-top-2">
+        <div className="mx-2 mt-2 flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-sm text-green-700 animate-in slide-in-from-top-2 dark:bg-green-950 dark:border-green-700 dark:text-green-300">
           <span>&#x2705;</span>
           <span>{addedBanner}</span>
         </div>
@@ -150,7 +150,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       {/* Source list */}
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
         {isLoading && (
-          <div className="text-center text-sm text-gray-400 mt-8">
+          <div className="text-center text-sm text-gray-400 mt-8 dark:text-gray-500">
             {t('sources.loadingSources')}
           </div>
         )}
@@ -158,12 +158,12 @@ export function SourceManager({ courseId }: { courseId: string }) {
         {!isLoading && isError && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <span className="text-4xl mb-3">&#x26A0;&#xFE0F;</span>
-            <p className="text-sm font-medium text-red-600">
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">
               {t(getSourceErrorKey(queryError))}
             </p>
             <button
               onClick={() => refetch()}
-              className="mt-3 px-4 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="mt-3 px-4 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors dark:bg-blue-500 dark:text-white"
             >
               {t('sources.retry', '\u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1')}
             </button>
@@ -173,10 +173,10 @@ export function SourceManager({ courseId }: { courseId: string }) {
         {!isLoading && !isError && data?.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <span className="text-5xl mb-3">&#x1F4DA;</span>
-            <p className="text-sm font-medium text-gray-700">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
               {t('sources.noSourcesYet')}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
               {t('sources.noSourcesHint')}
             </p>
           </div>
@@ -186,22 +186,22 @@ export function SourceManager({ courseId }: { courseId: string }) {
           <div
             key={source.id}
             onClick={() => setDetailId(source.id)}
-            className="flex items-start gap-3 p-3 rounded-xl bg-white border hover:border-blue-300 cursor-pointer transition-all group"
+            className="flex items-start gap-3 p-3 rounded-xl bg-white border hover:border-blue-300 cursor-pointer transition-all group dark:bg-gray-900"
           >
             <span className="text-xl mt-0.5 shrink-0">
               {SOURCE_ICONS[source.sourceType]}
             </span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800 truncate">
+              <p className="text-sm font-medium text-gray-800 truncate dark:text-gray-100">
                 {source.title}
               </p>
               {source.origin && (
-                <p className="text-xs text-gray-400 truncate mt-0.5">
+                <p className="text-xs text-gray-400 truncate mt-0.5 dark:text-gray-500">
                   {source.origin}
                 </p>
               )}
               {source.preview && source.status === 'READY' && (
-                <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed dark:text-gray-400">
                   {source.preview}
                 </p>
               )}
@@ -212,12 +212,12 @@ export function SourceManager({ courseId }: { courseId: string }) {
                   {t(STATUS_I18N_KEYS[source.status])}
                 </span>
                 {source.status === 'READY' && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     &middot; {t('sources.chunks', { count: source.chunkCount })}
                   </span>
                 )}
                 {source.status === 'FAILED' && (
-                  <span className="text-xs text-red-400 truncate">
+                  <span className="text-xs text-red-400 truncate dark:text-red-400">
                     &mdash;{' '}
                     {t(getFriendlySourceErrorKey(source.errorMessage))}
                   </span>
@@ -226,7 +226,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
             </div>
             <button
               onClick={(e) => handleDelete(e, source.id)}
-              className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-lg leading-none mt-0.5 shrink-0"
+              className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-lg leading-none mt-0.5 shrink-0 dark:text-gray-600"
               title={t('sources.deleteTitle')}
             >
               &#x2715;
@@ -236,8 +236,8 @@ export function SourceManager({ courseId }: { courseId: string }) {
       </div>
 
       {/* Info footer */}
-      <div className="px-4 py-3 border-t bg-white">
-        <p className="text-xs text-gray-400 text-center leading-relaxed">
+      <div className="px-4 py-3 border-t bg-white dark:bg-gray-900">
+        <p className="text-xs text-gray-400 text-center leading-relaxed dark:text-gray-500">
           {t('sources.footerInfo')}
         </p>
       </div>

@@ -6,9 +6,9 @@ export function StatusBadge({ status }: { status: LiveSession['status'] }) {
     return (
       <span
         data-testid="session-status-live"
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+        <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse dark:bg-red-600" />
         Live Now
       </span>
     );
@@ -17,7 +17,7 @@ export function StatusBadge({ status }: { status: LiveSession['status'] }) {
     return (
       <span
         data-testid="session-status-scheduled"
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600"
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
       >
         <Clock className="h-3 w-3" />
         Scheduled

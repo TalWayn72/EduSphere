@@ -221,11 +221,11 @@ export function CourseAnalyticsPage() {
         {/* At-Risk Learners */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            <AlertTriangle className="h-4 w-4 text-orange-500 dark:text-orange-400" />
             <CardTitle className="text-base">
               At-Risk Learners
               {atRisk.length > 0 && (
-                <span className="ml-2 px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-semibold">
+                <span className="ml-2 px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-semibold dark:bg-orange-900 dark:text-orange-200">
                   {atRisk.length} at risk
                 </span>
               )}

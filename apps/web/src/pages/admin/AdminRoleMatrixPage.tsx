@@ -47,8 +47,9 @@ export function AdminRoleMatrixPage() {
   const { t } = useTranslation('admin');
   return (
     <AdminLayout title={t('roleMatrix.title')} description={t('roleMatrix.description')}>
+      <h1 className="sr-only">Role Matrix</h1>
       <div data-testid="admin-role-matrix-page" className="space-y-4">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
+        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">BETA</Badge>
 
         <Card>
           <CardHeader>
@@ -76,7 +77,7 @@ export function AdminRoleMatrixPage() {
                       {ROLES.map((role) => (
                         <TableCell key={role} className="text-center">
                           {MATRIX[role].has(perm) ? (
-                            <span className="text-green-600 font-bold" aria-label="granted">&#10003;</span>
+                            <span className="text-green-600 font-bold dark:text-green-400" aria-label="granted">&#10003;</span>
                           ) : (
                             <span className="text-muted-foreground" aria-label="denied">&mdash;</span>
                           )}

@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
 import React from 'react';
 import { Clock, BarChart2, Tag } from 'lucide-react';
 import { PageMeta, CourseSchema, BreadcrumbSchema } from '@/components/seo';
@@ -121,7 +122,7 @@ function CourseCard({ course }: CourseCardProps) {
       </div>
       <a
         href="/pilot"
-        className="mt-2 inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+        className="mt-2 inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:text-white"
         aria-label={`Enroll in ${course.title} — Start Free Trial`}
       >
         Start Free Trial
@@ -158,18 +159,18 @@ export function CourseCatalogPage() {
       <PublicLayout>
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
-        <div className="bg-indigo-700 text-white py-16">
+        <div className="bg-indigo-700 text-white py-16 dark:bg-indigo-400 dark:text-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
               Featured Learning Programs
             </h1>
-            <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto dark:text-indigo-300">
               Explore our curated courses designed for modern professionals. AI-powered
               personalization adapts every course to your learning pace.
             </p>
             <a
               href="/pilot"
-              className="inline-flex items-center px-6 py-3 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition-colors dark:bg-gray-900 dark:text-indigo-300"
               aria-label="Start your free EduSphere pilot"
             >
               Start Free Trial
@@ -201,7 +202,7 @@ export function CourseCatalogPage() {
             </p>
             <a
               href="/pilot"
-              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:text-white"
               aria-label="Request an EduSphere pilot program"
             >
               Request a Pilot

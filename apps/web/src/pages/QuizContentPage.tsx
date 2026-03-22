@@ -47,7 +47,7 @@ export function QuizContentPage() {
 
         {!fetching && error && (
           <Card>
-            <CardContent className="p-6 text-center text-sm text-red-600">
+            <CardContent className="p-6 text-center text-sm text-red-600 dark:text-red-400">
               Failed to load quiz: {error}
             </CardContent>
           </Card>

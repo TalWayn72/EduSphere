@@ -162,9 +162,9 @@ export function AnnotationPanel({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
       {/* Header */}
-      <div className="p-4 bg-white border-b space-y-4">
+      <div className="p-4 bg-white border-b space-y-4 dark:bg-gray-900">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Annotations</h2>
           <Button onClick={() => setIsAddingNew(!isAddingNew)} size="sm">
@@ -222,7 +222,7 @@ export function AnnotationPanel({
 
       {/* Add New Annotation Form */}
       {isAddingNew && (
-        <div className="p-4 bg-white border-b">
+        <div className="p-4 bg-white border-b dark:bg-gray-900">
           <AnnotationForm
             userRole={currentUserRole}
             contentTimestamp={contentTimestamp}
@@ -255,7 +255,7 @@ export function AnnotationPanel({
             <div key={annotation.id}>
               {submittedIds.has(annotation.id) && (
                 <p
-                  className="text-xs text-indigo-600 mb-1 ml-1"
+                  className="text-xs text-indigo-600 mb-1 ml-1 dark:text-indigo-400"
                   data-testid={`merge-submitted-${annotation.id}`}
                 >
                   Proposal submitted — pending instructor review.

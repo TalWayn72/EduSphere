@@ -205,13 +205,13 @@ export function CollaborativeEditorToolbar({
         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs">
           {status === 'connected' ? (
             <>
-              <Wifi className="h-3 w-3 text-green-500" />
-              <span className="text-green-600">Live</span>
+              <Wifi className="h-3 w-3 text-green-500 dark:text-green-400" />
+              <span className="text-green-600 dark:text-green-400">Live</span>
             </>
           ) : status === 'connecting' ? (
             <>
-              <Wifi className="h-3 w-3 text-yellow-500 animate-pulse" />
-              <span className="text-yellow-600">Connecting</span>
+              <Wifi className="h-3 w-3 text-yellow-500 animate-pulse dark:text-yellow-400" />
+              <span className="text-yellow-600 dark:text-yellow-400">Connecting</span>
             </>
           ) : (
             <>
@@ -238,7 +238,7 @@ export function CollaborativeEditorToolbar({
                   </AvatarFallback>
                 </Avatar>
                 {u.isTyping && (
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-green-500 border border-background" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-green-500 border border-background dark:bg-green-600" />
                 )}
               </div>
             ))}

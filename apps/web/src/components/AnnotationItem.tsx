@@ -117,7 +117,7 @@ export function AnnotationItem({
                   variant="ghost"
                   size="sm"
                   onClick={() => onDelete(annotation.id)}
-                  className="h-7 text-xs text-red-600 hover:text-red-700"
+                  className="h-7 text-xs text-red-600 hover:text-red-700 dark:text-red-400"
                 >
                   Delete
                 </Button>
@@ -170,7 +170,7 @@ export function AnnotationItem({
                 variant="ghost"
                 size="sm"
                 onClick={() => onPropose!(annotation.id)}
-                className="h-7 text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                className="h-7 text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400"
                 data-testid={`propose-btn-${annotation.id}`}
                 aria-label="Propose to official content"
               >

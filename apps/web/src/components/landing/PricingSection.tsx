@@ -47,20 +47,20 @@ export function PricingSection() {
     <section
       id="pricing"
       data-testid="pricing-section"
-      className="bg-slate-50 py-20"
+      className="bg-slate-50 py-20 dark:bg-slate-800"
       aria-label="Pricing plans"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight dark:text-slate-100">
             {t('landing.pricing.title')}
           </h2>
-          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto dark:text-slate-400">
             {t('landing.pricing.subtitle')}{' '}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button className="underline decoration-dotted text-indigo-600 text-sm cursor-help" aria-label={t('landing.pricing.whatIsYau')}>
+                  <button className="underline decoration-dotted text-indigo-600 text-sm cursor-help dark:text-indigo-400" aria-label={t('landing.pricing.whatIsYau')}>
                     {t('landing.pricing.whatIsYau')}
                   </button>
                 </TooltipTrigger>
@@ -70,7 +70,7 @@ export function PricingSection() {
               </Tooltip>
             </TooltipProvider>
           </p>
-          <p className="mt-2 text-sm text-slate-500">{t('landing.pricing.annualBilling')}</p>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t('landing.pricing.annualBilling')}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-16">
@@ -90,7 +90,7 @@ export function PricingSection() {
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-indigo-600 text-white text-xs font-bold text-center py-1.5">
+                  <div className="absolute top-0 left-0 right-0 bg-indigo-600 text-white text-xs font-bold text-center py-1.5 dark:bg-indigo-500 dark:text-white">
                     {t('landing.pricing.mostPopular')}
                   </div>
                 )}
@@ -148,20 +148,20 @@ export function PricingSection() {
 
         {/* FAQs */}
         <div className="max-w-2xl mx-auto">
-          <h3 className="text-lg font-bold text-slate-900 mb-5 text-center">{t('landing.pricing.faqTitle')}</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-5 text-center dark:text-slate-100">{t('landing.pricing.faqTitle')}</h3>
           <div className="space-y-3">
             {FAQ_KEYS.map((faqKey, i) => (
-              <div key={faqKey} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <div key={faqKey} className="bg-white border border-slate-200 rounded-xl overflow-hidden dark:bg-gray-900 dark:border-slate-600">
                 <button
-                  className="w-full text-left px-5 py-4 font-semibold text-slate-800 text-sm flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  className="w-full text-left px-5 py-4 font-semibold text-slate-800 text-sm flex justify-between items-center hover:bg-slate-50 transition-colors dark:text-slate-100"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   aria-expanded={openFaq === i}
                 >
                   {t(`landing.pricing.faqs.${faqKey}.q`)}
-                  <span className="text-indigo-600 font-bold ml-4" aria-hidden="true">{openFaq === i ? '−' : '+'}</span>
+                  <span className="text-indigo-600 font-bold ml-4 dark:text-indigo-400" aria-hidden="true">{openFaq === i ? '−' : '+'}</span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-5 pb-4 text-sm text-slate-500">{t(`landing.pricing.faqs.${faqKey}.a`)}</div>
+                  <div className="px-5 pb-4 text-sm text-slate-500 dark:text-slate-400">{t(`landing.pricing.faqs.${faqKey}.a`)}</div>
                 )}
               </div>
             ))}

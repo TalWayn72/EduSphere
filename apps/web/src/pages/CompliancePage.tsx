@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
 /**
  * CompliancePage — Static public compliance overview.
  * Route: /compliance (public, no auth required)
@@ -148,7 +149,7 @@ export function CompliancePage() {
             >
               <div className="flex items-start gap-4 mb-4">
                 <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0">
-                  <Icon className="h-6 w-6 text-indigo-600" aria-hidden="true" />
+                  <Icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <div>
                   <h2
@@ -169,7 +170,7 @@ export function CompliancePage() {
                     className="flex items-start gap-2 text-gray-700 dark:text-white"
                   >
                     <ShieldCheck
-                      className="h-4 w-4 text-green-500 mt-1 flex-shrink-0"
+                      className="h-4 w-4 text-green-500 mt-1 flex-shrink-0 dark:text-green-400"
                       aria-hidden="true"
                     />
                     <span>{item}</span>
@@ -202,7 +203,7 @@ export function CompliancePage() {
               className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
             >
               <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                <Download className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+                <Download className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               </div>
               <div>
                 <span className="font-semibold text-gray-900 dark:text-white block">
@@ -219,7 +220,7 @@ export function CompliancePage() {
               className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
             >
               <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                <Download className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+                <Download className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               </div>
               <div>
                 <span className="font-semibold text-gray-900 dark:text-white block">
@@ -245,7 +246,7 @@ export function CompliancePage() {
           <div className="flex justify-center gap-4">
             <Link
               to="/contact"
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium"
+              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium dark:bg-indigo-500 dark:text-white"
             >
               Contact Sales
             </Link>

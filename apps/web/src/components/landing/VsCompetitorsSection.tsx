@@ -22,20 +22,20 @@ function Cell({ val, highlight = false }: { val: CellValue; highlight?: boolean 
   if (val === true) {
     return (
       <td className={`px-4 py-3 text-center text-base ${highlight ? 'bg-indigo-50' : ''}`}>
-        <span className="text-green-600 font-bold" aria-label="Yes">✅</span>
+        <span className="text-green-600 font-bold dark:text-green-400" aria-label="Yes">✅</span>
       </td>
     );
   }
   if (val === 'partial') {
     return (
       <td className="px-4 py-3 text-center text-base">
-        <span className="text-amber-500 font-bold" aria-label="Partial">⚠️</span>
+        <span className="text-amber-500 font-bold dark:text-amber-400" aria-label="Partial">⚠️</span>
       </td>
     );
   }
   return (
     <td className="px-4 py-3 text-center text-base">
-      <span className="text-red-400 font-bold" aria-label="No">❌</span>
+      <span className="text-red-400 font-bold dark:text-red-400" aria-label="No">❌</span>
     </td>
   );
 }
@@ -46,41 +46,41 @@ export function VsCompetitorsSection() {
   return (
     <section
       data-testid="vs-competitors-section"
-      className="bg-slate-50 py-20"
+      className="bg-slate-50 py-20 dark:bg-slate-800"
       aria-label="Comparison with competitors"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight dark:text-slate-100">
             {t('landing.competitors.title')}
           </h2>
-          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto dark:text-slate-400">
             {t('landing.competitors.subtitle')}
           </p>
         </div>
-        <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
-          <table className="w-full min-w-[700px] bg-white" role="table" aria-label="LMS comparison table">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm dark:border-slate-600">
+          <table className="w-full min-w-[700px] bg-white dark:bg-gray-900" role="table" aria-label="LMS comparison table">
             <thead>
-              <tr className="border-b border-slate-200">
-                <th className="px-4 py-4 text-left text-sm font-semibold text-slate-700 bg-slate-50 sticky left-0 z-10 min-w-[220px]">
+              <tr className="border-b border-slate-200 dark:border-slate-600">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-slate-700 bg-slate-50 sticky left-0 z-10 min-w-[220px] dark:text-slate-200 dark:bg-slate-800">
                   {t('landing.competitors.feature')}
                 </th>
-                <th className="px-4 py-4 text-center text-sm font-bold text-indigo-700 bg-indigo-50 min-w-[110px]">
+                <th className="px-4 py-4 text-center text-sm font-bold text-indigo-700 bg-indigo-50 min-w-[110px] dark:text-indigo-300 dark:bg-indigo-950">
                   EduSphere
                 </th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px]">Canvas</th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px]">D2L</th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[110px]">Blackboard</th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px]">Docebo</th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">Canvas</th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">D2L</th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[110px] dark:text-slate-300">Blackboard</th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">Docebo</th>
               </tr>
             </thead>
             <tbody>
               {ROW_KEYS.map((row, i) => (
                 <tr
                   key={row.key}
-                  className={`border-b border-slate-100 ${i % 2 === 0 ? '' : 'bg-slate-50/50'}`}
+                  className={`border-b border-slate-100  dark:border-slate-700${i % 2 === 0 ? '' : 'bg-slate-50/50'}`}
                 >
-                  <td className="px-4 py-3 text-sm font-medium text-slate-700 sticky left-0 bg-white z-10">
+                  <td className="px-4 py-3 text-sm font-medium text-slate-700 sticky left-0 bg-white z-10 dark:text-slate-200 dark:bg-gray-900">
                     {t(`landing.competitors.${row.key}`)}
                   </td>
                   <Cell val={row.edu} highlight />
@@ -93,7 +93,7 @@ export function VsCompetitorsSection() {
             </tbody>
           </table>
         </div>
-        <p className="text-center text-xs text-slate-500 mt-4">
+        <p className="text-center text-xs text-slate-500 mt-4 dark:text-slate-400">
           {t('landing.competitors.legend')}
         </p>
       </div>

@@ -177,7 +177,7 @@ export function ScormImportDialog({
           )}
 
           {state === 'done' && (
-            <div className="flex items-center gap-3 text-green-600">
+            <div className="flex items-center gap-3 text-green-600 dark:text-green-400">
               <CheckCircle className="h-5 w-5" />
               <span className="text-sm font-medium">
                 Import successful! Redirecting...

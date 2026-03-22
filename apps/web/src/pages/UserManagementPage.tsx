@@ -323,7 +323,7 @@ export function UserManagementPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 px-2 text-xs text-red-600"
+                          className="h-7 px-2 text-xs text-red-600 dark:text-red-400"
                           onClick={() => setConfirmDeactivate(u.id)}
                         >
                           Deactivate

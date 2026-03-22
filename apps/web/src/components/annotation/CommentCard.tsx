@@ -145,7 +145,7 @@ export function CommentCard({
           <Button
             size="sm"
             variant="ghost"
-            className="h-6 px-1.5 text-[10px] text-amber-600 hover:text-amber-700"
+            className="h-6 px-1.5 text-[10px] text-amber-600 hover:text-amber-700 dark:text-amber-400"
             aria-label="Save as flashcard"
             onClick={async (e) => {
               e.stopPropagation();
@@ -162,7 +162,7 @@ export function CommentCard({
           <Button
             size="sm"
             variant="ghost"
-            className="h-6 px-1.5 text-[10px] text-indigo-600 hover:text-indigo-700"
+            className="h-6 px-1.5 text-[10px] text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
             aria-label="Promote to instructor layer"
             onClick={async (e) => {
               e.stopPropagation();
@@ -175,13 +175,13 @@ export function CommentCard({
           </Button>
         )}
         {promoted && annotation.layer !== AnnotationLayer.INSTRUCTOR && (
-          <span className="text-[10px] text-indigo-500 px-1">Promoted!</span>
+          <span className="text-[10px] text-indigo-500 px-1 dark:text-indigo-400">Promoted!</span>
         )}
         {onResolve && (
           <Button
             size="sm"
             variant="ghost"
-            className="h-6 px-1.5 text-[10px] text-green-600 hover:text-green-700"
+            className="h-6 px-1.5 text-[10px] text-green-600 hover:text-green-700 dark:text-green-400"
             onClick={(e) => {
               e.stopPropagation();
               onResolve(annotation.id);

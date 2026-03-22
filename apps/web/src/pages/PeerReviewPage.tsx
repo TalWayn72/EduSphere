@@ -78,7 +78,7 @@ export function PeerReviewPage() {
     <Layout>
       <div className="container mx-auto p-6 space-y-8">
         <div className="flex items-center gap-3">
-          <Star className="h-8 w-8 text-indigo-500" aria-hidden="true" />
+          <Star className="h-8 w-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
           <h1 className="text-3xl font-bold">{t('peerReview')}</h1>
         </div>
 

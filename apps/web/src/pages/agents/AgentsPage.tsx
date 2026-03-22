@@ -56,7 +56,7 @@ export function AgentsPage() {
           <p className="text-sm text-muted-foreground">
             {t('subtitle')}
             {DEV_MODE && (
-              <span className="ml-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 px-1.5 py-0.5 rounded">
+              <span className="ml-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 px-1.5 py-0.5 rounded dark:text-yellow-300 dark:bg-yellow-950 dark:border-yellow-700">
                 {t('devMode')}
               </span>
             )}
@@ -65,7 +65,7 @@ export function AgentsPage() {
             <p
               role="alert"
               data-testid="agents-templates-error"
-              className="text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-1"
+              className="text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-1 dark:text-orange-200 dark:bg-orange-950 dark:border-orange-700"
             >
               {t('templatesUnavailable')}
             </p>

@@ -20,11 +20,11 @@ export function TrustBar() {
   return (
     <section
       data-testid="trust-bar"
-      className="bg-white border-b border-slate-100 py-8"
+      className="bg-white border-b border-slate-100 py-8 dark:bg-gray-900 dark:border-slate-700"
       aria-label="Trust indicators"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-sm font-semibold text-slate-500 uppercase tracking-wider mb-6">
+        <p className="text-center text-sm font-semibold text-slate-500 uppercase tracking-wider mb-6 dark:text-slate-400">
           {t('landing.trustBar.tagline')}
         </p>
         {/* Compliance mini-badges */}
@@ -33,9 +33,9 @@ export function TrustBar() {
             <div
               key={badge}
               role="listitem"
-              className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-3 py-1 text-xs font-semibold text-slate-700"
+              className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200"
             >
-              <Shield className="h-3 w-3 text-indigo-600" aria-hidden="true" />
+              <Shield className="h-3 w-3 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               {badge}
             </div>
           ))}

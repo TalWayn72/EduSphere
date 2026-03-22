@@ -84,7 +84,7 @@
 | BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection | ✅ Fixed | (pending commit) |
 | BUG-101 | Delete Course — 400 Bad Request + accessibility console errors | ✅ Fixed | `c7beef92` |
 | BUG-102 | Delete course button missing from CourseDetailPage | ✅ Fixed | (pending commit) |
-| BUG-103 | Delete Course fails silently — course not removed from list after deletion | 🟡 In Progress | — |
+| BUG-103 | Delete Course fails silently — course not removed from list after deletion | ✅ Fixed | `3dce63f4`, `0ad9030b`, `ae4a4200`, `10f9e269` |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 | FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (Wave 2) | (pending commit) |
 
@@ -197,9 +197,10 @@ Self-service organization onboarding with provisioning pipeline, user invitation
 
 ## BUG-103 — Delete Course Fails Silently — Course Not Removed from List (21 Mar 2026)
 
-- **Status:** 🟡 In Progress
+- **Status:** ✅ Fixed
 - **Severity:** 🔴 Critical (core CRUD operation — delete appears to succeed but course remains visible)
 - **Reported:** 21 March 2026
+- **Fixed:** 22 March 2026 — commits `3dce63f4`, `0ad9030b`, `ae4a4200`, `10f9e269`
 
 ### Problem
 
@@ -223,6 +224,8 @@ After clicking "Delete Course" and confirming the dialog, the course is not remo
 2. **Navigation state refetch:** `CourseHeaderCard.tsx` now passes `{ deleted: true }` in navigation state after successful deletion. `useCourseListData.ts` detects this state flag and triggers a network-only refetch to bypass cache.
 3. **i18n success key:** Added `courseDeletedSuccess` key to all 10 locale files (en, es, fr, he, hi, bn, id, pt, ru, zh-CN).
 4. **CourseEditPage.tsx:** Updated to align with the new deletion flow.
+5. **withTenantContext RLS fix (content subgraph):** Wrapped course delete mutation in `withTenantContext` to fix RLS blocking the DELETE query (`ae4a4200`).
+6. **Hard navigate after delete:** Replaced client-side `navigate()` with `window.location.href` to fully bypass urql cache and guarantee a fresh course list on redirect (`10f9e269`).
 
 ### Files Changed
 
@@ -239,9 +242,9 @@ After clicking "Delete Course" and confirming the dialog, the course is not remo
 
 | Test Type | Count | Status |
 |-----------|-------|--------|
-| Frontend unit (CourseList.test.tsx) | Regression tests added | 🟡 Pending verification |
+| Frontend unit (CourseList.test.tsx) | Regression tests added | ✅ Passing |
 | E2E (Playwright) | — | ⏳ Pending |
-| **Total** | **TBD** | **🟡 In Progress** |
+| **Total** | **Regression tests passing** | **✅ Fixed** |
 
 ### Anti-Recurrence
 

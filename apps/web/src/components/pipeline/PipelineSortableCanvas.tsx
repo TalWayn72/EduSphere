@@ -100,7 +100,7 @@ export function PipelineSortableCanvas({
         {customMode ? (
           <>
             <p className="text-4xl mb-3">&#x1F527;</p>
-            <p className="text-lg font-medium text-blue-600">מצב בנייה חופשית</p>
+            <p className="text-lg font-medium text-blue-600 dark:text-blue-400">מצב בנייה חופשית</p>
             <p className="text-sm mt-1">גרור מודולים מהחלונית השמאלית לכאן</p>
           </>
         ) : (

@@ -50,7 +50,7 @@ export function PartnerRevenueTable({ revenue }: { revenue: RevenueRow[] }) {
                   <td className="py-3 pr-4">{row.month}</td>
                   <td className="py-3 pr-4">${row.grossRevenue.toLocaleString()}</td>
                   <td className="py-3 pr-4 text-muted-foreground">${row.platformCut.toLocaleString()}</td>
-                  <td className="py-3 pr-4 font-semibold text-green-700">${row.payout.toLocaleString()}</td>
+                  <td className="py-3 pr-4 font-semibold text-green-700 dark:text-green-300">${row.payout.toLocaleString()}</td>
                   <td className="py-3">
                     <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${ROW_STATUS_BADGE[row.status] ?? ''}`}>
                       {row.status}

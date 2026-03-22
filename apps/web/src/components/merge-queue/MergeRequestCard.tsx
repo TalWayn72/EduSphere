@@ -45,7 +45,7 @@ export function MergeRequestCard({ request: req, onApprove, onReject }: Props) {
               <span>{timeAgo(req.submittedAt)}</span>
             </div>
           </div>
-          <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700">
             Pending
           </span>
         </div>
@@ -53,8 +53,8 @@ export function MergeRequestCard({ request: req, onApprove, onReject }: Props) {
       <CardContent className="space-y-3">
         <div>
           <p className="text-xs font-medium text-muted-foreground mb-1">Proposed annotation:</p>
-          <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm" data-testid={`proposal-content-${req.id}`}>
-            <span className="text-green-700 font-mono text-xs mr-1">+</span>
+          <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm dark:bg-green-950 dark:border-green-700" data-testid={`proposal-content-${req.id}`}>
+            <span className="text-green-700 font-mono text-xs mr-1 dark:text-green-300">+</span>
             {req.content}
           </div>
         </div>
@@ -65,7 +65,7 @@ export function MergeRequestCard({ request: req, onApprove, onReject }: Props) {
         <div className="flex gap-2 pt-1">
           <Button
             size="sm"
-            className="h-8 gap-1 bg-green-600 hover:bg-green-700"
+            className="h-8 gap-1 bg-green-600 hover:bg-green-700 dark:bg-green-500"
             onClick={onApprove}
             data-testid={`approve-btn-${req.id}`}
           >
@@ -75,7 +75,7 @@ export function MergeRequestCard({ request: req, onApprove, onReject }: Props) {
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1 text-red-600 hover:text-red-700 hover:border-red-300"
+            className="h-8 gap-1 text-red-600 hover:text-red-700 hover:border-red-300 dark:text-red-400"
             onClick={onReject}
             data-testid={`reject-btn-${req.id}`}
           >

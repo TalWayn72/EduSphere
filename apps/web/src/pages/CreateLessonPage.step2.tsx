@@ -45,7 +45,7 @@ export function CreateLessonStep2({
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">הוספת חומרים</h2>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
         ניתן לדלג על שלב זה ולהוסיף חומרים לאחר יצירת השיעור
       </p>
 
@@ -69,10 +69,10 @@ export function CreateLessonStep2({
             )}
           </div>
           {videoError && (
-            <p className="text-red-500 text-xs mt-1">{videoError}</p>
+            <p className="text-red-500 text-xs mt-1 dark:text-red-400">{videoError}</p>
           )}
           {!lessonId && (
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
               הקישור יתווסף לאחר יצירת השיעור
             </p>
           )}
@@ -87,7 +87,7 @@ export function CreateLessonStep2({
             accept=".pdf,.docx,.txt"
             className="w-full border rounded-lg px-3 py-2 text-sm"
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
             תמיכה בקבצי PDF, Word, TXT
           </p>
         </div>

@@ -42,10 +42,10 @@ export function OnboardingReentryCard({ onboardingSkipped }: OnboardingReentryCa
   }
 
   return (
-    <Card data-testid="onboarding-reentry-card" className="border-amber-200 bg-amber-50">
+    <Card data-testid="onboarding-reentry-card" className="border-amber-200 bg-amber-50 dark:border-amber-700 dark:bg-amber-950">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <UserCircle className="h-5 w-5 text-amber-600" />
+          <UserCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           {t('reentry.title', 'Complete Your Profile')}
         </CardTitle>
         <Button

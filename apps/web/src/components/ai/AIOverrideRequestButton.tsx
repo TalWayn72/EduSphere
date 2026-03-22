@@ -87,7 +87,7 @@ export function AIOverrideRequestButton({
             <p
               role="status"
               aria-live="polite"
-              className="text-sm text-green-600 py-2"
+              className="text-sm text-green-600 py-2 dark:text-green-400"
             >
               Your review request has been submitted successfully.
             </p>

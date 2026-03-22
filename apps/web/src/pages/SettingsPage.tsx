@@ -125,7 +125,7 @@ export function SettingsPage() {
                 </div>
               )}
               {!stats?.isOverLimit && stats?.isApproachingLimit && (
-                <div className="rounded-md bg-yellow-50 border border-yellow-200 px-3 py-2 text-sm text-yellow-800">
+                <div className="rounded-md bg-yellow-50 border border-yellow-200 px-3 py-2 text-sm text-yellow-800 dark:bg-yellow-950 dark:border-yellow-700 dark:text-yellow-200">
                   {t('storage.approachingLimitWarning')}
                 </div>
               )}

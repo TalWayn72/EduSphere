@@ -52,9 +52,9 @@ function StatusBadge({ status }: { status: LiveSession['status'] }) {
     return (
       <span
         data-testid="detail-status-live"
-        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-700"
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
       >
-        <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" aria-hidden />
+        <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse dark:bg-red-600" aria-hidden />
         Live Now
       </span>
     );
@@ -63,7 +63,7 @@ function StatusBadge({ status }: { status: LiveSession['status'] }) {
     return (
       <span
         data-testid="detail-status-scheduled"
-        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700"
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
       >
         <Radio className="h-3 w-3" aria-hidden />
         Scheduled
@@ -346,13 +346,13 @@ export function LiveSessionDetailPage() {
             <CardContent className="flex-1 flex flex-col p-0">
               {/* Video placeholder */}
               <div
-                className="flex-1 bg-zinc-900 flex flex-col items-center justify-center gap-3 rounded-t-lg"
+                className="flex-1 bg-zinc-900 flex flex-col items-center justify-center gap-3 rounded-t-lg dark:bg-zinc-100"
                 data-testid="video-area"
               >
                 {isEnded ? (
                   <div className="text-center space-y-2" data-testid="session-ended-state">
                     <CheckCircle2 className="h-12 w-12 text-muted-foreground mx-auto" />
-                    <p className="text-white font-semibold">Session Ended</p>
+                    <p className="text-white font-semibold dark:text-white">Session Ended</p>
                     {session.recordingUrl && (
                       <a
                         href={session.recordingUrl}
@@ -367,13 +367,13 @@ export function LiveSessionDetailPage() {
                   </div>
                 ) : (
                   <>
-                    <Video className="h-16 w-16 text-zinc-600" aria-hidden />
-                    <p className="text-zinc-400 text-sm">
+                    <Video className="h-16 w-16 text-zinc-600 dark:text-zinc-300" aria-hidden />
+                    <p className="text-zinc-400 text-sm dark:text-zinc-500">
                       {isLive ? 'Live video stream' : 'Session not started yet'}
                     </p>
                     {isLive && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                        <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 dark:bg-red-400/20 dark:text-red-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse dark:bg-red-500" />
                         LIVE
                       </span>
                     )}

@@ -98,7 +98,7 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
                   Revoked
                 </span>
               ) : (
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700">
                   Valid
                 </span>
               )}

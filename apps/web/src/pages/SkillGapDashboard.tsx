@@ -121,7 +121,7 @@ export function SkillGapDashboard() {
               {/* Mastered skills */}
               <div className="rounded-lg border p-4 space-y-2">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-500" aria-hidden />
+                  <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" aria-hidden />
                   Mastered Skills ({masteredCount})
                 </h2>
                 {masteredSkillsList.length === 0 ? (

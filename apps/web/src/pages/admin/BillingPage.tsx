@@ -84,6 +84,7 @@ export function BillingPage() {
 
   return (
     <AdminLayout title={t('billing.title')} description={t('billing.description')}>
+      <h1 className="sr-only">Billing</h1>
       <div data-testid="billing-page" className="space-y-6">
         {fetching ? (
           <Card><CardContent className="p-6"><Skeleton className="h-32 w-full" /></CardContent></Card>

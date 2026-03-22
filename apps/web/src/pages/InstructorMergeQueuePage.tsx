@@ -96,7 +96,7 @@ export function InstructorMergeQueuePage() {
         />
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <GitPullRequest className="h-5 w-5 text-indigo-600" />
+            <GitPullRequest className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             <h1 className="text-2xl font-bold">Annotation Proposals</h1>
           </div>
           <p className="text-sm text-muted-foreground">

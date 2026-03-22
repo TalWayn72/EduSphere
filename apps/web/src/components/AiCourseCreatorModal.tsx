@@ -499,7 +499,7 @@ export function AiCourseCreatorModal({
                         key={i}
                         className="flex items-center gap-2 text-xs text-muted-foreground"
                       >
-                        <CheckCircle2 className="h-3 w-3 text-green-500 shrink-0" />
+                        <CheckCircle2 className="h-3 w-3 text-green-500 shrink-0 dark:text-green-400" />
                         {item}
                       </li>
                     ))}

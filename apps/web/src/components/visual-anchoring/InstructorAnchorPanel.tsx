@@ -57,7 +57,7 @@ function AnchorRow({ anchor, onDelete }: AnchorRowProps) {
           {anchor.isBroken && (
             <Badge
               variant="outline"
-              className="gap-1 text-[10px] text-orange-600 border-orange-400"
+              className="gap-1 text-[10px] text-orange-600 border-orange-400 dark:text-orange-400 dark:border-orange-500"
               data-testid={`broken-badge-${anchor.id}`}
               aria-label="עוגן שבור — הקישור לתמונה אינו תקין"
             >

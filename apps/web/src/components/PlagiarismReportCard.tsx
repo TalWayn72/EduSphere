@@ -87,7 +87,7 @@ export function PlagiarismReportCard({
                   {isInstructor && onReview && (
                     <button
                       onClick={() => onReview(s.submissionId)}
-                      className="ml-4 text-xs text-blue-600 underline hover:text-blue-800"
+                      className="ml-4 text-xs text-blue-600 underline hover:text-blue-800 dark:text-blue-400"
                     >
                       Review
                     </button>

@@ -115,6 +115,7 @@ export function CollaborationSessionPage() {
   return (
     <Layout>
       <PageShell size="md" spacing="compact">
+        <h1 className="sr-only">Collaboration Session</h1>
         {/* Header */}
         <div className="flex items-center gap-3">
           <Button
@@ -155,14 +156,14 @@ export function CollaborationSessionPage() {
           {infoNote && (
             <>
               <span className="text-muted-foreground">·</span>
-              <span className="text-xs text-blue-600 font-medium">
+              <span className="text-xs text-blue-600 font-medium dark:text-blue-400">
                 {infoNote}
               </span>
             </>
           )}
           <div className="flex-1" />
           <div className="flex items-center gap-1">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse dark:bg-green-600" />
             <span className="text-xs text-muted-foreground">
               {t('participants', { count: participantCount })}
             </span>

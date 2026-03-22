@@ -49,23 +49,23 @@ export function SourceDetailDrawer({
     : '';
 
   return (
-    <div className="absolute inset-0 z-10 bg-white flex flex-col" dir={dir}>
+    <div className="absolute inset-0 z-10 bg-white flex flex-col dark:bg-gray-900" dir={dir}>
       <div className="flex items-center gap-2 px-4 py-3 border-b">
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-700"
+          className="text-gray-400 hover:text-gray-700 dark:text-gray-500"
         >
           {t('sources.back')}
         </button>
         <span className="font-medium truncate">{data?.title ?? '...'}</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
+      <div className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700 dark:text-gray-200">
         {isLoading
           ? t('sources.loading')
           : isError
             ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                <p className="text-sm font-medium text-red-600">
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
                   {t(getSourceErrorKey(queryError))}
                 </p>
               </div>

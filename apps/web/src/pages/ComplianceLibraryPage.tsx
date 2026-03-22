@@ -92,7 +92,7 @@ export function ComplianceLibraryPage() {
     <PageShell size="xl" className="p-6">
       <header className="mb-8">
         <div className="flex items-center gap-3">
-          <ShieldCheck className="h-8 w-8 text-indigo-600" aria-hidden="true" />
+          <ShieldCheck className="h-8 w-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-bold">Compliance Course Library</h1>
             <p className="text-muted-foreground mt-1">
@@ -114,7 +114,7 @@ export function ComplianceLibraryPage() {
           ))}
         </div>
       ) : result.error ? (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
           Unable to load compliance library.
         </p>
       ) : (
@@ -124,7 +124,7 @@ export function ComplianceLibraryPage() {
               <CardHeader className="flex-1">
                 <div className="flex items-start gap-2">
                   <BookOpen
-                    className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0"
+                    className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0 dark:text-indigo-400"
                     aria-hidden="true"
                   />
                   <CardTitle className="text-base leading-snug">

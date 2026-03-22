@@ -45,8 +45,8 @@ export function DocumentAnnotationPanel({
 }: DocumentAnnotationPanelProps) {
   if (fetching) {
     return (
-      <div className="flex flex-col h-full bg-gray-50">
-        <div className="p-4 bg-white border-b">
+      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
+        <div className="p-4 bg-white border-b dark:bg-gray-900">
           <h2 className="text-lg font-semibold">Text Annotations</h2>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -60,12 +60,12 @@ export function DocumentAnnotationPanel({
 
   if (error) {
     return (
-      <div className="flex flex-col h-full bg-gray-50">
-        <div className="p-4 bg-white border-b">
+      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
+        <div className="p-4 bg-white border-b dark:bg-gray-900">
           <h2 className="text-lg font-semibold">Text Annotations</h2>
         </div>
         <div className="flex-1 p-4">
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3 dark:text-red-400 dark:bg-red-950 dark:border-red-700">
             {error}
           </p>
         </div>

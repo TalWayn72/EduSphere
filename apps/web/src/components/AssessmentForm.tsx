@@ -114,7 +114,7 @@ export function AssessmentForm({
     return (
       <Card>
         <CardContent className="pt-6 text-center">
-          <p className="text-green-600 font-medium">
+          <p className="text-green-600 font-medium dark:text-green-400">
             Your feedback has been submitted. Thank you!
           </p>
         </CardContent>

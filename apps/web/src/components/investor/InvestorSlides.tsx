@@ -21,11 +21,11 @@ interface Slide {
 function SlideCard({ slide }: { slide: Slide }) {
   return (
     <Card data-testid={`slide-${slide.n}`} className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex flex-row items-center gap-4 py-4">
+      <CardHeader className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex flex-row items-center gap-4 py-4 dark:text-white">
         <span role="presentation" aria-hidden="true" className="flex-shrink-0 w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
           {slide.n}
         </span>
-        <CardTitle className="text-white text-lg">{slide.title}</CardTitle>
+        <CardTitle className="text-white text-lg dark:text-white">{slide.title}</CardTitle>
       </CardHeader>
       <CardContent className="pt-4 text-sm text-foreground">{slide.content}</CardContent>
     </Card>

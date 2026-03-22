@@ -155,7 +155,7 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
             <input
               ref={textInputRef}
               type="text"
-              className="absolute bg-transparent border-b border-white text-white outline-none text-sm min-w-[4rem]"
+              className="absolute bg-transparent border-b border-white text-white outline-none text-sm min-w-[4rem] dark:border-gray-700 dark:text-white"
               style={{ left: `${textInput.x * 100}%`, top: `${textInput.y * 100}%` }}
               onKeyDown={(e) => { if (e.key === 'Enter') commitText(e.currentTarget.value); }}
               onBlur={(e) => commitText(e.currentTarget.value)}
@@ -169,7 +169,7 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
       {/* Toggle button (inactive) / Toolbar (active) */}
       {!active ? (
         <button
-          className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 hover:bg-black/80 text-white rounded px-2 py-1 text-[11px] font-medium transition-colors"
+          className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 hover:bg-black/80 text-white rounded px-2 py-1 text-[11px] font-medium transition-colors dark:text-white"
           onClick={() => setActive(true)}
           aria-label="Activate sketch mode"
           data-testid="sketch-toggle-btn"

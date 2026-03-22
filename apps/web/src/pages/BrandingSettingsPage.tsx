@@ -149,7 +149,7 @@ export function BrandingSettingsPage() {
                 Save Changes
               </Button>
               {saved && (
-                <span className="flex items-center gap-1.5 text-sm text-green-600">
+                <span className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
                   <CheckCircle2 className="h-4 w-4" /> Branding saved
                   successfully
                 </span>

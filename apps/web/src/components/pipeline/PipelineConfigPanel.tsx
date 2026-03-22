@@ -363,7 +363,7 @@ function IngestionConfig({
           />
         </label>
         {uploading && (
-          <span className="text-xs text-blue-500 animate-pulse mt-1 block">
+          <span className="text-xs text-blue-500 animate-pulse mt-1 block dark:text-blue-400">
             {t('pipeline.uploadingFile')}
           </span>
         )}

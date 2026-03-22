@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';

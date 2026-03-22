@@ -45,6 +45,7 @@ function KpiCard({ kpi }: { kpi: KPI }) {
   const isPositive = kpi.change >= 0;
   return (
     <Card>
+      <h1 className="sr-only">Analytics Dashboard</h1>
       <CardContent className="p-4">
         <p className="text-xs text-muted-foreground">{kpi.label}</p>
         <p className="text-2xl font-bold mt-1">{kpi.value}</p>

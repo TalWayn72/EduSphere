@@ -32,15 +32,15 @@ export function ROICalculatorSection() {
     <section
       id="roi"
       data-testid="roi-calculator-section"
-      className="bg-white py-20"
+      className="bg-white py-20 dark:bg-gray-900"
       aria-label="ROI Calculator"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight dark:text-slate-100">
             {t('landing.roi.title')}
           </h2>
-          <p className="mt-4 text-lg text-slate-500">
+          <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">
             {t('landing.roi.subtitle')}
           </p>
         </div>
@@ -56,8 +56,8 @@ export function ROICalculatorSection() {
             ].map(({ label, value, min, max, step, set, format }) => (
               <div key={label}>
                 <div className="flex justify-between items-center mb-3">
-                  <Label className="text-sm font-semibold text-slate-700">{label}</Label>
-                  <span className="text-sm font-bold text-indigo-600">{format(value)}</span>
+                  <Label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</Label>
+                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{format(value)}</span>
                 </div>
                 <Slider
                   min={min}
@@ -73,7 +73,7 @@ export function ROICalculatorSection() {
           </div>
 
           {/* Results */}
-          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 flex flex-col gap-6">
+          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 flex flex-col gap-6 dark:bg-slate-800 dark:border-slate-600">
             {[
               { label: t('landing.roi.hoursSavedYear'), value: `${hoursSaved.toLocaleString()} hrs` },
               { label: t('landing.roi.dollarValueSaved'), value: formatCurrency(valueSaved), highlight: true },
@@ -84,11 +84,11 @@ export function ROICalculatorSection() {
                 <p className={`text-2xl font-extrabold ${highlight ? 'text-white' : 'text-slate-900'}`}>{value}</p>
               </div>
             ))}
-            <div className="rounded-xl bg-green-50 border border-green-200 px-5 py-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1">{t('landing.roi.netRoi')}</p>
-              <p className="text-3xl font-extrabold text-green-700">{netROI > 0 ? '+' : ''}{netROI}%</p>
+            <div className="rounded-xl bg-green-50 border border-green-200 px-5 py-4 dark:bg-green-950 dark:border-green-700">
+              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1 dark:text-green-300">{t('landing.roi.netRoi')}</p>
+              <p className="text-3xl font-extrabold text-green-700 dark:text-green-300">{netROI > 0 ? '+' : ''}{netROI}%</p>
             </div>
-            <Button className="bg-indigo-600 hover:bg-indigo-500 text-white w-full" asChild>
+            <Button className="bg-indigo-600 hover:bg-indigo-500 text-white w-full dark:bg-indigo-500 dark:text-white" asChild>
               <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>{t('landing.roi.getReport')}</Link>
             </Button>
           </div>

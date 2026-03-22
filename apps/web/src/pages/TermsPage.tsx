@@ -40,7 +40,7 @@ export function TermsPage() {
             <h2 className="text-xl font-semibold">9. Contact</h2>
             <p>
               For questions regarding these terms, contact us at{' '}
-              <a href="mailto:legal@edusphere.dev" className="text-blue-600 hover:underline">
+              <a href="mailto:legal@edusphere.dev" className="text-blue-600 hover:underline dark:text-blue-400">
                 legal@edusphere.dev
               </a>.
             </p>

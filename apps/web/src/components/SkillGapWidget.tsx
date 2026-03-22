@@ -178,7 +178,7 @@ export function SkillGapWidget() {
                       className="border rounded-md p-2.5"
                     >
                       <p className="text-sm font-medium flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-amber-500" />
+                        <BookOpen className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
                         {gap.conceptName}
                       </p>
                       {gap.recommendedContentTitles.length > 0 && (
@@ -192,7 +192,7 @@ export function SkillGapWidget() {
               )}
 
               {report.gapCount === 0 && (
-                <p className="text-sm text-emerald-600 font-medium">
+                <p className="text-sm text-emerald-600 font-medium dark:text-emerald-400">
                   All required skills mastered for this role!
                 </p>
               )}

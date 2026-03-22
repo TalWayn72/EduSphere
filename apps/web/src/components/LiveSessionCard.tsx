@@ -100,7 +100,7 @@ export function LiveSessionCard({
         </div>
 
         {joinError && (
-          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-1.5">
+          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-1.5 dark:text-red-400 dark:bg-red-950 dark:border-red-700">
             {joinError}
           </p>
         )}
@@ -128,7 +128,7 @@ export function LiveSessionCard({
             <video
               src={liveSession.recordingUrl}
               controls
-              className="w-full rounded-md aspect-video bg-black"
+              className="w-full rounded-md aspect-video bg-black dark:bg-black"
               aria-label={`Recording of ${liveSession.meetingName}`}
             />
           </div>

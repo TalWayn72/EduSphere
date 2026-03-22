@@ -21,7 +21,7 @@ export function ResultsGrid({ courseId, lessonId, r }: ResultsGridProps) {
       {r.ingestion && (
         <ResultCard icon="📥" title="חומר גלם שעובד" testId="result-ingestion">
           {r.ingestedUrl ? (
-            <p className="text-sm text-blue-700 break-all" data-testid="ingestion-url">
+            <p className="text-sm text-blue-700 break-all dark:text-blue-300" data-testid="ingestion-url">
               <a href={r.ingestedUrl} target="_blank" rel="noopener noreferrer" className="underline">
                 {r.ingestedUrl}
               </a>
@@ -73,7 +73,7 @@ export function ResultsGrid({ courseId, lessonId, r }: ResultsGridProps) {
               <h3 className="text-xs font-semibold text-muted-foreground mb-1 uppercase">ישויות שזוהו</h3>
               <div className="flex flex-wrap gap-1">
                 {r.entities.slice(0, 20).map((e, i) => (
-                  <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200" data-testid={`entity-${i}`}>
+                  <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 dark:bg-blue-950 dark:border-blue-700" data-testid={`entity-${i}`}>
                     {e.text}
                     {e.type && <span className="text-muted-foreground ml-1">({e.type})</span>}
                   </span>
@@ -91,7 +91,7 @@ export function ResultsGrid({ courseId, lessonId, r }: ResultsGridProps) {
                 {r.linkedSources.slice(0, 10).map((s, i) => (
                   <li key={i}>
                     {s.url ? (
-                      <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">{s.title}</a>
+                      <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline dark:text-blue-400">{s.title}</a>
                     ) : (
                       <span>{s.title}</span>
                     )}
@@ -141,10 +141,10 @@ export function ResultsGrid({ courseId, lessonId, r }: ResultsGridProps) {
       {r.citations && (
         <ResultCard icon="🔍" title="אימות ציטוטים" testId="result-citations">
           <div className="flex gap-4 mb-3">
-            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm" data-testid="citations-verified">
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm dark:bg-green-900 dark:text-green-300" data-testid="citations-verified">
               ✓ אומתו: {r.verifiedCount}
             </span>
-            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm" data-testid="citations-failed">
+            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm dark:bg-red-900 dark:text-red-300" data-testid="citations-failed">
               ✗ נכשלו: {r.failedCount}
             </span>
           </div>
@@ -160,7 +160,7 @@ export function ResultsGrid({ courseId, lessonId, r }: ResultsGridProps) {
       {r.qa && (
         <ResultCard icon="✅" title="בקרת איכות" testId="result-qa">
           <div className="flex items-center gap-3 mb-3">
-            <div className="text-3xl font-bold text-blue-600" data-testid="qa-score">
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400" data-testid="qa-score">
               {Math.round(Number(r.qaScore ?? 0) * (Number(r.qaScore ?? 0) <= 1 ? 100 : 1))}%
             </div>
             <span className="text-sm text-muted-foreground">ציון כללי</span>
@@ -185,14 +185,14 @@ export function ResultsGrid({ courseId, lessonId, r }: ResultsGridProps) {
       {r.publish && (
         <ResultCard icon="🚀" title="יצוא והפצה" testId="result-publish">
           {r.publishReady === true && (
-            <p className="text-green-600 text-sm font-medium mb-2" data-testid="publish-ready">✅ מוכן לפרסום</p>
+            <p className="text-green-600 text-sm font-medium mb-2 dark:text-green-400" data-testid="publish-ready">✅ מוכן לפרסום</p>
           )}
           {r.publishedUrl && (
             <a
               href={r.publishedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 underline text-sm break-all"
+              className="text-blue-600 underline text-sm break-all dark:text-blue-400"
               data-testid="publish-url"
             >
               {r.publishedUrl}

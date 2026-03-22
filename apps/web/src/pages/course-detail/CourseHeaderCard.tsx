@@ -107,7 +107,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
               {editMode ? (
                 <input
                   data-testid="course-title-input"
-                  className="text-2xl font-bold border-b-2 border-blue-400 outline-none w-full bg-transparent leading-snug mb-2"
+                  className="text-2xl font-bold border-b-2 border-blue-400 outline-none w-full bg-transparent leading-snug mb-2 dark:border-blue-500"
                   value={editTitle}
                   onChange={(e) => onEditTitleChange(e.target.value)}
                   onKeyDown={(e) => {

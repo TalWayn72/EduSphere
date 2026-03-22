@@ -81,7 +81,7 @@ export function ProctoringOverlay({ assessmentId, onFlagCountChange }: Props) {
         playsInline
         width={128}
         height={96}
-        className={`rounded border border-border bg-black ${isActive ? 'block' : 'hidden'}`}
+        className={`rounded border border-border bg-black  dark:bg-black${isActive ? 'block' : 'hidden'}`}
         aria-label="Webcam preview"
       />
 
@@ -90,7 +90,7 @@ export function ProctoringOverlay({ assessmentId, onFlagCountChange }: Props) {
           data-testid="proctoring-active-badge"
           className="flex items-center gap-1.5 rounded-full bg-destructive/90 px-3 py-1 text-xs font-semibold text-destructive-foreground"
         >
-          <span className="h-2 w-2 rounded-full bg-white animate-pulse" aria-hidden="true" />
+          <span className="h-2 w-2 rounded-full bg-white animate-pulse dark:bg-gray-900" aria-hidden="true" />
           Proctoring Active
         </div>
       )}
@@ -98,7 +98,7 @@ export function ProctoringOverlay({ assessmentId, onFlagCountChange }: Props) {
       {flagCount > 0 && (
         <div
           data-testid="proctoring-flag-count"
-          className="rounded bg-yellow-500/90 px-2 py-0.5 text-xs font-medium text-black"
+          className="rounded bg-yellow-500/90 px-2 py-0.5 text-xs font-medium text-black dark:bg-yellow-600/90 dark:text-gray-100"
         >
           {flagCount} flag(s)
         </div>

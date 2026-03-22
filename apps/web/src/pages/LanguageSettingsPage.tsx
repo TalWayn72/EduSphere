@@ -69,7 +69,7 @@ interface QueryResult {
 
 function RtlBadge() {
   return (
-    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono">
+    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono dark:bg-amber-900 dark:text-amber-300">
       RTL
     </span>
   );
@@ -217,7 +217,7 @@ export function LanguageSettingsPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {supported.size === 0 && (
-                  <div className="flex items-center gap-2 text-sm text-amber-600">
+                  <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
                     <AlertCircle className="h-4 w-4" />
                     {t('languageAdmin.atLeastOne')}
                   </div>
@@ -306,7 +306,7 @@ export function LanguageSettingsPage() {
                 {t('languageAdmin.saveChanges')}
               </Button>
               {saved && (
-                <span className="flex items-center gap-1.5 text-sm text-green-600">
+                <span className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
                   <CheckCircle2 className="h-4 w-4" /> {t('languageAdmin.saved')}
                 </span>
               )}

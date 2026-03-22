@@ -180,14 +180,14 @@ export function CreateLessonPage() {
             </div>
             {error && (
               <div
-                className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4"
+                className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 dark:bg-red-950 dark:border-red-700"
                 data-testid="create-lesson-error"
                 role="alert"
               >
-                <p className="text-red-700 text-sm">{error}</p>
+                <p className="text-red-700 text-sm dark:text-red-300">{error}</p>
                 <button
                   type="button"
-                  className="text-red-600 text-xs underline mt-1"
+                  className="text-red-600 text-xs underline mt-1 dark:text-red-400"
                   onClick={() => setError(null)}
                 >
                   סגור

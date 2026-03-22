@@ -48,7 +48,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
             <Link to="/login">{t('logIn')}</Link>
           </Button>
           {isFull && (
-            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white" asChild>
+            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white dark:bg-indigo-500 dark:text-white" asChild>
               <a href={anchor('#pilot-cta')} onClick={smoothScroll('#pilot-cta')}>{tNav('startFreePilot')}</a>
             </Button>
           )}
@@ -79,7 +79,7 @@ export function PublicNav({ variant = 'full' }: PublicNavProps) {
               <Link to="/login">{t('logIn')}</Link>
             </Button>
             {isFull && (
-              <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white" asChild>
+              <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white dark:bg-indigo-500 dark:text-white" asChild>
                 <a href={anchor('#pilot-cta')} onClick={smoothScroll('#pilot-cta')}>{tNav('freePilot')}</a>
               </Button>
             )}

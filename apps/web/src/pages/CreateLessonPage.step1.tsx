@@ -43,7 +43,7 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.title && (
-            <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
+            <p className="text-red-500 text-xs mt-1 dark:text-red-400">{errors.title.message}</p>
           )}
         </div>
 

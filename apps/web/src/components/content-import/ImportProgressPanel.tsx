@@ -23,7 +23,7 @@ export function ImportProgressPanel({ job, onDone }: Props) {
       aria-label="Import progress"
     >
       {job.status === 'COMPLETE' && (
-        <CheckCircle className="mx-auto h-12 w-12 text-green-500" aria-hidden="true" />
+        <CheckCircle className="mx-auto h-12 w-12 text-green-500 dark:text-green-400" aria-hidden="true" />
       )}
       {job.status === 'FAILED' && (
         <XCircle className="mx-auto h-12 w-12 text-destructive" aria-hidden="true" />

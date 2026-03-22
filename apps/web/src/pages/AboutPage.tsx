@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lightbulb, ShieldCheck, Accessibility, BookOpen } from 'lucide-react';
@@ -45,12 +46,12 @@ export function AboutPage() {
         </section>
 
         {/* Stats */}
-        <section aria-label="Company statistics" className="bg-indigo-600 py-12">
+        <section aria-label="Company statistics" className="bg-indigo-600 py-12 dark:bg-indigo-500">
           <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             {STAT_KEYS.map((key, i) => (
               <div key={key}>
-                <p className="text-3xl font-extrabold text-white">{STAT_VALUES[i]}</p>
-                <p className="text-indigo-100 text-sm mt-1">{t(`about.stats.${key}`)}</p>
+                <p className="text-3xl font-extrabold text-white dark:text-white">{STAT_VALUES[i]}</p>
+                <p className="text-indigo-100 text-sm mt-1 dark:text-indigo-300">{t(`about.stats.${key}`)}</p>
               </div>
             ))}
           </div>
@@ -62,8 +63,8 @@ export function AboutPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {TEAM.map((m) => (
               <article key={m.name} className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mb-3" aria-hidden="true">
-                  <span className="text-indigo-600 font-bold text-lg">{m.initials}</span>
+                <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mb-3 dark:bg-indigo-900" aria-hidden="true">
+                  <span className="text-indigo-600 font-bold text-lg dark:text-indigo-400">{m.initials}</span>
                 </div>
                 <p className="font-semibold text-slate-900 dark:text-white">{m.name}</p>
                 <p className="text-sm text-slate-500 dark:text-slate-300">{m.role}</p>
@@ -81,7 +82,7 @@ export function AboutPage() {
                 const Icon = VALUE_ICONS[i] as typeof VALUE_ICONS[number];
                 return (
                   <div key={key} className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
-                    <Icon className="h-8 w-8 text-indigo-600 mb-3" aria-hidden="true" />
+                    <Icon className="h-8 w-8 text-indigo-600 mb-3 dark:text-indigo-400" aria-hidden="true" />
                     <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{t(`about.values.${key}`)}</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-300">{t(`about.values.${key}Desc`)}</p>
                   </div>

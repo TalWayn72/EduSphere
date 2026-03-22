@@ -138,7 +138,7 @@ export function MicrolessonCard({
             </div>
           </div>
           {isCompleted && (
-            <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-1" />
+            <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-1 dark:text-green-400" />
           )}
         </div>
         <div className="flex items-start gap-2 text-sm bg-primary/5 rounded-md p-2">

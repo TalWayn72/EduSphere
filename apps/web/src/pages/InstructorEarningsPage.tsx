@@ -124,7 +124,7 @@ export function InstructorEarningsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-yellow-600">
+            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {formatCents(earnings?.pendingPayoutCents ?? 0)}
             </p>
           </CardContent>
@@ -136,7 +136,7 @@ export function InstructorEarningsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
               {formatCents(earnings?.paidOutCents ?? 0)}
             </p>
           </CardContent>

@@ -121,7 +121,7 @@ export function ProgramDetailPage(): React.ReactElement {
               <div className="flex items-center gap-2 flex-wrap">
                 <CardTitle className="text-2xl">{program.title}</CardTitle>
                 {isCompleted && (
-                  <Badge className="bg-green-500">Completed</Badge>
+                  <Badge className="bg-green-500 dark:bg-green-600">Completed</Badge>
                 )}
                 {isEnrolled && !isCompleted && (
                   <Badge variant="secondary">In Progress</Badge>
@@ -188,7 +188,7 @@ export function ProgramDetailPage(): React.ReactElement {
                     {done && (
                       <Badge
                         variant="outline"
-                        className="text-xs text-green-600 border-green-600"
+                        className="text-xs text-green-600 border-green-600 dark:text-green-400 dark:border-green-400"
                       >
                         Done
                       </Badge>
@@ -203,7 +203,7 @@ export function ProgramDetailPage(): React.ReactElement {
 
       <div className="flex gap-3">
         {isCompleted && enrollment?.certificateId ? (
-          <Button className="bg-green-500 hover:bg-green-600">
+          <Button className="bg-green-500 hover:bg-green-600 dark:bg-green-600">
             View Nanodegree Certificate
           </Button>
         ) : isEnrolled ? (

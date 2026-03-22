@@ -51,9 +51,9 @@ export function TextSubmissionForm({
 
   if (submitted) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+      <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-200">
         <p className="font-semibold">Submitted successfully.</p>
-        <p className="mt-1 text-green-700">
+        <p className="mt-1 text-green-700 dark:text-green-300">
           Plagiarism check in progress. Results will be available shortly.
         </p>
       </div>
@@ -86,7 +86,7 @@ export function TextSubmissionForm({
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 rounded border border-red-200 bg-red-50 p-2">
+        <p className="text-sm text-red-600 rounded border border-red-200 bg-red-50 p-2 dark:text-red-400 dark:border-red-700 dark:bg-red-950">
           {error}
         </p>
       )}

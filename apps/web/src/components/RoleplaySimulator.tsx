@@ -143,12 +143,12 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-950 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-gray-950 flex flex-col dark:bg-gray-50">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 bg-gray-900 border-b border-gray-700">
+      <div className="flex items-center gap-3 px-6 py-4 bg-gray-900 border-b border-gray-700 dark:bg-gray-100 dark:border-gray-300">
         <div className="flex-1">
-          <h2 className="text-white font-bold text-lg">{scenario.title}</h2>
-          <p className="text-gray-300 text-sm">{scenario.sceneDescription}</p>
+          <h2 className="text-white font-bold text-lg dark:text-white">{scenario.title}</h2>
+          <p className="text-gray-300 text-sm dark:text-gray-600">{scenario.sceneDescription}</p>
         </div>
         <div className="flex items-center gap-3">
           <span
@@ -156,14 +156,14 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
           >
             {scenario.difficultyLevel}
           </span>
-          <span className="text-gray-300 text-sm">
+          <span className="text-gray-300 text-sm dark:text-gray-600">
             {turnCount} / {scenario.maxTurns} turns
           </span>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-gray-300 hover:text-white"
+            className="text-gray-300 hover:text-white dark:text-gray-600"
             aria-label="Close roleplay simulator"
           >
             <X className="h-4 w-4" />
@@ -172,9 +172,9 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
       </div>
 
       {/* Turn progress bar */}
-      <div className="h-1 bg-gray-800">
+      <div className="h-1 bg-gray-800 dark:bg-gray-200">
         <div
-          className="h-full bg-blue-500 transition-all duration-500"
+          className="h-full bg-blue-500 transition-all duration-500 dark:bg-blue-600"
           style={{
             width: `${Math.min((turnCount / scenario.maxTurns) * 100, 100)}%`,
           }}
@@ -201,7 +201,7 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
         ))}
         {isSending && (
           <div className="flex justify-start">
-            <div className="bg-blue-600 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
+            <div className="bg-blue-600 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center dark:bg-blue-500">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
@@ -216,7 +216,7 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
       </div>
 
       {/* Input */}
-      <div className="px-6 py-4 bg-gray-900 border-t border-gray-700 flex gap-3">
+      <div className="px-6 py-4 bg-gray-900 border-t border-gray-700 flex gap-3 dark:bg-gray-100 dark:border-gray-300">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -230,12 +230,12 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
             isSending ? 'Waiting for response...' : 'Type your response...'
           }
           disabled={isSending || !sessionId}
-          className="flex-1 bg-gray-800 text-white placeholder-gray-300 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 bg-gray-800 text-white placeholder-gray-300 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:bg-gray-200 dark:text-white dark:border-gray-300"
         />
         <Button
           onClick={() => void handleSend()}
           disabled={isSending || !input.trim() || !sessionId}
-          className="h-11 w-11 p-0 bg-blue-600 hover:bg-blue-700 rounded-xl"
+          className="h-11 w-11 p-0 bg-blue-600 hover:bg-blue-700 rounded-xl dark:bg-blue-500"
         >
           <Send className="h-4 w-4" />
         </Button>

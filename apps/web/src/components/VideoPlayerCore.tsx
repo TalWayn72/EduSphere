@@ -239,7 +239,7 @@ export function VideoPlayerCore({
   return (
     <div
       ref={containerRef}
-      className="relative bg-black rounded-lg overflow-hidden group select-none"
+      className="relative bg-black rounded-lg overflow-hidden group select-none dark:bg-black"
       data-testid="video-player-core"
     >
       <video
@@ -303,12 +303,12 @@ export function VideoPlayerCore({
         </div>
 
         {/* Controls row */}
-        <div className="flex items-center gap-2 text-white">
+        <div className="flex items-center gap-2 text-white dark:text-white">
           {/* Play/Pause */}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-white hover:bg-white/20"
+            className="h-8 w-8 text-white hover:bg-white/20 dark:text-white"
             onClick={togglePlay}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
@@ -323,7 +323,7 @@ export function VideoPlayerCore({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-white hover:bg-white/20"
+            className="h-8 w-8 text-white hover:bg-white/20 dark:text-white"
             onClick={() => {
               if (!videoRef.current) return;
               const newMuted = !isMuted;
@@ -423,7 +423,7 @@ export function VideoPlayerCore({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-white hover:bg-white/20"
+              className="h-8 w-8 text-white hover:bg-white/20 dark:text-white"
               onClick={() => {
                 if (document.pictureInPictureElement) {
                   void document.exitPictureInPicture();
@@ -450,7 +450,7 @@ export function VideoPlayerCore({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-white hover:bg-white/20"
+            className="h-8 w-8 text-white hover:bg-white/20 dark:text-white"
             onClick={() => {
               if (!document.fullscreenElement) {
                 void containerRef.current?.requestFullscreen();

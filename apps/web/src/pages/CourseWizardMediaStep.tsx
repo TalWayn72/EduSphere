@@ -244,7 +244,7 @@ export function CourseWizardMediaStep({
           </p>
           {mediaList.map((m) => (
             <Card key={m.id} className="p-3 flex items-center gap-3 text-sm">
-              <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+              <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 dark:text-green-400" />
               <span className="flex-1 truncate font-medium">{m.title}</span>
               <span className="text-muted-foreground text-xs">
                 {m.contentType}
@@ -378,7 +378,7 @@ export function CourseWizardMediaStep({
         <RichEditor content={richDocContent} onChange={setRichDocContent} />
         <div className="flex items-center gap-2 justify-end">
           {richDocSaved && (
-            <span className="text-sm text-green-600 flex items-center gap-1">
+            <span className="text-sm text-green-600 flex items-center gap-1 dark:text-green-400">
               <CheckCircle2 className="h-4 w-4" /> {t('wizard.richDocAdded')}
             </span>
           )}

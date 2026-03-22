@@ -68,7 +68,7 @@ export function OpenBadgeCard({
       <CardHeader className="pb-2">
         <div className="flex items-start gap-3">
           <Award
-            className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-0.5"
+            className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-0.5 dark:text-yellow-400"
             aria-hidden="true"
           />
           <div className="flex-1 min-w-0">
@@ -125,7 +125,7 @@ export function OpenBadgeCard({
             variant="default"
             onClick={handleShareLinkedIn}
             aria-label={`Share ${assertion.badgeName} to LinkedIn`}
-            className="gap-1 bg-[#0A66C2] hover:bg-[#004182] text-white"
+            className="gap-1 bg-[#0A66C2] hover:bg-[#004182] text-white dark:text-white"
           >
             <ExternalLink className="h-3 w-3" aria-hidden="true" />
             Share to LinkedIn

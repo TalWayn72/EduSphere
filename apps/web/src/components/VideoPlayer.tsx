@@ -169,7 +169,7 @@ export function VideoPlayer({
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="relative bg-black rounded-lg overflow-hidden group">
+    <div className="relative bg-black rounded-lg overflow-hidden group dark:bg-black">
       <video
         ref={videoRef}
         className="w-full aspect-video"
@@ -211,13 +211,13 @@ export function VideoPlayer({
           ))}
         </div>
 
-        <div className="flex items-center justify-between text-white">
+        <div className="flex items-center justify-between text-white dark:text-white">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={togglePlayPause}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 dark:text-white"
             >
               {isPlaying ? (
                 <Pause className="h-5 w-5" />
@@ -236,7 +236,7 @@ export function VideoPlayer({
               variant="ghost"
               size="icon"
               onClick={toggleMute}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 dark:text-white"
             >
               {isMuted || volume === 0 ? (
                 <VolumeX className="h-5 w-5" />
@@ -267,7 +267,7 @@ export function VideoPlayer({
               variant="ghost"
               size="icon"
               onClick={toggleFullscreen}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 dark:text-white"
             >
               <Maximize className="h-5 w-5" />
             </Button>

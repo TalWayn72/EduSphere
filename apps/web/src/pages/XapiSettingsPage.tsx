@@ -241,7 +241,7 @@ export function XapiSettingsPage() {
               <div className="divide-y text-sm">
                 {statements.map((s) => (
                   <div key={s.id} className="py-2 flex items-center gap-3">
-                    <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                    <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                       {s.verb.split('/').pop()}
                     </span>
                     <span className="text-muted-foreground truncate flex-1 text-xs">
@@ -271,9 +271,9 @@ export function XapiSettingsPage() {
             <h2 className="text-lg font-semibold">Generate xAPI Token</h2>
             {generatedToken ? (
               <div className="space-y-3">
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
-                  <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-amber-800">
+                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm dark:bg-amber-950 dark:border-amber-700">
+                  <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 dark:text-amber-400" />
+                  <span className="text-amber-800 dark:text-amber-200">
                     Save this token — it will not be shown again.
                   </span>
                 </div>

@@ -64,6 +64,7 @@ export function ApiKeysPage() {
 
   return (
     <AdminLayout title={t('apiKeys.title')} description={t('apiKeys.description')}>
+      <h1 className="sr-only">API Keys</h1>
       <div data-testid="api-keys-page" className="space-y-6">
         <Card>
           <CardHeader>
@@ -91,9 +92,9 @@ export function ApiKeysPage() {
         </Card>
 
         {newToken && (
-          <Card className="border-green-500">
+          <Card className="border-green-500 dark:border-green-400">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-green-700 mb-1">{t('apiKeys.tokenCreated')}</p>
+              <p className="text-sm font-medium text-green-700 mb-1 dark:text-green-300">{t('apiKeys.tokenCreated')}</p>
               <code className="block p-2 bg-muted rounded text-xs break-all font-mono">{newToken}</code>
               <p className="text-xs text-muted-foreground mt-2">{t('apiKeys.tokenWarning')}</p>
               <Button variant="ghost" size="sm" className="mt-2" onClick={() => setNewToken(null)}>

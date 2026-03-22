@@ -94,7 +94,7 @@ export function LessonDetailPage() {
       return (
         <Layout>
           <div className="p-6 space-y-3">
-            <p className="text-amber-700 font-medium">הסשן פג תוקף</p>
+            <p className="text-amber-700 font-medium dark:text-amber-300">הסשן פג תוקף</p>
             <p className="text-sm text-muted-foreground">יש להתחבר מחדש כדי להמשיך.</p>
             <Button onClick={() => login()}>התחבר מחדש</Button>
           </div>
@@ -103,7 +103,7 @@ export function LessonDetailPage() {
     }
     return (
       <Layout>
-        <div className="p-6 text-red-600">שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.</div>
+        <div className="p-6 text-red-600 dark:text-red-400">שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.</div>
       </Layout>
     );
   }
@@ -176,7 +176,7 @@ export function LessonDetailPage() {
                       href={asset.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 truncate"
+                      className="text-blue-500 truncate dark:text-blue-400"
                     >
                       {asset.sourceUrl}
                     </a>

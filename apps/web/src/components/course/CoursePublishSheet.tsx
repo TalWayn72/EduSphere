@@ -119,7 +119,7 @@ export const CoursePublishSheet: React.FC<Props> = ({
                 data-testid={`check-${check.name}`}
               >
                 {check.passed ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 dark:text-green-400" />
                 ) : (
                   <XCircle className="h-5 w-5 text-destructive shrink-0" />
                 )}

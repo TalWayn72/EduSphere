@@ -54,7 +54,7 @@ export function PilotCTASection() {
     <section
       id="pilot-cta"
       data-testid="pilot-cta-section"
-      className="bg-gradient-to-br from-indigo-900 to-slate-900 py-20 text-white"
+      className="bg-gradient-to-br from-indigo-900 to-slate-900 py-20 text-white dark:text-white"
       aria-label="Start your 90-day pilot"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +62,7 @@ export function PilotCTASection() {
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
             {t('landing.pilotCta.title')}
           </h2>
-          <p className="mt-4 text-indigo-100 text-lg max-w-2xl mx-auto">
+          <p className="mt-4 text-indigo-100 text-lg max-w-2xl mx-auto dark:text-indigo-300">
             {t('landing.pilotCta.subtitle')}
           </p>
         </div>
@@ -71,24 +71,24 @@ export function PilotCTASection() {
           <div className="bg-white/10 backdrop-blur rounded-2xl border border-white/20 p-8">
             {submitted ? (
               <div className="text-center py-8" role="status" aria-live="polite">
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-5">
-                  <Check className="h-8 w-8 text-white" aria-hidden="true" />
+                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-5 dark:bg-green-600">
+                  <Check className="h-8 w-8 text-white dark:text-white" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{t('landing.pilotCta.applicationReceived')}</h3>
-                <p className="text-indigo-100">{t('landing.pilotCta.respondWithin24h')}</p>
+                <h3 className="text-2xl font-bold text-white mb-2 dark:text-white">{t('landing.pilotCta.applicationReceived')}</h3>
+                <p className="text-indigo-100 dark:text-indigo-300">{t('landing.pilotCta.respondWithin24h')}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Pilot application form">
                 <div className="space-y-5">
                   <div>
-                    <Label htmlFor="orgName" className="text-white text-sm font-medium">{t('landing.pilotCta.orgName')}</Label>
-                    <Input id="orgName" {...register('orgName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder={t('landing.pilotCta.orgNamePlaceholder')} aria-required="true" />
-                    {errors.orgName && <p className="text-red-300 text-xs mt-1" role="alert">{errors.orgName.message}</p>}
+                    <Label htmlFor="orgName" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.orgName')}</Label>
+                    <Input id="orgName" {...register('orgName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder={t('landing.pilotCta.orgNamePlaceholder')} aria-required="true" />
+                    {errors.orgName && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.orgName.message}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="orgType" className="text-white text-sm font-medium">{t('landing.pilotCta.orgType')}</Label>
+                    <Label htmlFor="orgType" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.orgType')}</Label>
                     <Select onValueChange={(v) => setValue('orgType', v as FormData['orgType'])} aria-required="true">
-                      <SelectTrigger id="orgType" className="mt-1.5 bg-white/10 border-white/20 text-white">
+                      <SelectTrigger id="orgType" className="mt-1.5 bg-white/10 border-white/20 text-white dark:text-white">
                         <SelectValue placeholder={t('landing.pilotCta.selectType')} />
                       </SelectTrigger>
                       <SelectContent>
@@ -99,37 +99,37 @@ export function PilotCTASection() {
                         <SelectItem value="DEFENSE">{t('landing.pilotCta.orgTypeDefense')}</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.orgType && <p className="text-red-300 text-xs mt-1" role="alert">{errors.orgType.message}</p>}
+                    {errors.orgType && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.orgType.message}</p>}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="contactName" className="text-white text-sm font-medium">{t('landing.pilotCta.contactName')}</Label>
-                      <Input id="contactName" {...register('contactName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder={t('landing.pilotCta.contactNamePlaceholder')} aria-required="true" />
-                      {errors.contactName && <p className="text-red-300 text-xs mt-1" role="alert">{errors.contactName.message}</p>}
+                      <Label htmlFor="contactName" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.contactName')}</Label>
+                      <Input id="contactName" {...register('contactName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder={t('landing.pilotCta.contactNamePlaceholder')} aria-required="true" />
+                      {errors.contactName && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.contactName.message}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="email" className="text-white text-sm font-medium">{t('landing.pilotCta.emailLabel')}</Label>
-                      <Input id="email" type="email" {...register('email')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder={t('landing.pilotCta.emailPlaceholder')} aria-required="true" />
-                      {errors.email && <p className="text-red-300 text-xs mt-1" role="alert">{errors.email.message}</p>}
+                      <Label htmlFor="email" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.emailLabel')}</Label>
+                      <Input id="email" type="email" {...register('email')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder={t('landing.pilotCta.emailPlaceholder')} aria-required="true" />
+                      {errors.email && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.email.message}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="phone" className="text-white text-sm font-medium">{t('landing.pilotCta.phone')}</Label>
-                      <Input id="phone" {...register('phone')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder={t('landing.pilotCta.phonePlaceholder')} />
+                      <Label htmlFor="phone" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.phone')}</Label>
+                      <Input id="phone" {...register('phone')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder={t('landing.pilotCta.phonePlaceholder')} />
                     </div>
                     <div>
-                      <Label htmlFor="estimatedUsers" className="text-white text-sm font-medium">{t('landing.pilotCta.estimatedUsers')}</Label>
-                      <Input id="estimatedUsers" type="number" {...register('estimatedUsers')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder={t('landing.pilotCta.estimatedUsersPlaceholder')} aria-required="true" />
-                      {errors.estimatedUsers && <p className="text-red-300 text-xs mt-1" role="alert">{errors.estimatedUsers.message}</p>}
+                      <Label htmlFor="estimatedUsers" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.estimatedUsers')}</Label>
+                      <Input id="estimatedUsers" type="number" {...register('estimatedUsers')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder={t('landing.pilotCta.estimatedUsersPlaceholder')} aria-required="true" />
+                      {errors.estimatedUsers && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.estimatedUsers.message}</p>}
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="useCase" className="text-white text-sm font-medium">{t('landing.pilotCta.useCase')}</Label>
-                    <Textarea id="useCase" {...register('useCase')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 min-h-[80px]" placeholder={t('landing.pilotCta.useCasePlaceholder')} aria-required="true" />
-                    {errors.useCase && <p className="text-red-300 text-xs mt-1" role="alert">{errors.useCase.message}</p>}
+                    <Label htmlFor="useCase" className="text-white text-sm font-medium dark:text-white">{t('landing.pilotCta.useCase')}</Label>
+                    <Textarea id="useCase" {...register('useCase')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 min-h-[80px] dark:text-white" placeholder={t('landing.pilotCta.useCasePlaceholder')} aria-required="true" />
+                    {errors.useCase && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.useCase.message}</p>}
                   </div>
-                  <Button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3">
+                  <Button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 dark:bg-indigo-500 dark:text-white">
                     {isSubmitting ? t('landing.pilotCta.submitting') : t('landing.pilotCta.applyForPilot')}
                   </Button>
                 </div>
@@ -138,14 +138,14 @@ export function PilotCTASection() {
           </div>
           {/* Benefits */}
           <div className="flex flex-col justify-center">
-            <h3 className="text-2xl font-bold text-white mb-8">{t('landing.pilotCta.whyPilot')}</h3>
+            <h3 className="text-2xl font-bold text-white mb-8 dark:text-white">{t('landing.pilotCta.whyPilot')}</h3>
             <ul className="space-y-5">
               {BENEFIT_KEYS.map((bk) => (
                 <li key={bk} className="flex items-start gap-4">
-                  <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                  <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5 dark:bg-green-600">
+                    <Check className="h-3.5 w-3.5 text-white dark:text-white" aria-hidden="true" />
                   </div>
-                  <span className="text-indigo-100 text-base">{t(`landing.pilotCta.${bk}`)}</span>
+                  <span className="text-indigo-100 text-base dark:text-indigo-300">{t(`landing.pilotCta.${bk}`)}</span>
                 </li>
               ))}
             </ul>

@@ -338,7 +338,7 @@ export function KnowledgeSkillTree({ nodes, onNodeClick, className }: KnowledgeS
                     aria-label={`${node.label} progress`}
                   >
                     <div
-                      className="h-full bg-indigo-500 rounded-full transition-all"
+                      className="h-full bg-indigo-500 rounded-full transition-all dark:bg-indigo-600"
                       style={{ width: `${node.progress}%` }}
                     />
                   </div>

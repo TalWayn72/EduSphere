@@ -22,15 +22,15 @@ export function ComplianceBadgesSection() {
     <section
       id="compliance"
       data-testid="compliance-badges-section"
-      className="bg-white py-20"
+      className="bg-white py-20 dark:bg-gray-900"
       aria-label="Compliance certifications"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight dark:text-slate-100">
             {t('landing.complianceBadges.title')}<br className="hidden sm:block" /> {t('landing.complianceBadges.titleBreak')}
           </h2>
-          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto dark:text-slate-400">
             {t('landing.complianceBadges.subtitle')}
           </p>
         </div>
@@ -38,27 +38,27 @@ export function ComplianceBadgesSection() {
           {BADGE_ITEMS.map(({ icon: Icon, title, descKey }) => (
             <div
               key={title}
-              className="border border-indigo-100 rounded-xl p-5 bg-white hover:shadow-md transition-shadow"
+              className="border border-indigo-100 rounded-xl p-5 bg-white hover:shadow-md transition-shadow dark:border-indigo-800 dark:bg-gray-900"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-indigo-50 flex-shrink-0">
-                  <Icon className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-indigo-50 flex-shrink-0 dark:bg-indigo-950">
+                  <Icon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-slate-900 text-sm">{title}</span>
-                  <span className="text-green-600 text-sm font-bold" aria-label="Certified">✓</span>
+                  <span className="font-semibold text-slate-900 text-sm dark:text-slate-100">{title}</span>
+                  <span className="text-green-600 text-sm font-bold dark:text-green-400" aria-label="Certified">✓</span>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">{t(`landing.complianceBadges.${descKey}`)}</p>
+              <p className="text-xs text-slate-500 leading-relaxed dark:text-slate-400">{t(`landing.complianceBadges.${descKey}`)}</p>
             </div>
           ))}
         </div>
         {/* SOC2 note */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center gap-3">
-            <Shield className="h-5 w-5 text-slate-500" aria-hidden="true" />
-            <span className="text-sm text-slate-500">
-              <strong className="text-slate-700">{t('landing.complianceBadges.soc2')}</strong> — {t('landing.complianceBadges.soc2Status')}
+          <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center gap-3 dark:border-slate-600 dark:bg-slate-800">
+            <Shield className="h-5 w-5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              <strong className="text-slate-700 dark:text-slate-200">{t('landing.complianceBadges.soc2')}</strong> — {t('landing.complianceBadges.soc2Status')}
             </span>
           </div>
         </div>

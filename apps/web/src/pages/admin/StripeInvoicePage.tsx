@@ -89,9 +89,9 @@ export function StripeInvoicePage() {
   return (
     <AdminLayout title="Stripe Invoices" description="Manage tenant invoices and billing">
       <div data-testid="stripe-invoice-page" className="space-y-6">
-        <Card className="border-yellow-300 bg-yellow-50">
+        <Card className="border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-950">
           <CardContent className="py-4">
-            <p data-testid="stripe-setup-notice" className="text-sm text-yellow-800">
+            <p data-testid="stripe-setup-notice" className="text-sm text-yellow-800 dark:text-yellow-200">
               Stripe integration requires STRIPE_SECRET_KEY in environment
             </p>
           </CardContent>

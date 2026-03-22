@@ -54,7 +54,7 @@ export function ApiKeySection({ currentKey, showPlain, onRegenerate, regeneratin
             </Button>
           </div>
           {showPlain && (
-            <p className="mt-2 text-xs text-amber-600 font-medium" data-testid="new-key-notice">
+            <p className="mt-2 text-xs text-amber-600 font-medium dark:text-amber-400" data-testid="new-key-notice">
               Copy this key now — it will not be shown again after you leave this page.
             </p>
           )}

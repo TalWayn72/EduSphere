@@ -159,13 +159,13 @@ export function AddSourceModal({
         <div className="p-6 flex flex-col gap-4" role="tabpanel">
           {success && (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center dark:bg-green-900">
                 <span className="text-3xl">&#x2705;</span>
               </div>
-              <p className="font-semibold text-green-700 text-base">
+              <p className="font-semibold text-green-700 text-base dark:text-green-300">
                 {t('sources.addedSuccess')}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {t('sources.addedProcessing')}
               </p>
             </div>
@@ -173,7 +173,7 @@ export function AddSourceModal({
 
           {!success && tab === 'url' && (
             <>
-              <label className="text-xs font-medium text-gray-700">
+              <label className="text-xs font-medium text-gray-700 dark:text-gray-200">
                 {t('sources.urlLabel')}
               </label>
               <input
@@ -189,7 +189,7 @@ export function AddSourceModal({
                 value={urlTitle}
                 onChange={(e) => setUrlTitle(e.target.value)}
               />
-              <p className="text-xs text-gray-500">{t('sources.urlHint')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t('sources.urlHint')}</p>
             </>
           )}
 
@@ -225,7 +225,7 @@ export function AddSourceModal({
                 value={youtubeTitle}
                 onChange={(e) => setYoutubeTitle(e.target.value)}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('sources.youtubeHint')}
               </p>
             </>
@@ -241,24 +241,24 @@ export function AddSourceModal({
                 disabled={busy}
               />
               {busy ? (
-                <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50">
-                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2" />
-                  <span className="text-sm text-blue-700 font-medium">
+                <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50 dark:border-blue-700 dark:bg-blue-950">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2 dark:border-blue-400" />
+                  <span className="text-sm text-blue-700 font-medium dark:text-blue-300">
                     {t('sources.uploading')}
                   </span>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors dark:border-gray-600">
                   <span className="text-3xl mb-1">
                     {selectedFileName ? '\u{1F4C4}' : '\u{1F4C2}'}
                   </span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
                     {selectedFileName
                       ? t('sources.fileChanged', { name: selectedFileName })
                       : t('sources.dropOrClick')}
                   </span>
                   {!selectedFileName && (
-                    <span className="text-xs text-gray-400 mt-1">
+                    <span className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                       {t('sources.fileHint')}
                     </span>
                   )}
@@ -282,7 +282,7 @@ export function AddSourceModal({
 
           {!success && error && (
             <p
-              className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2"
+              className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2 dark:text-red-400 dark:bg-red-950"
               role="alert"
               data-testid="source-error-message"
             >
@@ -297,18 +297,18 @@ export function AddSourceModal({
             <button
               onClick={onClose}
               disabled={busy}
-              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-40"
+              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-40 dark:text-gray-300"
             >
               {t('sources.cancel')}
             </button>
             <button
               onClick={handleSubmit}
               disabled={busy}
-              className="flex items-center gap-2 px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-500 dark:text-white"
               data-testid="add-source-submit"
             >
               {busy && (
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin dark:border-gray-700" />
               )}
               {busy ? t('sources.submitAdding') : t('sources.submit')}
             </button>

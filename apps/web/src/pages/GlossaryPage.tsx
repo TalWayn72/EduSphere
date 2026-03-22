@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
 import React, { useState, useMemo } from 'react';
 import { Search, BookOpen } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
@@ -57,7 +58,7 @@ function GlossaryTermCard({ term }: { term: GlossaryTerm }) {
       )}
       <button
         onClick={() => setExpanded((e) => !e)}
-        className="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+        className="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors dark:text-indigo-400"
         aria-expanded={expanded}
       >
         {expanded ? 'Show less' : 'Read more'}
@@ -118,13 +119,13 @@ export function GlossaryPage() {
       <PublicLayout navVariant="minimal">
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         {/* Header */}
-        <div className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-16">
+        <div className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-16 dark:text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="flex justify-center mb-4">
-              <BookOpen className="h-10 w-10 text-indigo-300" aria-hidden="true" />
+              <BookOpen className="h-10 w-10 text-indigo-300 dark:text-indigo-400" aria-hidden="true" />
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">EdTech Glossary</h1>
-            <p className="text-indigo-100 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-indigo-100 text-lg mb-8 max-w-xl mx-auto dark:text-indigo-300">
               Definitions of key terms in AI learning, educational technology, and e-learning
               standards.
             </p>

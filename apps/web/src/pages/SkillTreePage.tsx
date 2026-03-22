@@ -213,7 +213,7 @@ export function SkillTreePage() {
               className="text-2xl font-bold flex items-center gap-2"
               data-testid="skill-tree-page-title"
             >
-              <Network className="h-6 w-6 text-indigo-500" />
+              <Network className="h-6 w-6 text-indigo-500 dark:text-indigo-400" />
               {t('skillTree.title')}
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -271,7 +271,7 @@ export function SkillTreePage() {
           <div
             role="alert"
             aria-live="polite"
-            className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2"
+            className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 dark:text-amber-300 dark:bg-amber-950 dark:border-amber-700"
             data-testid="skill-tree-error"
           >
             {t('skillTree.loadError')}

@@ -13,7 +13,7 @@ export const OfflineBanner = React.memo(function OfflineBanner({ onRetry }: Offl
       role="alert"
       aria-live="polite"
       data-testid="offline-banner"
-      className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md"
+      className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md dark:text-orange-200 dark:bg-orange-950 dark:border-orange-700"
     >
       <div className="flex items-center gap-2">
         <AlertTriangle className="h-3 w-3 flex-shrink-0" />
@@ -21,7 +21,7 @@ export const OfflineBanner = React.memo(function OfflineBanner({ onRetry }: Offl
       </div>
       <button
         onClick={onRetry}
-        className="underline hover:no-underline text-orange-900 font-medium shrink-0"
+        className="underline hover:no-underline text-orange-900 font-medium shrink-0 dark:text-orange-100"
         data-testid="offline-banner-retry"
       >
         {t('retry')}

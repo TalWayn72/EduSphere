@@ -36,8 +36,9 @@ export function AdminAnnouncementsPage() {
 
   return (
     <AdminLayout title={t('announcements.title')} description={t('announcements.description')}>
+      <h1 className="sr-only">Admin Announcements</h1>
       <div data-testid="admin-announcements-page" className="space-y-4">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
+        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">BETA</Badge>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>

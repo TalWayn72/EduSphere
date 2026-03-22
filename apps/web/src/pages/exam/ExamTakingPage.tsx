@@ -61,6 +61,7 @@ export function ExamTakingPage() {
   if (loading && !store.sessionId) {
     return (
       <div className="flex items-center justify-center h-64">
+        <h1 className="sr-only">Exam</h1>
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );

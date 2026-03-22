@@ -151,7 +151,7 @@ export function LessonPreviewPage() {
                 )}
                 {result.fileUrl && (
                   <a href={result.fileUrl} target="_blank" rel="noopener noreferrer"
-                    className="text-blue-500 text-sm underline mt-2 inline-block">
+                    className="text-blue-500 text-sm underline mt-2 inline-block dark:text-blue-400">
                     פתח קובץ
                   </a>
                 )}
@@ -174,13 +174,13 @@ export function LessonPreviewPage() {
 function PreviewBanner({ onClose }: { onClose: () => void }) {
   return (
     <div
-      className="sticky top-0 z-50 bg-amber-500 text-white px-6 py-2 flex items-center justify-between"
+      className="sticky top-0 z-50 bg-amber-500 text-white px-6 py-2 flex items-center justify-between dark:bg-amber-600 dark:text-white"
       role="banner"
       aria-label="מצב תצוגה מקדימה"
     >
       <span className="font-semibold text-sm">תצוגה מקדימה — כך יראו התלמידים את השיעור</span>
       <Button variant="ghost" size="sm" onClick={onClose}
-        className="text-white hover:bg-amber-600" aria-label="סגור תצוגה מקדימה">
+        className="text-white hover:bg-amber-600 dark:text-white" aria-label="סגור תצוגה מקדימה">
         ✕ סגור
       </Button>
     </div>

@@ -153,3 +153,6 @@ test-upload.txt
 .maintenance-mode
 # Health monitor logs (local only)
 docs/logs/health-monitor.log
+
+# HiveMind coordination data (SQLite DB, local state)
+.hivemind/

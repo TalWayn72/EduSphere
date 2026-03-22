@@ -62,7 +62,7 @@ export function AddAnnotationOverlay({
           Add Note @ {formatTime(currentTime)}
         </Button>
       ) : (
-        <div className="w-72 bg-white border rounded-lg shadow-xl p-3 space-y-2 text-sm">
+        <div className="w-72 bg-white border rounded-lg shadow-xl p-3 space-y-2 text-sm dark:bg-gray-900">
           {/* Timestamp label */}
           <p className="text-xs text-muted-foreground font-medium">
             Note at {formatTime(capturedTime)}

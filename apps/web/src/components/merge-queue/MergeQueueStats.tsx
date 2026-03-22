@@ -9,11 +9,11 @@ export function StatsBar({ requests }: { requests: MergeRequest[] }) {
   const pending = requests.filter((r) => r.status === 'pending');
   return (
     <div className="flex gap-4 text-sm">
-      <span className="flex items-center gap-1 text-amber-600 font-medium">
-        <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
+      <span className="flex items-center gap-1 text-amber-600 font-medium dark:text-amber-400">
+        <span className="inline-block h-2 w-2 rounded-full bg-amber-500 dark:bg-amber-600" />
         {pending.length} pending
       </span>
-      <span className="flex items-center gap-1 text-green-600">
+      <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
         <CheckCircle2 className="h-3.5 w-3.5" />
         {requests.filter((r) => r.status === 'approved').length} approved
       </span>
@@ -33,8 +33,8 @@ export function ResolvedList({ resolved }: { resolved: MergeRequest[] }) {
       {resolved.map((req) => (
         <div key={req.id} className="flex items-start gap-3 p-3 rounded-md border bg-muted/30 text-sm" data-testid={`resolved-${req.id}`}>
           {req.status === 'approved'
-            ? <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-            : <XCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />}
+            ? <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5 dark:text-green-400" />
+            : <XCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5 dark:text-red-400" />}
           <div className="min-w-0 flex-1">
             <p className="font-medium text-xs">{req.authorName}</p>
             <p className="text-muted-foreground text-xs truncate">{req.content}</p>

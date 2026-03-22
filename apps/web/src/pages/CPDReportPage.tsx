@@ -63,7 +63,7 @@ export function CPDReportPage() {
     <Layout>
       <PageShell size="lg" className="p-6">
         <div className="flex items-center gap-3">
-          <BookOpen className="h-7 w-7 text-blue-600" />
+          <BookOpen className="h-7 w-7 text-blue-600 dark:text-blue-400" />
           <div>
             <h1 className="text-2xl font-bold">My CPD Report</h1>
             <p className="text-muted-foreground text-sm">

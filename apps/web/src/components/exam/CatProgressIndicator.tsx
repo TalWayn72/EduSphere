@@ -44,7 +44,7 @@ export function CatProgressIndicator({
 
         {/* Min-items marker */}
         <div
-          className="absolute top-0 h-3 w-0.5 bg-amber-500"
+          className="absolute top-0 h-3 w-0.5 bg-amber-500 dark:bg-amber-600"
           style={{ left: `${minPercent}%` }}
           title={`Minimum: ${minItems} items`}
         />

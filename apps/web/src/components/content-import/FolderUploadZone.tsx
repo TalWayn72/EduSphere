@@ -114,7 +114,7 @@ export function FolderUploadZone({ courseId: _courseId, onFilesSelected }: Props
       </div>
 
       {sizeWarning && (
-        <p className="mt-2 text-sm text-yellow-600" role="status">{sizeWarning}</p>
+        <p className="mt-2 text-sm text-yellow-600 dark:text-yellow-400" role="status">{sizeWarning}</p>
       )}
 
       {files.length > 0 && (

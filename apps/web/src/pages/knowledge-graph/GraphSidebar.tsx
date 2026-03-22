@@ -194,7 +194,7 @@ export const GraphSidebar = React.memo(function GraphSidebar({
                   onClick={() => onSelectNode(c.id)}
                   className="w-full text-left flex items-center gap-2 p-1.5 rounded-md hover:bg-muted/50 transition-colors"
                 >
-                  <span className="h-2 w-2 rounded-full flex-shrink-0 bg-blue-400" />
+                  <span className="h-2 w-2 rounded-full flex-shrink-0 bg-blue-400 dark:bg-blue-500" />
                   <p className="text-xs truncate">{c.name}</p>
                   <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0 ml-auto" />
                 </button>

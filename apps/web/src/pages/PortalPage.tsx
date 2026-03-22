@@ -66,6 +66,7 @@ export function PortalPage() {
 
   return (
     <main className="min-h-screen bg-background" aria-label="Learning portal">
+      <h1 className="sr-only">Portal</h1>
       <div className="flex flex-col">
         {blocks.map((block) => (
           <section key={block.id} aria-label={`${block.type} section`}>

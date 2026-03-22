@@ -27,7 +27,7 @@ function BrandingPreview({ orgName, primaryColor, logoPreview, tagline }: Brandi
       <CardContent className="p-4">
         <p className="text-xs text-muted-foreground mb-2">{t('branding.previewLabel')}</p>
         <div
-          className="rounded-lg p-4 text-white flex items-center gap-3"
+          className="rounded-lg p-4 text-white flex items-center gap-3 dark:text-white"
           style={{ backgroundColor: primaryColor || '#2563eb' }}
         >
           {logoPreview ? (

@@ -204,7 +204,7 @@ export function DocumentAnnotationPage() {
             className="h-full overflow-y-auto bg-muted/20 flex justify-center py-8 px-4"
           >
             <div
-              className="bg-white shadow-xl rounded-sm"
+              className="bg-white shadow-xl rounded-sm dark:bg-gray-900"
               style={{
                 width: '794px',
                 transform: `scale(${documentZoom})`,

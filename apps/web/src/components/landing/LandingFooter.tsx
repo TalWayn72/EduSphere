@@ -72,19 +72,19 @@ export function LandingFooter() {
   };
 
   return (
-    <footer data-testid="landing-footer" className="bg-slate-900 text-slate-400 pt-16 pb-8">
+    <footer data-testid="landing-footer" className="bg-slate-900 text-slate-400 pt-16 pb-8 dark:bg-slate-100 dark:text-slate-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Brand */}
         <div className="flex items-center gap-2 mb-10">
-          <Brain className="h-7 w-7 text-indigo-400" aria-hidden="true" />
-          <span className="text-white font-bold text-xl">EduSphere</span>
+          <Brain className="h-7 w-7 text-indigo-400 dark:text-indigo-300" aria-hidden="true" />
+          <span className="text-white font-bold text-xl dark:text-white">EduSphere</span>
         </div>
 
         {/* Columns */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {COLUMNS.map((col) => (
             <div key={col.heading}>
-              <h4 className="text-white font-semibold text-sm mb-4">{col.heading}</h4>
+              <h4 className="text-white font-semibold text-sm mb-4 dark:text-white">{col.heading}</h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
@@ -92,14 +92,14 @@ export function LandingFooter() {
                       <a
                         href={link.href}
                         onClick={(e) => handleHashLink(e, link.href)}
-                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                        className="text-sm text-slate-400 hover:text-white transition-colors dark:text-slate-500"
                       >
                         {link.label}
                       </a>
                     ) : (
                       <Link
                         to={link.href}
-                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                        className="text-sm text-slate-400 hover:text-white transition-colors dark:text-slate-500"
                       >
                         {link.label}
                       </Link>
@@ -117,11 +117,11 @@ export function LandingFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 dark:border-slate-300">
           <p className="text-sm">
             {t('landing.footer.copyright')}
           </p>
-          <div className="flex items-center gap-4 text-xs text-slate-400">
+          <div className="flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500">
             <Link to="/privacy" className="hover:text-white transition-colors">{t('landing.footer.privacy')}</Link>
             <span aria-hidden="true">&middot;</span>
             <Link to="/terms" className="hover:text-white transition-colors">{t('landing.footer.terms')}</Link>

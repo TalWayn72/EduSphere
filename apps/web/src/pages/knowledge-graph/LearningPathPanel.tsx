@@ -109,7 +109,7 @@ export const LearningPathPanel = React.memo(function LearningPathPanel({
                   <span key={c.id} className="flex items-center gap-1">
                     <button
                       onClick={() => onSelectNode(c.id)}
-                      className="text-xs px-1.5 py-0.5 rounded border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-950 font-medium hover:bg-yellow-100 transition-colors"
+                      className="text-xs px-1.5 py-0.5 rounded border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-950 font-medium hover:bg-yellow-100 transition-colors dark:border-yellow-500"
                     >
                       {c.name}
                     </button>

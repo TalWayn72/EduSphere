@@ -148,7 +148,7 @@ export function SecuritySettingsPage() {
               {saving ? 'Saving...' : 'Save Settings'}
             </Button>
             {saved && (
-              <span className="text-sm text-green-600">Settings saved.</span>
+              <span className="text-sm text-green-600 dark:text-green-400">Settings saved.</span>
             )}
           </div>
           <p className="text-xs text-muted-foreground">

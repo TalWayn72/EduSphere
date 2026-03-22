@@ -153,7 +153,7 @@ export function CollaborationPage() {
               {/* Human Chavruta */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-600" />
+                  <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   <h2 className="font-semibold">{t('humanChavruta')}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -173,7 +173,7 @@ export function CollaborationPage() {
                   </Button>
                 ) : (
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-500"
                     onClick={handleCreateChavruta}
                     disabled={createResult.fetching}
                   >
@@ -188,14 +188,14 @@ export function CollaborationPage() {
               {/* AI Chavruta */}
               <div className="space-y-3 border-l pl-6">
                 <div className="flex items-center gap-2">
-                  <Bot className="h-5 w-5 text-purple-600" />
+                  <Bot className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   <h2 className="font-semibold">{t('aiChavruta')}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('aiChavrutaDescription')}
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <div className="h-2 w-2 rounded-full bg-purple-500" />
+                  <div className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-600" />
                   <span>{t('alwaysAvailable')}</span>
                 </div>
                 {matchState === 'idle' || matchMode !== 'ai' ? (
@@ -212,7 +212,7 @@ export function CollaborationPage() {
                     {t('connectingAi')}
                   </Button>
                 ) : (
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white dark:bg-purple-500 dark:text-white">
                     <CheckCircle className="h-4 w-4 mr-2" />
                     {t('openingSession')}
                   </Button>
@@ -228,7 +228,7 @@ export function CollaborationPage() {
             role="alert"
             aria-live="polite"
             data-testid="collab-offline-banner"
-            className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md"
+            className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md dark:text-orange-200 dark:bg-orange-950 dark:border-orange-700"
           >
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-3 w-3 flex-shrink-0" />
@@ -236,7 +236,7 @@ export function CollaborationPage() {
             </div>
             <button
               onClick={() => reexecute({ requestPolicy: 'network-only' })}
-              className="underline hover:no-underline text-orange-900 font-medium shrink-0"
+              className="underline hover:no-underline text-orange-900 font-medium shrink-0 dark:text-orange-100"
               data-testid="collab-offline-banner-retry"
             >
               {t('common:retry')}
@@ -261,13 +261,13 @@ export function CollaborationPage() {
                   {activeSessions.map((session) => (
                     <Card
                       key={session.id}
-                      className="border-green-200 bg-green-50/50"
+                      className="border-green-200 bg-green-50/50 dark:border-green-700 dark:bg-green-950/50"
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse dark:bg-green-600" />
                               <span className="text-sm font-semibold truncate max-w-[160px]">
                                 {session.title}
                               </span>
@@ -283,7 +283,7 @@ export function CollaborationPage() {
                           </div>
                           <Button
                             size="sm"
-                            className="h-8 text-xs bg-green-600 hover:bg-green-700"
+                            className="h-8 text-xs bg-green-600 hover:bg-green-700 dark:bg-green-500"
                             onClick={() =>
                               navigate(toSessionUrl(session.title, session.id))
                             }

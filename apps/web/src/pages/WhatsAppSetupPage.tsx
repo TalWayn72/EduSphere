@@ -54,7 +54,7 @@ export function WhatsAppSetupPage() {
   return (
     <div className="max-w-md mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
-        <MessageCircle className="h-6 w-6 text-green-600" aria-hidden="true" />
+        <MessageCircle className="h-6 w-6 text-green-600 dark:text-green-400" aria-hidden="true" />
         <h1 className="text-2xl font-bold">WhatsApp Setup</h1>
       </div>
 
@@ -103,7 +103,7 @@ export function WhatsAppSetupPage() {
           </div>
           <Button type="submit" disabled={otpCode.length !== 6} className="w-full">Verify</Button>
           <button type="button" onClick={handleResend}
-            className="text-sm text-blue-600 hover:underline w-full text-center">
+            className="text-sm text-blue-600 hover:underline w-full text-center dark:text-blue-400">
             Resend code
           </button>
         </form>

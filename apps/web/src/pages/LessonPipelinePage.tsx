@@ -164,6 +164,7 @@ export function LessonPipelinePage() {
 
   return (
     <Layout>
+      <h1 className="sr-only">Lesson Pipeline</h1>
       <PipelinePrintStylesheet />
       <UnsavedChangesDialog open={blocker.state === 'blocked'} onLeave={() => blocker.proceed?.()} onStay={() => blocker.reset?.()} />
       <div className="flex flex-col h-[calc(100vh-4rem)]">
@@ -189,7 +190,7 @@ export function LessonPipelinePage() {
         />
 
         {pipelineError && (
-          <div className="px-4 sm:px-6 py-2 bg-red-50 border-b border-red-200 text-red-700 text-sm" data-testid="pipeline-error" role="alert">
+          <div className="px-4 sm:px-6 py-2 bg-red-50 border-b border-red-200 text-red-700 text-sm dark:bg-red-950 dark:border-red-700 dark:text-red-300" data-testid="pipeline-error" role="alert">
             {pipelineError}
           </div>
         )}

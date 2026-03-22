@@ -55,7 +55,7 @@ export function SocialLinksBar({ links, size = 'sm', className }: SocialLinksBar
             rel="noopener noreferrer"
             aria-label={label}
             role="listitem"
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-slate-400 hover:text-white transition-colors dark:text-slate-500"
           >
             <Icon className={SIZE_CLASSES[size]} aria-hidden="true" />
           </a>

@@ -120,7 +120,7 @@ export function PipelineStepper({ steps, onRetry, onSkip }: Props) {
             {isExpanded && hasDetails && (
               <div className="px-3 pb-3 text-xs space-y-2 border-t mt-1 pt-2">
                 {isFailed && step.errorMessage && (
-                  <p className="text-red-600 whitespace-pre-wrap" data-testid="step-error-message">
+                  <p className="text-red-600 whitespace-pre-wrap dark:text-red-400" data-testid="step-error-message">
                     {step.errorMessage}
                   </p>
                 )}

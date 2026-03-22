@@ -16,15 +16,15 @@ export function UniqueFeaturesSection() {
     <section
       id="features"
       data-testid="unique-features-section"
-      className="bg-white py-20"
+      className="bg-white py-20 dark:bg-gray-900"
       aria-label="Unique features"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight dark:text-slate-100">
             {t('landing.features.title')}
           </h2>
-          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto dark:text-slate-400">
             {t('landing.features.subtitle')}
           </p>
         </div>
@@ -32,13 +32,13 @@ export function UniqueFeaturesSection() {
           {FEATURE_KEYS.map(({ icon: Icon, key, badgeColor }) => (
             <div
               key={key}
-              className="bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+              className="bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden hover:shadow-xl transition-shadow dark:bg-gray-900 dark:border-slate-600"
             >
               {/* Indigo gradient top border */}
               <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600" aria-hidden="true" />
               <div className="p-7">
-                <div className="p-3 rounded-xl bg-indigo-50 inline-flex mb-5">
-                  <Icon className="h-7 w-7 text-indigo-600" aria-hidden="true" />
+                <div className="p-3 rounded-xl bg-indigo-50 inline-flex mb-5 dark:bg-indigo-950">
+                  <Icon className="h-7 w-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <div className="mb-3">
                   <Badge
@@ -48,11 +48,11 @@ export function UniqueFeaturesSection() {
                     {t(`landing.features.${key}.badge`)}
                   </Badge>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{t(`landing.features.${key}.title`)}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-4">{t(`landing.features.${key}.desc`)}</p>
-                <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2">
-                  <span className="text-green-600 font-bold text-sm" aria-hidden="true">✓</span>
-                  <span className="text-sm font-semibold text-slate-700">{t(`landing.features.${key}.detail`)}</span>
+                <h3 className="text-xl font-bold text-slate-900 mb-3 dark:text-slate-100">{t(`landing.features.${key}.title`)}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4 dark:text-slate-400">{t(`landing.features.${key}.desc`)}</p>
+                <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 dark:bg-slate-800">
+                  <span className="text-green-600 font-bold text-sm dark:text-green-400" aria-hidden="true">✓</span>
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t(`landing.features.${key}.detail`)}</span>
                 </div>
               </div>
             </div>

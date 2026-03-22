@@ -60,8 +60,9 @@ export function AdminAuditLogPage() {
 
   return (
     <AdminLayout title={t('audit.title')} description={t('audit.description')}>
+      <h1 className="sr-only">Audit Log</h1>
       <div data-testid="admin-audit-log-page" className="space-y-4">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
+        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">BETA</Badge>
 
         <div className="flex gap-3 items-end flex-wrap" data-testid="audit-date-filter">
           <div>

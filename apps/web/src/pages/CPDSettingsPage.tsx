@@ -107,7 +107,7 @@ export function CPDSettingsPage() {
           ]}
         />
         <div className="flex items-center gap-3">
-          <Settings className="h-7 w-7 text-blue-600" />
+          <Settings className="h-7 w-7 text-blue-600 dark:text-blue-400" />
           <div>
             <h1 className="text-2xl font-bold">{t('cpd.pageTitle')}</h1>
             <p className="text-muted-foreground text-sm">

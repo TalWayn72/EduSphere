@@ -259,7 +259,7 @@ export function AnnotationsPage() {
 
       <div className="space-y-4">
         {error && (
-          <div className="flex items-center gap-2 p-3 rounded-md border border-orange-200 bg-orange-50 text-orange-800 text-xs">
+          <div className="flex items-center gap-2 p-3 rounded-md border border-orange-200 bg-orange-50 text-orange-800 text-xs dark:border-orange-700 dark:bg-orange-950 dark:text-orange-200">
             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
             {t('loadError')}
           </div>

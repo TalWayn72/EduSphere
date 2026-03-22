@@ -174,7 +174,7 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
                   </p>
                   {connectedEdges.map((e) => (
                     <span key={e.id}
-                      className="inline-block mr-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded"
+                      className="inline-block mr-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-700"
                     >
                       {e.sharedConcept}
                     </span>

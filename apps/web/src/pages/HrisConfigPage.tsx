@@ -55,9 +55,9 @@ const STATUS_STYLES: Record<SystemStatus, string> = {
 };
 
 const STATUS_ICONS: Record<SystemStatus, React.ReactNode> = {
-  CONNECTED: <CheckCircle className="h-4 w-4 text-green-600" />,
-  NOT_CONFIGURED: <XCircle className="h-4 w-4 text-gray-400" />,
-  ERROR: <XCircle className="h-4 w-4 text-red-600" />,
+  CONNECTED: <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />,
+  NOT_CONFIGURED: <XCircle className="h-4 w-4 text-gray-400 dark:text-gray-500" />,
+  ERROR: <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />,
 };
 
 interface SyncEntry {

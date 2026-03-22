@@ -300,9 +300,9 @@ export function ScimSettingsPage() {
           </DialogHeader>
           {generatedToken ? (
             <div className="space-y-3">
-              <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
-                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-amber-800">
+              <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm dark:bg-amber-950 dark:border-amber-700">
+                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 dark:text-amber-400" />
+                <span className="text-amber-800 dark:text-amber-200">
                   Save this token - it will not be shown again.
                 </span>
               </div>

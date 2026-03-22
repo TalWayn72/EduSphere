@@ -68,7 +68,7 @@ export function AdminUserManagementPage() {
   return (
     <AdminLayout title={t('users.title')} description={t('users.description')}>
       <div data-testid="admin-user-management-page" className="space-y-4">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700">BETA</Badge>
+        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">BETA</Badge>
 
         <div className="flex gap-3 items-center">
           <Input

@@ -31,7 +31,7 @@ export function AddAnnotationForm({
   };
 
   return (
-    <div className="absolute bottom-10 right-3 z-40 w-64 bg-white border rounded-lg shadow-xl p-3 space-y-2 text-sm">
+    <div className="absolute bottom-10 right-3 z-40 w-64 bg-white border rounded-lg shadow-xl p-3 space-y-2 text-sm dark:bg-gray-900">
       <p className="text-xs text-muted-foreground font-medium">
         Note at {formatTime(capturedTime)}
       </p>

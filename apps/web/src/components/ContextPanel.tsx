@@ -95,7 +95,7 @@ export function ContextPanel({ activeSegment, onSeek }: Props) {
       {concepts.length > 0 && (
         <section>
           <div className="flex items-center gap-1.5 mb-2">
-            <Network className="h-3.5 w-3.5 text-amber-600" />
+            <Network className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
               Related Concepts
             </span>
@@ -109,7 +109,7 @@ export function ContextPanel({ activeSegment, onSeek }: Props) {
                 )}
               >
                 <div className="flex items-start justify-between gap-1">
-                  <p className="text-[11px] font-medium text-amber-900 leading-snug line-clamp-2">
+                  <p className="text-[11px] font-medium text-amber-900 leading-snug line-clamp-2 dark:text-amber-100">
                     {r.text.split('\n')[0]?.slice(0, 80)}
                   </p>
                   <SimilarityBadge score={r.similarity} />
@@ -123,7 +123,7 @@ export function ContextPanel({ activeSegment, onSeek }: Props) {
       {segments.length > 0 && (
         <section>
           <div className="flex items-center gap-1.5 mb-2">
-            <MessageSquare className="h-3.5 w-3.5 text-green-600" />
+            <MessageSquare className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
               Related Segments
             </span>
@@ -137,14 +137,14 @@ export function ContextPanel({ activeSegment, onSeek }: Props) {
                 )}
               >
                 <div className="flex items-start justify-between gap-1 mb-1">
-                  <p className="text-[11px] text-green-900 leading-snug line-clamp-3">
+                  <p className="text-[11px] text-green-900 leading-snug line-clamp-3 dark:text-green-100">
                     {r.text.slice(0, 120)}
                   </p>
                   <SimilarityBadge score={r.similarity} />
                 </div>
                 {r.startTime != null && onSeek && (
                   <button
-                    className="text-[10px] text-green-700 hover:underline font-medium"
+                    className="text-[10px] text-green-700 hover:underline font-medium dark:text-green-300"
                     onClick={() => onSeek(r.startTime!)}
                   >
                     Jump to {Math.floor(r.startTime / 60)}:{String(Math.floor(r.startTime % 60)).padStart(2, '0')}

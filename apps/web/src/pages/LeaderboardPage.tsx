@@ -64,7 +64,7 @@ export function LeaderboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Trophy className="h-7 w-7 text-yellow-500" />
+            <Trophy className="h-7 w-7 text-yellow-500 dark:text-yellow-400" />
             <h1 className="text-2xl font-bold">{t('leaderboard')}</h1>
           </div>
           {myRank !== undefined && (

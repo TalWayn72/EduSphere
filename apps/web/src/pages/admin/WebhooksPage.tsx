@@ -60,6 +60,7 @@ export function WebhooksPage() {
 
   return (
     <AdminLayout title={t('webhooks.title')} description={t('webhooks.description')}>
+      <h1 className="sr-only">Webhooks</h1>
       <div data-testid="webhooks-page" className="space-y-6">
         <WebhookForm t={t} onSubmit={onCreate} />
 

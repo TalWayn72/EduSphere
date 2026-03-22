@@ -14,7 +14,9 @@
       "Bash(test:*)",
       "Bash(pnpm --filter @edusphere/web add:*)",
       "Bash(pnpm typecheck:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "mcp__coordination-bridge__cb_health",
+      "mcp__vector-memory__vm_health"
     ]
   }
 }

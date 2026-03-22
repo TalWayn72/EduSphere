@@ -337,7 +337,7 @@ export function AgentStudioPage() {
 
           {/* Connection mode indicator */}
           {connecting && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-orange-100 border border-orange-300 text-orange-800 text-xs px-3 py-1.5 rounded-full shadow-sm pointer-events-none">
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-orange-100 border border-orange-300 text-orange-800 text-xs px-3 py-1.5 rounded-full shadow-sm pointer-events-none dark:bg-orange-900 dark:border-orange-600 dark:text-orange-200">
               Click a target node to connect
             </div>
           )}

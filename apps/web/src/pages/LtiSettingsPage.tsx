@@ -329,7 +329,7 @@ export function LtiSettingsPage() {
                     }}
                   >
                     {platform.isActive ? (
-                      <ToggleRight className="h-4 w-4 text-green-600" />
+                      <ToggleRight className="h-4 w-4 text-green-600 dark:text-green-400" />
                     ) : (
                       <ToggleLeft className="h-4 w-4" />
                     )}

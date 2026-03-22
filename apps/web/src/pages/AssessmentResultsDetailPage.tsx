@@ -108,7 +108,7 @@ export default function AssessmentResultsDetailPage() {
   if (result.error || !result.data?.assessmentCampaign) {
     return (
       <div className="p-6" role="alert">
-        <p className="text-sm text-red-600">Unable to load assessment results.</p>
+        <p className="text-sm text-red-600 dark:text-red-400">Unable to load assessment results.</p>
       </div>
     );
   }

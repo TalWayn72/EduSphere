@@ -45,9 +45,9 @@ export function ExamResultPage() {
       <Card className={cn('border-2', result.passed ? 'border-green-500' : 'border-red-500')}>
         <CardContent className="p-6 text-center space-y-3">
           {result.passed ? (
-            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto dark:text-green-400" />
           ) : (
-            <XCircle className="h-16 w-16 text-red-500 mx-auto" />
+            <XCircle className="h-16 w-16 text-red-500 mx-auto dark:text-red-400" />
           )}
           <h1 className="text-2xl font-bold">
             {result.passed ? 'Congratulations — You Passed!' : 'Exam Not Passed'}

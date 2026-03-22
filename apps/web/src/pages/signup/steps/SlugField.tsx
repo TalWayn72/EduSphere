@@ -81,7 +81,7 @@ export function SlugField({
         </div>
       )}
       {!checking && slugAvailable === true && (
-        <p className="text-xs text-green-600" role="status">{t('org.slugAvailable')}</p>
+        <p className="text-xs text-green-600 dark:text-green-400" role="status">{t('org.slugAvailable')}</p>
       )}
       {error && (
         <p className="text-destructive text-xs mt-1" role="alert">{error}</p>

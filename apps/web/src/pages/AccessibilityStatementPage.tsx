@@ -165,7 +165,7 @@ export function AccessibilityStatementPage() {
             {FEATURES.map((f) => (
               <li key={f.criterion} className="flex items-start gap-3 text-sm">
                 <CheckCircle
-                  className="h-4 w-4 text-green-600 mt-0.5 shrink-0"
+                  className="h-4 w-4 text-green-600 mt-0.5 shrink-0 dark:text-green-400"
                   aria-hidden="true"
                 />
                 <span>

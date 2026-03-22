@@ -190,7 +190,7 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-64 bg-gray-900 rounded-lg overflow-hidden ${className ?? ''}`}
+      className={`relative w-full h-64 bg-gray-900 rounded-lg overflow-hidden  dark:bg-gray-100${className ?? ''}`}
     >
       <canvas
         ref={canvasRef}
@@ -201,18 +201,18 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
       {viewerState === 'loading' && (
         <div
           data-testid="model3d-loading"
-          className="absolute inset-0 flex items-center justify-center bg-gray-900/80"
+          className="absolute inset-0 flex items-center justify-center bg-gray-900/80 dark:bg-gray-100/80"
         >
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-400" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-400 dark:border-indigo-500" />
         </div>
       )}
 
       {viewerState === 'error' && (
         <div
           data-testid="model3d-error"
-          className="absolute inset-0 flex items-center justify-center bg-gray-900/90 p-4"
+          className="absolute inset-0 flex items-center justify-center bg-gray-900/90 p-4 dark:bg-gray-100/90"
         >
-          <p className="text-red-400 text-sm text-center">
+          <p className="text-red-400 text-sm text-center dark:text-red-400">
             Unable to load the 3D model. Please check your connection and try again.
           </p>
         </div>
@@ -221,9 +221,9 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
       {viewerState === 'unavailable' && (
         <div
           data-testid="model3d-unavailable"
-          className="absolute inset-0 flex items-center justify-center bg-gray-900/90 p-4"
+          className="absolute inset-0 flex items-center justify-center bg-gray-900/90 p-4 dark:bg-gray-100/90"
         >
-          <p className="text-gray-400 text-sm text-center">
+          <p className="text-gray-400 text-sm text-center dark:text-gray-500">
             3D viewer is not available in this environment
           </p>
         </div>

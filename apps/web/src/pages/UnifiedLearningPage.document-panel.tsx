@@ -182,7 +182,7 @@ export function DocumentPanel({
         className="flex-1 overflow-y-auto bg-muted/10 flex justify-center py-6 px-4"
       >
         <div
-          className="bg-white shadow-lg rounded-sm"
+          className="bg-white shadow-lg rounded-sm dark:bg-gray-900"
           style={{
             width: '760px',
             transform: `scale(${documentZoom})`,

@@ -99,7 +99,7 @@ export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, 
           {run.status === 'RUNNING' && (
             <button
               onClick={onCancel}
-              className="underline text-red-600 hover:text-red-800"
+              className="underline text-red-600 hover:text-red-800 dark:text-red-400"
               data-testid="cancel-run-btn"
             >
               ביטול

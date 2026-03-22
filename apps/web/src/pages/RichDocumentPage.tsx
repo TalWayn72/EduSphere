@@ -151,7 +151,7 @@ export function RichDocumentPage() {
         />
 
         {hasError && (
-          <div className="mx-6 mt-4 flex items-center gap-2 px-3 py-2 text-sm text-red-800 bg-red-50 border border-red-200 rounded-md">
+          <div className="mx-6 mt-4 flex items-center gap-2 px-3 py-2 text-sm text-red-800 bg-red-50 border border-red-200 rounded-md dark:text-red-200 dark:bg-red-950 dark:border-red-700">
             <AlertCircle className="h-4 w-4 shrink-0" />
             Failed to load document. Please try again.
           </div>

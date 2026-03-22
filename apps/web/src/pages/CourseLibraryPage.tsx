@@ -168,7 +168,7 @@ export function CourseLibraryPage() {
                 {course.isActivated ? (
                   <Badge
                     variant="outline"
-                    className="w-full justify-center py-2 text-green-700 border-green-300"
+                    className="w-full justify-center py-2 text-green-700 border-green-300 dark:text-green-300 dark:border-green-600"
                   >
                     Activated
                   </Badge>

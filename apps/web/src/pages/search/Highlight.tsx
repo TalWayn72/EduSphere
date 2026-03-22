@@ -9,7 +9,7 @@ export function Highlight({ text, query }: { text: string; query: string }) {
         part.toLowerCase() === lower ? (
           <mark
             key={i}
-            className="bg-yellow-200 text-yellow-900 rounded px-0.5"
+            className="bg-yellow-200 text-yellow-900 rounded px-0.5 dark:bg-yellow-800 dark:text-yellow-100"
           >
             {part}
           </mark>

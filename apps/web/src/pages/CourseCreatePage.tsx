@@ -173,7 +173,7 @@ export function CourseCreatePage() {
               href={downloadUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline text-indigo-400"
+              className="underline text-indigo-400 dark:text-indigo-300"
             >
               Download SCORM package
             </a>
@@ -328,22 +328,22 @@ export function CourseCreatePage() {
               {/* AI Course Builder CTA */}
               <div
                 data-testid="ai-builder-cta"
-                className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5"
+                className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5 dark:border-indigo-400/30 dark:bg-indigo-400/10"
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">✨</span>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-indigo-300">
+                    <h3 className="font-semibold text-indigo-300 dark:text-indigo-400">
                       {t('aiCreator.builderTitle')}
                     </h3>
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
                       {t('aiCreator.builderDescription')}
                     </p>
                   </div>
                   <Button
                     data-testid="launch-ai-builder-btn"
                     onClick={() => setShowAiModal(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700"
+                    className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500"
                   >
                     {t('aiCreator.launchAiBuilder')}
                   </Button>
@@ -419,10 +419,10 @@ export function CourseCreatePage() {
               onClick={handleExportScorm}
               disabled={isExporting}
               data-testid="export-scorm-btn"
-              className="border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10"
+              className="border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10 dark:border-indigo-400/40 dark:text-indigo-300"
             >
               {isExporting ? (
-                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-400 mr-2 inline-block" />
+                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-400 mr-2 inline-block dark:border-indigo-500" />
               ) : (
                 <Download className="h-4 w-4 mr-2" />
               )}

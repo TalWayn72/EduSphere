@@ -76,7 +76,7 @@ export function GamificationPage() {
     <Layout>
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <Trophy className="h-8 w-8 text-yellow-500" aria-hidden="true" />
+        <Trophy className="h-8 w-8 text-yellow-500 dark:text-yellow-400" aria-hidden="true" />
         <h1 className="text-3xl font-bold">{t('gamification')}</h1>
       </div>
 
@@ -92,11 +92,11 @@ export function GamificationPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Card>
               <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                <Flame className="h-5 w-5 text-orange-500" aria-hidden="true" />
+                <Flame className="h-5 w-5 text-orange-500 dark:text-orange-400" aria-hidden="true" />
                 <CardTitle className="text-base">{t('currentStreak')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-bold text-orange-500">
+                <p className="text-4xl font-bold text-orange-500 dark:text-orange-400">
                   {stats?.currentStreak ?? 0}
                   <span className="text-lg text-muted-foreground ml-1">{t('days')}</span>
                 </p>
@@ -111,7 +111,7 @@ export function GamificationPage() {
                 <CardTitle className="text-base">{t('activeChallenges')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-bold text-indigo-600">
+                <p className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">
                   {stats?.activeChallenges.filter((c) => !c.completed).length ?? 0}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -140,7 +140,7 @@ export function GamificationPage() {
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <Target className="h-4 w-4 text-indigo-500" aria-hidden="true" />
+                      <Target className="h-4 w-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                       <Badge variant={c.completed ? 'default' : 'secondary'}>
                         +{c.xpReward} XP
                       </Badge>
@@ -207,7 +207,7 @@ export function GamificationPage() {
                       <td className="p-4">
                         <Badge variant="outline">{t('level')} {entry.level}</Badge>
                       </td>
-                      <td className="p-4 text-right text-sm font-semibold text-indigo-600">
+                      <td className="p-4 text-right text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                         {entry.totalXp.toLocaleString()}
                       </td>
                     </tr>

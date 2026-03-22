@@ -42,7 +42,7 @@ export function PricingPage() {
         </p>
         <Link
           to="/pilot"
-          className="mt-6 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
+          className="mt-6 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors dark:bg-indigo-500 dark:text-white"
         >
           Start Free Pilot →
         </Link>
@@ -74,7 +74,7 @@ export function PricingPage() {
                   aria-expanded={openFaq === i}
                 >
                   {item.q}
-                  <span className="text-indigo-600 font-bold ml-4" aria-hidden="true">
+                  <span className="text-indigo-600 font-bold ml-4 dark:text-indigo-400" aria-hidden="true">
                     {openFaq === i ? '−' : '+'}
                   </span>
                 </button>

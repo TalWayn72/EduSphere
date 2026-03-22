@@ -341,7 +341,7 @@ export function EnrollmentManagementPage() {
         )}
 
         {successMessage && (
-          <span className="text-sm text-green-600 font-medium">
+          <span className="text-sm text-green-600 font-medium dark:text-green-400">
             {successMessage}
           </span>
         )}

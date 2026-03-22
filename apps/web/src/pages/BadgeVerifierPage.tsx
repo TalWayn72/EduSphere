@@ -106,7 +106,7 @@ export function BadgeVerifierPage(): React.ReactElement {
         <div className="w-full max-w-md space-y-4">
           <div className="text-center">
             <Award
-              className="h-12 w-12 text-yellow-500 mx-auto mb-2"
+              className="h-12 w-12 text-yellow-500 mx-auto mb-2 dark:text-yellow-400"
               aria-hidden="true"
             />
             <h1 className="text-2xl font-bold">Badge Verification</h1>
@@ -140,12 +140,12 @@ export function BadgeVerifierPage(): React.ReactElement {
                     {result.valid ? (
                       <>
                         <CheckCircle
-                          className="h-6 w-6 text-green-500"
+                          className="h-6 w-6 text-green-500 dark:text-green-400"
                           aria-hidden="true"
                         />
                         <Badge
                           variant="default"
-                          className="bg-green-600 hover:bg-green-700"
+                          className="bg-green-600 hover:bg-green-700 dark:bg-green-500"
                         >
                           Valid Credential
                         </Badge>

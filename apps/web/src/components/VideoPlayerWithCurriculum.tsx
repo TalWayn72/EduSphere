@@ -94,7 +94,7 @@ export function VideoPlayerWithCurriculum({
       {/* ── Left: video area ─────────────────────────────────────────────── */}
       <div className="flex flex-col flex-1 min-w-0 overflow-y-auto" data-testid="video-player">
         {/* Video */}
-        <div className="relative w-full bg-black aspect-video">
+        <div className="relative w-full bg-black aspect-video dark:bg-black">
           {videoUrl ? (
             <video
               src={videoUrl}
@@ -247,7 +247,7 @@ export function VideoPlayerWithCurriculum({
                   >
                     <span className="mt-0.5 flex-shrink-0 text-muted-foreground" data-testid={lesson.completed ? 'lesson-completed-icon' : 'lesson-incomplete-icon'}>
                       {lesson.completed
-                        ? <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        ? <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
                         : <Circle className="h-4 w-4" />}
                     </span>
                     <span className="flex-1 min-w-0">

@@ -148,9 +148,9 @@ export function QuizBuilderPage() {
             <DialogTitle>Generate Quiz from Content</DialogTitle>
             <DialogDescription className="sr-only">Auto-generate quiz questions from course content using AI.</DialogDescription>
           </DialogHeader>
-          <div className="py-4 text-sm text-slate-500 text-center">
+          <div className="py-4 text-sm text-slate-500 text-center dark:text-slate-400">
             <p className="text-2xl mb-3">🚧</p>
-            <p className="font-semibold text-slate-700 mb-1">Coming in Phase 52</p>
+            <p className="font-semibold text-slate-700 mb-1 dark:text-slate-200">Coming in Phase 52</p>
             <p>
               Paste a lesson URL, upload a PDF, or select an existing lesson — and AI will
               generate quiz questions automatically.

@@ -25,7 +25,7 @@ export function ExpandableText({ text, limit = 600, testId }: { text: string; li
       </pre>
       {text.length > limit && (
         <button
-          className="text-xs text-blue-600 hover:underline mt-1"
+          className="text-xs text-blue-600 hover:underline mt-1 dark:text-blue-400"
           onClick={() => setExpanded(!expanded)}
           data-testid={`${testId}-expand`}
         >

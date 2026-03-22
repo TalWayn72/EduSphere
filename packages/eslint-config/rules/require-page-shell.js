@@ -37,6 +37,8 @@ module.exports = {
   create(context) {
     const filename = context.filename || context.getFilename();
 
+    // Skip test files.
+    if (/\.(test|spec|memory\.test)\.[jt]sx?$/.test(filename)) return {};
     // Only apply to files inside a pages/ directory.
     if (!/[/\\]pages[/\\]/.test(filename)) return {};
     if (!/\.tsx$/.test(filename)) return {};

@@ -15,7 +15,7 @@ export function PilotBanner({ daysRemaining }: PilotBannerProps) {
   return (
     <div
       data-testid="pilot-banner"
-      className={`flex items-center justify-between gap-4 rounded-lg bg-indigo-600 px-4 py-3 text-white text-sm${urgent ? ' animate-pulse' : ''}`}
+      className={`flex items-center justify-between gap-4 rounded-lg bg-indigo-600 px-4 py-3 text-white text-sm dark:bg-indigo-500 dark:text-white${urgent ? ' animate-pulse' : ''}`}
       role="status"
       aria-live="polite"
     >
@@ -24,7 +24,7 @@ export function PilotBanner({ daysRemaining }: PilotBannerProps) {
       </span>
       <Link
         to="/pricing"
-        className="shrink-0 rounded bg-white px-3 py-1 text-indigo-700 font-semibold text-xs hover:bg-indigo-50 transition-colors"
+        className="shrink-0 rounded bg-white px-3 py-1 text-indigo-700 font-semibold text-xs hover:bg-indigo-50 transition-colors dark:bg-gray-900 dark:text-indigo-300"
       >
         Upgrade
       </Link>

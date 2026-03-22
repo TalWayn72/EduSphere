@@ -64,7 +64,7 @@ export function AnnotationTimeline({
         aria-valuenow={Math.floor(currentTime)}
         aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
         tabIndex={0}
-        className="relative w-full h-2 bg-gray-200 rounded-full cursor-pointer"
+        className="relative w-full h-2 bg-gray-200 rounded-full cursor-pointer dark:bg-gray-700"
         onClick={handleBarClick}
         onKeyDown={(e) => {
           if (e.key === 'ArrowLeft') onSeek(Math.max(0, currentTime - 5));

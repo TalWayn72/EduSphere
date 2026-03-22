@@ -47,7 +47,7 @@ export function DriveImportCard({ courseId: _courseId, moduleId: _moduleId, onIm
           Connect Google Drive
         </Button>
       ) : (
-        <p className="text-sm text-green-600" data-testid="drive-connected-msg">
+        <p className="text-sm text-green-600 dark:text-green-400" data-testid="drive-connected-msg">
           Google Drive connected ✓
         </p>
       )}

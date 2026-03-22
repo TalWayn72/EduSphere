@@ -15,9 +15,9 @@ export function QuizResultView({ result, quiz, onRetry }: Props) {
       <CardContent className="p-6 space-y-6">
         <div className="text-center space-y-2">
           {result.passed ? (
-            <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+            <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto dark:text-green-400" />
           ) : (
-            <XCircle className="h-12 w-12 text-red-500 mx-auto" />
+            <XCircle className="h-12 w-12 text-red-500 mx-auto dark:text-red-400" />
           )}
           <h2 className="text-xl font-bold">
             {result.passed ? 'Congratulations!' : 'Not quite — keep going!'}
@@ -42,9 +42,9 @@ export function QuizResultView({ result, quiz, onRetry }: Props) {
                     ${ir.correct ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
                 >
                   {ir.correct ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5 dark:text-green-400" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    <XCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5 dark:text-red-400" />
                   )}
                   <div>
                     <p className="font-medium">{item?.question}</p>

@@ -68,7 +68,7 @@ export function SortablePipelineNode({ node, idx, total, isSelected, onSelect, o
           >
             <GripVertical size={16} />
           </button>
-          <span className="bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center shrink-0">
+          <span className="bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center shrink-0 dark:bg-blue-500 dark:text-white">
             {idx + 1}
           </span>
           <button

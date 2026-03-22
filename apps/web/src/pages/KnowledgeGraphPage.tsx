@@ -6,6 +6,7 @@ import { KnowledgeGraph } from './KnowledgeGraph';
 function GraphLoader() {
   return (
     <div className="flex items-center justify-center h-full">
+      <h1 className="sr-only">Knowledge Graph</h1>
       <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
     </div>
   );

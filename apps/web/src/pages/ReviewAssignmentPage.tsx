@@ -80,7 +80,7 @@ export function ReviewAssignmentPage() {
         {submitted ? (
           <Card>
             <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-              <CheckCircle2 className="h-12 w-12 text-green-500" aria-hidden="true" />
+              <CheckCircle2 className="h-12 w-12 text-green-500 dark:text-green-400" aria-hidden="true" />
               <p className="text-lg font-semibold">Review submitted successfully!</p>
               <Link
                 to="/peer-review"

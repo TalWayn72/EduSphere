@@ -107,7 +107,7 @@ function SortableBlock({ block, onUpdate, onRemove }: SortableBlockProps) {
       <button
         {...attributes}
         {...listeners}
-        className="mt-1 cursor-grab text-gray-400 hover:text-gray-600"
+        className="mt-1 cursor-grab text-gray-400 hover:text-gray-600 dark:text-gray-500"
         aria-label={`Drag ${BLOCK_LABELS[block.type]}`}
       >
         <GripVertical size={16} />
@@ -135,7 +135,7 @@ function SortableBlock({ block, onUpdate, onRemove }: SortableBlockProps) {
       </div>
       <button
         onClick={() => onRemove(block.id)}
-        className="mt-1 text-gray-400 hover:text-red-500"
+        className="mt-1 text-gray-400 hover:text-red-500 dark:text-gray-500"
         aria-label={`Remove ${BLOCK_LABELS[block.type]}`}
       >
         <Trash2 size={16} />

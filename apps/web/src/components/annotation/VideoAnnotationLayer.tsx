@@ -79,7 +79,7 @@ export function VideoAnnotationLayer({
                   role="listitem"
                   className="absolute top-0 -translate-x-1/2 h-4 w-4 rounded-full border-2 border-white shadow
                              cursor-pointer hover:scale-125 transition-transform
-                             focus:outline-none focus:ring-2 focus:ring-primary"
+                             focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-700"
                   style={{ left: `${leftPct}%`, backgroundColor: ann.color }}
                   aria-label={`Annotation at ${Math.floor(ann.timestamp)}s: ${ann.text.slice(0, 60)}`}
                   onClick={() => onAnnotationClick(ann)}

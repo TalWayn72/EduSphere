@@ -57,30 +57,30 @@ export function PilotSignupPage() {
       <div data-testid="pilot-signup-page" className="min-h-screen bg-gradient-to-br from-indigo-900 to-slate-900">
         <PageShell size="sm" className="py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white">Start Your Free Pilot</h1>
-          <p className="mt-3 text-indigo-100">90 days, full features, no credit card required.</p>
+          <h1 className="text-3xl font-bold text-white dark:text-white">Start Your Free Pilot</h1>
+          <p className="mt-3 text-indigo-100 dark:text-indigo-300">90 days, full features, no credit card required.</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur rounded-2xl border border-white/20 p-8">
           {success ? (
             <div data-testid="pilot-success-message" className="text-center py-8" role="status" aria-live="polite">
               <p className="text-4xl mb-4">✅</p>
-              <h2 className="text-2xl font-bold text-white mb-2">Request Received</h2>
-              <p className="text-indigo-100">EduSphere will review within 24 hours. Check your email.</p>
+              <h2 className="text-2xl font-bold text-white mb-2 dark:text-white">Request Received</h2>
+              <p className="text-indigo-100 dark:text-indigo-300">EduSphere will review within 24 hours. Check your email.</p>
             </div>
           ) : (
             <form data-testid="pilot-form" onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className="space-y-5">
                 <div>
-                  <Label htmlFor="orgName" className="text-white text-sm font-medium">Organization Name *</Label>
-                  <Input id="orgName" {...register('orgName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="University of..." aria-required="true" />
-                  {errors.orgName && <p className="text-red-300 text-xs mt-1" role="alert">{errors.orgName.message}</p>}
+                  <Label htmlFor="orgName" className="text-white text-sm font-medium dark:text-white">Organization Name *</Label>
+                  <Input id="orgName" {...register('orgName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder="University of..." aria-required="true" />
+                  {errors.orgName && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.orgName.message}</p>}
                 </div>
 
                 <div>
-                  <Label htmlFor="orgType" className="text-white text-sm font-medium">Organization Type *</Label>
+                  <Label htmlFor="orgType" className="text-white text-sm font-medium dark:text-white">Organization Type *</Label>
                   <Select onValueChange={(v) => setValue('orgType', v as FormData['orgType'])}>
-                    <SelectTrigger id="orgType" aria-required="true" className="mt-1.5 bg-white/10 border-white/20 text-white">
+                    <SelectTrigger id="orgType" aria-required="true" className="mt-1.5 bg-white/10 border-white/20 text-white dark:text-white">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -91,36 +91,36 @@ export function PilotSignupPage() {
                       <SelectItem value="DEFENSE">Defense</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.orgType && <p className="text-red-300 text-xs mt-1" role="alert">{errors.orgType.message}</p>}
+                  {errors.orgType && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.orgType.message}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="contactName" className="text-white text-sm font-medium">Contact Name *</Label>
-                    <Input id="contactName" {...register('contactName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="Dr. Jane Smith" aria-required="true" />
-                    {errors.contactName && <p className="text-red-300 text-xs mt-1" role="alert">{errors.contactName.message}</p>}
+                    <Label htmlFor="contactName" className="text-white text-sm font-medium dark:text-white">Contact Name *</Label>
+                    <Input id="contactName" {...register('contactName')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder="Dr. Jane Smith" aria-required="true" />
+                    {errors.contactName && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.contactName.message}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="contactEmail" className="text-white text-sm font-medium">Email *</Label>
-                    <Input id="contactEmail" type="email" {...register('contactEmail')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="jane@university.edu" aria-required="true" />
-                    {errors.contactEmail && <p className="text-red-300 text-xs mt-1" role="alert">{errors.contactEmail.message}</p>}
+                    <Label htmlFor="contactEmail" className="text-white text-sm font-medium dark:text-white">Email *</Label>
+                    <Input id="contactEmail" type="email" {...register('contactEmail')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder="jane@university.edu" aria-required="true" />
+                    {errors.contactEmail && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.contactEmail.message}</p>}
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="estimatedUsers" className="text-white text-sm font-medium">Estimated Users *</Label>
-                  <Input id="estimatedUsers" type="number" min={1} max={1000000} {...register('estimatedUsers', { valueAsNumber: true })} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80" placeholder="500" aria-required="true" />
-                  {errors.estimatedUsers && <p className="text-red-300 text-xs mt-1" role="alert">{errors.estimatedUsers.message}</p>}
+                  <Label htmlFor="estimatedUsers" className="text-white text-sm font-medium dark:text-white">Estimated Users *</Label>
+                  <Input id="estimatedUsers" type="number" min={1} max={1000000} {...register('estimatedUsers', { valueAsNumber: true })} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 dark:text-white" placeholder="500" aria-required="true" />
+                  {errors.estimatedUsers && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.estimatedUsers.message}</p>}
                 </div>
 
                 <div>
-                  <Label htmlFor="useCase" className="text-white text-sm font-medium">Use Case *</Label>
-                  <Textarea id="useCase" {...register('useCase')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 min-h-[80px]" placeholder="Describe your learning goals..." aria-required="true" />
-                  {errors.useCase && <p className="text-red-300 text-xs mt-1" role="alert">{errors.useCase.message}</p>}
+                  <Label htmlFor="useCase" className="text-white text-sm font-medium dark:text-white">Use Case *</Label>
+                  <Textarea id="useCase" {...register('useCase')} className="mt-1.5 bg-white/10 border-white/20 text-white placeholder:text-white/80 min-h-[80px] dark:text-white" placeholder="Describe your learning goals..." aria-required="true" />
+                  {errors.useCase && <p className="text-red-300 text-xs mt-1 dark:text-red-400" role="alert">{errors.useCase.message}</p>}
                 </div>
 
                 {error && (
-                  <p data-testid="pilot-error-message" className="text-red-300 text-sm text-center" role="alert">
+                  <p data-testid="pilot-error-message" className="text-red-300 text-sm text-center dark:text-red-400" role="alert">
                     Something went wrong. Please try again.
                   </p>
                 )}
@@ -129,11 +129,11 @@ export function PilotSignupPage() {
                   data-testid="pilot-submit-btn"
                   type="submit"
                   disabled={fetching}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3"
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 dark:bg-indigo-500 dark:text-white"
                 >
                   {fetching ? (
                     <span className="flex items-center justify-center gap-2">
-                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" aria-hidden="true" />
+                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-gray-700" aria-hidden="true" />
                       Submitting…
                     </span>
                   ) : 'Submit'}

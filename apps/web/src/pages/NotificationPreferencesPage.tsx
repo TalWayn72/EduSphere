@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
+import React, { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -50,7 +51,7 @@ type PrefRow = { notificationType: string; channel: string; enabled: boolean };
 export function NotificationPreferencesPage() {
   const [{ data, fetching }] = urql.useQuery({ query: PREFS_QUERY });
   const [, executeMutation] = urql.useMutation(UPDATE_MUTATION);
-  const prefs: PrefRow[] = data?.myNotificationPreferences ?? [];
+  const prefs: PrefRow[] = useMemo(() => data?.myNotificationPreferences ?? [], [data]);
   const whatsappSetup = prefs.some((p) => p.channel === 'whatsapp');
 
   const isEnabled = useCallback((type: string, ch: Channel) =>
@@ -88,7 +89,7 @@ export function NotificationPreferencesPage() {
                       {CHANNELS.map((ch) => (
                         <td key={ch} className="text-center py-2 px-2">
                           {ch === 'whatsapp' && !whatsappSetup ? (
-                            <Link to="/settings/whatsapp" className="text-xs text-blue-600 hover:underline">Set up</Link>
+                            <Link to="/settings/whatsapp" className="text-xs text-blue-600 hover:underline dark:text-blue-400">Set up</Link>
                           ) : (
                             <>
                               <Label className="sr-only" htmlFor={`${t.key}-${ch}`}>{`${t.label} ${CHANNEL_LABELS[ch]}`}</Label>

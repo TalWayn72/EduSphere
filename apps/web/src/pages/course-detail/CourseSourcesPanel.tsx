@@ -23,7 +23,7 @@ export function CourseSourcesPanel({ courseId }: Props) {
         data-testid="toggle-sources"
       >
         <span className="flex items-center gap-2">
-          <BookMarked className="h-4 w-4 text-blue-600" />
+          <BookMarked className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           {t('knowledgeSources')}
         </span>
         <span className="text-muted-foreground">

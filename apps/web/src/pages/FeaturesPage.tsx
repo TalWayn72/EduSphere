@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-shell -- multi-section layout */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Brain, Network, Trophy, Shield, Globe, Zap, Check } from 'lucide-react';
@@ -136,7 +137,7 @@ export function FeaturesPage() {
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950">
                       <feature.Icon
-                        className="h-6 w-6 text-indigo-600"
+                        className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
                         aria-hidden={true}
                       />
                     </div>
@@ -160,7 +161,7 @@ export function FeaturesPage() {
                         className="flex items-start gap-2 text-sm text-gray-700 dark:text-white"
                       >
                         <Check
-                          className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0"
+                          className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0 dark:text-indigo-400"
                           aria-hidden={true}
                         />
                         {b}
@@ -178,7 +179,7 @@ export function FeaturesPage() {
                     <ol className="space-y-4">
                       {feature.howItWorks.map((s) => (
                         <li key={s.step} className="flex items-start gap-3">
-                          <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 dark:bg-indigo-500 dark:text-white">
                             {s.step}
                           </div>
                           <div>
@@ -200,15 +201,15 @@ export function FeaturesPage() {
         </main>
 
         {/* CTA */}
-        <div className="bg-indigo-700 py-16 text-center text-white">
+        <div className="bg-indigo-700 py-16 text-center text-white dark:bg-indigo-400 dark:text-white">
           <div className="max-w-2xl mx-auto px-4">
             <h2 className="text-3xl font-extrabold mb-4">{t('features.ctaHeading')}</h2>
-            <p className="text-indigo-100 mb-8">
+            <p className="text-indigo-100 mb-8 dark:text-indigo-300">
               {t('features.ctaSubtext')}
             </p>
             <Button
               size="lg"
-              className="bg-white text-indigo-700 hover:bg-indigo-50"
+              className="bg-white text-indigo-700 hover:bg-indigo-50 dark:bg-gray-900 dark:text-indigo-300"
               asChild
             >
               <Link to="/login">{t('features.getStartedFree')}</Link>

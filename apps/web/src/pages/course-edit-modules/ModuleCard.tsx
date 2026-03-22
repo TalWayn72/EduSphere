@@ -106,7 +106,7 @@ export function ModuleCard({
                 className="h-7 w-7 p-0"
                 onClick={handleSave}
               >
-                <Check className="h-3.5 w-3.5 text-green-600" />
+                <Check className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
               </Button>
               <Button
                 size="sm"

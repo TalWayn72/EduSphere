@@ -20,7 +20,7 @@ function HeroBannerPreview({ config }: { config: Record<string, unknown> }) {
     <div className="relative bg-gradient-to-r from-primary to-primary/70 text-primary-foreground p-10 rounded-t-xl">
       <h1 className="text-2xl font-bold mb-2">{title}</h1>
       <p className="text-sm opacity-80 mb-4">{subtitle}</p>
-      <button className="bg-white text-primary text-sm font-medium px-4 py-2 rounded-lg">
+      <button className="bg-white text-primary text-sm font-medium px-4 py-2 rounded-lg dark:bg-gray-900">
         {ctaText}
       </button>
     </div>

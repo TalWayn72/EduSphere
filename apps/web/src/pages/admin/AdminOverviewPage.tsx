@@ -52,6 +52,7 @@ function MetricCard({ testId, title, value, description }: MetricCardProps) {
 function MetricsSkeleton() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-testid="overview-skeleton">
+      <h1 className="sr-only">Admin Overview</h1>
       {Array.from({ length: 4 }).map((_, i) => (
         <Card key={i}>
           <CardHeader className="pb-2">
@@ -83,7 +84,7 @@ export function AdminOverviewPage() {
   return (
     <AdminLayout title={t('overview.title')} description={t('overview.description')}>
       <div data-testid="admin-overview-page" className="space-y-6">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700">
+        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">
           BETA
         </Badge>
 

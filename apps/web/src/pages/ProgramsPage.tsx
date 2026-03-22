@@ -111,7 +111,7 @@ export function ProgramsPage(): React.ReactElement {
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-4xl">{program.badgeEmoji}</span>
                     {isCompleted ? (
-                      <Badge variant="default" className="bg-green-500">
+                      <Badge variant="default" className="bg-green-500 dark:bg-green-600">
                         Completed
                       </Badge>
                     ) : isEnrolled ? (

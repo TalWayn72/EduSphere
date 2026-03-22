@@ -99,7 +99,7 @@ export function CourseCard({
         </span>
 
         {featured && (
-          <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5">
+          <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 dark:bg-amber-500 dark:text-amber-100">
             <Star className="h-2.5 w-2.5 fill-current" aria-hidden="true" />
             FEATURED
           </span>
