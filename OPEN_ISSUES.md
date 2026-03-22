@@ -86,13 +86,13 @@
 | BUG-102 | Delete course button missing from CourseDetailPage | ✅ Fixed | (pending commit) |
 | BUG-103 | Delete Course fails silently — course not removed from list after deletion | ✅ Fixed | `3dce63f4`, `0ad9030b`, `ae4a4200`, `10f9e269` |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
-| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (Wave 2) | (pending commit) |
+| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (All Waves — F-01 through F-15) | `df587183`, `0af3996d`, `ff162ce6`, `8f4d975f`, `058c0b4c` |
 
 ---
 
 ## FEAT-ORG-ONBOARDING — Organization Self-Service Onboarding & White-Label Platform (22 Mar 2026)
 
-- **Status:** ✅ Complete (Wave 2)
+- **Status:** ✅ Complete (All Waves — F-01 through F-15)
 - **Severity:** N/A (Feature)
 - **Reported:** 22 March 2026
 
@@ -104,16 +104,19 @@ Self-service organization onboarding with provisioning pipeline, user invitation
 
 | Category | Count | Details |
 |----------|-------|---------|
-| DB tables | 7 | `onboarding_checklist`, `org_invitations`, `course_licenses`, `api_keys`, `webhook_endpoints`, `gamification_config`, `marketplace_listings` |
-| Migration | 1 | `packages/db/src/migrations/0036_org_onboarding.sql` |
+| DB tables | 11 | `onboarding_checklist`, `org_invitations`, `course_licenses`, `api_keys`, `webhook_endpoints`, `gamification_config`, `marketplace_listings`, `tenant_audit_log`, `org_badges`, `custom_domains`, `welcome_message` |
+| Migrations | 4 | `0036_org_onboarding.sql`, `0037_audit_log_and_badges.sql`, `0038_custom_domains.sql`, `0039_welcome_message.sql` |
 | GraphQL SDL | 2 | `org-onboarding.graphql` (Core), `marketplace-org.graphql` (Content) |
 | Mutations | 18 | createOrganization, inviteUser, acceptInvitation, revokeInvitation, updateMemberRole, removeMember, createApiKey, revokeApiKey, createWebhook, updateWebhook, deleteWebhook, testWebhook, licenseCourse, revokeCourseLicense, updateGamificationConfig, exportAnalytics, publishToMarketplace, unpublishFromMarketplace |
 | Queries | 12 | myOrganization, orgMembers, orgInvitations, trialStatus, apiKeys, webhooks, webhookDeliveries, courseLicenses, gamificationConfig, orgAnalytics, marketplaceListings, marketplaceListing |
-| NestJS services | 18 | OrgProvisioningService, OrgInvitationService, OrgLicensingService, OrgOnboardingResolver, MarketplaceOrgService, MarketplaceOrgResolver, + Zod schemas, module wiring |
-| React pages | 26 | OrgSignupWizard (3 steps), TeamManagement, ApiKeysPage, WebhooksPage, GamificationConfig, AnalyticsDashboard, MarketplaceBrowse, OrgCatalog, BillingPage, SsoConfigPage, ThemeProvider, StepIndicator, SlugField |
+| NestJS services | 28 | OrgProvisioningService, OrgInvitationService, OrgLicensingService, OrgOnboardingResolver, MarketplaceOrgService, MarketplaceOrgResolver, OrgBadgeService, BadgeAutoAwardService, AtRiskLearnerService, AnalyticsSnapshotCron, AnalyticsExportController, DomainProvisioningService, MarketplaceCheckoutService, MarketplacePayoutService, CourseCopyService, AuditLogInterceptor, + Zod schemas, module wiring |
+| React pages | 32 | OrgSignupWizard (3 steps), TeamManagement, ApiKeysPage, WebhooksPage, GamificationConfig, AnalyticsDashboard, MarketplaceBrowse, OrgCatalog, BillingPage, SsoConfigPage, ThemeProvider, StepIndicator, SlugField, BadgeAutoAwardEditor, LearnerDetailPanel, DomainConfigPage, MarketplacePurchases, MarketplaceSuccess, BrandedLoginPage |
+| New packages | 1 | `packages/dns-provider/` (DNS provisioning abstraction) |
+| Mobile services | 2 | push-notifications, offline-db + eas.json org-build profile |
 | i18n namespaces | 7 x 10 locales = 70 files | orgOnboarding, orgAdmin, orgBranding, orgMarketplace, orgAnalytics, orgGamification, orgApi |
-| Security tests | 201 | RLS isolation, rate limiting, CSRF, GDPR erasure |
-| QA tests | ~300 | Unit tests + E2E (org-signup-wizard.spec.ts, org-i18n-pages.spec.ts) |
+| Security tests | 201+ | RLS isolation, rate limiting, CSRF, GDPR erasure, cross-tenant isolation, RLS completeness audit |
+| QA tests | ~300+ | Unit tests + E2E (org-signup-wizard.spec.ts, org-i18n-pages.spec.ts, branded-login.spec.ts) |
+| Features complete | 15/15 | F-01 through F-15 — all waves delivered |
 
 ### Key Files Created
 
@@ -186,12 +189,77 @@ Self-service organization onboarding with provisioning pipeline, user invitation
 | `docs/plans/features/FEAT-ORG-ONBOARDING-ARCHITECTURE.md` | Full architecture design |
 | `docs/plans/features/FEAT-ORG-ONBOARDING-ADMIN-GUIDE.md` | Admin guide |
 
+### Wave 3-5 (22 Mar 2026) — Remaining Features
+
+#### F-10 Content Isolation Audit (`8f4d975f`)
+| File | Purpose |
+|------|---------|
+| `packages/db/src/migrations/0037_audit_log_and_badges.sql` | Audit log + badges tables |
+| `packages/db/src/schema/tenant-audit-log.ts` | Drizzle schema for tenant audit log |
+| `apps/subgraph-core/src/interceptors/audit-log.interceptor.ts` | Auto-capture mutation audit trail |
+| `tests/security/cross-tenant-isolation.spec.ts` | Cross-tenant isolation tests |
+| `tests/security/rls-completeness-audit.spec.ts` | RLS completeness audit across all tables |
+
+#### F-12 Per-Org Gamification (`8f4d975f`)
+| File | Purpose |
+|------|---------|
+| `apps/subgraph-core/src/gamification/org-badge.service.ts` | Org-scoped badge management |
+| `apps/subgraph-core/src/gamification/badge-auto-award.service.ts` | Automatic badge awarding engine |
+| `apps/web/src/pages/admin/BadgeAutoAwardEditor.tsx` | Admin UI for auto-award rules |
+
+#### F-15 Org Analytics (`8f4d975f`)
+| File | Purpose |
+|------|---------|
+| `apps/subgraph-core/src/analytics/at-risk-learner.service.ts` | At-risk learner detection |
+| `apps/subgraph-core/src/analytics/analytics-snapshot.cron.ts` | Periodic analytics snapshot cron |
+| `apps/subgraph-core/src/analytics/analytics-export.controller.ts` | CSV/JSON analytics export |
+| `apps/web/src/pages/admin/LearnerDetailPanel.tsx` | Learner detail drill-down panel |
+
+#### F-03 Subdomain Provisioning (`058c0b4c`)
+| File | Purpose |
+|------|---------|
+| `packages/dns-provider/` | New package — DNS provisioning abstraction (mock + real providers) |
+| `packages/db/src/migrations/0038_custom_domains.sql` | Custom domains table |
+| `apps/subgraph-core/src/tenant/domain-provisioning.service.ts` | Domain verification + SSL provisioning |
+| `apps/web/src/pages/admin/DomainConfigPage.tsx` | Admin domain configuration UI |
+
+#### F-14 Content Marketplace (`058c0b4c`)
+| File | Purpose |
+|------|---------|
+| `apps/subgraph-core/src/marketplace/marketplace-checkout.service.ts` | Checkout flow + Stripe integration |
+| `apps/subgraph-core/src/marketplace/marketplace-payout.service.ts` | Seller payout management |
+| `apps/subgraph-content/src/marketplace/course-copy.service.ts` | Deep-copy course on license purchase |
+| `apps/web/src/pages/admin/MarketplacePurchases.tsx` | Purchase history admin page |
+| `apps/web/src/pages/admin/MarketplaceSuccess.tsx` | Post-purchase success page |
+
+#### F-09 Branded Login Page (`058c0b4c`)
+| File | Purpose |
+|------|---------|
+| `packages/db/src/migrations/0039_welcome_message.sql` | Welcome message table |
+| `apps/web/src/pages/auth/BrandedLoginPage.tsx` | Org-branded login page with custom logo/colors |
+| `apps/web/e2e/branded-login.spec.ts` | E2E test for branded login |
+
+#### F-11 White-Label Mobile (`058c0b4c`)
+| File | Purpose |
+|------|---------|
+| `apps/mobile/src/services/push-notifications.ts` | Push notification service |
+| `apps/mobile/src/services/offline-db.ts` | Offline SQLite database service |
+| `apps/mobile/eas.json` | EAS Build org-build profile |
+| `scripts/build-org-app.sh` | Org-branded mobile app build script |
+
+#### Wave 0 — Trial Period Update
+| File | Purpose |
+|------|---------|
+| `apps/subgraph-core/src/tenant/org-provisioning.service.ts` | TRIAL_DAYS 14 → 90 |
+
 ### Anti-Recurrence
 
-- RLS policies on all 7 new tables enforce tenant isolation
+- RLS policies on all 11 tables enforce tenant isolation
 - Zod schemas validate all mutation inputs
-- E2E tests cover signup wizard flow and i18n locale rendering
-- Security tests cover rate limiting, CSRF protection, and GDPR erasure for org data
+- E2E tests cover signup wizard flow, i18n locale rendering, and branded login
+- Security tests cover rate limiting, CSRF protection, GDPR erasure, cross-tenant isolation, and RLS completeness audit
+- Audit log interceptor captures all mutations for compliance trail
+- DNS provider abstraction allows mock testing without real DNS changes
 
 ---
 
