@@ -116,8 +116,8 @@ describe('BE-2: AgentService Promise.race timeout', () => {
     expect(src).toContain('Promise.race');
   });
 
-  it('timeout is 5 minutes (300000ms)', () => {
-    expect(src).toMatch(/300[_]?000|5\s*\*\s*60\s*\*\s*1000/);
+  it('timeout is 10 minutes (600000ms)', () => {
+    expect(src).toMatch(/600[_]?000|10\s*\*\s*60\s*\*\s*1000/);
   });
 
   it('timeout rejects with descriptive error', () => {

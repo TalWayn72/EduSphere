@@ -6,13 +6,13 @@
   "editCourse": "Edit Course",
   "deleteCourse": "Eliminar curso",
   "deleteCourseDialogTitle": "Eliminar curso",
-  "deleteCourseDialogDescription": "Esta acci\u00f3n no se puede deshacer. El curso \"{{title}}\" y todo su contenido se eliminar\u00e1n permanentemente.",
-  "deleteCourseWarningPublished": "Este curso est\u00e1 publicado actualmente. Eliminarlo quitar\u00e1 el acceso a todos los estudiantes inscritos.",
-  "deleteCourseWarningDraft": "Este curso es un borrador. Eliminarlo quitar\u00e1 todos los m\u00f3dulos y elementos de contenido.",
-  "deleteCourseConfirmLabel": "Escribe \"{{title}}\" para confirmar la eliminaci\u00f3n",
-  "deleteCourseConfirmMatched": "El t\u00edtulo coincide \u2014 ahora puedes eliminar este curso.",
-  "deleteCourseConfirmHint": "Por favor escribe el t\u00edtulo exacto del curso para confirmar.",
-  "deleteCourseFailed": "Error al eliminar el curso. Por favor int\u00e9ntalo de nuevo.",
+  "deleteCourseDialogDescription": "Esta acción no se puede deshacer. El curso \"{{title}}\" y todo su contenido se eliminarán permanentemente.",
+  "deleteCourseWarningPublished": "Este curso está publicado actualmente. Eliminarlo quitará el acceso a todos los estudiantes inscritos.",
+  "deleteCourseWarningDraft": "Este curso es un borrador. Eliminarlo quitará todos los módulos y elementos de contenido.",
+  "deleteCourseConfirmLabel": "Escribe \"{{title}}\" para confirmar la eliminación",
+  "deleteCourseConfirmMatched": "El título coincide — ahora puedes eliminar este curso.",
+  "deleteCourseConfirmHint": "Por favor escribe el título exacto del curso para confirmar.",
+  "deleteCourseFailed": "Error al eliminar el curso. Por favor inténtalo de nuevo.",
   "deleteCoursePermissionDenied": "No tienes permiso para eliminar este curso.",
   "deleteCourseNotFound": "Curso no encontrado. Es posible que ya haya sido eliminado.",
   "deleteCourseConfirm": "Eliminar curso",
@@ -115,7 +115,16 @@
     "failedUploadUrl": "Failed to get upload URL",
     "retryUpload": "Retry",
     "networkError": "Network error during upload",
-    "failedConfirm": "Failed to confirm upload"
+    "failedConfirm": "Failed to confirm upload",
+    "moveUpAriaLabel": "Move up",
+    "moveDownAriaLabel": "Move down",
+    "removeModuleAriaLabel": "Remove module",
+    "createRichDocument": "Create Rich Document",
+    "richDocTitlePlaceholder": "Document title...",
+    "richDocAdded": "Added",
+    "addRichDocument": "Add Rich Document",
+    "removeAriaLabel": "Remove",
+    "selectFilesAriaLabel": "Select files to upload"
   },
   "checkout": {
     "payNow": "Pay Now",
@@ -228,5 +237,7 @@
   "courseFilter": "Course filter",
   "gridView": "Grid view",
   "listView": "List view",
-  "viewMode": "View mode"
+  "viewMode": "View mode",
+  "thumbnailPlaceholder": "e.g. 📚 or https://...",
+  "estimatedHoursEditPlaceholder": "e.g. 8"
 }

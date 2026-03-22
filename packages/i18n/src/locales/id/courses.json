@@ -10,7 +10,7 @@
   "deleteCourseWarningPublished": "Kursus ini saat ini dipublikasikan. Menghapusnya akan menghapus akses untuk semua siswa yang terdaftar.",
   "deleteCourseWarningDraft": "Kursus ini adalah draf. Menghapusnya akan menghapus semua modul dan item konten.",
   "deleteCourseConfirmLabel": "Ketik \"{{title}}\" untuk mengonfirmasi penghapusan",
-  "deleteCourseConfirmMatched": "Judul cocok \u2014 Anda sekarang dapat menghapus kursus ini.",
+  "deleteCourseConfirmMatched": "Judul cocok — Anda sekarang dapat menghapus kursus ini.",
   "deleteCourseConfirmHint": "Silakan ketik judul kursus yang tepat untuk mengonfirmasi.",
   "deleteCourseFailed": "Gagal menghapus kursus. Silakan coba lagi.",
   "deleteCoursePermissionDenied": "Anda tidak memiliki izin untuk menghapus kursus ini.",
@@ -115,7 +115,16 @@
     "failedUploadUrl": "Failed to get upload URL",
     "retryUpload": "Retry",
     "networkError": "Network error during upload",
-    "failedConfirm": "Failed to confirm upload"
+    "failedConfirm": "Failed to confirm upload",
+    "moveUpAriaLabel": "Move up",
+    "moveDownAriaLabel": "Move down",
+    "removeModuleAriaLabel": "Remove module",
+    "createRichDocument": "Create Rich Document",
+    "richDocTitlePlaceholder": "Document title...",
+    "richDocAdded": "Added",
+    "addRichDocument": "Add Rich Document",
+    "removeAriaLabel": "Remove",
+    "selectFilesAriaLabel": "Select files to upload"
   },
   "checkout": {
     "payNow": "Pay Now",
@@ -228,5 +237,7 @@
   "courseFilter": "Course filter",
   "gridView": "Grid view",
   "listView": "List view",
-  "viewMode": "View mode"
+  "viewMode": "View mode",
+  "thumbnailPlaceholder": "e.g. 📚 or https://...",
+  "estimatedHoursEditPlaceholder": "e.g. 8"
 }

@@ -160,6 +160,10 @@ const RESOLVER_GUARDED_MUTATIONS = [
   'addYoutubeSource',
   'addFileSource',
   'deleteKnowledgeSource',
+  // Org onboarding: public signup endpoint (no JWT — unauthenticated by design)
+  'createOrganization',
+  // Org onboarding: invitation acceptance uses token-based auth, not JWT
+  'acceptInvitation',
 ] as const;
 
 // ─── Tests ────────────────────────────────────────────────────────────────────

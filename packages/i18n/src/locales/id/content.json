@@ -102,7 +102,9 @@
     "urlHint": "The system will fetch the page content, split into chunks, and create embeddings.",
     "youtubeHint": "The system will download the video transcript and create embeddings for semantic search.",
     "noSourcesYet": "No sources yet",
-    "noSourcesHint": "Add links, documents or text — the system will analyze and index them"
+    "noSourcesHint": "Add links, documents or text — the system will analyze and index them",
+    "addSourceDescription": "Attach a URL, text, YouTube video, or file as a knowledge source for this course.",
+    "retry": "Try again"
   },
   "pipeline": {
     "enableModule": "Enable this module",

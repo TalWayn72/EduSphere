@@ -41,5 +41,18 @@
   "groupTeaching": "Teaching",
   "groupAnalytics": "Analytics",
   "helpAndSupport": "Help & Support",
-  "poweredBy": "Powered by EduSphere"
+  "poweredBy": "Powered by EduSphere",
+  "skillPaths": "Skill Paths",
+  "socialFeed": "Social Feed",
+  "findPeople": "Find People",
+  "peerReview": "Peer Review",
+  "assessments": "Assessments",
+  "groupChallenges": "Group Challenges",
+  "peerMatching": "Peer Matching",
+  "cohortInsights": "Cohort Insights",
+  "features": "Features",
+  "pricing": "Pricing",
+  "pilot": "Pilot",
+  "startFreePilot": "Start Free Pilot",
+  "freePilot": "Free Pilot"
 }

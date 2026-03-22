@@ -554,5 +554,159 @@
       "netRoi": "Net ROI",
       "getReport": "Get Your Custom ROI Report"
     }
+  },
+  "features": {
+    "pageHeading": "Everything You Need to Learn Smarter",
+    "pageSubheading": "EduSphere combines AI tutoring, knowledge graphs, gamification, and enterprise LMS features into a single platform built for 100,000+ concurrent users.",
+    "getStartedFree": "Get Started Free",
+    "viewFaq": "View FAQ",
+    "howItWorks": "How it works",
+    "ctaHeading": "Ready to Transform Learning?",
+    "ctaSubtext": "Start free. Upgrade anytime. No credit card required.",
+    "aiTutor": {
+      "title": "AI Tutoring (Chavruta)",
+      "tagline": "The AI that thinks with you",
+      "description": "EduSphere's AI tutor uses Socratic dialogue to challenge your reasoning and build deep understanding. Powered by LangGraph.js with a 4-stage learning loop: assess → quiz → explain → debate.",
+      "benefits": [
+        "Adapts to your learning pace and knowledge gaps",
+        "Socratic questioning that builds critical thinking",
+        "Concepts auto-linked to your personal knowledge graph",
+        "Context preserved across topic switches",
+        "Available 24/7 with no message limits on Pro"
+      ],
+      "steps": [
+        {
+          "title": "Assessment",
+          "desc": "AI assesses your current knowledge level"
+        },
+        {
+          "title": "Quiz",
+          "desc": "Targeted questions identify specific gaps"
+        },
+        {
+          "title": "Explain",
+          "desc": "AI explains in a way adapted to your level"
+        },
+        {
+          "title": "Debate",
+          "desc": "Socratic dialogue deepens understanding"
+        }
+      ]
+    },
+    "knowledgeGraph": {
+      "title": "Knowledge Graph",
+      "tagline": "Your personal concept map",
+      "description": "Powered by Apache AGE (graph database) and pgvector semantic search, EduSphere builds a visual map of everything you've learned and how concepts interconnect.",
+      "benefits": [
+        "Visualize relationships between concepts",
+        "AI suggests related topics based on your graph",
+        "Identify knowledge gaps at a glance",
+        "Semantic search across all your learning",
+        "Export your knowledge graph as a learning portfolio"
+      ],
+      "steps": [
+        {
+          "title": "Learn",
+          "desc": "Complete lessons and interact with AI tutor"
+        },
+        {
+          "title": "Map",
+          "desc": "Concepts are automatically added to your graph"
+        },
+        {
+          "title": "Connect",
+          "desc": "AI links related concepts as you learn"
+        },
+        {
+          "title": "Explore",
+          "desc": "Navigate your personal knowledge network"
+        }
+      ]
+    },
+    "gamification": {
+      "title": "Gamification",
+      "tagline": "Learning that keeps you coming back",
+      "description": "EduSphere's 5-level mastery system, daily streaks, and OpenBadges 3.0-certified digital badges increase completion rates by 40-60% compared to traditional LMS platforms.",
+      "benefits": [
+        "5-level mastery progression (Novice → Expert)",
+        "Daily streaks and XP points",
+        "OpenBadges 3.0-certified verifiable badges",
+        "Leaderboards for teams and cohorts",
+        "Push notifications for achievements and reminders"
+      ],
+      "steps": [
+        {
+          "title": "Learn",
+          "desc": "Complete lessons to earn XP points"
+        },
+        {
+          "title": "Level Up",
+          "desc": "Progress through 5 mastery levels"
+        },
+        {
+          "title": "Earn Badges",
+          "desc": "Receive verifiable OpenBadges on milestones"
+        },
+        {
+          "title": "Share",
+          "desc": "Display badges on LinkedIn and portfolios"
+        }
+      ]
+    },
+    "enterprise": {
+      "title": "Enterprise Grade",
+      "tagline": "Built for scale and compliance",
+      "description": "Multi-tenant architecture, SSO/SAML/SCIM, GDPR compliance, WCAG 2.2 AA accessibility, SCORM 1.2/2004, xAPI, LTI 1.3, and custom white-labeling for your organization.",
+      "benefits": [
+        "Multi-tenant with row-level security (RLS)",
+        "SSO via SAML 2.0, OIDC, LDAP",
+        "SCIM 2.0 user provisioning",
+        "GDPR + FERPA compliant",
+        "WCAG 2.2 AA accessibility certified",
+        "SLA: 99.9% uptime guarantee"
+      ],
+      "steps": [
+        {
+          "title": "Provision",
+          "desc": "SSO and SCIM auto-create user accounts"
+        },
+        {
+          "title": "Customize",
+          "desc": "White-label with your branding and domain"
+        },
+        {
+          "title": "Manage",
+          "desc": "Admin dashboard for all users and courses"
+        },
+        {
+          "title": "Report",
+          "desc": "Compliance and CPD reporting built-in"
+        }
+      ]
+    },
+    "multilingual": {
+      "title": "Multi-Language",
+      "tagline": "50+ languages with full RTL support",
+      "description": "EduSphere supports 50+ languages with native RTL support for Hebrew and Arabic. Automatic locale detection, localized content delivery, and per-tenant language configuration.",
+      "benefits": [
+        "50+ languages supported",
+        "Full RTL support for Hebrew and Arabic",
+        "Automatic locale detection",
+        "Per-tenant language configuration",
+        "Localized email notifications"
+      ]
+    },
+    "liveSessions": {
+      "title": "Live Sessions",
+      "tagline": "Real-time collaborative learning",
+      "description": "Schedule and run live instructor-led sessions. Real-time attendance tracking, session recording, and NATS-powered event streaming for instant notifications.",
+      "benefits": [
+        "Real-time session scheduling and notifications",
+        "Attendance tracking and reporting",
+        "Session recording for later review",
+        "Works on web and mobile",
+        "Integrated with course completion tracking"
+      ]
+    }
   }
 }
