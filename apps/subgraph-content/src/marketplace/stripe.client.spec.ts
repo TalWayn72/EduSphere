@@ -10,6 +10,9 @@ const mockCustomersCreate = vi.fn();
 const mockTransfersCreate = vi.fn();
 const mockWebhooksConstructEvent = vi.fn();
 const mockPaymentIntentsRetrieve = vi.fn();
+const mockCheckoutSessionsCreate = vi.fn();
+const mockCheckoutSessionsRetrieve = vi.fn();
+const mockRefundsCreate = vi.fn();
 
 vi.mock('stripe', () => {
   function MockStripe() {
@@ -26,6 +29,15 @@ vi.mock('stripe', () => {
       },
       webhooks: {
         constructEventAsync: mockWebhooksConstructEvent,
+      },
+      checkout: {
+        sessions: {
+          create: mockCheckoutSessionsCreate,
+          retrieve: mockCheckoutSessionsRetrieve,
+        },
+      },
+      refunds: {
+        create: mockRefundsCreate,
       },
     };
   }
@@ -143,5 +155,62 @@ describe('StripeClient', () => {
 
     expect(mockPaymentIntentsRetrieve).toHaveBeenCalledWith('pi_retrieve');
     expect(result).toBe(fakeIntent);
+  });
+
+  it('7. createCheckoutSession creates checkout session with line items', async () => {
+    const fakeSession = {
+      id: 'cs_test_123',
+      url: 'https://checkout.stripe.com/pay/cs_test_123',
+    };
+    mockCheckoutSessionsCreate.mockResolvedValue(fakeSession);
+
+    const client = await getClient();
+    const result = await client.createCheckoutSession({
+      lineItems: [
+        { name: 'Test Course', amountCents: 4999, currency: 'usd', quantity: 1 },
+      ],
+      metadata: { listingId: 'listing-1', tenantId: 'tenant-1' },
+      successUrl: 'http://localhost:5173/success',
+      cancelUrl: 'http://localhost:5173/cancel',
+    });
+
+    expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'payment',
+        line_items: expect.arrayContaining([
+          expect.objectContaining({
+            price_data: expect.objectContaining({
+              currency: 'usd',
+              unit_amount: 4999,
+            }),
+          }),
+        ]),
+      })
+    );
+    expect(result).toBe(fakeSession);
+  });
+
+  it('8. createRefund creates refund for payment intent', async () => {
+    const fakeRefund = { id: 're_test_123', status: 'succeeded' };
+    mockRefundsCreate.mockResolvedValue(fakeRefund);
+
+    const client = await getClient();
+    const result = await client.createRefund('pi_test_123');
+
+    expect(mockRefundsCreate).toHaveBeenCalledWith({
+      payment_intent: 'pi_test_123',
+    });
+    expect(result).toBe(fakeRefund);
+  });
+
+  it('9. retrieveCheckoutSession retrieves session by id', async () => {
+    const fakeSession = { id: 'cs_test_456', payment_status: 'paid' };
+    mockCheckoutSessionsRetrieve.mockResolvedValue(fakeSession);
+
+    const client = await getClient();
+    const result = await client.retrieveCheckoutSession('cs_test_456');
+
+    expect(mockCheckoutSessionsRetrieve).toHaveBeenCalledWith('cs_test_456');
+    expect(result).toBe(fakeSession);
   });
 });

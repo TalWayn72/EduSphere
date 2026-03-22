@@ -30,6 +30,7 @@ import type { Database } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { sql } from 'drizzle-orm';
+import { DomainProvisioningService } from './domain-provisioning.service';
 
 export interface CreateOrgInput {
   name: string;
@@ -56,6 +57,7 @@ interface ProvisioningSteps {
   step3_keycloak_group?: { groupId: string; completed: boolean };
   step4_admin_user?: { userId: string; completed: boolean };
   step5_minio_bucket?: { completed: boolean };
+  step5b_subdomain?: { url: string; completed: boolean };
   step6_checklist?: { completed: boolean };
   step7_nats_event?: { completed: boolean };
   step8_welcome_email?: { completed: boolean };
@@ -71,9 +73,11 @@ export class OrgProvisioningService implements OnModuleDestroy {
   private readonly db: Database;
   private readonly sc = StringCodec();
   private nc: NatsConnection | null = null;
+  private readonly domainService: DomainProvisioningService;
 
   constructor() {
     this.db = createDatabaseConnection();
+    this.domainService = new DomainProvisioningService();
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -140,6 +144,13 @@ export class OrgProvisioningService implements OnModuleDestroy {
 
       // Step 5: MinIO bucket (emit event for infra layer)
       steps.step5_minio_bucket = { completed: true };
+
+      // Step 5b: Create subdomain via DnsProvider
+      const subdomainResult = await this.domainService.createSubdomain(
+        input.slug,
+        { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' }
+      );
+      steps.step5b_subdomain = { url: subdomainResult.url, completed: true };
 
       // Step 6: Init onboarding checklist (store in settings)
       await this.updateProvisioningSteps(tenantId, steps);

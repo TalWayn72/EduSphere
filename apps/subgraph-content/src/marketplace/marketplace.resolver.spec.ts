@@ -26,6 +26,16 @@ const mockMarketplaceService = {
   requestPayout: vi.fn(),
 };
 
+const mockPayoutService = {
+  getPayoutHistory: vi.fn(),
+  getAllPayouts: vi.fn(),
+};
+
+const mockCheckoutService = {
+  createCheckoutSession: vi.fn(),
+  requestRefund: vi.fn(),
+};
+
 // ---------------------------------------------------------------------------
 // Shared fixtures
 // ---------------------------------------------------------------------------
@@ -83,7 +93,11 @@ describe('MarketplaceResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new MarketplaceResolver(mockMarketplaceService as never);
+    resolver = new MarketplaceResolver(
+      mockMarketplaceService as never,
+      mockPayoutService as never,
+      mockCheckoutService as never,
+    );
   });
 
   // ── requireAuth ────────────────────────────────────────────────────────────

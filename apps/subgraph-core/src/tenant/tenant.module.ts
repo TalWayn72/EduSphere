@@ -7,6 +7,7 @@ import { OrgProvisioningService } from './org-provisioning.service';
 import { OrgInvitationService } from './org-invitation.service';
 import { TrialService } from './trial.service';
 import { OrgLicensingService } from './org-licensing.service';
+import { DomainProvisioningService } from './domain-provisioning.service';
 import { OrgOnboardingResolver } from './org-onboarding.resolver';
 import { OrgAnalyticsService } from '../analytics/org-analytics.service';
 import { AtRiskLearnerService } from '../analytics/at-risk-learner.service';
@@ -26,6 +27,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     OrgInvitationService,
     TrialService,
     OrgLicensingService,
+    DomainProvisioningService,
     OrgOnboardingResolver,
     OrgAnalyticsService,
     AtRiskLearnerService,
@@ -43,6 +45,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     OrgInvitationService,
     TrialService,
     OrgLicensingService,
+    DomainProvisioningService,
     OrgAnalyticsService,
     AtRiskLearnerService,
     OrgGamificationService,

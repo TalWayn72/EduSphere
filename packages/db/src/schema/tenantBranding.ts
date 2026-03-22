@@ -44,6 +44,7 @@ export const tenantBranding = pgTable('tenant_branding', {
   hideEduSphereBranding: boolean('hide_edusphere_branding')
     .notNull()
     .default(false),
+  welcomeMessage: text('welcome_message').default(''),
   customCss: text('custom_css'),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()

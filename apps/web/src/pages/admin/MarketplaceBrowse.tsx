@@ -2,9 +2,9 @@
  * MarketplaceBrowse — Course catalog card grid + filters.
  * Route: /admin/marketplace
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'urql';
+import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +27,15 @@ const MARKETPLACE_QUERY = `
   }
 `;
 
+const CREATE_CHECKOUT_SESSION_MUTATION = `
+  mutation CreateCheckoutSession($listingId: ID!) {
+    createCheckoutSession(listingId: $listingId) {
+      sessionUrl
+      sessionId
+    }
+  }
+`;
+
 interface MarketplaceListing {
   id: string;
   title: string;
@@ -43,7 +52,17 @@ const CATEGORIES = [
   'all', 'technology', 'business', 'design', 'science', 'humanities', 'compliance',
 ] as const;
 
-function CourseCard({ course, t }: { course: MarketplaceListing; t: (k: string) => string }) {
+function CourseCard({
+  course,
+  t,
+  onCheckout,
+  isCheckingOut,
+}: {
+  course: MarketplaceListing;
+  t: (k: string) => string;
+  onCheckout: (listingId: string) => void;
+  isCheckingOut: boolean;
+}) {
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow" data-testid={`course-card-${course.id}`}>
       <div className="aspect-video bg-muted relative">
@@ -72,7 +91,15 @@ function CourseCard({ course, t }: { course: MarketplaceListing; t: (k: string) 
             {'★'.repeat(Math.round(course.rating))} ({course.reviewCount})
           </span>
         </div>
-        <Button size="sm" className="w-full mt-2">{t('marketplace.addToOrg')}</Button>
+        <Button
+          size="sm"
+          className="w-full mt-2"
+          disabled={isCheckingOut}
+          onClick={() => onCheckout(course.id)}
+          data-testid={`checkout-btn-${course.id}`}
+        >
+          {isCheckingOut ? t('marketplace.processing') : t('marketplace.addToOrg')}
+        </Button>
       </CardContent>
     </Card>
   );
@@ -83,6 +110,7 @@ export function MarketplaceBrowse() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [mounted, setMounted] = useState(false);
+  const [checkingOutId, setCheckingOutId] = useState<string | null>(null);
   useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching }] = useQuery<{
@@ -97,6 +125,22 @@ export function MarketplaceBrowse() {
     },
     pause: !mounted,
   });
+
+  const [, executeCheckout] = useMutation<{
+    createCheckoutSession: { sessionUrl: string; sessionId: string };
+  }>(CREATE_CHECKOUT_SESSION_MUTATION);
+
+  const handleCheckout = useCallback(async (listingId: string) => {
+    setCheckingOutId(listingId);
+    try {
+      const result = await executeCheckout({ listingId });
+      if (result.data?.createCheckoutSession?.sessionUrl) {
+        window.location.href = result.data.createCheckoutSession.sessionUrl;
+      }
+    } finally {
+      setCheckingOutId(null);
+    }
+  }, [executeCheckout]);
 
   const listings = data?.marketplaceListings?.items ?? [];
 
@@ -140,7 +184,13 @@ export function MarketplaceBrowse() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {listings.map((course) => (
-              <CourseCard key={course.id} course={course} t={t} />
+              <CourseCard
+                key={course.id}
+                course={course}
+                t={t}
+                onCheckout={handleCheckout}
+                isCheckingOut={checkingOutId === course.id}
+              />
             ))}
           </div>
         )}

@@ -222,3 +222,6 @@ export * from './org-badges';
 
 // F-10: Tenant Audit Log (per-tenant fine-grained audit trail)
 export * from './tenant-audit-log';
+
+// F-03: Custom Domains (subdomain provisioning + custom domain verification)
+export * from './custom-domains';

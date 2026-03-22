@@ -17,6 +17,7 @@ export interface TenantBrandingData {
   termsOfServiceUrl?: string | null;
   supportEmail?: string | null;
   hideEduSphereBranding: boolean;
+  welcomeMessage?: string | null;
 }
 
 const DEFAULT_BRANDING: TenantBrandingData = {
@@ -124,6 +125,39 @@ export class TenantBrandingService implements OnModuleDestroy {
       return rows[0] ?? null;
     } catch (err) {
       this.logger.warn({ slug, err }, '[TenantBrandingService] getPublicBranding failed');
+      return null;
+    }
+  }
+
+  async getBrandedLoginData(slug: string): Promise<{
+    orgName: string;
+    logoUrl: string | null;
+    primaryColor: string | null;
+    secondaryColor: string | null;
+    welcomeMessage: string | null;
+    ssoProviders: Array<{ id: string; name: string; type: string; iconUrl: string | null }>;
+  } | null> {
+    try {
+      const rows = await db
+        .select({
+          orgName: tenantBranding.organizationName,
+          logoUrl: tenantBranding.logoUrl,
+          primaryColor: tenantBranding.primaryColor,
+          secondaryColor: tenantBranding.secondaryColor,
+          welcomeMessage: tenantBranding.welcomeMessage,
+        })
+        .from(tenantBranding)
+        .innerJoin(tenants, eq(tenants.id, tenantBranding.tenantId))
+        .where(eq(tenants.slug, slug))
+        .limit(1);
+      if (!rows[0]) return null;
+      return {
+        ...rows[0],
+        orgName: rows[0].orgName,
+        ssoProviders: [], // SSO providers loaded from Keycloak IDP config in future
+      };
+    } catch (err) {
+      this.logger.warn({ slug, err }, '[TenantBrandingService] getBrandedLoginData failed');
       return null;
     }
   }

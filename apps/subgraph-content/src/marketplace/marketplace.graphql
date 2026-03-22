@@ -62,6 +62,27 @@ type PaymentIntentResult {
   paymentIntentId: String!
 }
 
+type CheckoutSession {
+  sessionUrl: String!
+  sessionId: String!
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}
+
+type PurchaseDetail {
+  id: ID!
+  listingId: ID!
+  courseTitle: String!
+  price: Float!
+  status: PurchaseStatus!
+  createdAt: DateTime!
+}
+
 type InstructorPayout {
   id: ID!
   periodMonth: String!
@@ -80,6 +101,7 @@ extend type Query {
     filters: CourseListingFiltersInput
   ): CourseListingConnection! @authenticated
   myPurchases: [MarketplacePurchase!]! @authenticated
+  purchases(limit: Int = 20, offset: Int = 0): [PurchaseDetail!]! @authenticated
   instructorEarnings: EarningsSummary! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
   myPayouts: [InstructorPayout!]! @authenticated
   allPayouts(month: String): [InstructorPayout!]! @authenticated @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
@@ -96,6 +118,10 @@ extend type Mutation {
   publishListing(courseId: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
 
   purchaseCourse(courseId: ID!): PaymentIntentResult! @authenticated
+
+  createCheckoutSession(listingId: ID!): CheckoutSession! @authenticated
+
+  requestRefund(purchaseId: ID!): PurchaseDetail! @authenticated
 
   requestPayout: Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
 }

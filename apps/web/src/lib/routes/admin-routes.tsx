@@ -185,6 +185,12 @@ const SsoConfigPage = lazy(() =>
 const MarketplaceBrowse = lazy(() =>
   import('@/pages/admin/MarketplaceBrowse').then((m) => ({ default: m.MarketplaceBrowse }))
 );
+const MarketplaceSuccess = lazy(() =>
+  import('@/pages/admin/MarketplaceSuccess').then((m) => ({ default: m.MarketplaceSuccess }))
+);
+const MarketplacePurchases = lazy(() =>
+  import('@/pages/admin/MarketplacePurchases').then((m) => ({ default: m.MarketplacePurchases }))
+);
 const OrgCatalog = lazy(() =>
   import('@/pages/admin/OrgCatalog').then((m) => ({ default: m.OrgCatalog }))
 );
@@ -199,6 +205,9 @@ const ApiKeysPage = lazy(() =>
 );
 const WebhooksPage = lazy(() =>
   import('@/pages/admin/WebhooksPage').then((m) => ({ default: m.WebhooksPage }))
+);
+const DomainConfigPage = lazy(() =>
+  import('@/pages/admin/DomainConfigPage').then((m) => ({ default: m.DomainConfigPage }))
 );
 
 const ADMIN_ROLES = { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] };
@@ -252,9 +261,12 @@ export const adminRoutes: RouteObject[] = [
   { path: '/admin/billing', element: guarded(<BillingPage />, ADMIN_ROLES) },
   { path: '/admin/sso', element: guarded(<SsoConfigPage />, ADMIN_ROLES) },
   { path: '/admin/marketplace', element: guarded(<MarketplaceBrowse />, ADMIN_ROLES) },
+  { path: '/admin/marketplace/success', element: guarded(<MarketplaceSuccess />, ADMIN_ROLES) },
+  { path: '/admin/marketplace/purchases', element: guarded(<MarketplacePurchases />, ADMIN_ROLES) },
   { path: '/admin/catalog', element: guarded(<OrgCatalog />, ADMIN_ROLES) },
   { path: '/admin/org-analytics', element: guarded(<AnalyticsDashboard />, ADMIN_ROLES) },
   { path: '/admin/org-gamification', element: guarded(<GamificationConfig />, ADMIN_ROLES) },
   { path: '/admin/api-keys', element: guarded(<ApiKeysPage />, ADMIN_ROLES) },
   { path: '/admin/webhooks', element: guarded(<WebhooksPage />, ADMIN_ROLES) },
+  { path: '/admin/domains', element: guarded(<DomainConfigPage />, ADMIN_ROLES) },
 ];

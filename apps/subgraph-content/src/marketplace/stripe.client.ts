@@ -69,4 +69,54 @@ export class StripeClient {
   async getPaymentIntent(id: string): Promise<Stripe.PaymentIntent> {
     return this.client.paymentIntents.retrieve(id);
   }
+
+  /**
+   * Create a Stripe Checkout Session with line items and metadata.
+   */
+  async createCheckoutSession(params: {
+    lineItems: Array<{
+      name: string;
+      amountCents: number;
+      currency: string;
+      quantity: number;
+    }>;
+    metadata: Record<string, string>;
+    successUrl: string;
+    cancelUrl: string;
+  }): Promise<Stripe.Checkout.Session> {
+    return this.client.checkout.sessions.create({
+      mode: 'payment',
+      line_items: params.lineItems.map((item) => ({
+        price_data: {
+          currency: item.currency,
+          product_data: { name: item.name },
+          unit_amount: item.amountCents,
+        },
+        quantity: item.quantity,
+      })),
+      metadata: params.metadata,
+      success_url: params.successUrl,
+      cancel_url: params.cancelUrl,
+    });
+  }
+
+  /**
+   * Create a refund for a payment intent.
+   */
+  async createRefund(
+    paymentIntentId: string
+  ): Promise<Stripe.Refund> {
+    return this.client.refunds.create({
+      payment_intent: paymentIntentId,
+    });
+  }
+
+  /**
+   * Retrieve a Checkout Session by ID.
+   */
+  async retrieveCheckoutSession(
+    sessionId: string
+  ): Promise<Stripe.Checkout.Session> {
+    return this.client.checkout.sessions.retrieve(sessionId);
+  }
 }

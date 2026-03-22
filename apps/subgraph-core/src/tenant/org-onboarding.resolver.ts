@@ -22,6 +22,7 @@ import {
 import { ApiKeyService } from '../api-keys/api-key.service';
 import { WebhookService } from '../webhooks/webhook.service';
 import { OrgLicensingService } from './org-licensing.service';
+import { DomainProvisioningService } from './domain-provisioning.service';
 
 interface GqlContext {
   authContext?: AuthContext;
@@ -52,7 +53,8 @@ export class OrgOnboardingResolver {
     private readonly orgBadgeService: OrgBadgeService,
     private readonly apiKeyService: ApiKeyService,
     private readonly webhookService: WebhookService,
-    private readonly licensingService: OrgLicensingService
+    private readonly licensingService: OrgLicensingService,
+    private readonly domainProvisioningService: DomainProvisioningService
   ) {}
 
   // ─── Provisioning ─────────────────────────────────────────
@@ -263,6 +265,41 @@ export class OrgOnboardingResolver {
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.webhookService.getDeliveries(webhookId, tenantCtx, limit);
+  }
+
+  // ─── Custom Domains (F-03) ───────────────────────────────
+
+  @Query('customDomains')
+  async getCustomDomains(@Context() ctx: GqlContext) {
+    const tenantCtx = requireAuth(ctx);
+    return this.domainProvisioningService.listCustomDomains(tenantCtx);
+  }
+
+  @Mutation('requestDomainVerification')
+  async requestDomainVerification(
+    @Args('domain') domain: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.domainProvisioningService.requestCustomDomain(domain, tenantCtx);
+  }
+
+  @Mutation('checkDomainVerification')
+  async checkDomainVerification(
+    @Args('domain') domain: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.domainProvisioningService.checkCustomDomain(domain, tenantCtx);
+  }
+
+  @Mutation('removeCustomDomain')
+  async removeCustomDomain(
+    @Args('domainId') domainId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.domainProvisioningService.removeCustomDomain(domainId, tenantCtx);
   }
 
   // ─── Licensing ────────────────────────────────────────────

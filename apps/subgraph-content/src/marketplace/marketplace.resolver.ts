@@ -5,6 +5,7 @@ import { buildRelayConnection } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { MarketplaceService } from './marketplace.service.js';
 import { InstructorPayoutService } from './instructor-payout.service.js';
+import { MarketplaceCheckoutService } from './marketplace-checkout.service.js';
 import type { CourseListingFiltersInput } from './marketplace.types.js';
 
 interface GqlContext {
@@ -28,6 +29,7 @@ export class MarketplaceResolver {
   constructor(
     private readonly marketplaceService: MarketplaceService,
     private readonly payoutService: InstructorPayoutService,
+    private readonly checkoutService: MarketplaceCheckoutService,
   ) {}
 
   @Query('courseListings')
@@ -187,6 +189,54 @@ export class MarketplaceResolver {
       status: r.status,
       paidAt: r.paidAt?.toISOString() ?? null,
     }));
+  }
+
+  @Query('purchases')
+  async getPurchases(
+    @Args('limit') limit: number | undefined,
+    @Args('offset') offset: number | undefined,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    const purchases = await this.marketplaceService.getUserPurchases(
+      tenantCtx.userId,
+      tenantCtx.tenantId
+    );
+    const safeLimit = Math.min(Math.max(1, limit ?? 20), 100);
+    const safeOffset = Math.max(0, offset ?? 0);
+    return purchases.slice(safeOffset, safeOffset + safeLimit).map((p) => ({
+      id: p.id,
+      listingId: p.courseId,
+      courseTitle: '',
+      price: p.amountCents / 100,
+      status: p.status === 'COMPLETE' ? 'COMPLETED' : p.status,
+      createdAt: p.purchasedAt.toISOString(),
+    }));
+  }
+
+  @Mutation('createCheckoutSession')
+  async createCheckoutSession(
+    @Args('listingId') listingId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.checkoutService.createCheckoutSession(listingId, tenantCtx);
+  }
+
+  @Mutation('requestRefund')
+  async requestRefund(
+    @Args('purchaseId') purchaseId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    const result = await this.checkoutService.requestRefund(purchaseId, tenantCtx);
+    return {
+      ...result,
+      status: 'REFUNDED',
+      createdAt: result.createdAt instanceof Date
+        ? result.createdAt.toISOString()
+        : result.createdAt,
+    };
   }
 
   @Mutation('requestPayout')

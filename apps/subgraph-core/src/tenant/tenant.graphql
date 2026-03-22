@@ -42,6 +42,7 @@ type TenantBranding {
   termsOfServiceUrl: String
   supportEmail: String
   hideEduSphereBranding: Boolean!
+  welcomeMessage: String
 }
 
 input UpdateTenantBrandingInput {
@@ -59,6 +60,7 @@ input UpdateTenantBrandingInput {
   termsOfServiceUrl: String
   supportEmail: String
   hideEduSphereBranding: Boolean
+  welcomeMessage: String
 }
 
 type PublicTenantBranding {
@@ -70,12 +72,29 @@ type PublicTenantBranding {
   tagline: String
 }
 
+type SsoProvider {
+  id: ID!
+  name: String!
+  type: String!
+  iconUrl: String
+}
+
+type BrandedLoginData {
+  orgName: String!
+  logoUrl: String
+  primaryColor: String
+  secondaryColor: String
+  welcomeMessage: String
+  ssoProviders: [SsoProvider!]!
+}
+
 type Query {
   tenant(id: ID!): Tenant
   tenants(limit: Int = 10, offset: Int = 0): [Tenant!]!
   myTenantLanguageSettings: TenantLanguageSettings! @authenticated
   myTenantBranding: TenantBranding! @authenticated
   publicBranding(slug: String!): PublicTenantBranding
+  brandedLoginData(slug: String!): BrandedLoginData
 }
 
 type Mutation {

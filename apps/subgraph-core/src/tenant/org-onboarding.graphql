@@ -300,6 +300,25 @@ input UpdateWebhookInput {
   isActive: Boolean
 }
 
+# ─── Custom Domains (F-03) ────────────────────────────────────
+
+type CustomDomain {
+  id: ID!
+  domain: String!
+  verificationToken: String
+  verificationRecordType: String
+  verifiedAt: DateTime
+  sslStatus: String!
+  createdAt: DateTime!
+}
+
+type DomainVerificationInfo {
+  token: String!
+  recordType: String!
+  recordValue: String!
+  instructions: String!
+}
+
 # ─── Input Types ──────────────────────────────────────────────
 
 input CreateOrganizationInput {
@@ -337,6 +356,7 @@ extend type Query {
   webhooks: [Webhook!]! @authenticated
   webhookDeliveries(webhookId: ID!, limit: Int = 20): [WebhookDelivery!]!
     @authenticated
+  customDomains: [CustomDomain!]! @authenticated
   courseLicenses: [CourseLicense!]! @authenticated
   gamificationConfig: GamificationConfig! @authenticated
   orgBadges: [OrgBadge!]! @authenticated
@@ -373,6 +393,13 @@ extend type Mutation {
   deleteWebhook(id: ID!): Boolean!
     @authenticated
   testWebhook(id: ID!): WebhookDelivery!
+    @authenticated
+
+  requestDomainVerification(domain: String!): DomainVerificationInfo!
+    @authenticated
+  checkDomainVerification(domain: String!): CustomDomain!
+    @authenticated
+  removeCustomDomain(domainId: ID!): Boolean!
     @authenticated
 
   licenseCourse(input: LicenseCourseInput!): CourseLicense!

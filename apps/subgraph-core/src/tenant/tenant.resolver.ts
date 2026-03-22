@@ -63,6 +63,12 @@ export class TenantResolver {
     return this.tenantBrandingService.getPublicBranding(slug);
   }
 
+  @Query('brandedLoginData')
+  async brandedLoginData(@Args('slug') slug: string) {
+    if (!slug?.trim()) return null;
+    return this.tenantBrandingService.getBrandedLoginData(slug);
+  }
+
   @Query('myTenantBranding')
   async getMyTenantBranding(@Context() context: GraphQLContext) {
     if (!context.authContext) {

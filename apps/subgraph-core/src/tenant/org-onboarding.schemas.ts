@@ -123,6 +123,17 @@ export const UpdateOrgBadgeSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+export const RequestDomainVerificationSchema = z.object({
+  domain: z
+    .string()
+    .min(4)
+    .max(255)
+    .regex(
+      /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/,
+      'Must be a valid domain name (e.g., learn.example.com)'
+    ),
+});
+
 export const UpdateGamificationConfigSchema = z.object({
   enabled: z.boolean().optional(),
   showLeaderboard: z.boolean().optional(),

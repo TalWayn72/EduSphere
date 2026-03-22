@@ -19,6 +19,7 @@
     "@edusphere/auth": "workspace:*",
     "@edusphere/config": "workspace:*",
     "@edusphere/db": "workspace:*",
+    "@edusphere/dns-provider": "workspace:*",
     "@edusphere/metrics": "workspace:*",
     "@edusphere/nats-client": "workspace:*",
     "@edusphere/telemetry": "workspace:*",

@@ -16,6 +16,7 @@ export interface BrandingFormState {
   fontFamily: string;
   organizationName: string;
   tagline: string;
+  welcomeMessage: string;
   privacyPolicyUrl: string;
   termsOfServiceUrl: string;
   supportEmail: string;
@@ -98,6 +99,16 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
             onChange={(e) => onChange('tagline', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm"
             placeholder={t('branding.taglinePlaceholder')}
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium">{t('branding.welcomeMessageLabel', 'Welcome Message')}</label>
+          <textarea
+            value={form.welcomeMessage}
+            onChange={(e) => onChange('welcomeMessage', e.target.value)}
+            className="w-full border rounded px-3 py-2 text-sm min-h-[80px] resize-y"
+            placeholder={t('branding.welcomeMessagePlaceholder', 'Displayed on your branded login page')}
+            data-testid="welcome-message-input"
           />
         </div>
         <div className="space-y-1">

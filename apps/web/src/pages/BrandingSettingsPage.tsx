@@ -38,6 +38,7 @@ const DEFAULT_FORM: BrandingFormState = {
   fontFamily: 'Inter',
   organizationName: '',
   tagline: '',
+  welcomeMessage: '',
   privacyPolicyUrl: '',
   termsOfServiceUrl: '',
   supportEmail: '',

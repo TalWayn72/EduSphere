@@ -17,6 +17,7 @@ export const TENANT_BRANDING_QUERY = gql`
       termsOfServiceUrl
       supportEmail
       hideEduSphereBranding
+      welcomeMessage
       customCss
     }
   }
@@ -31,6 +32,24 @@ export const PUBLIC_BRANDING_QUERY = gql`
       faviconUrl
       organizationName
       tagline
+    }
+  }
+`;
+
+export const BRANDED_LOGIN_DATA_QUERY = gql`
+  query BrandedLoginData($slug: String!) {
+    brandedLoginData(slug: $slug) {
+      orgName
+      logoUrl
+      primaryColor
+      secondaryColor
+      welcomeMessage
+      ssoProviders {
+        id
+        name
+        type
+        iconUrl
+      }
     }
   }
 `;
@@ -52,6 +71,7 @@ export const UPDATE_TENANT_BRANDING_MUTATION = gql`
       termsOfServiceUrl
       supportEmail
       hideEduSphereBranding
+      welcomeMessage
     }
   }
 `;
