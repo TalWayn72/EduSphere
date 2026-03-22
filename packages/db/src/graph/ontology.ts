@@ -77,8 +77,8 @@ export async function createConcept(
     ...props,
     id: props.id || 'gen_random_uuid()::text',
     source_ids: JSON.stringify(props.source_ids || []),
-    created_at: 'timestamp()',
-    updated_at: 'timestamp()',
+    created_at: Date.now(),
+    updated_at: Date.now(),
   });
 
   const result = await executeCypher<{ id: string }>(
@@ -208,7 +208,7 @@ export async function createRelationship(
 ): Promise<void> {
   const propsJson = JSON.stringify({
     ...properties,
-    created_at: 'timestamp()',
+    created_at: Date.now(),
   });
 
   await executeCypher(

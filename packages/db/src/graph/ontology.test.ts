@@ -4,6 +4,7 @@ import {
   findContradictions,
   findLearningPath,
   createRelationship,
+  createConcept,
 } from './ontology';
 import type { DrizzleDB } from './client';
 
@@ -252,5 +253,51 @@ describe('createRelationship()', () => {
     await expect(
       createRelationship(db, 'f', 't', 'RELATED_TO')
     ).resolves.toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// BUG-104: createConcept — timestamps must be numeric, not literal "timestamp()"
+// ---------------------------------------------------------------------------
+
+describe('createConcept() — BUG-104 regression', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExecuteCypher.mockResolvedValue([{ id: 'new-concept-id' }]);
+  });
+
+  it('embeds numeric created_at/updated_at in the Cypher query (not string "timestamp()")', async () => {
+    const db = buildMockDb();
+    await createConcept(db, {
+      tenant_id: 'tenant-1',
+      name: 'Test Concept',
+      definition: 'A test',
+    });
+
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    // The JSON embedded in the query must contain numeric timestamps, not "timestamp()"
+    // Extract the JSON portion from CREATE (c:Concept {...}) RETURN ...
+    const jsonMatch = query.match(/\{[^}]+\}/);
+    expect(jsonMatch).not.toBeNull();
+    const props = JSON.parse(jsonMatch![0]);
+    expect(typeof props.created_at).toBe('number');
+    expect(typeof props.updated_at).toBe('number');
+    // Must be a valid epoch millis (within last minute)
+    expect(props.created_at).toBeGreaterThan(Date.now() - 60_000);
+    expect(props.updated_at).toBeGreaterThan(Date.now() - 60_000);
+  });
+
+  it('does NOT contain the string "timestamp()" in the embedded JSON', async () => {
+    const db = buildMockDb();
+    await createConcept(db, {
+      tenant_id: 'tenant-1',
+      name: 'Test',
+      definition: 'A test',
+    });
+
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    // BUG-104 root cause: JSON.stringify({created_at: 'timestamp()'}) produced
+    // "created_at":"timestamp()" in the Cypher query, which AGE stored as a string.
+    expect(query).not.toContain('"timestamp()"');
   });
 });

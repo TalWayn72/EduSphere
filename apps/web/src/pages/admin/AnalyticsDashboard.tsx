@@ -29,8 +29,8 @@ const ANALYTICS_QUERY = `
 `;
 
 const AT_RISK_QUERY = `
-  query AtRiskLearners($limit: Int, $offset: Int) {
-    atRiskLearners(limit: $limit, offset: $offset) {
+  query OrgAtRiskLearners($limit: Int, $offset: Int) {
+    orgAtRiskLearners(limit: $limit, offset: $offset) {
       userId
       email
       name
@@ -140,7 +140,7 @@ export function AnalyticsDashboard() {
   });
 
   const [{ data: atRiskData, fetching: atRiskFetching }] = useQuery<{
-    atRiskLearners: AtRiskLearner[];
+    orgAtRiskLearners: AtRiskLearner[];
   }>({
     query: AT_RISK_QUERY,
     variables: { limit: 20, offset: 0 },
@@ -148,7 +148,7 @@ export function AnalyticsDashboard() {
   });
 
   const analytics = data?.orgAnalytics;
-  const atRiskLearners = atRiskData?.atRiskLearners ?? [];
+  const atRiskLearners = atRiskData?.orgAtRiskLearners ?? [];
 
   const handleRowClick = useCallback((userId: string) => {
     setSelectedLearnerId(userId);

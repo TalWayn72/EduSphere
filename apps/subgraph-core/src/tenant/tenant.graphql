@@ -43,6 +43,7 @@ type TenantBranding {
   supportEmail: String
   hideEduSphereBranding: Boolean!
   welcomeMessage: String
+  customCss: String
 }
 
 input UpdateTenantBrandingInput {
@@ -61,6 +62,7 @@ input UpdateTenantBrandingInput {
   supportEmail: String
   hideEduSphereBranding: Boolean
   welcomeMessage: String
+  customCss: String
 }
 
 type PublicTenantBranding {

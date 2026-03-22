@@ -92,7 +92,7 @@ function setupMocks(
     if (callCount % 2 === 1) {
       return [{ data: analyticsData ? { orgAnalytics: analyticsData } : null, fetching }, reexecute];
     }
-    return [{ data: atRiskData !== null ? { atRiskLearners: atRiskData } : null, fetching }, reexecute];
+    return [{ data: atRiskData !== null ? { orgAtRiskLearners: atRiskData } : null, fetching }, reexecute];
   });
 }
 

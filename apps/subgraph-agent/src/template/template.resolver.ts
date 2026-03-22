@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { TemplateService } from './template.service';
 
 interface CreateAgentTemplateInput {
@@ -19,17 +19,39 @@ interface UpdateAgentTemplateInput {
 export class TemplateResolver {
   constructor(private readonly templateService: TemplateService) {}
 
+  /**
+   * Map DB column `template` to GraphQL field `templateType`.
+   * The agent_definitions table stores the enum value in `template`,
+   * but the AgentTemplate GraphQL type exposes it as `templateType`.
+   */
+  @ResolveField('templateType')
+  resolveTemplateType(@Parent() template: Record<string, unknown>) {
+    return template['templateType'] ?? template['template'] ?? 'CUSTOM';
+  }
+
+  /**
+   * Map DB `config.systemPrompt` to GraphQL field `systemPrompt`.
+   * The agent_definitions table stores systemPrompt inside the config jsonb column.
+   */
+  @ResolveField('systemPrompt')
+  resolveSystemPrompt(@Parent() template: Record<string, unknown>) {
+    if (template['systemPrompt']) return template['systemPrompt'];
+    const config = template['config'] as Record<string, unknown> | undefined;
+    return config?.['systemPrompt'] ?? '';
+  }
+
+  /**
+   * Map DB `config` to GraphQL field `parameters`.
+   * The hardcoded templates use `parameters`, the DB uses `config`.
+   */
+  @ResolveField('parameters')
+  resolveParameters(@Parent() template: Record<string, unknown>) {
+    return template['parameters'] ?? template['config'] ?? {};
+  }
+
   @Query('agentTemplate')
   async getAgentTemplate(@Args('id') id: string) {
     return this.templateService.findById(id);
-  }
-
-  @Query('agentTemplates')
-  async getAgentTemplates(
-    @Args('limit') limit: number,
-    @Args('offset') offset: number
-  ) {
-    return this.templateService.findAll(limit, offset);
   }
 
   @Query('agentTemplatesByType')

@@ -409,7 +409,7 @@ export class OrgOnboardingResolver {
     });
   }
 
-  @Query('atRiskLearners')
+  @Query('orgAtRiskLearners')
   async getAtRiskLearners(
     @Args('limit') limit: number,
     @Args('offset') offset: number,

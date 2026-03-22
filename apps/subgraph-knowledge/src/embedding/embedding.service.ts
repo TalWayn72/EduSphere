@@ -19,6 +19,9 @@ export type { EmbeddingRecord, SearchResult, SegmentInput };
 
 const BATCH_SIZE = 20;
 
+const safeDate = (v: unknown): string =>
+  v ? new Date(v as string | number).toISOString() : new Date().toISOString();
+
 /**
  * Facade -- delegates to EmbeddingStoreService + EmbeddingProviderService.
  * Falls back to direct DB/HTTP when sub-services are not injected (unit-test
@@ -416,14 +419,14 @@ export class EmbeddingService implements OnModuleDestroy {
     id: string;
     segment_id: string;
     embedding: number[];
-    created_at: Date;
+    created_at: Date | null;
   }): EmbeddingRecord {
     return {
       id: r.id,
       type: 'content',
       refId: r.segment_id,
       embedding: r.embedding,
-      createdAt: new Date(r.created_at).toISOString(),
+      createdAt: safeDate(r.created_at),
     };
   }
 
@@ -431,14 +434,14 @@ export class EmbeddingService implements OnModuleDestroy {
     id: string;
     annotation_id: string;
     embedding: number[];
-    created_at: Date;
+    created_at: Date | null;
   }): EmbeddingRecord {
     return {
       id: r.id,
       type: 'annotation',
       refId: r.annotation_id,
       embedding: r.embedding,
-      createdAt: new Date(r.created_at).toISOString(),
+      createdAt: safeDate(r.created_at),
     };
   }
 
@@ -446,14 +449,14 @@ export class EmbeddingService implements OnModuleDestroy {
     id: string;
     concept_id: string;
     embedding: number[];
-    created_at: Date;
+    created_at: Date | null;
   }): EmbeddingRecord {
     return {
       id: r.id,
       type: 'concept',
       refId: r.concept_id,
       embedding: r.embedding,
-      createdAt: new Date(r.created_at).toISOString(),
+      createdAt: safeDate(r.created_at),
     };
   }
 }

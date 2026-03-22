@@ -23,6 +23,19 @@ export function toUserRole(
   return 'STUDENT';
 }
 
+/**
+ * Safely convert an Apache AGE timestamp value to an ISO string.
+ * AGE may return: epoch millis (number), ISO string, or invalid values
+ * (e.g. the literal string "timestamp()" from a JSON.stringify bug).
+ * Returns the current time as fallback when the value is unparseable.
+ */
+export function safeIsoDate(value: number | string | null | undefined): string {
+  if (value == null) return new Date().toISOString();
+  const d = new Date(typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value);
+  if (isNaN(d.getTime())) return new Date().toISOString();
+  return d.toISOString();
+}
+
 /** Shape of a Concept vertex as returned by Apache AGE graph queries. */
 export interface GraphConceptNode {
   id: string;
@@ -30,8 +43,8 @@ export interface GraphConceptNode {
   name: string;
   definition?: string;
   source_ids?: string;
-  created_at: number | string;
-  updated_at: number | string;
+  created_at: number | string | null;
+  updated_at: number | string | null;
 }
 
 /** Shape of a generic related-concept row from findRelatedConcepts. */

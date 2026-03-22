@@ -88,6 +88,9 @@
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 | FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (All Waves — F-01 through F-15) | `df587183`, `0af3996d`, `ff162ce6`, `8f4d975f`, `058c0b4c` |
 | INFRA-1 | HiveMind shared intelligence layer (3 MCP servers) | ✅ Fixed | (pending commit) |
+| BUG-104 | Knowledge Graph Page — "Invalid time value" GraphQL Error | ✅ Fixed | (pending commit) |
+| BUG-105 | Cannot return null for AgentTemplate.templateType | ✅ Fixed | (pending commit) |
+| BUG-106 | GraphQL 400 Bad Request errors on Lesson Pipeline page | ✅ Fixed | (pending commit) |
 
 ---
 
@@ -11010,4 +11013,122 @@ Full certification-grade examination system with AI-powered question generation,
 - 10 Division Lead prompts updated with HiveMind protocol section
 
 **Tests:** 50 unit/integration tests passing + 4 benchmarks
+
+---
+
+## BUG-106: GraphQL 400 Bad Request errors on Lesson Pipeline page (22 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (page broken, core feature unusable)
+- **Page:** Lesson Pipeline page
+- **Symptom:** 2x POST requests to `localhost:4000/graphql` returning 400 (Bad Request) from `urql-core-chunk.mjs:510` on the Lesson Pipeline page
+- **Root Cause:** Stale supergraph.graphql — composed before Pipeline Templates were added to subgraph-content SDL. compose.js had 4 bugs:
+  1. `normalizeKnowledgeSdl` left orphaned docstrings after stripping `socialFeed`/`socialRecommendations` queries
+  2. Type block regexes used `\s*\{` which failed to match types with `@authenticated` directive before opening brace
+  3. Agent subgraph `LessonPipelineResult` type conflicted with content subgraph's same-named type (no `@key`)
+  4. `skillGapReport` query not stripped despite its return type being stripped
+- **Fix Applied:** Fixed compose.js (docstring-aware regexes, directive-tolerant type matching, `normalizeAgentSdl` function, `skillGapReport` stripping), recomposed supergraph
+- **Idempotency Fix:** Normalizer regexes now use negative lookbehind to prevent double-stripping on repeated compose runs. Ensures compose.js is fully idempotent.
+- **Files Changed:**
+  - `apps/gateway/compose.js`
+  - `apps/gateway/supergraph.graphql`
+- **Tests:**
+
+| Test File | Coverage |
+|-----------|----------|
+| `apps/gateway/tests/compose-normalizers.test.ts` | 13 unit tests for compose.js normalizers (docstring cleanup, directive-tolerant matching, idempotency, agent SDL normalization) |
+| `apps/gateway/tests/supergraph-pipeline-types.test.ts` | Supergraph validation — verifies pipeline types present after composition |
+| `apps/web/e2e/bug104-pipeline-graphql.spec.ts` | E2E Playwright test — Lesson Pipeline page loads without 400 errors |
+
+- **Visual Verification:** Screenshot at `docs/screenshots/bug106-pipeline-fixed.png`
+- **Note:** 400 errors in console were actually `customCss` on `TenantBranding` — global branding issue, not pipeline-specific. Tracked separately.
+- **Date:** 22 March 2026
+
+---
+
+## BUG-104: Knowledge Graph Page — "Invalid time value" GraphQL Error (22 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical
+- **Page:** `/knowledge-graph`
+- **Symptom:** Page shows "Failed to load graph" with Retry button. Console: `[KnowledgeGraph] Concepts use-graph-data.ts:171 query error: [GraphQL] Invalid time value`
+
+### Root Cause
+
+`packages/db/src/graph/ontology.ts` used string literal `'timestamp()'` for `created_at`/`updated_at` in Cypher CREATE statements. Apache AGE stored the literal string instead of a real timestamp. When `graph-concept.service.ts` called `new Date("timestamp()").toISOString()`, it threw "Invalid time value".
+
+### Fix
+
+- **Round 1:** Replaced `'timestamp()'` with `Date.now()` in `ontology.ts` — numeric epoch millis stored correctly.
+- **Round 2:** Added `safeIsoDate()` defensive helper in `graph-types.ts` — handles invalid/null/string timestamp values gracefully. Applied in `graph-concept.service.ts` and `graph-concept-link.service.ts`.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/db/src/graph/ontology.ts` | Replaced `'timestamp()'` string literal with `Date.now()` |
+| `apps/subgraph-knowledge/src/graph/graph-types.ts` | Added `safeIsoDate()` defensive helper |
+| `apps/subgraph-knowledge/src/graph/graph-concept.service.ts` | Applied `safeIsoDate()` to timestamp mapping |
+| `apps/subgraph-knowledge/src/graph/graph-concept-link.service.ts` | Applied `safeIsoDate()` to timestamp mapping |
+| `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` | Applied safe date handling |
+| `apps/subgraph-knowledge/src/embedding/embedding.service.ts` | Applied safe date handling |
+
+### Tests
+
+- 62+ assertions across 6 test files (111 total passing)
+
+| Test File | Coverage |
+|-----------|----------|
+| `apps/subgraph-knowledge/src/graph/graph-types.spec.ts` | safeIsoDate null/undefined/epoch/"timestamp()" string tests |
+| `apps/subgraph-knowledge/src/graph/graph-concept.service.spec.ts` | mapConcept regression |
+| `apps/subgraph-knowledge/src/graph/graph-concept-link.service.spec.ts` | mapConceptLink regression |
+| `apps/subgraph-knowledge/src/embedding/embedding-store.service.spec.ts` | safeDate regression |
+| `apps/subgraph-knowledge/src/embedding/embedding.service.spec.ts` | safeDate regression |
+
+### Anti-Recurrence
+
+- `safeIsoDate()` prevents any future invalid timestamp from crashing the graph. Reproducer test in `graph-types.spec.ts` catches literal "timestamp()" string.
+
+### Discovery List
+
+- **Wave 1:** `ontology.ts` — source of `'timestamp()'` string
+- **Wave 2:** `graph-concept.service.ts`, `graph-concept-link.service.ts`, `embedding-store.service.ts`, `embedding.service.ts` — all use `new Date()` on graph node timestamps
+- **Wave 3:** Date serialization class — all Cypher-based timestamp handling in knowledge subgraph
+
+---
+
+## BUG-105 — [GraphQL] Cannot return null for AgentTemplate.templateType (22 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🟡 Medium
+- **Reported:** 22 March 2026
+- **Page:** `/agents` (AI Learning Agents page)
+
+### Problem
+
+`[AgentsPage] Failed to load agent templates: [GraphQL] Cannot return null for non-nullable field AgentTemplate.templateType` at `useAgentChat.ts:231`
+
+### Root Cause
+
+Schema-resolver contract violation. DB stores `agent_type` column → Drizzle maps to `agentType` field → GraphQL schema expects `templateType: TemplateType!` (non-nullable). No field resolver mapped between them.
+
+### Fix
+
+Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `agentType` → `templateType` with `'CUSTOM'` fallback.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/subgraph-agent/src/agent-session/agent-session.resolver.ts` | Added `resolveTemplateType` field resolver |
+
+### Tests
+
+| Test File | Coverage |
+|-----------|----------|
+| `apps/subgraph-agent/src/agent-session/agent-session.resolver.spec.ts` | 7 regression tests covering templateType/agentType/fallback |
+
+### Anti-Recurrence
+
+- Field resolver ensures non-null contract is always satisfied regardless of DB field naming
 **Files:** `tools/` directory (new), `.mcp.json` (updated), 10 agent prompt templates (updated)

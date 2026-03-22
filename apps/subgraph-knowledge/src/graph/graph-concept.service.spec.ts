@@ -172,6 +172,60 @@ describe('GraphConceptService', () => {
     });
   });
 
+  // ── BUG-104 regression: mapConcept must not throw on invalid timestamps ──
+  describe('mapConcept() — BUG-104 regression', () => {
+    it('does NOT throw when created_at is literal "timestamp()" string', async () => {
+      const brokenNode = {
+        ...sampleNode,
+        created_at: 'timestamp()',
+        updated_at: 'timestamp()',
+      };
+      mockFindConceptById.mockResolvedValue(brokenNode);
+      // BUG-104: Previously threw "Invalid time value" here
+      const result = await service.findConceptById(
+        'concept-1',
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+      // Must produce valid ISO dates (fallback), not throw
+      expect(result.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+      expect(result.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    });
+
+    it('does NOT throw when created_at is null', async () => {
+      const nullNode = {
+        ...sampleNode,
+        created_at: null,
+        updated_at: null,
+      };
+      mockFindConceptById.mockResolvedValue(nullNode);
+      const result = await service.findConceptById(
+        'concept-1',
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+      expect(result.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    });
+
+    it('correctly maps epoch millis from AGE timestamp()', async () => {
+      const epochNode = {
+        ...sampleNode,
+        created_at: 1711100000000,
+        updated_at: 1711100000000,
+      };
+      mockFindConceptById.mockResolvedValue(epochNode);
+      const result = await service.findConceptById(
+        'concept-1',
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+      expect(result.createdAt).toBe(new Date(1711100000000).toISOString());
+    });
+  });
+
   // linkConcepts and findRelatedConcepts live in GraphConceptLinkService.
   // See graph-concept-link.service.spec.ts for those tests.
 });

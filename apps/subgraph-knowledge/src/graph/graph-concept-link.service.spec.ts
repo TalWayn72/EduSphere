@@ -27,9 +27,13 @@ vi.mock('./cypher-concept-relation.service.js', () => ({
   },
 }));
 
-vi.mock('./graph-types', () => ({
-  toUserRole: vi.fn((r: string) => r),
-}));
+vi.mock('./graph-types', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./graph-types')>();
+  return {
+    ...actual,
+    toUserRole: vi.fn((r: string) => r),
+  };
+});
 
 import { GraphConceptLinkService } from './graph-concept-link.service.js';
 import { CypherConceptRelationService } from './cypher-concept-relation.service.js';

@@ -302,10 +302,10 @@ test.describe('admin-mutations — Announcements', () => {
 test.describe('admin-mutations — At-Risk Dashboard', () => {
   test('at-risk dashboard page loads without raw errors', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
-      if (opName === 'AtRiskUsers' || opName === 'GetAtRiskLearners') {
+      if (opName === 'AtRiskUsers' || opName === 'GetAtRiskLearners' || opName === 'OrgAtRiskLearners') {
         return JSON.stringify({
           data: {
-            atRiskLearners: [
+            orgAtRiskLearners: [
               { userId: 'user-003', userName: 'Charlie Brown', riskScore: 0.85, lastActive: '2026-02-01T00:00:00Z', completionRate: 0.12 },
             ],
           },

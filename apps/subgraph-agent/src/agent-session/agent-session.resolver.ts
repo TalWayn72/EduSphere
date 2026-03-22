@@ -252,6 +252,17 @@ export class AgentSessionResolver {
     return this.pubSub.subscribe(`messageStream_${sessionId}`);
   }
 
+  @ResolveField('templateType')
+  resolveTemplateType(@Parent() session: Record<string, unknown>) {
+    // AgentSession DB column is `agent_type` but GraphQL exposes `templateType`
+    return (
+      session['templateType'] ??
+      session['agentType'] ??
+      session['agent_type'] ??
+      'CUSTOM'
+    );
+  }
+
   @ResolveField('messages')
   async getMessages(
     @Parent() session: { id: string },

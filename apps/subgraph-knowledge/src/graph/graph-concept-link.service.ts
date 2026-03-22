@@ -10,6 +10,7 @@ import type { ConceptRelationshipType } from '@edusphere/db';
 import { CypherConceptRelationService } from './cypher-concept-relation.service';
 import {
   toUserRole,
+  safeIsoDate,
   type GraphConceptNode,
   type RelatedConceptRow,
 } from './graph-types';
@@ -22,8 +23,8 @@ export function mapConceptNode(node: GraphConceptNode) {
     name: node.name,
     definition: node.definition,
     sourceIds: JSON.parse(node.source_ids || '[]') as string[],
-    createdAt: new Date(node.created_at).toISOString(),
-    updatedAt: new Date(node.updated_at).toISOString(),
+    createdAt: safeIsoDate(node.created_at),
+    updatedAt: safeIsoDate(node.updated_at),
   };
 }
 

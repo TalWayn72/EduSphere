@@ -18,6 +18,7 @@ export interface TenantBrandingData {
   supportEmail?: string | null;
   hideEduSphereBranding: boolean;
   welcomeMessage?: string | null;
+  customCss?: string | null;
 }
 
 const DEFAULT_BRANDING: TenantBrandingData = {
@@ -90,6 +91,8 @@ export class TenantBrandingService implements OnModuleDestroy {
           termsOfServiceUrl: rows[0].termsOfServiceUrl,
           supportEmail: rows[0].supportEmail,
           hideEduSphereBranding: rows[0].hideEduSphereBranding,
+          welcomeMessage: rows[0].welcomeMessage,
+          customCss: rows[0].customCss,
         }
       : { ...DEFAULT_BRANDING };
 

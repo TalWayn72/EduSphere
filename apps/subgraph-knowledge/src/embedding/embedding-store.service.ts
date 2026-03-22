@@ -16,23 +16,26 @@ import {
 import type { TenantContext } from '@edusphere/db';
 import type { EmbeddingRecord, SearchResult } from './embedding.types.js';
 
+const safeDate = (v: unknown): string =>
+  v ? new Date(v as string | number).toISOString() : new Date().toISOString();
+
 type ContentRow = {
   id: string;
   segment_id: string;
   embedding: number[];
-  created_at: Date;
+  created_at: Date | null;
 };
 type AnnotationRow = {
   id: string;
   annotation_id: string;
   embedding: number[];
-  created_at: Date;
+  created_at: Date | null;
 };
 type ConceptRow = {
   id: string;
   concept_id: string;
   embedding: number[];
-  created_at: Date;
+  created_at: Date | null;
 };
 type SimRow = {
   id: string;
@@ -47,7 +50,7 @@ function mapContent(r: ContentRow): EmbeddingRecord {
     type: 'content',
     refId: r.segment_id,
     embedding: r.embedding,
-    createdAt: new Date(r.created_at).toISOString(),
+    createdAt: safeDate(r.created_at),
   };
 }
 function mapAnnotation(r: AnnotationRow): EmbeddingRecord {
@@ -56,7 +59,7 @@ function mapAnnotation(r: AnnotationRow): EmbeddingRecord {
     type: 'annotation',
     refId: r.annotation_id,
     embedding: r.embedding,
-    createdAt: new Date(r.created_at).toISOString(),
+    createdAt: safeDate(r.created_at),
   };
 }
 function mapConcept(r: ConceptRow): EmbeddingRecord {
@@ -65,7 +68,7 @@ function mapConcept(r: ConceptRow): EmbeddingRecord {
     type: 'concept',
     refId: r.concept_id,
     embedding: r.embedding,
-    createdAt: new Date(r.created_at).toISOString(),
+    createdAt: safeDate(r.created_at),
   };
 }
 

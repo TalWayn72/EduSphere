@@ -229,6 +229,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   cohortRetention(weeksBack: Int = 12) : [CohortMetrics!]! @join__field(graph: CONTENT)  @authenticated
   exportTenantAnalytics(period: AnalyticsPeriod!, format: ExportFormat!) : String! @join__field(graph: CONTENT)  @authenticated
   listAtRiskLearners(threshold: Int) : [AtRiskLearner!]! @join__field(graph: CONTENT)  @authenticated
+  aiUsageStats: AiUsageStats! @join__field(graph: CONTENT)  @authenticated
   myCampaigns: [AssessmentCampaign!]! @join__field(graph: CONTENT)  @authenticated
   campaignsToRespond: [AssessmentCampaign!]! @join__field(graph: CONTENT)  @authenticated
   assessmentResult(campaignId: ID!) : AssessmentResult @join__field(graph: CONTENT)  @authenticated
@@ -253,10 +254,22 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   courseEnrollmentCount(courseId: ID!) : Int! @join__field(graph: CONTENT)  @authenticated
   myCpdReport(startDate: String, endDate: String) : CpdReport! @join__field(graph: CONTENT)  @authenticated
   cpdCreditTypes: [CpdCreditType!]! @join__field(graph: CONTENT)  @authenticated
-  getDocumentVersions(mediaAssetId: ID!) : [DocumentVersion!]! @join__field(graph: CONTENT)  @authenticated
+  getDocumentVersions(mediaAssetId: ID!) : [DocumentVersion!]! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:read"]]) 
+  examItemBank(courseId: ID!, filters: ExamItemFilterInput, first: Int, after: String) : ExamItemConnection! @join__field(graph: CONTENT)  @authenticated
+  examBlueprints(courseId: ID!) : [ExamBlueprint!]! @join__field(graph: CONTENT)  @authenticated
+  examBlueprint(id: ID!) : ExamBlueprint @join__field(graph: CONTENT)  @authenticated
+  myExamSessions(blueprintId: ID!) : [ExamSession!]! @join__field(graph: CONTENT)  @authenticated
+  examSession(id: ID!) : ExamSession! @join__field(graph: CONTENT)  @authenticated
+  examResult(sessionId: ID!) : ExamResult @join__field(graph: CONTENT)  @authenticated
+  myExamResults(courseId: ID) : [ExamResult!]! @join__field(graph: CONTENT)  @authenticated
+  examItemStatistics(itemId: ID!) : ExamItemStatistics @join__field(graph: CONTENT)  @authenticated
+  examBlueprintAnalytics(blueprintId: ID!) : BlueprintAnalytics! @join__field(graph: CONTENT)  @authenticated
+  examReliabilityReport(blueprintId: ID!) : ExamReliabilityReport! @join__field(graph: CONTENT)  @authenticated
   lesson(id: ID!) : Lesson @join__field(graph: CONTENT)  @authenticated
   lessonsByCourse(courseId: ID!, limit: Int = 20, offset: Int = 0) : [Lesson!]! @join__field(graph: CONTENT)  @authenticated
   lessonPipelineRun(runId: ID!) : LessonPipelineRun @join__field(graph: CONTENT)  @authenticated
+  lessonPipelineRuns(lessonId: ID!, limit: Int) : [LessonPipelineRun!]! @join__field(graph: CONTENT)  @authenticated
+  pipelineTemplates: [LessonPipelineTemplate!]! @join__field(graph: CONTENT)  @authenticated
   courseLessonPlan(id: ID!) : CourseLessonPlan @join__field(graph: CONTENT)  @authenticated
   myCourseLessonPlans(courseId: ID!) : [CourseLessonPlan!]! @join__field(graph: CONTENT)  @authenticated
   sessionPolls(sessionId: ID!) : [SessionPoll!]! @join__field(graph: CONTENT)  @authenticated
@@ -272,6 +285,8 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   courseListings(tenantId: ID!, limit: Int, offset: Int, filters: CourseListingFiltersInput) : CourseListingConnection! @join__field(graph: CONTENT)  @authenticated
   myPurchases: [MarketplacePurchase!]! @join__field(graph: CONTENT)  @authenticated
   instructorEarnings: EarningsSummary! @join__field(graph: CONTENT)  @authenticated
+  myPayouts: [InstructorPayout!]! @join__field(graph: CONTENT)  @authenticated
+  allPayouts(month: String) : [InstructorPayout!]! @join__field(graph: CONTENT)  @authenticated
   getPresignedUploadUrl(fileName: String!, contentType: String!, courseId: ID!) : PresignedUploadUrl! @join__field(graph: CONTENT)  @authenticated
   """
   Returns the next unviewed MICROLESSON for the authenticated user today.
@@ -302,6 +317,13 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Simpler scalar alternative to verifyBadge for quick validity checks.
   """
   verifyOpenBadge(assertionId: ID!) : Boolean! @join__field(graph: CONTENT) 
+  """
+  Check knowledge graph topology coverage for a course before badge issuance.
+  """
+  knowledgePathCoverage(courseId: ID!, requiredConceptIds: [ID!]!) : KnowledgePathCoverage! @join__field(graph: CONTENT)  @authenticated
+  myReviewAssignments: [PeerReviewAssignment!]! @join__field(graph: CONTENT)  @authenticated
+  mySubmissions: [PeerReviewSubmission!]! @join__field(graph: CONTENT)  @authenticated
+  peerReviewRubric(contentItemId: ID!) : PeerReviewRubric @join__field(graph: CONTENT)  @authenticated
   myTextSubmissions(contentItemId: ID!) : [TextSubmission!]! @join__field(graph: CONTENT)  @authenticated
   submissionPlagiarismReport(submissionId: ID!) : PlagiarismReport @join__field(graph: CONTENT)  @authenticated
   programs: [CredentialProgram!]! @join__field(graph: CONTENT)  @authenticated
@@ -322,7 +344,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   contentTranslation(contentItemId: ID!, locale: String!) : ContentTranslation @join__field(graph: CONTENT)  @authenticated
   getVisualAssets(courseId: ID!) : [VisualAsset!]! @join__field(graph: CONTENT)  @authenticated
   getVisualAnchors(mediaAssetId: ID!) : [VisualAnchor!]! @join__field(graph: CONTENT)  @authenticated
-  searchVisualAssets(courseId: ID!, query: String!) : [VisualAssetSearchResult!]! @join__field(graph: CONTENT)  @authenticated
+  searchVisualAssets(courseId: ID!, query: String!) : [VisualAssetSearchResult!]! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:read"]]) 
   """
   List all xAPI tokens for this tenant. ORG_ADMIN only.
   """
@@ -331,6 +353,10 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Query recent xAPI statements stored in the self-hosted LRS.
   """
   xapiStatements(limit: Int, since: String) : [XapiStatementResult!]! @join__field(graph: CONTENT)  @authenticated
+  """
+  Return total count of xAPI statements for this tenant (optionally filtered by since).
+  """
+  xapiStatementCount(since: String) : Int! @join__field(graph: CONTENT)  @authenticated
   adminOverview: AdminOverview! @join__field(graph: CORE)  @authenticated
   adminDashboardStats: AdminDashboardStats! @join__field(graph: CORE)  @authenticated
   atRiskThresholds: AtRiskThresholds! @join__field(graph: CORE)  @authenticated
@@ -349,6 +375,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   userDelegations(userId: ID!) : [RoleDelegation!]! @join__field(graph: CORE)  @authenticated
   adminNotificationTemplates: [NotificationTemplate!]! @join__field(graph: CORE)  @authenticated
   mySecuritySettings: SecuritySettings! @join__field(graph: CORE)  @authenticated
+  tenantSocialLinks: TenantSocialLinks @join__field(graph: CORE)  @authenticated
   mySubscription: TenantSubscription @join__field(graph: CORE)  @authenticated
   myUsage: UsageSnapshot @join__field(graph: CORE)  @authenticated
   myTenantUsage(year: Int) : TenantUsage @join__field(graph: CORE)  @authenticated
@@ -370,6 +397,14 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   tenantLeaderboard(limit: Int) : [XpLeaderboardEntry!]! @join__field(graph: CORE)  @authenticated
   myTeamOverview: TeamOverview! @join__field(graph: CORE)  @authenticated
   myTeamMemberProgress: [TeamMemberProgress!]! @join__field(graph: CORE)  @authenticated
+  myNotificationPreferences: [NotificationPreference!]! @join__field(graph: CORE)  @authenticated
+  myNotificationHistory(
+    first: Int
+    after: String
+    types: [NotificationType!]
+    channels: [NotificationChannel!]
+  ): NotificationDeliveryConnection! @join__field(graph: CORE)  @authenticated
+  notificationDeliveryAnalytics(startDate: DateTime!, endDate: DateTime!) : NotificationAnalytics! @join__field(graph: CORE)  @authenticated
   myOnboardingState: OnboardingState @join__field(graph: CORE)  @authenticated
   myPartnerDashboard(partnerId: ID!) : PartnerDashboard! @join__field(graph: CORE)  @authenticated
   myPortal: PortalPage @join__field(graph: CORE)  @authenticated
@@ -415,6 +450,21 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   myInProgressCourses(limit: Int = 5) : [InProgressCourse!]! @join__field(graph: CORE)  @authenticated
   myRecommendedCourses(limit: Int = 5) : [RecommendedCourse!]! @join__field(graph: CORE)  @authenticated
   myActivityFeed(limit: Int = 10) : [ActivityFeedItem!]! @join__field(graph: CORE)  @authenticated
+  myOrganization: Organization! @join__field(graph: CORE)  @authenticated
+  orgMembers(limit: Int = 20, offset: Int = 0) : [OrgMember!]! @join__field(graph: CORE)  @authenticated
+  orgInvitations(status: InvitationStatus) : [OrgInvitation!]! @join__field(graph: CORE)  @authenticated
+  trialStatus: TrialStatus! @join__field(graph: CORE)  @authenticated
+  apiKeys: [ApiKey!]! @join__field(graph: CORE)  @authenticated
+  webhooks: [Webhook!]! @join__field(graph: CORE)  @authenticated
+  webhookDeliveries(webhookId: ID!, limit: Int = 20) : [WebhookDelivery!]! @join__field(graph: CORE)  @authenticated
+  customDomains: [CustomDomain!]! @join__field(graph: CORE)  @authenticated
+  courseLicenses: [CourseLicense!]! @join__field(graph: CORE)  @authenticated
+  gamificationConfig: GamificationConfig! @join__field(graph: CORE)  @authenticated
+  orgBadges: [OrgBadge!]! @join__field(graph: CORE)  @authenticated
+  orgAnalytics(dateRange: DateRangeInput!) : OrgAnalytics! @join__field(graph: CORE)  @authenticated
+  orgAtRiskLearners(limit: Int = 20, offset: Int = 0) : [AtRiskLearnerItem!]! @join__field(graph: CORE)  @authenticated
+  learnerDetail(userId: ID!) : LearnerAnalyticsDetail @join__field(graph: CORE)  @authenticated
+  brandedLoginData(slug: String!) : BrandedLoginData @join__field(graph: CORE) 
   cohortInsights(conceptId: ID!, courseId: ID!, limit: Int) : CohortInsightsResult! @join__field(graph: KNOWLEDGE)  @authenticated
   embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE) 
   embeddingsByContentItem(contentItemId: ID!) : [Embedding!]! @join__field(graph: KNOWLEDGE) 
@@ -476,8 +526,8 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   peerMatches(courseId: String) : [PeerMatch!]! @join__field(graph: KNOWLEDGE)  @authenticated
   myPeerMatchRequests: [PeerMatchRequest!]! @join__field(graph: KNOWLEDGE)  @authenticated
   mentorsByPathTopology(courseId: ID!) : [MentorPathMatch!]! @join__field(graph: KNOWLEDGE)  @authenticated
-  courseKnowledgeSources(courseId: ID!) : [KnowledgeSource!]! @join__field(graph: KNOWLEDGE) 
-  knowledgeSource(id: ID!) : KnowledgeSource @join__field(graph: KNOWLEDGE) 
+  courseKnowledgeSources(courseId: ID!) : [KnowledgeSource!]! @join__field(graph: KNOWLEDGE)  @authenticated
+  knowledgeSource(id: ID!) : KnowledgeSource @join__field(graph: KNOWLEDGE)  @authenticated
 }
 
 type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
@@ -487,6 +537,8 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   startAgentExecution(input: StartAgentExecutionInput!) : AgentExecution! @join__field(graph: AGENT)  @authenticated
   cancelAgentExecution(id: ID!) : AgentExecution! @join__field(graph: AGENT)  @authenticated
   generateCourseFromPrompt(input: GenerateCourseInput!) : CourseGenerationResult! @join__field(graph: AGENT)  @authenticated
+  generateLesson(input: LessonPipelineInput!) : AgentLessonPipelineResult! @join__field(graph: AGENT)  @authenticated
+  generateCertExamItems(input: GenerateCertExamItemsInput!) : CertExamGenResult! @join__field(graph: AGENT)  @authenticated
   createChavrutaPartnerSession(input: CreateChavrutaPartnerSessionInput!) : ChavrutaPartnerSession! @join__field(graph: AGENT)  @authenticated
   startLiveSession(sessionId: ID!) : StartLiveSessionResult! @join__field(graph: AGENT)  @authenticated
   endLiveSession(sessionId: ID!) : LiveSession! @join__field(graph: AGENT)  @authenticated
@@ -562,14 +614,15 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   updateCourseComplianceSettings(courseId: ID!, isCompliance: Boolean!, complianceDueDate: String) : ComplianceCourse! @join__field(graph: CONTENT)  @authenticated
   importFromYoutube(input: YoutubeImportInput!) : ImportJob! @join__field(graph: CONTENT)  @authenticated
   importFromWebsite(input: WebsiteImportInput!) : ImportJob! @join__field(graph: CONTENT)  @authenticated
+  importFromDrive(input: DriveImportInput!) : ImportJob! @join__field(graph: CONTENT)  @authenticated
   cancelImport(jobId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
-  createContentItem(input: CreateContentItemInput!) : ContentItem! @join__field(graph: CONTENT)  @authenticated
+  createContentItem(input: CreateContentItemInput!) : ContentItem! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   activateLibraryCourse(libraryCourseId: ID!) : LibraryActivation! @join__field(graph: CONTENT)  @authenticated
   deactivateLibraryCourse(libraryCourseId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
   createCourse(input: CreateCourseInput!) : Course! @join__field(graph: CONTENT)  @authenticated
   updateCourse(id: ID!, input: UpdateCourseInput!) : Course! @join__field(graph: CONTENT)  @authenticated
   deleteCourse(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
-  publishCourse(id: ID!) : Course! @join__field(graph: CONTENT)  @authenticated
+  publishCourse(id: ID!) : Course! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:publish"]]) 
   unpublishCourse(id: ID!) : Course! @join__field(graph: CONTENT)  @authenticated
   enrollCourse(courseId: ID!) : UserCourse! @join__field(graph: CONTENT)  @authenticated
   unenrollCourse(courseId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
@@ -578,19 +631,37 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   adminUnenrollUser(courseId: ID!, userId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
   adminBulkEnroll(courseId: ID!, userIds: [ID!]!) : Int! @join__field(graph: CONTENT)  @authenticated
   forkCourse(courseId: ID!) : Course! @join__field(graph: CONTENT)  @authenticated
+  cloneComplianceCourse(courseId: ID!) : ComplianceCourse! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   exportCpdReport(format: CpdExportFormat!) : String! @join__field(graph: CONTENT)  @authenticated
   createCpdCreditType(name: String!, regulatoryBody: String!, creditHoursPerHour: Float!) : CpdCreditType! @join__field(graph: CONTENT)  @authenticated
   assignCpdCreditsToCourse(courseId: ID!, creditTypeId: ID!, creditHours: Float!) : Boolean! @join__field(graph: CONTENT)  @authenticated
   createDocumentVersion(mediaAssetId: ID!, summary: String) : DocumentVersion! @join__field(graph: CONTENT)  @authenticated
   rollbackToVersion(versionId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
-  createLesson(input: CreateLessonInput!) : Lesson! @join__field(graph: CONTENT)  @authenticated
-  updateLesson(id: ID!, input: UpdateLessonInput!) : Lesson! @join__field(graph: CONTENT)  @authenticated
-  deleteLesson(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
-  addLessonAsset(lessonId: ID!, input: AddLessonAssetInput!) : LessonAsset! @join__field(graph: CONTENT)  @authenticated
-  saveLessonPipeline(lessonId: ID!, input: SaveLessonPipelineInput!) : LessonPipeline! @join__field(graph: CONTENT)  @authenticated
-  startLessonPipelineRun(pipelineId: ID!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated
-  cancelLessonPipelineRun(runId: ID!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated
-  publishLesson(id: ID!) : Lesson! @join__field(graph: CONTENT)  @authenticated
+  createExamItem(input: CreateExamItemInput!) : ExamItem! @join__field(graph: CONTENT)  @authenticated
+  updateExamItem(id: ID!, input: UpdateExamItemInput!) : ExamItem! @join__field(graph: CONTENT)  @authenticated
+  retireExamItem(id: ID!) : ExamItem! @join__field(graph: CONTENT)  @authenticated
+  generateExamItems(input: GenerateExamItemsInput!) : ExamItemGenerationResult! @join__field(graph: CONTENT)  @authenticated
+  createExamBlueprint(input: CreateExamBlueprintInput!) : ExamBlueprint! @join__field(graph: CONTENT)  @authenticated
+  updateExamBlueprint(id: ID!, input: UpdateExamBlueprintInput!) : ExamBlueprint! @join__field(graph: CONTENT)  @authenticated
+  startExamSession(blueprintId: ID!) : ExamSession! @join__field(graph: CONTENT)  @authenticated
+  submitExamAnswer(sessionId: ID!, itemId: ID!, answer: JSON!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  flagExamQuestion(sessionId: ID!, itemId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  submitExam(sessionId: ID!) : ExamResult! @join__field(graph: CONTENT)  @authenticated
+  voidExamSession(sessionId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  calibrateExamItems(blueprintId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  createLesson(input: CreateLessonInput!) : Lesson! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  updateLesson(id: ID!, input: UpdateLessonInput!) : Lesson! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  deleteLesson(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  addLessonAsset(lessonId: ID!, input: AddLessonAssetInput!) : LessonAsset! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  saveLessonPipeline(lessonId: ID!, input: SaveLessonPipelineInput!) : LessonPipeline! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  startLessonPipelineRun(pipelineId: ID!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  cancelLessonPipelineRun(runId: ID!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  retryPipelineModule(runId: ID!, moduleType: PipelineModuleType!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  restoreRun(runId: ID!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  publishLesson(id: ID!) : Lesson! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  createPipelineTemplate(input: CreatePipelineTemplateInput!) : LessonPipelineTemplate! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  updatePipelineTemplate(id: ID!, input: UpdatePipelineTemplateInput!) : LessonPipelineTemplate! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  deletePipelineTemplate(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   createLessonPlan(input: CreateLessonPlanInput!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
   addLessonStep(input: AddLessonStepInput!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
   reorderLessonSteps(planId: ID!, stepIds: [ID!]!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
@@ -625,7 +696,7 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
     filename: String!
     format: String!
     contentLength: Int!
-  ): MediaAssetUpload! @join__field(graph: CONTENT)  @authenticated
+  ): MediaAssetUpload! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
   """
   Creates a new ordered microlearning path from existing MICROLESSON content items.
   """
@@ -652,6 +723,14 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Revoke a previously issued badge (cannot be undone)
   """
   revokeBadge(assertionId: ID!, reason: String!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  """
+  Issue a badge gated on knowledge graph topology coverage (GAP-8).
+  Throws if coverage < 70% mastery threshold.
+  """
+  issueGraphGroundedBadge(courseId: ID!, definitionId: ID!, requiredConceptIds: [ID!]!) : OpenBadgeAssertion! @join__field(graph: CONTENT)  @authenticated
+  createPeerReviewRubric(input: CreateRubricInput!) : PeerReviewRubric! @join__field(graph: CONTENT)  @authenticated
+  submitForPeerReview(contentItemId: ID!, submissionText: String!) : [PeerReviewAssignment!]! @join__field(graph: CONTENT)  @authenticated
+  submitPeerReview(assignmentId: ID!, criteriaScores: String!, feedback: String) : Boolean! @join__field(graph: CONTENT)  @authenticated
   submitTextAssignment(contentItemId: ID!, textContent: String!, courseId: ID!) : TextSubmission! @join__field(graph: CONTENT)  @authenticated
   createProgram(
     title: String!
@@ -673,6 +752,7 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   finishScormSession(sessionId: ID!, data: String!) : Boolean! @join__field(graph: CONTENT)  @authenticated
   importScormPackage(fileKey: String!) : ScormImportResult! @join__field(graph: CONTENT)  @authenticated
   exportCourseAsScorm(courseId: ID!) : String! @join__field(graph: CONTENT)  @authenticated
+  exportCourseAsScorm2004(courseId: ID!) : ScormExportResult! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   requestContentTranslation(contentItemId: ID!, targetLocale: String!) : ContentTranslation! @join__field(graph: CONTENT)  @authenticated
   confirmVisualAssetUpload(
     fileKey: String!
@@ -680,12 +760,12 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
     originalName: String!
     declaredMimeType: String!
     declaredSize: Int!
-  ): VisualAsset! @join__field(graph: CONTENT)  @authenticated
-  createVisualAnchor(input: CreateVisualAnchorInput!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated
-  updateVisualAnchor(id: ID!, input: UpdateVisualAnchorInput!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated
-  deleteVisualAnchor(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
-  assignAssetToAnchor(anchorId: ID!, visualAssetId: ID!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated
-  syncAnchors(mediaAssetId: ID!) : SyncResult! @join__field(graph: CONTENT)  @authenticated
+  ): VisualAsset! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
+  createVisualAnchor(input: CreateVisualAnchorInput!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
+  updateVisualAnchor(id: ID!, input: UpdateVisualAnchorInput!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
+  deleteVisualAnchor(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
+  assignAssetToAnchor(anchorId: ID!, visualAssetId: ID!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
+  syncAnchors(mediaAssetId: ID!) : SyncResult! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:write"]]) 
   """
   Generate a new xAPI LRS bearer token. Returns the raw token (shown once).
   """
@@ -694,6 +774,10 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Revoke an existing xAPI token.
   """
   revokeXapiToken(tokenId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  """
+  Delete all xAPI statements older than the given number of days. SUPER_ADMIN only.
+  """
+  clearXapiStatements(olderThanDays: Int!) : Int! @join__field(graph: CONTENT)  @authenticated
   saveAtRiskThresholds(input: AtRiskThresholdsInput!) : AtRiskThresholds! @join__field(graph: CORE)  @authenticated
   createAnnouncement(input: CreateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
   updateAnnouncement(id: ID!, input: UpdateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
@@ -709,12 +793,14 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   updateNotificationTemplate(id: ID!, input: UpdateNotificationTemplateInput!) : NotificationTemplate! @join__field(graph: CORE)  @authenticated
   resetNotificationTemplate(id: ID!) : NotificationTemplate! @join__field(graph: CORE)  @authenticated
   updateSecuritySettings(input: UpdateSecuritySettingsInput!) : SecuritySettings! @join__field(graph: CORE)  @authenticated
+  updateTenantSocialLinks(input: UpdateTenantSocialLinksInput!) : TenantSocialLinks! @join__field(graph: CORE)  @authenticated
   submitPilotRequest(input: PilotRequestInput!) : PilotRequest! @join__field(graph: CORE) 
   approvePilotRequest(requestId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
   rejectPilotRequest(requestId: ID!, reason: String) : Boolean! @join__field(graph: CORE)  @authenticated
   createChallenge(input: CreateChallengeInput!) : GroupChallenge! @join__field(graph: CORE) 
   joinChallenge(challengeId: ID!) : ChallengeParticipant! @join__field(graph: CORE)  @authenticated
   submitChallengeScore(challengeId: ID!, score: Int!) : ChallengeParticipant! @join__field(graph: CORE)  @authenticated
+  updateConsent(input: UpdateConsentInput!) : Boolean! @join__field(graph: CORE)  @authenticated
   disconnectCrm: Boolean! @join__field(graph: CORE)  @authenticated
   createBadge(input: CreateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
   updateBadge(id: ID!, input: UpdateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
@@ -728,6 +814,11 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   """
   registerPushSubscription(subscriptionJson: String!) : PushRegistration! @join__field(graph: CORE)  @authenticated
   unregisterPushToken(platform: PushPlatform!) : Boolean! @join__field(graph: CORE)  @authenticated
+  updateNotificationPreference(input: UpdateNotificationPreferenceInput!) : NotificationPreference! @join__field(graph: CORE)  @authenticated
+  registerWhatsApp(phoneNumber: String!, countryCode: String!) : WhatsAppRegistration! @join__field(graph: CORE)  @authenticated
+  verifyWhatsApp(code: String!) : WhatsAppVerification! @join__field(graph: CORE)  @authenticated
+  markNotificationDeliveryRead(id: ID!) : NotificationDelivery! @join__field(graph: CORE)  @authenticated
+  markAllNotificationDeliveriesRead: Int! @join__field(graph: CORE)  @authenticated
   updateOnboardingStep(input: UpdateOnboardingStepInput!) : OnboardingState! @join__field(graph: CORE)  @authenticated
   completeOnboarding: OnboardingState! @join__field(graph: CORE)  @authenticated
   skipOnboarding: OnboardingState! @join__field(graph: CORE)  @authenticated
@@ -772,8 +863,29 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   deactivateUser(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
   suspendUser(userId: ID!, suspended: Boolean!) : User! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
   resetUserPassword(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
-  bulkImportUsers(csvData: String!) : BulkImportResult! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]])
-  updateConsent(input: UpdateConsentInput!) : Boolean! @join__field(graph: CORE)  @authenticated
+  bulkImportUsers(csvData: String!) : BulkImportResult! @join__field(graph: CORE)  @authenticated @requiresScopes(scopes: [["write:users"]]) 
+  createOrganization(input: CreateOrganizationInput!) : Organization! @join__field(graph: CORE) 
+  inviteUser(input: InviteUserInput!) : OrgInvitation! @join__field(graph: CORE)  @authenticated
+  acceptInvitation(token: String!) : OrgMember! @join__field(graph: CORE) 
+  revokeInvitation(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  updateMemberRole(userId: ID!, role: String!) : OrgMember! @join__field(graph: CORE)  @authenticated
+  removeMember(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  createApiKey(input: CreateApiKeyInput!) : ApiKeyCreated! @join__field(graph: CORE)  @authenticated
+  revokeApiKey(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  createWebhook(input: CreateWebhookInput!) : Webhook! @join__field(graph: CORE)  @authenticated
+  updateWebhook(id: ID!, input: UpdateWebhookInput!) : Webhook! @join__field(graph: CORE)  @authenticated
+  deleteWebhook(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  testWebhook(id: ID!) : WebhookDelivery! @join__field(graph: CORE)  @authenticated
+  requestDomainVerification(domain: String!) : DomainVerificationInfo! @join__field(graph: CORE)  @authenticated
+  checkDomainVerification(domain: String!) : CustomDomain! @join__field(graph: CORE)  @authenticated
+  removeCustomDomain(domainId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  licenseCourse(input: LicenseCourseInput!) : CourseLicense! @join__field(graph: CORE)  @authenticated
+  revokeCourseLicense(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  updateGamificationConfig(input: UpdateGamificationConfigInput!) : GamificationConfig! @join__field(graph: CORE)  @authenticated
+  createOrgBadge(input: CreateOrgBadgeInput!) : OrgBadge! @join__field(graph: CORE)  @authenticated
+  updateOrgBadge(id: ID!, input: UpdateOrgBadgeInput!) : OrgBadge! @join__field(graph: CORE)  @authenticated
+  deleteOrgBadge(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  exportAnalytics(input: ExportAnalyticsInput!) : ExportResult! @join__field(graph: CORE)  @authenticated
   createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
@@ -814,26 +926,26 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Add a URL as a knowledge source.
   The system fetches the page, extracts text, chunks it and embeds it.
   """
-  addUrlSource(input: AddUrlSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE) 
+  addUrlSource(input: AddUrlSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   """
   Add raw text as a knowledge source.
   """
-  addTextSource(input: AddTextSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE) 
+  addTextSource(input: AddTextSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   """
   Add a YouTube video as a knowledge source.
   The system fetches the auto-generated transcript and indexes it.
   """
-  addYoutubeSource(input: AddYoutubeSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE) 
+  addYoutubeSource(input: AddYoutubeSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   """
   Upload a local file (DOCX / PDF / TXT) as a knowledge source.
   The content is passed as a base64-encoded string so it can travel through
   the GraphQL gateway without a multipart transport layer.
   """
-  addFileSource(input: AddFileSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE) 
+  addFileSource(input: AddFileSourceInput!) : KnowledgeSource! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
   """
   Remove a knowledge source (and its embeddings).
   """
-  deleteKnowledgeSource(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE) 
+  deleteKnowledgeSource(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
 }
 
 type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  {
@@ -847,6 +959,8 @@ type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @jo
   Subscribe to new messages in a discussion
   """
   messageAdded(discussionId: ID!) : DiscussionMessage! @join__field(graph: COLLABORATION) 
+  examTimeUpdate(sessionId: ID!) : ExamTimeEvent! @join__field(graph: CONTENT) 
+  examSessionStatusChanged(sessionId: ID!) : ExamSession! @join__field(graph: CONTENT) 
   lessonPipelineProgress(runId: ID!) : LessonPipelineRun! @join__field(graph: CONTENT)  @authenticated
   pollUpdated(pollId: ID!) : PollResults! @join__field(graph: CONTENT)  @authenticated
   anchorDeleted(mediaAssetId: ID!) : ID! @join__field(graph: CONTENT)  @authenticated
@@ -901,6 +1015,21 @@ type CourseGenerationResult @join__type(graph: AGENT)  {
   courseDescription: String
   modules: [GeneratedModule!]!
   draftCourseId: ID
+}
+
+type AgentLessonPipelineResult @join__type(graph: AGENT)  {
+  executionId: ID!
+  status: String!
+  markdownContent: String
+  citations: [String!]!
+  hebrewNerEntities: [String!]!
+  stage: String!
+}
+
+type CertExamGenResult @join__type(graph: AGENT)  {
+  executionId: ID!
+  status: String!
+  itemCount: Int!
 }
 
 type ChavrutaPartnerMatch @join__type(graph: AGENT)  {
@@ -1061,15 +1190,6 @@ type SkillGapAnalysis @join__type(graph: AGENT)  {
   completionPct: Float!
 }
 
-"""
-Character range within a text document — used for INLINE_COMMENT and SUGGESTION types
-"""
-type TextRange @join__type(graph: ANNOTATION)  {
-  start: Int!
-  end: Int!
-  rangeType: String
-}
-
 type Annotation @join__type(graph: ANNOTATION, key: "id")  {
   id: ID!
   tenantId: ID!
@@ -1080,15 +1200,15 @@ type Annotation @join__type(graph: ANNOTATION, key: "id")  {
   layer: AnnotationLayer!
   content: JSON!
   spatialData: JSON
-  """
-  Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)
-  """
-  textRange: TextRange
   parentId: ID
   parent: Annotation
   isResolved: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
+  """
+  Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)
+  """
+  textRange: TextRange
 }
 
 type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -1102,6 +1222,15 @@ type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: C
   orderIndex: Int! @join__field(graph: CONTENT) 
   createdAt: String! @join__field(graph: CONTENT) 
   updatedAt: String! @join__field(graph: CONTENT) 
+}
+
+"""
+Character range within a text document — used for INLINE_COMMENT and SUGGESTION types
+"""
+type TextRange @join__type(graph: ANNOTATION)  {
+  start: Int!
+  end: Int!
+  rangeType: String
 }
 
 """
@@ -1139,10 +1268,10 @@ type DiscussionMessage @join__type(graph: COLLABORATION, key: "id")  {
   parentMessage: DiscussionMessage
   replies(limit: Int = 20, offset: Int = 0) : [DiscussionMessage!]!
   replyCount: Int!
-  likesCount: Int!
-  isLikedByMe: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
+  likesCount: Int!
+  isLikedByMe: Boolean!
 }
 
 """
@@ -1244,6 +1373,14 @@ type AtRiskLearner @join__type(graph: CONTENT)  {
   progressPercent: Float!
 }
 
+type AiUsageStats @join__type(graph: CONTENT)  {
+  totalRequests: Int!
+  uniqueLearnersUsed: Int!
+  estimatedTokensUsed: Int!
+  topCourseId: ID
+  topCourseRequests: Int!
+}
+
 type AssessmentCampaign @join__type(graph: CONTENT)  {
   id: ID!
   title: String!
@@ -1314,6 +1451,10 @@ type ComplianceCourse @join__type(graph: CONTENT)  {
   complianceDueDate: String
   isPublished: Boolean!
   estimatedHours: Int
+  description: String!
+  category: String!
+  tags: [String!]!
+  isTemplate: Boolean!
 }
 
 type ImportJob @join__type(graph: CONTENT)  {
@@ -1347,6 +1488,17 @@ type LibraryActivation @join__type(graph: CONTENT)  {
   activatedAt: String!
 }
 
+type CourseReadinessCheck @join__type(graph: CONTENT)  {
+  name: String!
+  passed: Boolean!
+  message: String
+}
+
+type CourseReadiness @join__type(graph: CONTENT)  {
+  ready: Boolean!
+  checks: [CourseReadinessCheck!]!
+}
+
 type UserCourse @join__type(graph: CONTENT)  {
   id: ID!
   courseId: ID!
@@ -1370,17 +1522,6 @@ type AdminEnrollmentRecord @join__type(graph: CONTENT)  {
   status: String!
   enrolledAt: String!
   completedAt: String
-}
-
-type CourseReadinessCheck @join__type(graph: CONTENT)  {
-  name: String!
-  passed: Boolean!
-  message: String
-}
-
-type CourseReadiness @join__type(graph: CONTENT)  {
-  ready: Boolean!
-  checks: [CourseReadinessCheck!]!
 }
 
 type CpdCreditType @join__type(graph: CONTENT)  {
@@ -1421,6 +1562,158 @@ type DocumentVersion @join__type(graph: CONTENT)  {
   diffSummary: String
   aiSuggestions: JSON
   createdAt: String!
+}
+
+type ExamSession @join__type(graph: CONTENT)  {
+  id: ID!
+  blueprintId: ID!
+  userId: ID!
+  status: ExamSessionStatus!
+  attemptNumber: Int!
+  startedAt: DateTime!
+  submittedAt: DateTime
+  timeRemainingSeconds: Int
+  questionOrder: [ID!]!
+  isAdaptive: Boolean!
+  currentQuestionIndex: Int
+}
+
+type ExamResponse @join__type(graph: CONTENT)  {
+  itemId: ID!
+  answerData: JSON!
+  isCorrect: Boolean
+  isFlagged: Boolean!
+  timeSpentMs: Int
+}
+
+type ExamResult @join__type(graph: CONTENT)  {
+  id: ID!
+  sessionId: ID!
+  rawScore: Float!
+  scaledScore: Float
+  passed: Boolean!
+  thetaEstimate: Float
+  sem: Float
+  confidenceInterval: JSON
+  domainScores: [DomainScore!]!
+  bloomScores: [BloomScore!]!
+  gradedAt: DateTime!
+}
+
+type DomainScore @join__type(graph: CONTENT)  {
+  domain: String!
+  correct: Int!
+  total: Int!
+  scaledScore: Float
+}
+
+type BloomScore @join__type(graph: CONTENT)  {
+  level: BloomLevel!
+  correct: Int!
+  total: Int!
+}
+
+type ExamReliabilityReport @join__type(graph: CONTENT)  {
+  blueprintId: ID!
+  kr20: Float!
+  cronbachAlpha: Float!
+  sem: Float!
+  totalSessions: Int!
+  averageScore: Float!
+}
+
+type BlueprintAnalytics @join__type(graph: CONTENT)  {
+  blueprintId: ID!
+  totalSessions: Int!
+  passRate: Float!
+  averageScore: Float!
+  averageTime: Float!
+  domainBreakdown: [DomainScore!]!
+}
+
+type ExamTimeEvent @join__type(graph: CONTENT)  {
+  sessionId: ID!
+  timeRemainingSeconds: Int!
+  isExpired: Boolean!
+}
+
+type ExamItem @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevel: BloomLevel!
+  questionData: JSON!
+  irtA: Float
+  irtB: Float
+  irtC: Float
+  calibrationStatus: CalibrationStatus!
+  source: ExamItemSource!
+  qualityTier: QualityTier!
+  pValue: Float
+  rpbis: Float
+  exposureCount: Int!
+  createdAt: DateTime!
+}
+
+type ExamBlueprint @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  title: String!
+  description: String
+  timeLimitMinutes: Int!
+  totalQuestions: Int!
+  passingScore: Float!
+  passingMethod: PassingMethod!
+  domainDistribution: JSON!
+  bloomDistribution: JSON!
+  shuffleQuestions: Boolean!
+  shuffleAnswers: Boolean!
+  maxRetakes: Int!
+  retakeCooldownHours: Int!
+  isAdaptive: Boolean!
+  catMinItems: Int
+  catMaxItems: Int
+  status: BlueprintStatus!
+  version: Int!
+  createdAt: DateTime!
+}
+
+type ExamItemStatistics @join__type(graph: CONTENT)  {
+  itemId: ID!
+  totalAdministrations: Int!
+  pValue: Float!
+  rpbis: Float!
+  dIndex: Float!
+  distractorAnalysis: [DistractorStat!]!
+  irtA: Float
+  irtB: Float
+  irtC: Float
+}
+
+type DistractorStat @join__type(graph: CONTENT)  {
+  optionIndex: Int!
+  selectionRate: Float!
+  rpbis: Float!
+  functional: Boolean!
+}
+
+type ExamItemGenerationResult @join__type(graph: CONTENT)  {
+  generatedCount: Int!
+  validCount: Int!
+  items: [ExamItem!]!
+}
+
+type ExamItemEdge @join__type(graph: CONTENT)  {
+  node: ExamItem!
+  cursor: String!
+}
+
+type ExamItemConnection @join__type(graph: CONTENT)  {
+  edges: [ExamItemEdge!]!
+  nodes: [ExamItem!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type Lesson @join__type(graph: CONTENT, key: "id")  {
@@ -1464,6 +1757,9 @@ type LessonPipeline @join__type(graph: CONTENT)  {
 type LessonPipelineRun @join__type(graph: CONTENT)  {
   id: ID!
   pipelineId: ID!
+  lessonId: ID
+  runNumber: Int!
+  triggeredBy: String!
   startedAt: String
   completedAt: String
   status: RunStatus!
@@ -1492,6 +1788,19 @@ type LessonCitation @join__type(graph: CONTENT)  {
   paragraph: String
   matchStatus: CitationMatchStatus!
   confidence: Float
+}
+
+type LessonPipelineTemplate @join__type(graph: CONTENT)  {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String
+  nodes: JSON!
+  config: JSON!
+  isSystem: Boolean!
+  createdBy: ID
+  createdAt: String!
+  updatedAt: String!
 }
 
 type CourseLessonPlan @join__type(graph: CONTENT)  {
@@ -1602,6 +1911,16 @@ type EarningsSummary @join__type(graph: CONTENT)  {
 type PaymentIntentResult @join__type(graph: CONTENT)  {
   clientSecret: String!
   paymentIntentId: String!
+}
+
+type InstructorPayout @join__type(graph: CONTENT)  {
+  id: ID!
+  periodMonth: String!
+  grossRevenue: Int!
+  platformCut: Int!
+  instructorPayout: Int!
+  status: String!
+  paidAt: String
 }
 
 type PresignedUploadUrl @join__type(graph: CONTENT)  {
@@ -1786,12 +2105,54 @@ type OpenBadgeAssertion @join__type(graph: CONTENT)  {
 }
 
 """
+Knowledge graph topology coverage for a credential requirement
+"""
+type KnowledgePathCoverage @join__type(graph: CONTENT)  {
+  covered: Boolean!
+  coverageScore: Float!
+  conceptIds: [ID!]!
+  pathDepth: Int!
+  missingConcepts: [ID!]!
+}
+
+"""
 Result of verifying a badge assertion's Ed25519 proof
 """
 type BadgeVerificationResult @join__type(graph: CONTENT)  {
   valid: Boolean!
   error: String
   assertion: OpenBadgeAssertion
+}
+
+type PeerReviewAssignment @join__type(graph: CONTENT)  {
+  id: ID!
+  contentItemId: ID!
+  contentItemTitle: String!
+  submitterId: ID!
+  submitterDisplayName: String
+  status: PeerReviewStatus!
+  submissionText: String
+  feedback: String
+  score: Int
+  createdAt: DateTime!
+}
+
+type PeerReviewSubmission @join__type(graph: CONTENT)  {
+  id: ID!
+  contentItemId: ID!
+  contentItemTitle: String!
+  status: PeerReviewStatus!
+  score: Int
+  feedback: String
+  createdAt: DateTime!
+}
+
+type PeerReviewRubric @join__type(graph: CONTENT)  {
+  id: ID!
+  contentItemId: ID!
+  criteria: String!
+  minReviewers: Int!
+  isAnonymous: Boolean!
 }
 
 type SimilarSubmission @join__type(graph: CONTENT)  {
@@ -1910,6 +2271,13 @@ type ScormSession @join__type(graph: CONTENT)  {
 type ScormImportResult @join__type(graph: CONTENT)  {
   courseId: ID!
   itemCount: Int!
+  version: ScormVersion
+}
+
+type ScormExportResult @join__type(graph: CONTENT)  {
+  downloadUrl: String!
+  expiresAt: String!
+  fileSizeBytes: Int!
 }
 
 type ContentTranslation @join__type(graph: CONTENT)  {
@@ -2107,6 +2475,17 @@ type SecuritySettings @join__type(graph: CORE)  {
   passwordRequireSpecialChars: Boolean!
   passwordExpiryDays: Int
   ipAllowlist: [String!]!
+}
+
+type TenantSocialLinks @join__type(graph: CORE)  {
+  id: ID!
+  linkedinUrl: String
+  facebookUrl: String
+  twitterUrl: String
+  youtubeUrl: String
+  instagramUrl: String
+  whatsappUrl: String
+  githubUrl: String
 }
 
 type SubscriptionPlan @join__type(graph: CORE)  {
@@ -2323,6 +2702,69 @@ type PushRegistration @join__type(graph: CORE)  {
   createdAt: String!
 }
 
+type NotificationPreference @join__type(graph: CORE)  {
+  id: ID!
+  notificationType: NotificationType!
+  channel: NotificationChannel!
+  enabled: Boolean!
+}
+
+type NotificationDelivery @join__type(graph: CORE)  {
+  id: ID!
+  notificationType: String!
+  channel: NotificationChannel!
+  title: String!
+  body: String!
+  status: DeliveryStatus!
+  sentAt: DateTime
+  deliveredAt: DateTime
+  readAt: DateTime
+  createdAt: DateTime!
+}
+
+type NotificationDeliveryEdge @join__type(graph: CORE)  {
+  cursor: String!
+  node: NotificationDelivery!
+}
+
+type NotificationDeliveryConnection @join__type(graph: CORE)  {
+  edges: [NotificationDeliveryEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ChannelAnalytics @join__type(graph: CORE)  {
+  channel: NotificationChannel!
+  sent: Int!
+  delivered: Int!
+  failed: Int!
+}
+
+type TypeAnalytics @join__type(graph: CORE)  {
+  notificationType: String!
+  sent: Int!
+  delivered: Int!
+  failed: Int!
+}
+
+type NotificationAnalytics @join__type(graph: CORE)  {
+  totalSent: Int!
+  totalDelivered: Int!
+  totalFailed: Int!
+  byChannel: [ChannelAnalytics!]!
+  byType: [TypeAnalytics!]!
+}
+
+type WhatsAppRegistration @join__type(graph: CORE)  {
+  success: Boolean!
+  message: String!
+}
+
+type WhatsAppVerification @join__type(graph: CORE)  {
+  verified: Boolean!
+  message: String!
+}
+
 type OnboardingState @join__type(graph: CORE)  {
   userId: ID!
   currentStep: Int!
@@ -2456,6 +2898,8 @@ type TenantBranding @join__type(graph: CORE)  {
   termsOfServiceUrl: String
   supportEmail: String
   hideEduSphereBranding: Boolean!
+  welcomeMessage: String
+  customCss: String
 }
 
 type PublicTenantBranding @join__type(graph: CORE)  {
@@ -2572,6 +3016,213 @@ type UserStatus @join__type(graph: CORE)  {
   userId: ID!
   online: Boolean!
   lastSeen: DateTime!
+}
+
+type Organization @join__type(graph: CORE, key: "id")  {
+  id: ID!
+  name: String!
+  slug: String!
+  plan: TenantPlan!
+  provisioningStatus: ProvisioningStatus!
+  trialEndsAt: DateTime
+  onboardingChecklist: OrgOnboardingChecklist
+  memberCount: Int!
+  createdAt: DateTime!
+}
+
+type OrgOnboardingChecklist @join__type(graph: CORE)  {
+  brandingConfigured: Boolean!
+  firstUserInvited: Boolean!
+  firstCourseCreated: Boolean!
+  domainConfigured: Boolean!
+  ssoConfigured: Boolean!
+  completionPercentage: Int!
+}
+
+type OrgInvitation @join__type(graph: CORE)  {
+  id: ID!
+  email: String!
+  role: String!
+  status: InvitationStatus!
+  expiresAt: DateTime!
+  createdAt: DateTime!
+}
+
+type OrgMember @join__type(graph: CORE)  {
+  id: ID!
+  email: String!
+  name: String
+  role: String!
+  joinedAt: DateTime!
+  lastActiveAt: DateTime
+}
+
+type TrialStatus @join__type(graph: CORE)  {
+  isTrialing: Boolean!
+  trialEndsAt: DateTime
+  daysRemaining: Int!
+  isInGracePeriod: Boolean!
+  gracePeriodEndsAt: DateTime
+}
+
+type CourseLicense @join__type(graph: CORE)  {
+  id: ID!
+  courseId: ID!
+  licenseType: LicenseType!
+  maxSeats: Int
+  usedSeats: Int!
+  status: LicenseStatus!
+  licensedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type OrgAnalytics @join__type(graph: CORE)  {
+  activeLearners: Int!
+  totalEnrollments: Int!
+  completionRate: Float!
+  totalLearningHours: Float!
+  topCourses: [CourseAnalyticsItem!]!
+  dailySnapshots: [AnalyticsSnapshot!]!
+}
+
+type CourseAnalyticsItem @join__type(graph: CORE)  {
+  courseId: ID!
+  title: String!
+  enrollmentCount: Int!
+  completionRate: Float!
+  avgTimeToComplete: Float
+}
+
+type AnalyticsSnapshot @join__type(graph: CORE)  {
+  date: String!
+  activeLearners: Int!
+  completions: Int!
+  newEnrollments: Int!
+  learningMinutes: Int!
+}
+
+type ExportResult @join__type(graph: CORE)  {
+  downloadUrl: String!
+  expiresAt: DateTime!
+  format: OrgExportFormat!
+}
+
+type AtRiskLearnerItem @join__type(graph: CORE)  {
+  userId: ID!
+  email: String!
+  name: String!
+  lastActive: DateTime
+  quizPassRate: Float!
+  completionRate: Float!
+  riskLevel: RiskLevel!
+}
+
+type LearnerAnalyticsDetail @join__type(graph: CORE)  {
+  userId: ID!
+  email: String!
+  name: String!
+  coursesEnrolled: Int!
+  coursesCompleted: Int!
+  avgQuizScore: Float!
+  totalLearningHours: Float!
+  activityTimeline: [ActivityEntry!]!
+}
+
+type ActivityEntry @join__type(graph: CORE)  {
+  date: DateTime!
+  type: String!
+  description: String!
+}
+
+type GamificationConfig @join__type(graph: CORE)  {
+  enabled: Boolean!
+  showLeaderboard: Boolean!
+  showBadges: Boolean!
+  showPoints: Boolean!
+  showStreaks: Boolean!
+  xpRules: JSON!
+  leaderboardScope: LeaderboardScope!
+}
+
+type OrgBadge @join__type(graph: CORE)  {
+  id: ID!
+  name: String!
+  description: String
+  iconUrl: String
+  xpRequired: Int!
+  autoAwardCriteria: JSON
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+type ApiKey @join__type(graph: CORE)  {
+  id: ID!
+  name: String!
+  keyPrefix: String!
+  scopes: [String!]!
+  rateLimitPerMinute: Int!
+  lastUsedAt: DateTime
+  expiresAt: DateTime
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+type ApiKeyCreated @join__type(graph: CORE)  {
+  apiKey: ApiKey!
+  plainTextKey: String!
+}
+
+type Webhook @join__type(graph: CORE)  {
+  id: ID!
+  url: String!
+  events: [String!]!
+  isActive: Boolean!
+  failureCount: Int!
+  lastTriggeredAt: DateTime
+  createdAt: DateTime!
+}
+
+type WebhookDelivery @join__type(graph: CORE)  {
+  id: ID!
+  eventType: String!
+  responseStatus: Int
+  attempt: Int!
+  status: WebhookDeliveryStatus!
+  deliveredAt: DateTime
+  createdAt: DateTime!
+}
+
+type CustomDomain @join__type(graph: CORE)  {
+  id: ID!
+  domain: String!
+  verificationToken: String
+  verificationRecordType: String
+  verifiedAt: DateTime
+  sslStatus: String!
+  createdAt: DateTime!
+}
+
+type DomainVerificationInfo @join__type(graph: CORE)  {
+  token: String!
+  recordType: String!
+  recordValue: String!
+  instructions: String!
+}
+
+type SsoProvider @join__type(graph: CORE)  {
+  id: ID!
+  name: String!
+  type: String!
+  iconUrl: String
+}
+
+type BrandedLoginData @join__type(graph: CORE)  {
+  orgName: String!
+  logoUrl: String
+  primaryColor: String
+  secondaryColor: String
+  welcomeMessage: String
+  ssoProviders: [SsoProvider!]!
 }
 
 type CohortInsight @join__type(graph: KNOWLEDGE)  {
@@ -2914,6 +3565,11 @@ enum AgentExecutionStatus @join__type(graph: AGENT)  {
   CANCELLED @join__enumValue(graph: AGENT) 
 }
 
+enum LessonPipelineArchetype @join__type(graph: AGENT)  {
+  THEMATIC @join__enumValue(graph: AGENT) 
+  SEQUENTIAL @join__enumValue(graph: AGENT) 
+}
+
 enum ProctoringSessionStatus @join__type(graph: AGENT)  {
   PENDING @join__enumValue(graph: AGENT) 
   ACTIVE @join__enumValue(graph: AGENT) 
@@ -2997,6 +3653,19 @@ enum CpdExportFormat @join__type(graph: CONTENT)  {
   CSV @join__enumValue(graph: CONTENT) 
 }
 
+enum PipelineModuleType @join__type(graph: CONTENT)  {
+  INGESTION @join__enumValue(graph: CONTENT) 
+  ASR @join__enumValue(graph: CONTENT) 
+  NER_SOURCE_LINKING @join__enumValue(graph: CONTENT) 
+  CONTENT_CLEANING @join__enumValue(graph: CONTENT) 
+  SUMMARIZATION @join__enumValue(graph: CONTENT) 
+  STRUCTURED_NOTES @join__enumValue(graph: CONTENT) 
+  DIAGRAM_GENERATOR @join__enumValue(graph: CONTENT) 
+  CITATION_VERIFIER @join__enumValue(graph: CONTENT) 
+  QA_GATE @join__enumValue(graph: CONTENT) 
+  PUBLISH_SHARE @join__enumValue(graph: CONTENT) 
+}
+
 enum ImportStatus @join__type(graph: CONTENT)  {
   PENDING @join__enumValue(graph: CONTENT) 
   RUNNING @join__enumValue(graph: CONTENT) 
@@ -3036,6 +3705,56 @@ enum UserRole @join__type(graph: CONTENT)  @join__type(graph: CORE)  {
   RESEARCHER @join__enumValue(graph: CONTENT)  @join__enumValue(graph: CORE) 
 }
 
+enum BloomLevel @join__type(graph: CONTENT)  {
+  REMEMBER @join__enumValue(graph: CONTENT) 
+  UNDERSTAND @join__enumValue(graph: CONTENT) 
+  APPLY @join__enumValue(graph: CONTENT) 
+  ANALYZE @join__enumValue(graph: CONTENT) 
+  EVALUATE @join__enumValue(graph: CONTENT) 
+  CREATE @join__enumValue(graph: CONTENT) 
+}
+
+enum ExamItemSource @join__type(graph: CONTENT)  {
+  MANUAL @join__enumValue(graph: CONTENT) 
+  AI_GENERATED @join__enumValue(graph: CONTENT) 
+  IMPORTED @join__enumValue(graph: CONTENT) 
+}
+
+enum CalibrationStatus @join__type(graph: CONTENT)  {
+  DRAFT @join__enumValue(graph: CONTENT) 
+  PILOT @join__enumValue(graph: CONTENT) 
+  CALIBRATED @join__enumValue(graph: CONTENT) 
+  RETIRED @join__enumValue(graph: CONTENT) 
+}
+
+enum PassingMethod @join__type(graph: CONTENT)  {
+  PERCENTAGE @join__enumValue(graph: CONTENT) 
+  SCALED_SCORE @join__enumValue(graph: CONTENT) 
+  IRT_THETA @join__enumValue(graph: CONTENT) 
+}
+
+enum BlueprintStatus @join__type(graph: CONTENT)  {
+  DRAFT @join__enumValue(graph: CONTENT) 
+  ACTIVE @join__enumValue(graph: CONTENT) 
+  ARCHIVED @join__enumValue(graph: CONTENT) 
+}
+
+enum ExamSessionStatus @join__type(graph: CONTENT)  {
+  SCHEDULED @join__enumValue(graph: CONTENT) 
+  IN_PROGRESS @join__enumValue(graph: CONTENT) 
+  SUBMITTED @join__enumValue(graph: CONTENT) 
+  GRADED @join__enumValue(graph: CONTENT) 
+  TIMED_OUT @join__enumValue(graph: CONTENT) 
+  VOIDED @join__enumValue(graph: CONTENT) 
+}
+
+enum QualityTier @join__type(graph: CONTENT)  {
+  AI_GENERATED @join__enumValue(graph: CONTENT) 
+  SME_REVIEWED @join__enumValue(graph: CONTENT) 
+  PILOT_TESTED @join__enumValue(graph: CONTENT) 
+  CALIBRATED @join__enumValue(graph: CONTENT) 
+}
+
 enum LessonType @join__type(graph: CONTENT)  {
   THEMATIC @join__enumValue(graph: CONTENT) 
   SEQUENTIAL @join__enumValue(graph: CONTENT) 
@@ -3053,19 +3772,6 @@ enum LessonAssetType @join__type(graph: CONTENT)  {
   AUDIO @join__enumValue(graph: CONTENT) 
   NOTES @join__enumValue(graph: CONTENT) 
   WHITEBOARD @join__enumValue(graph: CONTENT) 
-}
-
-enum PipelineModuleType @join__type(graph: CONTENT)  {
-  INGESTION @join__enumValue(graph: CONTENT) 
-  ASR @join__enumValue(graph: CONTENT) 
-  NER_SOURCE_LINKING @join__enumValue(graph: CONTENT) 
-  CONTENT_CLEANING @join__enumValue(graph: CONTENT) 
-  SUMMARIZATION @join__enumValue(graph: CONTENT) 
-  STRUCTURED_NOTES @join__enumValue(graph: CONTENT) 
-  DIAGRAM_GENERATOR @join__enumValue(graph: CONTENT) 
-  CITATION_VERIFIER @join__enumValue(graph: CONTENT) 
-  QA_GATE @join__enumValue(graph: CONTENT) 
-  PUBLISH_SHARE @join__enumValue(graph: CONTENT) 
 }
 
 enum PipelineStatus @join__type(graph: CONTENT)  {
@@ -3121,6 +3827,18 @@ enum AssetType @join__type(graph: CONTENT)  {
   MODEL_3D @join__enumValue(graph: CONTENT) 
 }
 
+enum PeerReviewStatus @join__type(graph: CONTENT)  {
+  PENDING @join__enumValue(graph: CONTENT) 
+  SUBMITTED @join__enumValue(graph: CONTENT) 
+  RATED @join__enumValue(graph: CONTENT) 
+}
+
+enum ScormVersion @join__type(graph: CONTENT)  {
+  SCORM_12 @join__enumValue(graph: CONTENT) 
+  SCORM_2004 @join__enumValue(graph: CONTENT) 
+  CMI5 @join__enumValue(graph: CONTENT) 
+}
+
 enum TranslationStatus @join__type(graph: CONTENT)  {
   PENDING @join__enumValue(graph: CONTENT) 
   PROCESSING @join__enumValue(graph: CONTENT) 
@@ -3141,6 +3859,37 @@ enum PilotRequestStatus @join__type(graph: CORE)  {
   APPROVED @join__enumValue(graph: CORE) 
   REJECTED @join__enumValue(graph: CORE) 
   EXPIRED @join__enumValue(graph: CORE) 
+}
+
+enum NotificationType @join__type(graph: CORE)  {
+  BADGE_ISSUED @join__enumValue(graph: CORE) 
+  COURSE_ENROLLED @join__enumValue(graph: CORE) 
+  USER_FOLLOWED @join__enumValue(graph: CORE) 
+  SRS_REVIEW_DUE @join__enumValue(graph: CORE) 
+  ANNOUNCEMENT @join__enumValue(graph: CORE) 
+  LESSON_AVAILABLE @join__enumValue(graph: CORE) 
+  SESSION_STARTING @join__enumValue(graph: CORE) 
+  STREAK_REMINDER @join__enumValue(graph: CORE) 
+  AT_RISK_ALERT @join__enumValue(graph: CORE) 
+  PEER_REVIEW_ASSIGNED @join__enumValue(graph: CORE) 
+  PEER_REVIEW_RECEIVED @join__enumValue(graph: CORE) 
+  DISCUSSION_REPLY @join__enumValue(graph: CORE) 
+  PEER_FOLLOWED_ACTIVITY @join__enumValue(graph: CORE) 
+}
+
+enum NotificationChannel @join__type(graph: CORE)  {
+  PUSH_WEB @join__enumValue(graph: CORE) 
+  PUSH_MOBILE @join__enumValue(graph: CORE) 
+  EMAIL @join__enumValue(graph: CORE) 
+  WHATSAPP @join__enumValue(graph: CORE) 
+  IN_APP @join__enumValue(graph: CORE) 
+}
+
+enum InvitationStatus @join__type(graph: CORE)  {
+  PENDING @join__enumValue(graph: CORE) 
+  ACCEPTED @join__enumValue(graph: CORE) 
+  EXPIRED @join__enumValue(graph: CORE) 
+  REVOKED @join__enumValue(graph: CORE) 
 }
 
 enum AuditExportFormat @join__type(graph: CORE)  {
@@ -3192,20 +3941,20 @@ enum ChallengeStatus @join__type(graph: CORE)  {
   COMPLETED @join__enumValue(graph: CORE) 
 }
 
-enum NotificationType @join__type(graph: CORE)  {
-  BADGE_ISSUED @join__enumValue(graph: CORE) 
-  COURSE_ENROLLED @join__enumValue(graph: CORE) 
-  USER_FOLLOWED @join__enumValue(graph: CORE) 
-  SRS_REVIEW_DUE @join__enumValue(graph: CORE) 
-  ANNOUNCEMENT @join__enumValue(graph: CORE) 
-  LESSON_AVAILABLE @join__enumValue(graph: CORE) 
-  SESSION_STARTING @join__enumValue(graph: CORE) 
-  STREAK_REMINDER @join__enumValue(graph: CORE) 
-  AT_RISK_ALERT @join__enumValue(graph: CORE) 
-  PEER_REVIEW_ASSIGNED @join__enumValue(graph: CORE) 
-  PEER_REVIEW_RECEIVED @join__enumValue(graph: CORE) 
-  DISCUSSION_REPLY @join__enumValue(graph: CORE) 
-  PEER_FOLLOWED_ACTIVITY @join__enumValue(graph: CORE) 
+enum ConsentType @join__type(graph: CORE)  {
+  AI_PROCESSING @join__enumValue(graph: CORE) 
+  THIRD_PARTY_LLM @join__enumValue(graph: CORE) 
+  ANALYTICS @join__enumValue(graph: CORE) 
+  MARKETING @join__enumValue(graph: CORE) 
+  RESEARCH @join__enumValue(graph: CORE) 
+}
+
+enum DeliveryStatus @join__type(graph: CORE)  {
+  PENDING @join__enumValue(graph: CORE) 
+  SENT @join__enumValue(graph: CORE) 
+  DELIVERED @join__enumValue(graph: CORE) 
+  FAILED @join__enumValue(graph: CORE) 
+  BOUNCED @join__enumValue(graph: CORE) 
 }
 
 enum TenantPlan @join__type(graph: CORE)  {
@@ -3221,6 +3970,49 @@ enum ActivityEventType @join__type(graph: CORE)  {
   AI_SESSION @join__enumValue(graph: CORE) 
   ANNOTATION_ADDED @join__enumValue(graph: CORE) 
   COURSE_ENROLLED @join__enumValue(graph: CORE) 
+}
+
+enum ProvisioningStatus @join__type(graph: CORE)  {
+  PROVISIONING @join__enumValue(graph: CORE) 
+  ACTIVE @join__enumValue(graph: CORE) 
+  FAILED @join__enumValue(graph: CORE) 
+  SUSPENDED @join__enumValue(graph: CORE) 
+}
+
+enum LicenseType @join__type(graph: CORE)  {
+  UNLIMITED @join__enumValue(graph: CORE) 
+  PER_SEAT @join__enumValue(graph: CORE) 
+  TIME_LIMITED @join__enumValue(graph: CORE) 
+}
+
+enum LicenseStatus @join__type(graph: CORE)  {
+  ACTIVE @join__enumValue(graph: CORE) 
+  EXPIRED @join__enumValue(graph: CORE) 
+  REVOKED @join__enumValue(graph: CORE) 
+}
+
+enum OrgExportFormat @join__type(graph: CORE)  {
+  CSV @join__enumValue(graph: CORE) 
+  PDF @join__enumValue(graph: CORE) 
+}
+
+enum RiskLevel @join__type(graph: CORE)  {
+  HIGH @join__enumValue(graph: CORE) 
+  MEDIUM @join__enumValue(graph: CORE) 
+  LOW @join__enumValue(graph: CORE) 
+}
+
+enum LeaderboardScope @join__type(graph: CORE)  {
+  TENANT @join__enumValue(graph: CORE) 
+  DEPARTMENT @join__enumValue(graph: CORE) 
+  GLOBAL @join__enumValue(graph: CORE) 
+}
+
+enum WebhookDeliveryStatus @join__type(graph: CORE)  {
+  PENDING @join__enumValue(graph: CORE) 
+  DELIVERED @join__enumValue(graph: CORE) 
+  FAILED @join__enumValue(graph: CORE) 
+  RETRYING @join__enumValue(graph: CORE) 
 }
 
 enum OcrMethod @join__type(graph: KNOWLEDGE)  {
@@ -3262,6 +4054,21 @@ input GenerateCourseInput @join__type(graph: AGENT)  {
   language: String
 }
 
+input LessonPipelineInput @join__type(graph: AGENT)  {
+  prompt: String!
+  archetype: LessonPipelineArchetype!
+  language: String
+  maxCitations: Int
+}
+
+input GenerateCertExamItemsInput @join__type(graph: AGENT)  {
+  moduleId: ID!
+  targetBloomLevels: [String!]!
+  targetCount: Int!
+  targetDifficulty: String!
+  locale: String
+}
+
 input FindChavrutaPartnerInput @join__type(graph: AGENT)  {
   courseId: ID!
   preferredTopic: String
@@ -3294,6 +4101,25 @@ input UpdateAgentTemplateInput @join__type(graph: AGENT)  {
   parameters: JSON
 }
 
+input CreateAnnotationInput @join__type(graph: ANNOTATION)  {
+  assetId: ID!
+  annotationType: AnnotationType!
+  layer: AnnotationLayer = PERSONAL
+  content: JSON!
+  spatialData: JSON
+  parentId: ID
+  """
+  Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)
+  """
+  textRange: TextRangeInput
+}
+
+input UpdateAnnotationInput @join__type(graph: ANNOTATION)  {
+  content: JSON
+  spatialData: JSON
+  isResolved: Boolean
+}
+
 """
 Input for text range — required for INLINE_COMMENT and SUGGESTION annotation types
 """
@@ -3301,25 +4127,6 @@ input TextRangeInput @join__type(graph: ANNOTATION)  {
   start: Int!
   end: Int!
   rangeType: String
-}
-
-input CreateAnnotationInput @join__type(graph: ANNOTATION)  {
-  assetId: ID!
-  annotationType: AnnotationType!
-  layer: AnnotationLayer = PERSONAL
-  content: JSON!
-  spatialData: JSON
-  """
-  Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)
-  """
-  textRange: TextRangeInput
-  parentId: ID
-}
-
-input UpdateAnnotationInput @join__type(graph: ANNOTATION)  {
-  content: JSON
-  spatialData: JSON
-  isResolved: Boolean
 }
 
 input CreateDiscussionInput @join__type(graph: COLLABORATION)  {
@@ -3347,6 +4154,13 @@ input WebsiteImportInput @join__type(graph: CONTENT)  {
   moduleId: ID!
 }
 
+input DriveImportInput @join__type(graph: CONTENT)  {
+  folderId: String!
+  courseId: ID!
+  moduleId: ID!
+  accessToken: String!
+}
+
 input CreateContentItemInput @join__type(graph: CONTENT)  {
   moduleId: ID!
   title: String!
@@ -3372,6 +4186,76 @@ input UpdateCourseInput @join__type(graph: CONTENT)  {
   description: String
   thumbnailUrl: String
   estimatedHours: Int
+}
+
+input CreateExamItemInput @join__type(graph: CONTENT)  {
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevel: BloomLevel!
+  questionData: JSON!
+  source: ExamItemSource
+}
+
+input UpdateExamItemInput @join__type(graph: CONTENT)  {
+  domainTag: String
+  bloomLevel: BloomLevel
+  questionData: JSON
+}
+
+input ExamItemFilterInput @join__type(graph: CONTENT)  {
+  courseId: ID
+  domainTag: String
+  bloomLevel: BloomLevel
+  calibrationStatus: CalibrationStatus
+  source: ExamItemSource
+}
+
+input GenerateExamItemsInput @join__type(graph: CONTENT)  {
+  courseId: ID!
+  moduleId: ID
+  domainTag: String!
+  bloomLevels: [BloomLevel!]!
+  count: Int!
+  targetDifficulty: Float
+}
+
+input CreateExamBlueprintInput @join__type(graph: CONTENT)  {
+  courseId: ID!
+  title: String!
+  description: String
+  timeLimitMinutes: Int!
+  totalQuestions: Int!
+  passingScore: Float!
+  passingMethod: PassingMethod!
+  domainDistribution: JSON!
+  bloomDistribution: JSON!
+  shuffleQuestions: Boolean
+  shuffleAnswers: Boolean
+  maxRetakes: Int
+  retakeCooldownHours: Int
+  isAdaptive: Boolean
+  catMinItems: Int
+  catMaxItems: Int
+}
+
+input UpdateExamBlueprintInput @join__type(graph: CONTENT)  {
+  title: String
+  description: String
+  timeLimitMinutes: Int
+  totalQuestions: Int
+  passingScore: Float
+  passingMethod: PassingMethod
+  domainDistribution: JSON
+  bloomDistribution: JSON
+  shuffleQuestions: Boolean
+  shuffleAnswers: Boolean
+  maxRetakes: Int
+  retakeCooldownHours: Int
+  isAdaptive: Boolean
+  catMinItems: Int
+  catMaxItems: Int
+  status: BlueprintStatus
 }
 
 input CreateLessonInput @join__type(graph: CONTENT)  {
@@ -3403,6 +4287,20 @@ input AddLessonAssetInput @join__type(graph: CONTENT)  {
 input SaveLessonPipelineInput @join__type(graph: CONTENT)  {
   templateName: String
   nodes: JSON!
+  config: JSON
+}
+
+input CreatePipelineTemplateInput @join__type(graph: CONTENT)  {
+  name: String!
+  description: String
+  nodes: JSON!
+  config: JSON
+}
+
+input UpdatePipelineTemplateInput @join__type(graph: CONTENT)  {
+  name: String
+  description: String
+  nodes: JSON
   config: JSON
 }
 
@@ -3454,6 +4352,13 @@ input UpdateModuleInput @join__type(graph: CONTENT)  {
   title: String
   description: String
   orderIndex: Int
+}
+
+input CreateRubricInput @join__type(graph: CONTENT)  {
+  contentItemId: ID!
+  criteria: String!
+  minReviewers: Int
+  isAnonymous: Boolean
 }
 
 input CreateVisualAnchorInput @join__type(graph: CONTENT)  {
@@ -3539,6 +4444,16 @@ input UpdateSecuritySettingsInput @join__type(graph: CORE)  {
   ipAllowlist: [String!]
 }
 
+input UpdateTenantSocialLinksInput @join__type(graph: CORE)  {
+  linkedinUrl: String
+  facebookUrl: String
+  twitterUrl: String
+  youtubeUrl: String
+  instagramUrl: String
+  whatsappUrl: String
+  githubUrl: String
+}
+
 input PilotRequestInput @join__type(graph: CORE)  {
   orgName: String!
   orgType: OrgType!
@@ -3560,6 +4475,11 @@ input CreateChallengeInput @join__type(graph: CORE)  {
   maxParticipants: Int
 }
 
+input UpdateConsentInput @join__type(graph: CORE)  {
+  consentType: ConsentType!
+  given: Boolean!
+}
+
 input CreateBadgeInput @join__type(graph: CORE)  {
   name: String!
   description: String!
@@ -3578,6 +4498,12 @@ input UpdateBadgeInput @join__type(graph: CORE)  {
   pointsReward: Int
   conditionType: String
   conditionValue: Int
+}
+
+input UpdateNotificationPreferenceInput @join__type(graph: CORE)  {
+  notificationType: NotificationType!
+  channel: NotificationChannel!
+  enabled: Boolean!
 }
 
 input UpdateOnboardingStepInput @join__type(graph: CORE)  {
@@ -3616,6 +4542,8 @@ input UpdateTenantBrandingInput @join__type(graph: CORE)  {
   termsOfServiceUrl: String
   supportEmail: String
   hideEduSphereBranding: Boolean
+  welcomeMessage: String
+  customCss: String
 }
 
 input ListUsersInput @join__type(graph: CORE)  {
@@ -3646,17 +4574,81 @@ input UpdateUserPreferencesInput @join__type(graph: CORE)  {
   pushNotifications: Boolean
 }
 
-input UpdateConsentInput @join__type(graph: CORE)  {
-  consentType: ConsentType!
-  given: Boolean!
+input DateRangeInput @join__type(graph: CORE)  {
+  from: DateTime!
+  to: DateTime!
 }
 
-enum ConsentType @join__type(graph: CORE)  {
-  AI_PROCESSING @join__enumValue(graph: CORE)
-  THIRD_PARTY_LLM @join__enumValue(graph: CORE)
-  ANALYTICS @join__enumValue(graph: CORE)
-  MARKETING @join__enumValue(graph: CORE)
-  RESEARCH @join__enumValue(graph: CORE)
+input ExportAnalyticsInput @join__type(graph: CORE)  {
+  format: OrgExportFormat!
+  dateRange: DateRangeInput!
+}
+
+input UpdateGamificationConfigInput @join__type(graph: CORE)  {
+  enabled: Boolean
+  showLeaderboard: Boolean
+  showBadges: Boolean
+  showPoints: Boolean
+  showStreaks: Boolean
+  xpRules: JSON
+  leaderboardScope: LeaderboardScope
+}
+
+input CreateOrgBadgeInput @join__type(graph: CORE)  {
+  name: String!
+  description: String
+  iconUrl: String
+  xpRequired: Int!
+  autoAwardCriteria: JSON
+}
+
+input UpdateOrgBadgeInput @join__type(graph: CORE)  {
+  name: String
+  description: String
+  iconUrl: String
+  xpRequired: Int
+  autoAwardCriteria: JSON
+  isActive: Boolean
+}
+
+input CreateApiKeyInput @join__type(graph: CORE)  {
+  name: String!
+  scopes: [String!]!
+  rateLimitPerMinute: Int = 60
+  expiresAt: DateTime
+}
+
+input CreateWebhookInput @join__type(graph: CORE)  {
+  url: String!
+  events: [String!]!
+}
+
+input UpdateWebhookInput @join__type(graph: CORE)  {
+  url: String
+  events: [String!]
+  isActive: Boolean
+}
+
+input CreateOrganizationInput @join__type(graph: CORE)  {
+  name: String!
+  slug: String!
+  adminEmail: String!
+  adminFirstName: String!
+  adminLastName: String!
+  idempotencyKey: String!
+}
+
+input InviteUserInput @join__type(graph: CORE)  {
+  email: String!
+  role: String!
+  message: String
+}
+
+input LicenseCourseInput @join__type(graph: CORE)  {
+  courseId: ID!
+  licenseType: LicenseType!
+  maxSeats: Int
+  durationMonths: Int
 }
 
 input CreateEmbeddingInput @join__type(graph: KNOWLEDGE)  {

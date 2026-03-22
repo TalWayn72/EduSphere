@@ -315,6 +315,60 @@ describe('AgentSessionResolver', () => {
     });
   });
 
+  // ── resolveTemplateType field resolver (BUG-105: regression guard) ────────
+
+  describe('resolveTemplateType() field resolver', () => {
+    // BUG-105: regression guard — DB returns `agentType`, GraphQL expects `templateType`
+    it('returns templateType directly when present on session', () => {
+      const session = { id: 's1', templateType: 'TUTOR', agentType: 'QUIZ' };
+      const result = resolver.resolveTemplateType(session);
+      expect(result).toBe('TUTOR');
+    });
+
+    // BUG-105: regression guard — core scenario that caused the original null error
+    it('falls back to agentType when templateType is missing', () => {
+      const session = { id: 's1', agentType: 'DEBATE_FACILITATOR' };
+      const result = resolver.resolveTemplateType(session);
+      expect(result).toBe('DEBATE_FACILITATOR');
+    });
+
+    // BUG-105: regression guard — defensive fallback
+    it('returns CUSTOM when neither templateType nor agentType is present', () => {
+      const session = { id: 's1' };
+      const result = resolver.resolveTemplateType(session);
+      expect(result).toBe('CUSTOM');
+    });
+
+    // BUG-105: regression guard — null values should not leak through
+    it('skips null templateType and falls back to agentType', () => {
+      const session = { id: 's1', templateType: null, agentType: 'TUTOR' };
+      const result = resolver.resolveTemplateType(session);
+      expect(result).toBe('TUTOR');
+    });
+
+    // BUG-105: regression guard — both null should yield CUSTOM
+    it('returns CUSTOM when both templateType and agentType are null', () => {
+      const session = { id: 's1', templateType: null, agentType: null };
+      const result = resolver.resolveTemplateType(session);
+      expect(result).toBe('CUSTOM');
+    });
+  });
+
+  // ── getAgentTemplates non-null templateType (BUG-105: regression guard) ──
+
+  describe('getAgentTemplates() templateType non-null guarantee', () => {
+    // BUG-105: regression guard — every template must have non-null templateType
+    it('returns all templates with non-null templateType', async () => {
+      const result = await resolver.getAgentTemplates();
+      for (const template of result) {
+        expect(template.templateType).toBeDefined();
+        expect(template.templateType).not.toBeNull();
+        expect(typeof template.templateType).toBe('string');
+        expect(template.templateType.length).toBeGreaterThan(0);
+      }
+    });
+  });
+
   // ── getMessages field resolver ────────────────────────────────────────────
 
   describe('getMessages() field resolver', () => {

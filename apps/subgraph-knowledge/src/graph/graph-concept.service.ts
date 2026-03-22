@@ -9,7 +9,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { db, withTenantContext } from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
 import { EmbeddingService } from '../embedding/embedding.service';
-import { toUserRole, type GraphConceptNode } from './graph-types';
+import { toUserRole, safeIsoDate, type GraphConceptNode } from './graph-types';
 import { DEFAULT_CONCEPT_LIMIT } from '../constants';
 
 @Injectable()
@@ -28,8 +28,8 @@ export class GraphConceptService {
       name: node.name,
       definition: node.definition,
       sourceIds: JSON.parse(node.source_ids || '[]') as string[],
-      createdAt: new Date(node.created_at).toISOString(),
-      updatedAt: new Date(node.updated_at).toISOString(),
+      createdAt: safeIsoDate(node.created_at),
+      updatedAt: safeIsoDate(node.updated_at),
     };
   }
 

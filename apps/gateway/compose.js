@@ -122,6 +122,11 @@ function normalizeCoreSdl(sdl) {
   );
   out = out.replace(/\s*issueBadge\([^)]*\)[^\n]*/g, '');
   out = out.replace(/\s*revokeOpenBadge[^\n]*/g, '');
+  // Rename atRiskLearners → orgAtRiskLearners (core's org-level query conflicts
+  // with content's course-level atRiskLearners which has different type/args)
+  out = out.replace(/\batRiskLearners\b/g, 'orgAtRiskLearners');
+  // Rename ExportFormat → OrgExportFormat (core has CSV/PDF, content has CSV/EXCEL)
+  out = out.replace(/\bExportFormat\b/g, 'OrgExportFormat');
   // Remove empty extend type Query {} and extend type Mutation {} blocks left behind
   out = out.replace(/extend\s+type\s+Query\s*\{\s*\}/g, '');
   out = out.replace(/extend\s+type\s+Mutation\s*\{\s*\}/g, '');
@@ -136,28 +141,33 @@ function normalizeCoreSdl(sdl) {
  * succeeds without rebuilding the Docker image.
  */
 function normalizeKnowledgeSdl(sdl) {
-  // Remove SocialFeedItem type block
+  // Remove SocialFeedItem type block (may have directives like @authenticated before {)
   let out = sdl.replace(
-    /"""[^"]*"""\s*type SocialFeedItem\s*\{[^}]*\}/gs,
+    /"""[^"]*"""\s*type SocialFeedItem[^{]*\{[^}]*\}/gs,
     ''
   );
-  out = out.replace(/type SocialFeedItem\s*\{[^}]*\}/gs, '');
+  out = out.replace(/type SocialFeedItem[^{]*\{[^}]*\}/gs, '');
   // Remove SocialRecommendation type block
   out = out.replace(
-    /"""[^"]*"""\s*type SocialRecommendation\s*\{[^}]*\}/gs,
+    /"""[^"]*"""\s*type SocialRecommendation[^{]*\{[^}]*\}/gs,
     ''
   );
-  out = out.replace(/type SocialRecommendation\s*\{[^}]*\}/gs, '');
+  out = out.replace(/type SocialRecommendation[^{]*\{[^}]*\}/gs, '');
   // Remove SocialVerb enum block
-  out = out.replace(/"""[^"]*"""\s*enum SocialVerb\s*\{[^}]*\}/gs, '');
-  out = out.replace(/enum SocialVerb\s*\{[^}]*\}/gs, '');
+  out = out.replace(/"""[^"]*"""\s*enum SocialVerb[^{]*\{[^}]*\}/gs, '');
+  out = out.replace(/enum SocialVerb[^{]*\{[^}]*\}/gs, '');
   // Remove socialFeed and socialRecommendations from extend type Query blocks
+  // Must also strip preceding """...""" docstrings to avoid orphaned block strings
+  out = out.replace(/\s*"""[^"]*"""\s*socialFeed[^\n]*/gs, '');
   out = out.replace(/\s*socialFeed[^\n]*/g, '');
+  out = out.replace(/\s*"""[^"]*"""\s*socialRecommendations[^\n]*/gs, '');
   out = out.replace(/\s*socialRecommendations[^\n]*/g, '');
-  // Remove skillGapAnalysis from knowledge (owned by agent subgraph)
-  // Knowledge's baked image still reflects the old skillGapAnalysis query
+  // Remove skillGapAnalysis and skillGapReport from knowledge (owned by agent subgraph)
+  // Knowledge's baked image still reflects the old skillGap queries
   out = out.replace(/\s*"""[^"]*"""\s*skillGapAnalysis[^\n]*/gs, '');
   out = out.replace(/\s*skillGapAnalysis[^\n]*/g, '');
+  out = out.replace(/\s*"""[^"]*"""\s*skillGapReport[^\n]*/gs, '');
+  out = out.replace(/\s*skillGapReport[^\n]*/g, '');
   // Remove SkillGapReport type block (conflicts with agent's SkillGapAnalysis)
   out = out.replace(
     /"""[^"]*"""\s*type SkillGapReport\s*\{[^}]*\}/gs,
@@ -175,6 +185,17 @@ function normalizeKnowledgeSdl(sdl) {
   return out;
 }
 
+/**
+ * Rename agent subgraph's LessonPipelineResult to AgentLessonPipelineResult.
+ * Agent subgraph defines LessonPipelineResult with different fields (executionId,
+ * status, markdownContent, etc.) than content's LessonPipelineResult (id, runId,
+ * moduleName, etc.). This rename prevents federation composition conflicts.
+ */
+function normalizeAgentSdl(sdl) {
+  let out = sdl.replace(/(?<!Agent)LessonPipelineResult/g, 'AgentLessonPipelineResult');
+  return out;
+}
+
 async function fetchSDL(name, url) {
   try {
     const res = await fetch(url, {
@@ -187,6 +208,7 @@ async function fetchSDL(name, url) {
     let sdl = normalizeRequiresScopes(data.data._service.sdl);
     if (name === 'core') sdl = normalizeCoreSdl(sdl);
     if (name === 'knowledge') sdl = normalizeKnowledgeSdl(sdl);
+    if (name === 'agent') sdl = normalizeAgentSdl(sdl);
     return sdl;
   } catch (err) {
     console.error(`  FAIL ${name}: ${err.message}`);
@@ -222,7 +244,7 @@ async function main() {
     console.warn('Continuing with warnings...');
   }
 
-  const outPath = path.join(__dirname, 'supergraph.graphql');
+  const outPath = process.env.SUPERGRAPH_OUTPUT || path.join(__dirname, 'supergraph.graphql');
   writeFileSync(outPath, result.supergraphSdl);
   console.log(`\nSupergraph written to ${outPath}`);
   console.log(`Schema size: ${result.supergraphSdl.length} chars`);

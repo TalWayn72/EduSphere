@@ -348,6 +348,29 @@ describe('EmbeddingService', () => {
     });
   });
 
+  // BUG-104: regression guard — safeDate must not throw on invalid timestamps
+  describe('safeDate() — BUG-104 regression via findById mapping', () => {
+    it('does NOT throw when created_at is null', async () => {
+      const nullDateRow = { ...CE, created_at: null };
+      mockSelectChain([nullDateRow]);
+      const result = await service.findById('emb-1');
+      expect(result.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    });
+
+    it('does NOT throw when created_at is undefined', async () => {
+      const undefRow = { ...CE, created_at: undefined };
+      mockSelectChain([undefRow]);
+      const result = await service.findById('emb-1');
+      expect(result.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    });
+
+    it('maps valid Date objects to ISO string', async () => {
+      mockSelectChain([CE]);
+      const result = await service.findById('emb-1');
+      expect(result.createdAt).toBe(new Date('2024-01-01').toISOString());
+    });
+  });
+
   // ── legacy shims ──────────────────────────────────────────────────────────
 
   describe('findByContentItem() — deprecated shim', () => {

@@ -125,20 +125,20 @@ type AnalyticsSnapshot {
   learningMinutes: Int!
 }
 
-enum ExportFormat {
+enum OrgExportFormat {
   CSV
   PDF
 }
 
 input ExportAnalyticsInput {
-  format: ExportFormat!
+  format: OrgExportFormat!
   dateRange: DateRangeInput!
 }
 
 type ExportResult {
   downloadUrl: String!
   expiresAt: DateTime!
-  format: ExportFormat!
+  format: OrgExportFormat!
 }
 
 # ─── At-Risk Learners ────────────────────────────────────────
@@ -361,7 +361,7 @@ extend type Query {
   gamificationConfig: GamificationConfig! @authenticated
   orgBadges: [OrgBadge!]! @authenticated
   orgAnalytics(dateRange: DateRangeInput!): OrgAnalytics! @authenticated
-  atRiskLearners(limit: Int = 20, offset: Int = 0): [AtRiskLearnerItem!]!
+  orgAtRiskLearners(limit: Int = 20, offset: Int = 0): [AtRiskLearnerItem!]!
     @authenticated
   learnerDetail(userId: ID!): LearnerAnalyticsDetail @authenticated
 }
