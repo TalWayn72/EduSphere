@@ -87,6 +87,7 @@
 | BUG-103 | Delete Course fails silently — course not removed from list after deletion | ✅ Fixed | `3dce63f4`, `0ad9030b`, `ae4a4200`, `10f9e269` |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
 | FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (All Waves — F-01 through F-15) | `df587183`, `0af3996d`, `ff162ce6`, `8f4d975f`, `058c0b4c` |
+| INFRA-1 | HiveMind shared intelligence layer (3 MCP servers) | ✅ Fixed | (pending commit) |
 
 ---
 
@@ -10987,3 +10988,26 @@ Full certification-grade examination system with AI-powered question generation,
 - RLS on `exam_item_embeddings` prevents cross-tenant vector search leakage
 - Standardized auth pattern across all exam resolvers prevents future scope-check omissions
 - NATS race condition fix uses `OnModuleInit` lifecycle hook pattern consistently
+
+---
+
+### INFRA-1: HiveMind Shared Intelligence Layer
+
+**Status:** ✅ Implemented | **Priority:** 🟡 Enhancement | **Date:** 2026-03-22
+
+**Description:** Development infrastructure for agent coordination — NOT product code. Three MCP servers providing shared memory across agent sessions.
+
+**Components:**
+- `tools/mcp-vector-memory/` — ChromaDB-backed vector search (12 tools, 18 tests)
+- `tools/mcp-coordination-bridge/` — SQLite-based pub/sub, locking, status tracking (15 tools, 30 tests)
+- `tools/docker-compose.hivemind.yml` — Isolated ChromaDB container (port 8100, separate from product)
+- `tools/tests/` — Integration tests (2) + performance benchmarks (4)
+
+**Key Design Decisions:**
+- ChromaDB runs in separate docker-compose (NOT in product docker-compose.yml)
+- SQLite WAL mode for coordination bridge (zero external dependencies)
+- All MCP tools prefixed: `vm_*` (vector-memory) and `cb_*` (coordination-bridge)
+- 10 Division Lead prompts updated with HiveMind protocol section
+
+**Tests:** 50 unit/integration tests passing + 4 benchmarks
+**Files:** `tools/` directory (new), `.mcp.json` (updated), 10 agent prompt templates (updated)
