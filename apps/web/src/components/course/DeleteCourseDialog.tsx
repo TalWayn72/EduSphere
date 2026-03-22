@@ -32,7 +32,7 @@ interface DeleteCourseDialogProps {
 export function DeleteCourseDialog({
   open,
   onClose,
-  onDeleted,
+  onDeleted: _onDeleted,
   courseId,
   courseTitle,
   isPublished,

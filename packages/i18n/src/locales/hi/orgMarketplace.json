@@ -1,0 +1,34 @@
+{
+  "marketplace": {
+    "title": "Content Marketplace",
+    "description": "Browse and license courses for your organization",
+    "searchPlaceholder": "Search courses...",
+    "searchLabel": "Search marketplace",
+    "categoryLabel": "Filter by category",
+    "categories": {
+      "all": "All Categories",
+      "technology": "Technology",
+      "business": "Business",
+      "design": "Design",
+      "science": "Science",
+      "humanities": "Humanities",
+      "compliance": "Compliance"
+    },
+    "free": "Free",
+    "noImage": "No preview",
+    "addToOrg": "Add to Org",
+    "noResults": "No courses found matching your criteria"
+  },
+  "catalog": {
+    "title": "Organization Catalog",
+    "description": "Courses licensed for your organization",
+    "searchPlaceholder": "Search your catalog...",
+    "searchLabel": "Search catalog",
+    "empty": "No courses in your catalog yet. Browse the marketplace to add courses.",
+    "colTitle": "Course",
+    "colCategory": "Category",
+    "colEnrollments": "Enrollments",
+    "colLicensed": "Licensed",
+    "colStatus": "Status"
+  }
+}

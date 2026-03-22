@@ -1,0 +1,186 @@
+name: Mobile Build (Per-Org Expo)
+
+# Manual dispatch for per-org branded mobile builds
+on:
+  workflow_dispatch:
+    inputs:
+      org-slug:
+        description: "Organization slug (e.g., acme-corp)"
+        required: true
+        type: string
+      profile:
+        description: "EAS build profile"
+        required: false
+        default: "production"
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+# Cancel outdated runs for the same org
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.org-slug }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/edusphere
+
+jobs:
+  # Fetch org branding from API before build
+  fetch-branding:
+    name: Fetch Org Branding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      org-name: ${{ steps.branding.outputs.org-name }}
+      primary-color: ${{ steps.branding.outputs.primary-color }}
+      icon-url: ${{ steps.branding.outputs.icon-url }}
+
+    steps:
+      - name: Fetch org branding from EduSphere API
+        id: branding
+        run: |
+          # Query the GraphQL API for org branding configuration
+          RESPONSE=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.EDUSPHERE_API_TOKEN }}" \
+            -d '{"query":"query OrgBranding($slug: String!) { organization(slug: $slug) { name branding { primaryColor iconUrl } } }","variables":{"slug":"${{ inputs.org-slug }}"}}' \
+            "${{ secrets.EDUSPHERE_API_URL }}/graphql" || echo '{}')
+
+          # Extract branding values with fallbacks
+          ORG_NAME=$(echo "$RESPONSE" | jq -r '.data.organization.name // "${{ inputs.org-slug }}"')
+          PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.data.organization.branding.primaryColor // "#4F46E5"')
+          ICON_URL=$(echo "$RESPONSE" | jq -r '.data.organization.branding.iconUrl // ""')
+
+          echo "org-name=${ORG_NAME}" >> $GITHUB_OUTPUT
+          echo "primary-color=${PRIMARY_COLOR}" >> $GITHUB_OUTPUT
+          echo "icon-url=${ICON_URL}" >> $GITHUB_OUTPUT
+          echo "Org: ${ORG_NAME}, Color: ${PRIMARY_COLOR}"
+
+  # Build for iOS and Android in parallel
+  build-mobile:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform == 'ios' && 'macos-latest' || 'ubuntu-latest' }}
+    needs: fetch-branding
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - ios
+          - android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Expo CLI
+        run: pnpm add -g expo-cli eas-cli
+
+      - name: Configure EAS
+        run: |
+          echo "${{ secrets.EXPO_TOKEN }}" | eas login --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Download org icon (if available)
+        if: needs.fetch-branding.outputs.icon-url != ''
+        working-directory: apps/mobile
+        run: |
+          curl -s -o assets/org-icon.png "${{ needs.fetch-branding.outputs.icon-url }}"
+          echo "Custom org icon downloaded"
+
+      - name: Customize app.json for org
+        working-directory: apps/mobile
+        run: |
+          ORG_SLUG="${{ inputs.org-slug }}"
+          ORG_NAME="${{ needs.fetch-branding.outputs.org-name }}"
+          PRIMARY_COLOR="${{ needs.fetch-branding.outputs.primary-color }}"
+
+          # Create org-specific app.json using jq
+          jq --arg name "${ORG_NAME}" \
+             --arg slug "edusphere-${ORG_SLUG}" \
+             --arg color "${PRIMARY_COLOR}" \
+             --arg iosBundleId "com.edusphere.${ORG_SLUG//[-]/.}" \
+             --arg androidPkg "com.edusphere.${ORG_SLUG//-/_}" \
+             '.expo.name = $name |
+              .expo.slug = $slug |
+              .expo.splash.backgroundColor = $color |
+              .expo.ios.bundleIdentifier = $iosBundleId |
+              .expo.android.package = $androidPkg |
+              .expo.extra.orgSlug = $ARGS.named["slug"] |
+              .expo.extra.primaryColor = $color' \
+             app.json > app.org.json
+
+          mv app.org.json app.json
+          echo "Customized app.json for org: ${ORG_NAME}"
+          cat app.json
+
+      - name: Run Expo prebuild
+        working-directory: apps/mobile
+        run: |
+          npx expo prebuild --platform ${{ matrix.platform }} --clean
+        env:
+          EXPO_NO_TELEMETRY: 1
+
+      - name: Build with EAS
+        working-directory: apps/mobile
+        run: |
+          eas build \
+            --platform ${{ matrix.platform }} \
+            --profile ${{ inputs.profile }} \
+            --non-interactive \
+            --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-build-${{ matrix.platform }}-${{ inputs.org-slug }}
+          path: |
+            apps/mobile/android/app/build/outputs/
+            apps/mobile/ios/build/
+          retention-days: 7
+
+  # Summary notification
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [fetch-branding, build-mobile]
+    if: always()
+
+    steps:
+      - name: Report build status
+        run: |
+          echo "## Mobile Build Summary"
+          echo ""
+          echo "**Organization:** ${{ needs.fetch-branding.outputs.org-name }} (${{ inputs.org-slug }})"
+          echo "**Profile:** ${{ inputs.profile }}"
+          echo "**iOS Build:** ${{ needs.build-mobile.result }}"
+          echo "**Android Build:** ${{ needs.build-mobile.result }}"
+          echo ""
+          if [[ "${{ needs.build-mobile.result }}" == "success" ]]; then
+            echo "All mobile builds completed successfully!"
+          else
+            echo "One or more builds failed. Check the build logs."
+            exit 1
+          fi

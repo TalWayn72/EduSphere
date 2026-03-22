@@ -3,6 +3,16 @@ import { TenantResolver } from './tenant.resolver';
 import { TenantService } from './tenant.service';
 import { TenantLanguageService } from './tenant-language.service';
 import { TenantBrandingService } from './tenant-branding.service';
+import { OrgProvisioningService } from './org-provisioning.service';
+import { OrgInvitationService } from './org-invitation.service';
+import { TrialService } from './trial.service';
+import { OrgLicensingService } from './org-licensing.service';
+import { OrgOnboardingResolver } from './org-onboarding.resolver';
+import { OrgAnalyticsService } from '../analytics/org-analytics.service';
+import { OrgGamificationService } from '../gamification/org-gamification.service';
+import { ApiKeyService } from '../api-keys/api-key.service';
+import { WebhookService } from '../webhooks/webhook.service';
+import { KeycloakAdminService } from '../auth/keycloak-admin.service';
 
 @Module({
   providers: [
@@ -10,7 +20,30 @@ import { TenantBrandingService } from './tenant-branding.service';
     TenantService,
     TenantLanguageService,
     TenantBrandingService,
+    OrgProvisioningService,
+    OrgInvitationService,
+    TrialService,
+    OrgLicensingService,
+    OrgOnboardingResolver,
+    OrgAnalyticsService,
+    OrgGamificationService,
+    ApiKeyService,
+    WebhookService,
+    KeycloakAdminService,
   ],
-  exports: [TenantService, TenantLanguageService, TenantBrandingService],
+  exports: [
+    TenantService,
+    TenantLanguageService,
+    TenantBrandingService,
+    OrgProvisioningService,
+    OrgInvitationService,
+    TrialService,
+    OrgLicensingService,
+    OrgAnalyticsService,
+    OrgGamificationService,
+    ApiKeyService,
+    WebhookService,
+    KeycloakAdminService,
+  ],
 })
 export class TenantModule {}

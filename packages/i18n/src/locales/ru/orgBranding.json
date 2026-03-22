@@ -1,0 +1,20 @@
+{
+  "editor": {
+    "title": "Branding Editor",
+    "description": "Customize your organization's look and feel",
+    "colorsSection": "Colors",
+    "typographySection": "Typography & Policies",
+    "logoSection": "Logos & Favicon",
+    "advancedSection": "Advanced",
+    "saveChanges": "Save Changes",
+    "resetDefaults": "Reset to Defaults",
+    "resetConfirm": "This will reset all branding to EduSphere defaults. Continue?",
+    "previewTitle": "Preview",
+    "customCssLabel": "Custom CSS",
+    "customCssPlaceholder": ".sidebar { border-radius: 12px; }",
+    "customCssWarning": "Unsafe CSS removed",
+    "hideEduSphereLabel": "Hide EduSphere Branding",
+    "hideEduSphereDescription": "Remove 'Powered by EduSphere' footer (Enterprise only)",
+    "hideEduSphereDisabled": "Available on Enterprise plan"
+  }
+}

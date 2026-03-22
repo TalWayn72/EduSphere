@@ -1,0 +1,18 @@
+{
+  "analytics": {
+    "title": "Organization Analytics",
+    "description": "Track engagement, completion rates, and learning outcomes",
+    "periodLabel": "Time period",
+    "periods": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "1y": "Last year"
+    },
+    "engagementTrend": "Engagement Trend",
+    "trendChartLabel": "Engagement trend bar chart",
+    "topCourses": "Top Courses",
+    "completed": "completed",
+    "noData": "No analytics data available for this period"
+  }
+}

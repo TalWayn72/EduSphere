@@ -91,7 +91,7 @@ export function useCourseListData() {
     if (state?.message || state?.deleted) {
       window.history.replaceState({}, '');
     }
-  }, [location.state]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   const showToast = (msg: string) => {
     setToast(msg);

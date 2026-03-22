@@ -1,0 +1,75 @@
+{
+  "wizard": {
+    "title": "צור את הארגון שלך",
+    "subtitle": "הגדר את פלטפורמת הלמידה הממותגת שלך בפחות מ-5 דקות",
+    "stepsLabel": "שלבי הרשמה",
+    "formLabel": "טופס הרשמת ארגון",
+    "steps": {
+      "account": "חשבון",
+      "organization": "ארגון",
+      "branding": "מיתוג"
+    },
+    "next": "הבא",
+    "back": "חזרה",
+    "create": "צור ארגון",
+    "creating": "יוצר..."
+  },
+  "account": {
+    "nameLabel": "שם מלא",
+    "namePlaceholder": "ישראל ישראלי",
+    "emailLabel": "דוא\"ל עבודה",
+    "emailPlaceholder": "admin@your-org.com",
+    "passwordLabel": "סיסמה",
+    "passwordPlaceholder": "צור סיסמה חזקה",
+    "passwordHint": "לפחות 8 תווים עם אות גדולה, אות קטנה, מספר ותו מיוחד",
+    "tosLabel": "אני מסכים/ה ל",
+    "tosLink": "תנאי השימוש",
+    "gdprLabel": "אני מסכים/ה לעיבוד נתונים כמתואר במדיניות הפרטיות"
+  },
+  "org": {
+    "nameLabel": "שם הארגון",
+    "namePlaceholder": "אוניברסיטת אקמה",
+    "slugLabel": "תת-דומיין",
+    "checkingSlug": "בודק זמינות...",
+    "slugTaken": "תת-דומיין זה כבר תפוס",
+    "slugAvailable": "זמין!",
+    "typeLabel": "סוג ארגון",
+    "typePlaceholder": "בחר סוג...",
+    "types": {
+      "UNIVERSITY": "אוניברסיטה",
+      "COLLEGE": "מכללה",
+      "CORPORATE": "תאגיד",
+      "GOVERNMENT": "ממשלה",
+      "DEFENSE": "ביטחון",
+      "NON_PROFIT": "עמותה"
+    },
+    "sizeLabel": "גודל ארגון",
+    "sizePlaceholder": "בחר גודל..."
+  },
+  "branding": {
+    "previewLabel": "תצוגה מקדימה",
+    "previewOrgName": "הארגון שלך",
+    "logoLabel": "לוגו",
+    "logoHint": "PNG, JPG, SVG או WebP. מקסימום 2 MB.",
+    "invalidType": "נא להעלות תמונת PNG, JPG, SVG או WebP",
+    "tooLarge": "הלוגו חייב להיות פחות מ-2 MB",
+    "primaryColorLabel": "צבע ראשי",
+    "taglineLabel": "סלוגן",
+    "taglinePlaceholder": "הסלוגן של פלטפורמת הלמידה שלך"
+  },
+  "checklist": {
+    "title": "רשימת הגדרה",
+    "ariaLabel": "וידג'ט רשימת הגדרת הארגון",
+    "collapse": "כווץ רשימה",
+    "expand": "הצג רשימת הגדרה",
+    "dismiss": "סגור רשימה",
+    "progress": "{{done}} מתוך {{total}} הושלמו"
+  },
+  "trial": {
+    "daysRemaining": "נותר יום אחד בניסיון שלך",
+    "daysRemaining_plural": "נותרו {{count}} ימים בניסיון שלך",
+    "expired": "תקופת הניסיון שלך הסתיימה",
+    "upgrade": "שדרג עכשיו",
+    "dismiss": "סגור"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "team": {
+    "title": "ניהול צוות",
+    "description": "הזמן משתמשים ונהל חברי צוות",
+    "inviteTitle": "הזמן משתמש",
+    "emailLabel": "כתובת דוא\"ל",
+    "emailPlaceholder": "user@example.com",
+    "roleLabel": "תפקיד",
+    "rolePlaceholder": "בחר תפקיד...",
+    "roles": {
+      "student": "תלמיד",
+      "instructor": "מרצה",
+      "orgAdmin": "מנהל ארגון"
+    },
+    "sendInvite": "שלח הזמנה",
+    "csvTitle": "ייבוא CSV",
+    "csvDescription": "העלה קובץ CSV עם עמודות: email, firstName, lastName, role",
+    "csvLabel": "העלה קובץ CSV",
+    "csvProcessing": "מעבד CSV...",
+    "csvUploaded": "CSV הועלה בהצלחה",
+    "pendingTitle": "הזמנות ממתינות",
+    "loading": "טוען...",
+    "noInvites": "אין הזמנות ממתינות",
+    "colEmail": "דוא\"ל",
+    "colRole": "תפקיד",
+    "colStatus": "סטטוס"
+  },
+  "billing": {
+    "title": "חיוב ומנוי",
+    "description": "נהל את תוכנית המנוי והתשלום שלך",
+    "currentPlan": "תוכנית נוכחית",
+    "yauUsage": "משתמשים פעילים שנתיים",
+    "renewsOn": "מתחדש ב-{{date}}",
+    "manageSubscription": "נהל מנוי",
+    "currentPlanBadge": "נוכחית",
+    "upgrade": "שדרג",
+    "noSubscription": "לא נמצא מנוי פעיל"
+  },
+  "sso": {
+    "title": "כניסה מאוחדת (SSO)",
+    "description": "הגדר SAML או OpenID Connect עבור הארגון שלך",
+    "currentProvider": "ספק נוכחי",
+    "samlTitle": "הגדרת SAML 2.0",
+    "oidcTitle": "הגדרת OpenID Connect",
+    "entityId": "Entity ID (כתובת מנפיק)",
+    "ssoUrl": "כתובת SSO",
+    "certificate": "תעודת X.509",
+    "certificatePlaceholder": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+    "issuer": "כתובת מנפיק",
+    "clientId": "מזהה לקוח",
+    "clientSecret": "סוד לקוח",
+    "save": "שמור הגדרות"
+  }
+}

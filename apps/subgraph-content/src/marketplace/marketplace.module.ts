@@ -5,6 +5,8 @@ import { MarketplaceService } from './marketplace.service.js';
 import { MarketplaceController } from './marketplace.controller.js';
 import { MarketplaceResolver } from './marketplace.resolver.js';
 import { InstructorPayoutService } from './instructor-payout.service.js';
+import { MarketplaceOrgService } from './marketplace-org.service.js';
+import { MarketplaceOrgResolver } from './marketplace-org.resolver.js';
 
 @Module({
   controllers: [MarketplaceController],
@@ -14,7 +16,9 @@ import { InstructorPayoutService } from './instructor-payout.service.js';
     MarketplaceService,
     MarketplaceResolver,
     InstructorPayoutService,
+    MarketplaceOrgService,
+    MarketplaceOrgResolver,
   ],
-  exports: [MarketplaceService, InstructorPayoutService],
+  exports: [MarketplaceService, InstructorPayoutService, MarketplaceOrgService],
 })
 export class MarketplaceModule {}

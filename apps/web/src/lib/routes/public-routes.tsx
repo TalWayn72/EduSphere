@@ -87,6 +87,9 @@ const PartnerSignupPage = lazy(() =>
 const PortalPage = lazy(() =>
   import('@/pages/PortalPage').then((m) => ({ default: m.PortalPage }))
 );
+const OrgSignupWizard = lazy(() =>
+  import('@/pages/signup/OrgSignupWizard').then((m) => ({ default: m.OrgSignupWizard }))
+);
 
 /**
  * Public routes — no authentication required.
@@ -132,6 +135,8 @@ export const publicRoutes: RouteObject[] = [
   { path: '/partners', element: publicPage(<PartnerSignupPage />) },
   // Public B2B pilot signup
   { path: '/pilot', element: publicPage(<PilotSignupPage />) },
+  // Public org self-service signup wizard
+  { path: '/signup/org', element: publicPage(<OrgSignupWizard />) },
   // Public portal viewer
   { path: '/portal', element: publicPage(<PortalPage />) },
   // Public profile

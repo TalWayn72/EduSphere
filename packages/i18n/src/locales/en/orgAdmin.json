@@ -1,0 +1,54 @@
+{
+  "team": {
+    "title": "Team Management",
+    "description": "Invite users and manage team members",
+    "inviteTitle": "Invite User",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "user@example.com",
+    "roleLabel": "Role",
+    "rolePlaceholder": "Select role...",
+    "roles": {
+      "student": "Student",
+      "instructor": "Instructor",
+      "orgAdmin": "Organization Admin"
+    },
+    "sendInvite": "Send Invite",
+    "csvTitle": "CSV Import",
+    "csvDescription": "Upload a CSV file with columns: email, firstName, lastName, role",
+    "csvLabel": "Upload CSV file",
+    "csvProcessing": "Processing CSV...",
+    "csvUploaded": "CSV uploaded successfully",
+    "pendingTitle": "Pending Invitations",
+    "loading": "Loading...",
+    "noInvites": "No pending invitations",
+    "colEmail": "Email",
+    "colRole": "Role",
+    "colStatus": "Status"
+  },
+  "billing": {
+    "title": "Billing & Subscription",
+    "description": "Manage your subscription plan and payment",
+    "currentPlan": "Current Plan",
+    "yauUsage": "Yearly Active Users",
+    "renewsOn": "Renews on {{date}}",
+    "manageSubscription": "Manage Subscription",
+    "currentPlanBadge": "Current",
+    "upgrade": "Upgrade",
+    "noSubscription": "No active subscription found"
+  },
+  "sso": {
+    "title": "Single Sign-On (SSO)",
+    "description": "Configure SAML or OpenID Connect for your organization",
+    "currentProvider": "Current provider",
+    "samlTitle": "SAML 2.0 Configuration",
+    "oidcTitle": "OpenID Connect Configuration",
+    "entityId": "Entity ID (Issuer URL)",
+    "ssoUrl": "SSO URL",
+    "certificate": "X.509 Certificate",
+    "certificatePlaceholder": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+    "issuer": "Issuer URL",
+    "clientId": "Client ID",
+    "clientSecret": "Client Secret",
+    "save": "Save Configuration"
+  }
+}

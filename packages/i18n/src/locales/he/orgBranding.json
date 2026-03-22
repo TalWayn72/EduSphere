@@ -1,0 +1,20 @@
+{
+  "editor": {
+    "title": "עורך מיתוג",
+    "description": "התאם את המראה והתחושה של הארגון שלך",
+    "colorsSection": "צבעים",
+    "typographySection": "טיפוגרפיה ומדיניות",
+    "logoSection": "לוגואים ופביקון",
+    "advancedSection": "מתקדם",
+    "saveChanges": "שמור שינויים",
+    "resetDefaults": "אפס לברירות מחדל",
+    "resetConfirm": "פעולה זו תאפס את כל המיתוג לברירות המחדל של EduSphere. להמשיך?",
+    "previewTitle": "תצוגה מקדימה",
+    "customCssLabel": "CSS מותאם",
+    "customCssPlaceholder": ".sidebar { border-radius: 12px; }",
+    "customCssWarning": "CSS לא בטוח הוסר",
+    "hideEduSphereLabel": "הסתר מיתוג EduSphere",
+    "hideEduSphereDescription": "הסר כיתוב 'מופעל על ידי EduSphere' (Enterprise בלבד)",
+    "hideEduSphereDisabled": "זמין בתוכנית Enterprise"
+  }
+}

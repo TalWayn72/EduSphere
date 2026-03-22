@@ -1,4 +1,4 @@
-import { pgTable, text, jsonb, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, text, jsonb, timestamp, varchar, uuid } from 'drizzle-orm/pg-core';
 import { pk, timestamps } from './_shared';
 
 /** Phase 63: No-Code Portal Builder — JSON schema for tenant portal config. */
@@ -33,6 +33,16 @@ export const tenants = pgTable('tenants', {
   subscription_expires_at: timestamp('subscription_expires_at', {
     withTimezone: true,
   }),
+  /** FEAT-ORG-ONBOARDING: trial end date for self-service signup */
+  trialEndsAt: timestamp('trial_ends_at', { withTimezone: true }),
+  /** PROVISIONING | ACTIVE | FAILED | SUSPENDED */
+  provisioningStatus: varchar('provisioning_status', { length: 20 })
+    .notNull()
+    .default('ACTIVE'),
+  /** UUID v4 idempotency key for provisioning pipeline */
+  idempotencyKey: uuid('idempotency_key').unique(),
+  /** Step completion state for provisioning pipeline resume */
+  provisioningSteps: jsonb('provisioning_steps').default({}),
   ...timestamps,
 });
 

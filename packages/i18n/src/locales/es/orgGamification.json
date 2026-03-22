@@ -1,0 +1,21 @@
+{
+  "gamification": {
+    "title": "Gamification Settings",
+    "description": "Configure badges, XP, and engagement mechanics",
+    "enableLabel": "Enable Gamification",
+    "enableDescription": "Turn on points, badges, and leaderboards for your organization",
+    "xpPerLesson": "XP per Lesson",
+    "xpPerQuiz": "XP per Quiz",
+    "streakBonus": "Streak Bonus",
+    "createBadge": "Create Badge",
+    "badgeName": "Badge Name",
+    "badgeNamePlaceholder": "Star Learner",
+    "badgeDescription": "Description",
+    "xpRequired": "XP Required",
+    "addBadge": "Add Badge",
+    "badgesTitle": "Organization Badges",
+    "colName": "Name",
+    "colDescription": "Description",
+    "colXp": "XP Required"
+  }
+}

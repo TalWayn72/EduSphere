@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 21 מרץ 2026
+**תאריך עדכון:** 22 מרץ 2026
 
 ---
 
@@ -86,6 +86,112 @@
 | BUG-102 | Delete course button missing from CourseDetailPage | ✅ Fixed | (pending commit) |
 | BUG-103 | Delete Course fails silently — course not removed from list after deletion | 🟡 In Progress | — |
 | F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
+| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (Wave 2) | (pending commit) |
+
+---
+
+## FEAT-ORG-ONBOARDING — Organization Self-Service Onboarding & White-Label Platform (22 Mar 2026)
+
+- **Status:** ✅ Complete (Wave 2)
+- **Severity:** N/A (Feature)
+- **Reported:** 22 March 2026
+
+### Summary
+
+Self-service organization onboarding with provisioning pipeline, user invitations, branding configuration, SSO setup, content marketplace (org-to-org licensing), API key management, webhook dispatch, per-org gamification config, and analytics dashboard. 14-day free trial with grace period.
+
+### Scope
+
+| Category | Count | Details |
+|----------|-------|---------|
+| DB tables | 7 | `onboarding_checklist`, `org_invitations`, `course_licenses`, `api_keys`, `webhook_endpoints`, `gamification_config`, `marketplace_listings` |
+| Migration | 1 | `packages/db/src/migrations/0036_org_onboarding.sql` |
+| GraphQL SDL | 2 | `org-onboarding.graphql` (Core), `marketplace-org.graphql` (Content) |
+| Mutations | 18 | createOrganization, inviteUser, acceptInvitation, revokeInvitation, updateMemberRole, removeMember, createApiKey, revokeApiKey, createWebhook, updateWebhook, deleteWebhook, testWebhook, licenseCourse, revokeCourseLicense, updateGamificationConfig, exportAnalytics, publishToMarketplace, unpublishFromMarketplace |
+| Queries | 12 | myOrganization, orgMembers, orgInvitations, trialStatus, apiKeys, webhooks, webhookDeliveries, courseLicenses, gamificationConfig, orgAnalytics, marketplaceListings, marketplaceListing |
+| NestJS services | 18 | OrgProvisioningService, OrgInvitationService, OrgLicensingService, OrgOnboardingResolver, MarketplaceOrgService, MarketplaceOrgResolver, + Zod schemas, module wiring |
+| React pages | 26 | OrgSignupWizard (3 steps), TeamManagement, ApiKeysPage, WebhooksPage, GamificationConfig, AnalyticsDashboard, MarketplaceBrowse, OrgCatalog, BillingPage, SsoConfigPage, ThemeProvider, StepIndicator, SlugField |
+| i18n namespaces | 7 x 10 locales = 70 files | orgOnboarding, orgAdmin, orgBranding, orgMarketplace, orgAnalytics, orgGamification, orgApi |
+| Security tests | 201 | RLS isolation, rate limiting, CSRF, GDPR erasure |
+| QA tests | ~300 | Unit tests + E2E (org-signup-wizard.spec.ts, org-i18n-pages.spec.ts) |
+
+### Key Files Created
+
+#### Database
+| File | Purpose |
+|------|---------|
+| `packages/db/src/migrations/0036_org_onboarding.sql` | 7 new tables with RLS policies |
+| `packages/db/src/migrations/0036_org_onboarding_down.rollback` | Rollback migration |
+| `packages/db/src/schema/onboarding-checklist.ts` | Drizzle schema for onboarding checklist |
+| `packages/db/src/schema/org-invitations.ts` | Drizzle schema for invitations |
+| `packages/db/src/schema/api-keys.ts` | Drizzle schema for API keys |
+| `packages/db/src/schema/webhook-endpoints.ts` | Drizzle schema for webhooks |
+| `packages/db/src/schema/course-licenses.ts` | Drizzle schema for course licenses |
+| `packages/db/src/schema/gamification-config.ts` | Drizzle schema for gamification config |
+| `packages/db/src/schema/marketplace.ts` | Drizzle schema for marketplace listings |
+
+#### Backend (Core Subgraph)
+| File | Purpose |
+|------|---------|
+| `apps/subgraph-core/src/tenant/org-onboarding.graphql` | SDL — 18 mutations, 10 queries, 20+ types |
+| `apps/subgraph-core/src/tenant/org-onboarding.resolver.ts` | Resolver wiring |
+| `apps/subgraph-core/src/tenant/org-onboarding.schemas.ts` | Zod validation schemas |
+| `apps/subgraph-core/src/tenant/org-provisioning.service.ts` | 8-step provisioning pipeline |
+| `apps/subgraph-core/src/tenant/org-invitation.service.ts` | Invitation CRUD + token validation |
+| `apps/subgraph-core/src/tenant/org-licensing.service.ts` | Course licensing + seat management |
+
+#### Backend (Content Subgraph)
+| File | Purpose |
+|------|---------|
+| `apps/subgraph-content/src/marketplace/marketplace-org.graphql` | SDL — 2 mutations, 2 queries |
+| `apps/subgraph-content/src/marketplace/marketplace-org.resolver.ts` | Marketplace resolver |
+| `apps/subgraph-content/src/marketplace/marketplace-org.service.ts` | Marketplace listing service |
+
+#### Frontend
+| File | Purpose |
+|------|---------|
+| `apps/web/src/pages/signup/OrgSignupWizard.tsx` | 3-step signup wizard |
+| `apps/web/src/pages/signup/OrgSignupWizard.schema.ts` | Zod form validation |
+| `apps/web/src/pages/signup/StepIndicator.tsx` | Step progress indicator |
+| `apps/web/src/pages/signup/steps/AccountStep.tsx` | Admin account step |
+| `apps/web/src/pages/signup/steps/OrgDetailsStep.tsx` | Org name + slug step |
+| `apps/web/src/pages/signup/steps/BrandingStep.tsx` | Logo + color config step |
+| `apps/web/src/pages/signup/steps/SlugField.tsx` | Slug field with availability check |
+| `apps/web/src/pages/admin/TeamManagement.tsx` | Member list + role management |
+| `apps/web/src/pages/admin/TeamManagement.invites.tsx` | Invitation management |
+| `apps/web/src/pages/admin/ApiKeysPage.tsx` | API key management |
+| `apps/web/src/pages/admin/ApiKeysPage.table.tsx` | API key table component |
+| `apps/web/src/pages/admin/WebhooksPage.tsx` | Webhook endpoint management |
+| `apps/web/src/pages/admin/WebhooksPage.form.tsx` | Webhook form component |
+| `apps/web/src/pages/admin/GamificationConfig.tsx` | Gamification settings |
+| `apps/web/src/pages/admin/GamificationConfig.badges.tsx` | Badge configuration |
+| `apps/web/src/pages/admin/AnalyticsDashboard.tsx` | Org analytics dashboard |
+| `apps/web/src/pages/admin/MarketplaceBrowse.tsx` | Marketplace browser |
+| `apps/web/src/pages/admin/OrgCatalog.tsx` | Organization course catalog |
+| `apps/web/src/pages/admin/BillingPage.tsx` | Billing + plan management |
+| `apps/web/src/pages/admin/SsoConfigPage.tsx` | SSO/SAML configuration |
+
+#### Tests
+| File | Purpose |
+|------|---------|
+| `apps/web/e2e/org-signup-wizard.spec.ts` | E2E signup flow |
+| `apps/web/e2e/org-i18n-pages.spec.ts` | i18n regression for org pages |
+| `apps/web/src/components/org/OrgSignupWizard.test.tsx` | Unit tests |
+| `tests/security/org-onboarding-rls.spec.ts` | RLS isolation tests |
+| `tests/security/org-onboarding-rate-csrf-gdpr.spec.ts` | Rate limit + CSRF + GDPR tests |
+
+#### Architecture
+| File | Purpose |
+|------|---------|
+| `docs/plans/features/FEAT-ORG-ONBOARDING-ARCHITECTURE.md` | Full architecture design |
+| `docs/plans/features/FEAT-ORG-ONBOARDING-ADMIN-GUIDE.md` | Admin guide |
+
+### Anti-Recurrence
+
+- RLS policies on all 7 new tables enforce tenant isolation
+- Zod schemas validate all mutation inputs
+- E2E tests cover signup wizard flow and i18n locale rendering
+- Security tests cover rate limiting, CSRF protection, and GDPR erasure for org data
 
 ---
 

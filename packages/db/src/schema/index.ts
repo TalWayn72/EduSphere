@@ -208,3 +208,11 @@ export * from './tenant-social-links';
 
 // Certification Exam System (Item Bank, Blueprints, Sessions, Results, Psychometrics)
 export * from './exam';
+
+// FEAT-ORG-ONBOARDING: Organization Self-Service Onboarding & White-Label
+export * from './onboarding-checklist';
+export * from './org-invitations';
+export * from './course-licenses';
+export * from './api-keys';
+export * from './webhook-endpoints';
+export * from './gamification-config';

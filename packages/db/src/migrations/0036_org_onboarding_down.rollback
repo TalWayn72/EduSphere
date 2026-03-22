@@ -1,0 +1,37 @@
+-- FEAT-ORG-ONBOARDING Phase 1: Rollback
+-- Drop tables in reverse order to avoid FK constraint violations
+
+-- 8. gamification_config
+DROP POLICY IF EXISTS gamification_config_tenant_isolation ON gamification_config;
+DROP TABLE IF EXISTS gamification_config;
+
+-- 7. webhook_deliveries (must drop before webhooks due to FK)
+DROP POLICY IF EXISTS webhook_deliveries_tenant_isolation ON webhook_deliveries;
+DROP TABLE IF EXISTS webhook_deliveries;
+
+-- 6. webhooks
+DROP POLICY IF EXISTS webhooks_tenant_isolation ON webhooks;
+DROP TABLE IF EXISTS webhooks;
+
+-- 5. api_keys
+DROP POLICY IF EXISTS api_keys_tenant_isolation ON api_keys;
+DROP TABLE IF EXISTS api_keys;
+
+-- 4. course_licenses
+DROP POLICY IF EXISTS course_licenses_tenant_isolation ON course_licenses;
+DROP TABLE IF EXISTS course_licenses;
+
+-- 3. org_invitations
+DROP POLICY IF EXISTS org_invitations_tenant_isolation ON org_invitations;
+DROP TABLE IF EXISTS org_invitations;
+
+-- 2. org_onboarding_checklist
+DROP POLICY IF EXISTS org_onboarding_checklist_tenant_isolation ON org_onboarding_checklist;
+DROP TABLE IF EXISTS org_onboarding_checklist;
+
+-- 1. Remove added columns from tenants (preserve existing data)
+ALTER TABLE tenants
+  DROP COLUMN IF EXISTS trial_ends_at,
+  DROP COLUMN IF EXISTS provisioning_status,
+  DROP COLUMN IF EXISTS idempotency_key,
+  DROP COLUMN IF EXISTS provisioning_steps;

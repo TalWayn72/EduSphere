@@ -55,5 +55,12 @@ export const NAMESPACES = [
   'social',
   'gamification',
   'profile',
+  'orgOnboarding',
+  'orgAdmin',
+  'orgBranding',
+  'orgMarketplace',
+  'orgAnalytics',
+  'orgGamification',
+  'orgApi',
 ] as const;
 export type I18nNamespace = (typeof NAMESPACES)[number];

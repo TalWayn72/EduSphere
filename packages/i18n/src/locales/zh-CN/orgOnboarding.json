@@ -1,0 +1,75 @@
+{
+  "wizard": {
+    "title": "Create Your Organization",
+    "subtitle": "Set up your branded learning platform in under 5 minutes",
+    "stepsLabel": "Signup steps",
+    "formLabel": "Organization signup form",
+    "steps": {
+      "account": "Account",
+      "organization": "Organization",
+      "branding": "Branding"
+    },
+    "next": "Next",
+    "back": "Back",
+    "create": "Create Organization",
+    "creating": "Creating..."
+  },
+  "account": {
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "emailLabel": "Work Email",
+    "emailPlaceholder": "admin@your-org.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Create a strong password",
+    "passwordHint": "Minimum 8 characters with uppercase, lowercase, number, and special character",
+    "tosLabel": "I agree to the",
+    "tosLink": "Terms of Service",
+    "gdprLabel": "I consent to data processing as described in the Privacy Policy"
+  },
+  "org": {
+    "nameLabel": "Organization Name",
+    "namePlaceholder": "Acme University",
+    "slugLabel": "Subdomain",
+    "checkingSlug": "Checking availability...",
+    "slugTaken": "This subdomain is already taken",
+    "slugAvailable": "Available!",
+    "typeLabel": "Organization Type",
+    "typePlaceholder": "Select type...",
+    "types": {
+      "UNIVERSITY": "University",
+      "COLLEGE": "College",
+      "CORPORATE": "Corporate",
+      "GOVERNMENT": "Government",
+      "DEFENSE": "Defense",
+      "NON_PROFIT": "Non-Profit"
+    },
+    "sizeLabel": "Organization Size",
+    "sizePlaceholder": "Select size..."
+  },
+  "branding": {
+    "previewLabel": "Live Preview",
+    "previewOrgName": "Your Organization",
+    "logoLabel": "Logo",
+    "logoHint": "PNG, JPG, SVG or WebP. Max 2 MB.",
+    "invalidType": "Please upload a PNG, JPG, SVG, or WebP image",
+    "tooLarge": "Logo must be under 2 MB",
+    "primaryColorLabel": "Primary Color",
+    "taglineLabel": "Tagline",
+    "taglinePlaceholder": "Your learning platform tagline"
+  },
+  "checklist": {
+    "title": "Setup Checklist",
+    "ariaLabel": "Onboarding checklist widget",
+    "collapse": "Collapse checklist",
+    "expand": "Show setup checklist",
+    "dismiss": "Dismiss checklist",
+    "progress": "{{done}} of {{total}} completed"
+  },
+  "trial": {
+    "daysRemaining": "{{count}} day remaining in your trial",
+    "daysRemaining_plural": "{{count}} days remaining in your trial",
+    "expired": "Your trial has expired",
+    "upgrade": "Upgrade Now",
+    "dismiss": "Dismiss"
+  }
+}

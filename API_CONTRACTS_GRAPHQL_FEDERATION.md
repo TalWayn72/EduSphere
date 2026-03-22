@@ -121,8 +121,8 @@ graph TD
 
 | Subgraph          | Port | Owned Entities                                                                                     | Extended Entities                               | Domain                                 |
 | ----------------- | ---- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------- |
-| **Core**          | 4001 | `Tenant`, `User`                                                                                   | —                                               | Identity, tenancy, auth                |
-| **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`, `ExamItem`, `ExamBlueprint`, `ExamSession`, `ExamResult` | `User` (createdCourses), `Tenant`               | Courses, media pipeline, transcription, certification exams |
+| **Core**          | 4001 | `Tenant`, `User`, `Organization`, `OrgInvitation`, `ApiKey`, `Webhook`, `CourseLicense`, `GamificationConfig` | —                                               | Identity, tenancy, auth, org onboarding, API keys, webhooks |
+| **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`, `ExamItem`, `ExamBlueprint`, `ExamSession`, `ExamResult`, `MarketplaceListing` | `User` (createdCourses), `Tenant`               | Courses, media pipeline, transcription, certification exams, marketplace |
 | **Annotation**    | 4003 | `Annotation`                                                                                       | `User`, `MediaAsset`                            | Markings, sketches, spatial comments   |
 | **Collaboration** | 4004 | `CollabDocument`, `CollabSession`                                                                  | `User`, `Annotation`                            | CRDT persistence, real-time presence   |
 | **Agent**         | 4005 | `AgentDefinition`, `AgentExecution`                                                                | `User`, `Annotation`, `Course`                  | AI agents, templates, executions       |
@@ -144,6 +144,12 @@ ExamItem            │ Content         │ id
 ExamBlueprint       │ Content         │ id
 ExamSession         │ Content         │ id
 ExamResult          │ Content         │ id
+MarketplaceListing  │ Content         │ id
+Organization        │ Core            │ id
+OrgInvitation       │ Core            │ id
+ApiKey              │ Core            │ id
+Webhook             │ Core            │ id
+CourseLicense       │ Core            │ id
 Annotation          │ Annotation      │ id
 CollabDocument      │ Collaboration   │ id
 CollabSession       │ Collaboration   │ id
@@ -1083,6 +1089,426 @@ type UserEdge {
   node: User!
   cursor: Cursor!
 }
+```
+
+### 7.2 Organization Onboarding Schema (org-onboarding.graphql)
+
+> **File:** `apps/subgraph-core/src/tenant/org-onboarding.graphql`
+> **Added:** March 2026 — Self-service org provisioning, invitations, licensing, analytics, API keys, webhooks, gamification config.
+
+```graphql
+# ─── File: apps/subgraph-core/src/tenant/org-onboarding.graphql ───
+
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Organization Provisioning
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+enum ProvisioningStatus {
+  PROVISIONING
+  ACTIVE
+  FAILED
+  SUSPENDED
+}
+
+"""
+An organization created via self-service signup.
+Extends the Tenant concept with provisioning pipeline, trial management,
+and onboarding checklist tracking.
+"""
+type Organization @key(fields: "id") {
+  id: ID!
+  name: String!
+  slug: String!
+  plan: TenantPlan!
+  provisioningStatus: ProvisioningStatus!
+  trialEndsAt: DateTime
+  onboardingChecklist: OrgOnboardingChecklist
+  memberCount: Int!
+  createdAt: DateTime!
+}
+
+"""
+Tracks onboarding progress for a newly provisioned organization.
+Each boolean represents a completed onboarding step.
+"""
+type OrgOnboardingChecklist {
+  brandingConfigured: Boolean!
+  firstUserInvited: Boolean!
+  firstCourseCreated: Boolean!
+  domainConfigured: Boolean!
+  ssoConfigured: Boolean!
+  completionPercentage: Int!
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Invitations
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+type OrgInvitation {
+  id: ID!
+  email: String!
+  role: String!
+  status: InvitationStatus!
+  expiresAt: DateTime!
+  createdAt: DateTime!
+}
+
+type OrgMember {
+  id: ID!
+  email: String!
+  name: String
+  role: String!
+  joinedAt: DateTime!
+  lastActiveAt: DateTime
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Trial Management
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+type TrialStatus {
+  isTrialing: Boolean!
+  trialEndsAt: DateTime
+  daysRemaining: Int!
+  isInGracePeriod: Boolean!
+  gracePeriodEndsAt: DateTime
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Course Licensing
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+enum LicenseType {
+  UNLIMITED
+  PER_SEAT
+  TIME_LIMITED
+}
+
+enum LicenseStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+type CourseLicense {
+  id: ID!
+  courseId: ID!
+  licenseType: LicenseType!
+  maxSeats: Int
+  usedSeats: Int!
+  status: LicenseStatus!
+  licensedAt: DateTime!
+  expiresAt: DateTime
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Organization Analytics
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+input DateRangeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
+type OrgAnalytics {
+  activeLearners: Int!
+  totalEnrollments: Int!
+  completionRate: Float!
+  totalLearningHours: Float!
+  topCourses: [CourseAnalyticsItem!]!
+  dailySnapshots: [AnalyticsSnapshot!]!
+}
+
+type CourseAnalyticsItem {
+  courseId: ID!
+  title: String!
+  enrollmentCount: Int!
+  completionRate: Float!
+  avgTimeToComplete: Float
+}
+
+type AnalyticsSnapshot {
+  date: String!
+  activeLearners: Int!
+  completions: Int!
+  newEnrollments: Int!
+  learningMinutes: Int!
+}
+
+enum ExportFormat {
+  CSV
+  PDF
+}
+
+input ExportAnalyticsInput {
+  format: ExportFormat!
+  dateRange: DateRangeInput!
+}
+
+type ExportResult {
+  downloadUrl: String!
+  expiresAt: DateTime!
+  format: ExportFormat!
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Gamification Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+enum LeaderboardScope {
+  TENANT
+  DEPARTMENT
+  GLOBAL
+}
+
+type GamificationConfig {
+  enabled: Boolean!
+  showLeaderboard: Boolean!
+  showBadges: Boolean!
+  showPoints: Boolean!
+  showStreaks: Boolean!
+  xpRules: JSON!
+  leaderboardScope: LeaderboardScope!
+}
+
+input UpdateGamificationConfigInput {
+  enabled: Boolean
+  showLeaderboard: Boolean
+  showBadges: Boolean
+  showPoints: Boolean
+  showStreaks: Boolean
+  xpRules: JSON
+  leaderboardScope: LeaderboardScope
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  API Keys
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+type ApiKey {
+  id: ID!
+  name: String!
+  keyPrefix: String!
+  scopes: [String!]!
+  rateLimitPerMinute: Int!
+  lastUsedAt: DateTime
+  expiresAt: DateTime
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+"""
+Returned only on creation — plainTextKey is shown once and never stored.
+"""
+type ApiKeyCreated {
+  apiKey: ApiKey!
+  plainTextKey: String!
+}
+
+input CreateApiKeyInput {
+  name: String!
+  scopes: [String!]!
+  rateLimitPerMinute: Int = 60
+  expiresAt: DateTime
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Webhooks
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+type Webhook {
+  id: ID!
+  url: String!
+  events: [String!]!
+  isActive: Boolean!
+  failureCount: Int!
+  lastTriggeredAt: DateTime
+  createdAt: DateTime!
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  RETRYING
+}
+
+type WebhookDelivery {
+  id: ID!
+  eventType: String!
+  responseStatus: Int
+  attempt: Int!
+  status: WebhookDeliveryStatus!
+  deliveredAt: DateTime
+  createdAt: DateTime!
+}
+
+input CreateWebhookInput {
+  url: String!
+  events: [String!]!
+}
+
+input UpdateWebhookInput {
+  url: String
+  events: [String!]
+  isActive: Boolean
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Input Types
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+input CreateOrganizationInput {
+  name: String!
+  slug: String!
+  adminEmail: String!
+  adminFirstName: String!
+  adminLastName: String!
+  idempotencyKey: String!
+}
+
+input InviteUserInput {
+  email: String!
+  role: String!
+  message: String
+}
+
+input LicenseCourseInput {
+  courseId: ID!
+  licenseType: LicenseType!
+  maxSeats: Int
+  durationMonths: Int
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Queries
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+extend type Query {
+  """Current user's organization with onboarding checklist"""
+  myOrganization: Organization! @authenticated
+
+  """List organization members with pagination"""
+  orgMembers(limit: Int = 20, offset: Int = 0): [OrgMember!]! @authenticated
+
+  """List invitations, optionally filtered by status"""
+  orgInvitations(status: InvitationStatus): [OrgInvitation!]! @authenticated
+
+  """Current trial/grace period status"""
+  trialStatus: TrialStatus! @authenticated
+
+  """List all API keys for the current organization"""
+  apiKeys: [ApiKey!]! @authenticated
+
+  """List all webhooks for the current organization"""
+  webhooks: [Webhook!]! @authenticated
+
+  """List delivery attempts for a specific webhook"""
+  webhookDeliveries(webhookId: ID!, limit: Int = 20): [WebhookDelivery!]! @authenticated
+
+  """List all course licenses for the current organization"""
+  courseLicenses: [CourseLicense!]! @authenticated
+
+  """Per-org gamification settings"""
+  gamificationConfig: GamificationConfig! @authenticated
+
+  """Organization analytics for a date range"""
+  orgAnalytics(dateRange: DateRangeInput!): OrgAnalytics! @authenticated
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Mutations
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+extend type Mutation {
+  """Self-service organization provisioning (public — no auth required)"""
+  createOrganization(input: CreateOrganizationInput!): Organization!
+
+  """Invite a user to the organization"""
+  inviteUser(input: InviteUserInput!): OrgInvitation! @authenticated
+
+  """Accept an invitation via email token (public)"""
+  acceptInvitation(token: String!): OrgMember!
+
+  """Revoke a pending invitation"""
+  revokeInvitation(id: ID!): Boolean! @authenticated
+
+  """Update a member's role"""
+  updateMemberRole(userId: ID!, role: String!): OrgMember! @authenticated
+
+  """Remove a member from the organization"""
+  removeMember(userId: ID!): Boolean! @authenticated
+
+  """Create a new API key (plainTextKey returned once)"""
+  createApiKey(input: CreateApiKeyInput!): ApiKeyCreated! @authenticated
+
+  """Revoke an existing API key"""
+  revokeApiKey(id: ID!): Boolean! @authenticated
+
+  """Register a webhook endpoint"""
+  createWebhook(input: CreateWebhookInput!): Webhook! @authenticated
+
+  """Update webhook URL, events, or active status"""
+  updateWebhook(id: ID!, input: UpdateWebhookInput!): Webhook! @authenticated
+
+  """Delete a webhook endpoint"""
+  deleteWebhook(id: ID!): Boolean! @authenticated
+
+  """Send a test event to a webhook"""
+  testWebhook(id: ID!): WebhookDelivery! @authenticated
+
+  """License a marketplace course for the organization"""
+  licenseCourse(input: LicenseCourseInput!): CourseLicense! @authenticated
+
+  """Revoke a course license"""
+  revokeCourseLicense(id: ID!): Boolean! @authenticated
+
+  """Update per-org gamification configuration"""
+  updateGamificationConfig(input: UpdateGamificationConfigInput!): GamificationConfig! @authenticated
+
+  """Export analytics data as CSV or PDF"""
+  exportAnalytics(input: ExportAnalyticsInput!): ExportResult! @authenticated
+}
+```
+
+#### Org Onboarding Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Admin as Org Admin
+    participant Gateway as Hive Gateway
+    participant Core as Core Subgraph
+    participant KC as Keycloak
+    participant DB as PostgreSQL
+    participant NATS as NATS JetStream
+
+    Admin->>Gateway: createOrganization(input)
+    Gateway->>Core: Forward mutation
+    Core->>DB: Check slug uniqueness
+    Core->>DB: INSERT tenant (plan: FREE, trial: 14d)
+    Core->>KC: Create group org:{slug}
+    Core->>KC: Create admin user + ORG_ADMIN role
+    Core->>DB: INSERT onboarding_checklist
+    Core->>NATS: Publish org.provisioned
+    Core-->>Gateway: Organization { id, provisioningStatus: ACTIVE }
+    Gateway-->>Admin: Response
+
+    Note over Admin,NATS: Post-provisioning onboarding steps
+    Admin->>Gateway: inviteUser(input)
+    Gateway->>Core: Forward mutation
+    Core->>DB: INSERT invitation (PENDING, 7d expiry)
+    Core->>NATS: Publish org.user.invited
+    Core-->>Admin: OrgInvitation { status: PENDING }
 ```
 
 ---
@@ -2304,6 +2730,110 @@ extend type Subscription {
   """Exam session status changes (e.g., TIMED_OUT, VOIDED)"""
   examSessionStatusChanged(sessionId: ID!): ExamSession!
 }
+```
+
+### 8.2 Marketplace Org-to-Org Schema (marketplace-org.graphql)
+
+> **File:** `apps/subgraph-content/src/marketplace/marketplace-org.graphql`
+> **Added:** March 2026 — Enables organizations to publish courses to the marketplace and browse/license content from other organizations.
+
+```graphql
+# ─── File: apps/subgraph-content/src/marketplace/marketplace-org.graphql ───
+
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Marketplace Listing (Org-to-Org)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+enum PricingModel {
+  FREE
+  PER_SEAT
+  FLAT_RATE
+}
+
+"""
+A course published to the cross-org marketplace.
+Other organizations can browse, preview, and license these courses.
+"""
+type MarketplaceListing @key(fields: "id") {
+  id: ID!
+  courseId: ID!
+  title: String!
+  description: String
+  pricingModel: PricingModel!
+  pricePerSeat: Float
+  flatRatePrice: Float
+  currency: String!
+  isPublished: Boolean!
+  categories: [String!]!
+  previewUrl: String
+  publisherName: String!
+}
+
+input PublishToMarketplaceInput {
+  courseId: ID!
+  title: String!
+  description: String
+  pricingModel: PricingModel!
+  pricePerSeat: Float
+  flatRatePrice: Float
+  currency: String = "USD"
+  categories: [String!]
+  previewUrl: String
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Queries
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+extend type Query {
+  """Browse marketplace listings with optional filters"""
+  marketplaceListings(
+    category: String
+    pricingModel: PricingModel
+    search: String
+    limit: Int = 20
+    offset: Int = 0
+  ): [MarketplaceListing!]!
+
+  """Get a single marketplace listing by ID"""
+  marketplaceListing(id: ID!): MarketplaceListing
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  Mutations
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+extend type Mutation {
+  """Publish a course to the cross-org marketplace"""
+  publishToMarketplace(input: PublishToMarketplaceInput!): MarketplaceListing! @authenticated
+
+  """Remove a course from the marketplace"""
+  unpublishFromMarketplace(listingId: ID!): Boolean! @authenticated
+}
+```
+
+#### Marketplace Licensing Flow
+
+```mermaid
+sequenceDiagram
+    participant OrgA as Org A (Publisher)
+    participant Content as Content Subgraph
+    participant Core as Core Subgraph
+    participant OrgB as Org B (Licensee)
+
+    OrgA->>Content: publishToMarketplace(input)
+    Content-->>OrgA: MarketplaceListing { id, isPublished: true }
+
+    OrgB->>Content: marketplaceListings(search: "...")
+    Content-->>OrgB: [MarketplaceListing, ...]
+
+    OrgB->>Core: licenseCourse(input: { courseId, licenseType: PER_SEAT })
+    Core-->>OrgB: CourseLicense { status: ACTIVE, maxSeats: 50 }
+
+    Note over OrgB: Org B users can now access the licensed course
 ```
 
 ---

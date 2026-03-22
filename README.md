@@ -272,6 +272,18 @@ sequenceDiagram
 
 ## Features
 
+### Recently Added — Organization Self-Service Onboarding
+
+- **Org Onboarding** — Self-service signup wizard (3 steps), 8-step provisioning pipeline (Keycloak group + MinIO bucket + NATS events), 14-day free trial with grace period, onboarding checklist tracking
+- **Team Management** — User invitations (email + role), member role management, invitation revocation, SSO/SAML configuration
+- **Content Marketplace** — Org-to-org course licensing (per-seat, flat-rate, unlimited), marketplace browse/publish, course catalog
+- **API Keys & Webhooks** — Scoped API key creation (shown once), rate limiting per key, webhook registration with event filtering, delivery tracking with retry
+- **Org Analytics** — Active learners, completion rates, learning hours, daily snapshots, CSV/PDF export
+- **Per-Org Gamification** — Configurable leaderboard scope, badges, points, streaks, XP rules
+- **Admin Dashboard** — Billing, SSO config, analytics, gamification, API keys, webhooks, team management — 26 new React pages
+- **i18n** — 7 new namespaces (orgOnboarding, orgAdmin, orgBranding, orgMarketplace, orgAnalytics, orgGamification, orgApi) across 10 locales (70 files)
+- **Security** — 201 security tests (RLS isolation, rate limiting, CSRF, GDPR), 7 new DB tables with RLS policies, Zod validation on all mutations
+
 ### Recently Added (Phase 65 — Certification Exam System)
 
 - **Certification Exam System** — Full certification-grade examination with AI question generation (LangGraph 7-node pipeline), psychometric analysis (IRT 3PL, CTT, KR-20, Cronbach's α), Computer Adaptive Testing (MFI item selection, EAP/MLE estimation), browser lockdown (7 security layers), exam blueprints with domain/bloom distribution, server-authoritative timer, 8 new DB tables with RLS, 211+ tests

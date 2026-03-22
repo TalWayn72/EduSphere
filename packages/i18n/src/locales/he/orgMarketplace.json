@@ -1,0 +1,34 @@
+{
+  "marketplace": {
+    "title": "שוק תוכן",
+    "description": "עיין ורכוש קורסים עבור הארגון שלך",
+    "searchPlaceholder": "חפש קורסים...",
+    "searchLabel": "חפש בשוק",
+    "categoryLabel": "סנן לפי קטגוריה",
+    "categories": {
+      "all": "כל הקטגוריות",
+      "technology": "טכנולוגיה",
+      "business": "עסקים",
+      "design": "עיצוב",
+      "science": "מדע",
+      "humanities": "מדעי הרוח",
+      "compliance": "ציות"
+    },
+    "free": "חינם",
+    "noImage": "אין תצוגה מקדימה",
+    "addToOrg": "הוסף לארגון",
+    "noResults": "לא נמצאו קורסים התואמים את הקריטריונים שלך"
+  },
+  "catalog": {
+    "title": "קטלוג הארגון",
+    "description": "קורסים ברישיון עבור הארגון שלך",
+    "searchPlaceholder": "חפש בקטלוג שלך...",
+    "searchLabel": "חפש בקטלוג",
+    "empty": "אין עדיין קורסים בקטלוג שלך. עיין בשוק כדי להוסיף קורסים.",
+    "colTitle": "קורס",
+    "colCategory": "קטגוריה",
+    "colEnrollments": "הרשמות",
+    "colLicensed": "רישיון",
+    "colStatus": "סטטוס"
+  }
+}

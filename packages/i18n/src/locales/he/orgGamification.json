@@ -1,0 +1,21 @@
+{
+  "gamification": {
+    "title": "הגדרות גיימיפיקציה",
+    "description": "הגדר תגים, XP ומכניקות מעורבות",
+    "enableLabel": "הפעל גיימיפיקציה",
+    "enableDescription": "הפעל נקודות, תגים ולוחות מובילים עבור הארגון שלך",
+    "xpPerLesson": "XP לשיעור",
+    "xpPerQuiz": "XP לבוחן",
+    "streakBonus": "בונוס רצף",
+    "createBadge": "צור תג",
+    "badgeName": "שם תג",
+    "badgeNamePlaceholder": "לומד מצטיין",
+    "badgeDescription": "תיאור",
+    "xpRequired": "XP נדרש",
+    "addBadge": "הוסף תג",
+    "badgesTitle": "תגי הארגון",
+    "colName": "שם",
+    "colDescription": "תיאור",
+    "colXp": "XP נדרש"
+  }
+}

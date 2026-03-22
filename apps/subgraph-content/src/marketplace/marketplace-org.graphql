@@ -1,0 +1,57 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+# ─── Marketplace Listing (Org-to-Org) ───────────────────────
+
+enum PricingModel {
+  FREE
+  PER_SEAT
+  FLAT_RATE
+}
+
+type MarketplaceListing @key(fields: "id") {
+  id: ID!
+  courseId: ID!
+  title: String!
+  description: String
+  pricingModel: PricingModel!
+  pricePerSeat: Float
+  flatRatePrice: Float
+  currency: String!
+  isPublished: Boolean!
+  categories: [String!]!
+  previewUrl: String
+  publisherName: String!
+}
+
+input PublishToMarketplaceInput {
+  courseId: ID!
+  title: String!
+  description: String
+  pricingModel: PricingModel!
+  pricePerSeat: Float
+  flatRatePrice: Float
+  currency: String = "USD"
+  categories: [String!]
+  previewUrl: String
+}
+
+extend type Query {
+  marketplaceListings(
+    category: String
+    pricingModel: PricingModel
+    search: String
+    limit: Int = 20
+    offset: Int = 0
+  ): [MarketplaceListing!]!
+
+  marketplaceListing(id: ID!): MarketplaceListing
+}
+
+extend type Mutation {
+  publishToMarketplace(input: PublishToMarketplaceInput!): MarketplaceListing!
+    @authenticated
+
+  unpublishFromMarketplace(listingId: ID!): Boolean!
+    @authenticated
+}

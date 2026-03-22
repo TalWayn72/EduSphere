@@ -144,7 +144,7 @@ describe('DeleteCourseDialog', () => {
     const locationSpy = vi.spyOn(window, 'location', 'get').mockReturnValue({
       ...window.location,
       href: '',
-    } as Location);
+    } as typeof window.location);
     const hrefSetter = vi.fn();
     Object.defineProperty(window.location, 'href', {
       set: hrefSetter,

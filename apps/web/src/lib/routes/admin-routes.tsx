@@ -172,6 +172,35 @@ const AdminAnnouncementsPage = lazy(() =>
   }))
 );
 
+// ── Org Onboarding Admin Pages ──────────────────────────────────────────────
+const TeamManagement = lazy(() =>
+  import('@/pages/admin/TeamManagement').then((m) => ({ default: m.TeamManagement }))
+);
+const BillingPage = lazy(() =>
+  import('@/pages/admin/BillingPage').then((m) => ({ default: m.BillingPage }))
+);
+const SsoConfigPage = lazy(() =>
+  import('@/pages/admin/SsoConfigPage').then((m) => ({ default: m.SsoConfigPage }))
+);
+const MarketplaceBrowse = lazy(() =>
+  import('@/pages/admin/MarketplaceBrowse').then((m) => ({ default: m.MarketplaceBrowse }))
+);
+const OrgCatalog = lazy(() =>
+  import('@/pages/admin/OrgCatalog').then((m) => ({ default: m.OrgCatalog }))
+);
+const AnalyticsDashboard = lazy(() =>
+  import('@/pages/admin/AnalyticsDashboard').then((m) => ({ default: m.AnalyticsDashboard }))
+);
+const GamificationConfig = lazy(() =>
+  import('@/pages/admin/GamificationConfig').then((m) => ({ default: m.GamificationConfig }))
+);
+const ApiKeysPage = lazy(() =>
+  import('@/pages/admin/ApiKeysPage').then((m) => ({ default: m.ApiKeysPage }))
+);
+const WebhooksPage = lazy(() =>
+  import('@/pages/admin/WebhooksPage').then((m) => ({ default: m.WebhooksPage }))
+);
+
 const ADMIN_ROLES = { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] };
 
 /**
@@ -218,4 +247,14 @@ export const adminRoutes: RouteObject[] = [
   { path: '/admin/role-matrix', element: guarded(<AdminRoleMatrixPage />, ADMIN_ROLES) },
   { path: '/admin/audit-viewer', element: guarded(<AdminAuditLogPage />, ADMIN_ROLES) },
   { path: '/admin/announcements-editor', element: guarded(<AdminAnnouncementsPage />, ADMIN_ROLES) },
+  // ── Org Onboarding Routes ───────────────────────────────────────────────────
+  { path: '/admin/team', element: guarded(<TeamManagement />, ADMIN_ROLES) },
+  { path: '/admin/billing', element: guarded(<BillingPage />, ADMIN_ROLES) },
+  { path: '/admin/sso', element: guarded(<SsoConfigPage />, ADMIN_ROLES) },
+  { path: '/admin/marketplace', element: guarded(<MarketplaceBrowse />, ADMIN_ROLES) },
+  { path: '/admin/catalog', element: guarded(<OrgCatalog />, ADMIN_ROLES) },
+  { path: '/admin/org-analytics', element: guarded(<AnalyticsDashboard />, ADMIN_ROLES) },
+  { path: '/admin/org-gamification', element: guarded(<GamificationConfig />, ADMIN_ROLES) },
+  { path: '/admin/api-keys', element: guarded(<ApiKeysPage />, ADMIN_ROLES) },
+  { path: '/admin/webhooks', element: guarded(<WebhooksPage />, ADMIN_ROLES) },
 ];
