@@ -386,82 +386,45 @@ MCP tools return **structured, typed data** — Bash commands return unstructure
 | E2E browser test after UI change                    | `mcp__playwright__*`                                              | `pnpm test:e2e`         |
 | NATS event monitoring / stream inspection           | `mcp__nats__*`                                                    | `nats sub EDUSPHERE.>`  |
 | Per-file TypeScript errors (faster than full build) | `mcp__typescript-diagnostics__*`                                  | `pnpm turbo typecheck`  |
-| Agent registration & coordination                   | `mcp__coordination-bridge__cb_*`                                  | Manual tracking in docs         |
-| File lock before concurrent edit                    | `mcp__coordination-bridge__cb_lock_file`                          | Hope for no conflicts           |
+| Agent coordination (Orchestrator only)              | `mcp__coordination-bridge__cb_health`                             | Manual tracking in docs         |
 | Store/search architectural decisions                | `mcp__vector-memory__vm_store/search_*`                           | Only `mcp__memory__*`           |
 | Search past bug patterns before fix                 | `mcp__vector-memory__vm_search_bugs`                              | Re-investigating from scratch   |
 
-### HIVEMIND — Shared Intelligence Layer (MANDATORY)
+### HIVEMIND — Shared Intelligence Layer (Orchestrator-Only)
 
-HIVEMIND is the cross-agent coordination and persistent memory system. It consists of 2 MCP servers (27 tools total) that MUST be used by ALL agents in every session.
+HIVEMIND provides persistent semantic memory via 2 MCP servers (27 tools). **Only the Orchestrator uses HIVEMIND directly.** Leads and Specialists work without any HIVEMIND overhead — the Orchestrator injects relevant prior intelligence as plain text in Lead briefs.
+
+#### Why Orchestrator-Only
+
+Requiring all ~50 agents to register, search, lock, and store added ~420 MCP calls per session with minimal value. Under the Orchestrator-Only model, HIVEMIND overhead drops to ~10 calls per session while retaining cross-session memory benefits.
 
 #### Auto-Startup Check (EVERY session start)
 
 Before spawning any agents, the Orchestrator MUST verify:
 1. `docker ps | grep hivemind-chromadb` — must be healthy
 2. If not running: `docker-compose -f tools/docker-compose.hivemind.yml up -d`
-3. `mcp__coordination-bridge__cb_health` — must return `status: ok`
-4. `mcp__vector-memory__vm_health` — must return `status: ok`
+3. `mcp__vector-memory__vm_health` — must return `status: ok`
 
 #### Orchestrator HIVEMIND Protocol
 
 **Before spawning Leads:**
-1. `cb_register_agent({ id: "L0-orchestrator", division: "Orchestrator", role: "Orchestrator" })`
-2. `cb_update_status({ id: "L0-orchestrator", status: "running" })`
-3. `vm_search({ query: "<task keywords>" })` — gather prior intelligence to include in Lead briefs
+1. `vm_search({ query: "<task keywords>" })` — gather prior intelligence
+2. `vm_search_decisions({ query: "<domain>" })` — find past architectural decisions
+3. `vm_search_bugs({ query: "<domain>" })` — find past bug patterns
+4. Include findings as "Prior Intelligence" plain text in each Lead brief
 
-**After all agents complete (Session Completion Gate Row 11):**
-- `cb_get_agents` — verify 0 agents stuck in "running" status
-- `cb_get_pending_help` — verify 0 pending help requests
-- `cb_get_violations` — verify 0 unacknowledged violations
-- `vm_get_recent({ n: 20 })` — verify decisions/patterns were stored
-- `cb_update_status({ id: "L0-orchestrator", status: "complete" })`
+**After all Leads complete:**
+1. `vm_store_decision({ title, rationale, alternatives, chosen, tags })` — for each major decision from Lead reports
+2. `vm_store_bug_pattern(...)` — for each bug fix from Lead reports
+3. `vm_get_recent({ n: 10 })` — verify decisions were stored
 
-#### Division Lead HIVEMIND Protocol (include in EVERY Lead brief)
+#### Leads and Specialists — NO HIVEMIND
 
-Every Lead agent prompt MUST include this mandatory preamble:
-
-```
-HIVEMIND PROTOCOL (MANDATORY — execute before any other work):
-1. cb_register_agent({ id: "L1-{DIV}-lead", division: "{Division Name}", role: "Lead" })
-2. cb_update_status({ id: "L1-{DIV}-lead", status: "running" })
-3. vm_search_decisions({ query: "<relevant domain>", n_results: 5 })
-4. vm_search_bugs({ query: "<relevant domain>", n_results: 3 })
-5. cb_get_pending_help({ division: "{Division Name}" })
-
-After work complete:
-6. vm_store_decision({ title, rationale, alternatives, chosen, tags }) — at least 1 per task
-7. vm_store_agent_perf({ agent_id, task, duration_ms, success, notes }) — per specialist
-8. cb_publish({ channel: "{div}:complete", agent_id, payload: summary })
-9. cb_update_status({ id: "L1-{DIV}-lead", status: "complete" })
-```
-
-#### Specialist HIVEMIND Protocol (Leads include in EVERY specialist brief)
-
-```
-HIVEMIND (MANDATORY):
-1. cb_register_agent({ id: "L2-{DIV}-{role}", division: "{Division}", role: "{Specialist Role}" })
-2. vm_search_patterns({ query: "<task domain>" }) — check existing patterns before writing new code
-3. Before EVERY file edit: cb_lock_file({ path, agent_id, ttl_ms: 300000 })
-4. After EVERY file edit: cb_unlock_file({ path, agent_id })
-5. After work: vm_store_code_pattern / vm_store_bug_pattern as applicable
-6. cb_update_status({ id, status: "complete" })
-```
-
-#### HIVEMIND Iron Rules (MH-1 through MH-10)
-
-| # | Rule | Applies To | Enforcement |
-|---|------|-----------|-------------|
-| MH-1 | Every agent MUST register via `cb_register_agent` within first 3 tool calls | All agents | Orchestrator audits `cb_get_agents` |
-| MH-2 | Every agent MUST search Vector Memory before implementation | All agents | Lead verifies in specialist report |
-| MH-3 | Every file edit MUST be preceded by `cb_lock_file` + followed by `cb_unlock_file` | Specialists | Concurrent edit = violation logged |
-| MH-4 | Every agent MUST call `cb_update_status("complete")` on completion | All agents | Orchestrator audits for stale "running" |
-| MH-5 | Every bug fix MUST store pattern via `vm_store_bug_pattern` | QA/FE/BE | Lead verifies in report |
-| MH-6 | Every architectural decision MUST be stored via `vm_store_decision` | Leads | Orchestrator checks `vm_get_recent` |
-| MH-7 | Every reusable pattern MUST be stored via `vm_store_code_pattern` | Implementation | Lead verifies |
-| MH-8 | Every Lead MUST store agent perf via `vm_store_agent_perf` per specialist | Leads | Orchestrator checks perf data |
-| MH-9 | Cross-division requests MUST use `cb_request_help` / `cb_respond_help` | All | Audit `cb_get_pending_help` |
-| MH-10 | Orchestrator MUST audit HIVEMIND compliance in Session Completion Gate | Orchestrator | Row 11 in Completion Gate |
+- Leads receive prior intelligence as plain text in their brief from the Orchestrator
+- Leads do NOT call any `cb_*` or `vm_*` tools
+- Specialists do NOT call any `cb_*` or `vm_*` tools
+- No file locking (`cb_lock_file`) — divisions already separate concerns by file ownership
+- No agent registration (`cb_register_agent`) — the Orchestrator tracks agents via the Agent tool directly
 
 ### postgres — Use For
 
@@ -526,72 +489,35 @@ Fix any errors before moving to next file. Do not batch lint at the end.
 
 ---
 
-## MindHive Shared Intelligence (Mandatory)
+## MindHive Shared Intelligence (Orchestrator-Only)
 
-MindHive is the shared intelligence layer for the 3-level agent hierarchy. It consists of 2 project-local MCP servers providing cross-agent coordination and persistent semantic memory.
+MindHive provides persistent semantic memory for the Orchestrator only. Leads and Specialists work without MindHive overhead.
 
-### MindHive MCP Servers
+### MindHive MCP Servers (infrastructure unchanged)
 
-| Server | Tool Prefix | Backend | Tools | Purpose |
+| Server | Tool Prefix | Backend | Tools | Used By |
 |--------|-------------|---------|-------|---------|
-| `coordination-bridge` | `mcp__coordination-bridge__cb_*` | SQLite (WAL mode, `.hivemind/coordination.db`) | 15 | Agent registration, pub/sub, file locks, help requests, violation logging |
-| `vector-memory` | `mcp__vector-memory__vm_*` | ChromaDB (Docker, port 8100) | 12 | Semantic search over decisions, bug patterns, code patterns, agent performance |
+| `coordination-bridge` | `mcp__coordination-bridge__cb_*` | SQLite (WAL mode, `.hivemind/coordination.db`) | 15 | Orchestrator only (health check) |
+| `vector-memory` | `mcp__vector-memory__vm_*` | ChromaDB (Docker, port 8100) | 12 | Orchestrator only (search + store) |
 
-**CRITICAL — Tool Name Format:** Use HYPHENS, not underscores: `mcp__coordination-bridge__cb_*` and `mcp__vector-memory__vm_*`. Underscores in tool names will silently fail.
+**CRITICAL — Tool Name Format:** Use HYPHENS, not underscores: `mcp__coordination-bridge__cb_*` and `mcp__vector-memory__vm_*`.
 
-### Iron Rules (MH-1 through MH-10)
+### Orchestrator-Only Protocol
 
-| # | Rule | Applies To | Enforcement |
-|---|------|-----------|-------------|
-| MH-1 | Every agent MUST `cb_register_agent` within first 3 tool calls | All | Orchestrator audits `cb_get_agents` |
-| MH-2 | Every agent MUST search Vector Memory before starting work | All | Lead verifies in specialist report |
-| MH-3 | Every file edit MUST be preceded by `cb_lock_file` and followed by `cb_unlock_file` | Specialists | Concurrent edit = violation via `cb_log_violation` |
-| MH-4 | Every agent MUST `cb_update_status("complete")` before finishing | All | Orchestrator audits for stale "running" agents |
-| MH-5 | Every bug fix MUST store pattern via `vm_store_bug_pattern` | QA/FE/BE | Lead verifies |
-| MH-6 | Every architectural decision MUST be stored via `vm_store_decision` | Leads/Arch | Orchestrator checks `vm_get_recent` |
-| MH-7 | Every reusable pattern MUST be stored via `vm_store_code_pattern` | FE/BE/DB | Lead verifies |
-| MH-8 | Every Lead MUST store agent perf via `vm_store_agent_perf` per specialist | Leads | Orchestrator checks perf data |
-| MH-9 | Cross-division requests MUST use `cb_request_help` / `cb_respond_help` | All | Audit `cb_get_pending_help` |
-| MH-10 | Orchestrator MUST audit MindHive compliance in Session Completion Gate | Orchestrator | Row 11 in gate |
+| Phase | Actions | Tools |
+|-------|---------|-------|
+| Session Start | Health check, search prior intelligence | `vm_health`, `vm_search`, `vm_search_decisions`, `vm_search_bugs` |
+| Before Leads | Inject findings as plain text in Lead briefs | (text only — no MCP) |
+| After Leads | Store major decisions and bug patterns from Lead reports | `vm_store_decision`, `vm_store_bug_pattern` |
+| Session End | Verify decisions stored | `vm_get_recent` |
 
-### Agent Lifecycle — Before / During / After Work
+### What Leads and Specialists Do NOT Do
 
-**Before-Work Checklist (MANDATORY for ALL agents):**
-
-| # | Check | Tool | Required For |
-|---|-------|------|-------------|
-| 1 | Register self | `cb_register_agent` | ALL agents |
-| 2 | Set status running | `cb_update_status` | ALL agents |
-| 3 | Search general memory | `vm_search` | ALL agents |
-| 4 | Search bug patterns | `vm_search_bugs` | Bug-fix agents |
-| 5 | Search code patterns | `vm_search_patterns` | Implementation specialists |
-| 6 | Search decisions | `vm_search_decisions` | Leads + Architecture |
-| 7 | Check pending help | `cb_get_pending_help` | Leads only |
-
-**During-Work Protocol:**
-- `cb_lock_file` before EVERY file edit → edit → `cb_unlock_file` after
-- `cb_publish` milestone event every 3 minutes minimum
-- Cross-division requests via `cb_request_help` (not informal passing)
-
-**After-Work Checklist (MANDATORY before completing):**
-
-| # | Action | Tool | Required For |
-|---|--------|------|-------------|
-| 1 | Store decisions | `vm_store_decision` | Leads + Arch (min 1 per task) |
-| 2 | Store bug patterns | `vm_store_bug_pattern` | Bug-fix agents (min 1 per bug) |
-| 3 | Store code patterns | `vm_store_code_pattern` | Specialists (if new pattern) |
-| 4 | Store specialist perf | `vm_store_agent_perf` | Leads (1 per specialist) |
-| 5 | Unlock all files | `cb_unlock_file` | Specialists who locked files |
-| 6 | Publish completion | `cb_publish` on `{div}:complete` | All agents |
-| 7 | Set status complete | `cb_update_status("complete")` | All agents |
-
-### Orchestrator Session Enforcement
-
-**Session Start:** `cb_health` + `vm_health` + `cb_get_agents` (clear stale) + `vm_search` (prior art) + `cb_register_agent`
-
-**Every 3-min cycle:** `cb_get_agents` (all registered?) + `cb_get_pending_help` (answered?) + `cb_get_violations` (any?)
-
-**Lead Brief Enhancement:** Every Lead brief MUST include "Prior Intelligence" section with results from `vm_search_decisions`, `vm_search_bugs`, `vm_search_patterns`.
+- No `cb_register_agent` — Orchestrator tracks agents via Agent tool
+- No `cb_lock_file` / `cb_unlock_file` — divisions separate file ownership
+- No `vm_search_*` — Orchestrator provides prior intelligence in briefs
+- No `vm_store_*` — Orchestrator consolidates and stores from Lead reports
+- No `cb_publish` / `cb_subscribe` — Leads report directly to Orchestrator
 
 **Full protocol reference:** `docs/architecture/MINDHIVE-PROTOCOL.md`
 
@@ -1395,7 +1321,7 @@ Then proceed autonomously without waiting for user approval.
 | 8 | GitHub CI | `gh run list --limit 3` | all green |
 | 9 | Git Push | `git log --oneline -1` | commit pushed |
 | 10 | OPEN_ISSUES.md | updated with E2E files listed | status ✅ |
-| 11 | HIVEMIND Audit | `cb_get_agents` + `vm_get_recent` + `cb_get_violations` | 0 stale agents, ≥1 decision stored, 0 unacked violations |
+| 11 | Memory Audit | `vm_get_recent({ n: 10 })` | ≥1 decision stored this session |
 
 ### Iron Rules for Completion
 
