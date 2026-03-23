@@ -134,12 +134,12 @@ export async function migrateMarkdown(args: Record<string, unknown>): Promise<Mc
 export async function healthCheck(): Promise<McpResult> {
   try {
     const client = getClient();
-    const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8000';
+    const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8100';
     await client.heartbeat();
     const collections = await listCollectionsWithCounts();
     return ok({ status: 'ok', collections: collections.length, chromadb_url: chromadbUrl });
   } catch (e) {
-    const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8000';
+    const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8100';
     return ok({ status: 'error', error: e instanceof Error ? e.message : String(e), chromadb_url: chromadbUrl });
   }
 }
