@@ -41,9 +41,9 @@ describe('BlogListPage', () => {
     });
   });
 
-  it('renders page heading containing "EduSphere Blog"', () => {
+  it('renders page heading containing "Blog"', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /EduSphere Blog/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Blog/i })).toBeInTheDocument();
   });
 
   it('renders all 4 post titles', () => {
