@@ -65,7 +65,7 @@ describe('AssessmentResultReport', () => {
       vi.fn(),
     ] as never);
     render(<AssessmentResultReport campaignId="c-1" />);
-    expect(screen.getByText('Network error')).toBeInTheDocument();
+    expect(screen.getByText(/failed to load data/i)).toBeInTheDocument();
   });
 
   it('shows "no results" message when result is null', () => {

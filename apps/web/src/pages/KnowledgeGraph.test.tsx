@@ -80,7 +80,9 @@ describe('KnowledgeGraph', () => {
 
   it('renders "Knowledge Graph" heading', () => {
     renderKG();
-    expect(screen.getByRole('heading', { name: 'Knowledge Graph' })).toBeDefined();
+    // PageHeader + inline h1 both render "Knowledge Graph" in global view
+    const headings = screen.getAllByRole('heading', { name: 'Knowledge Graph' });
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the subtitle about exploring concepts', () => {

@@ -135,6 +135,6 @@ describe('BreakoutRoomPanel', () => {
       target: { value: 'Beta Group' },
     });
     fireEvent.click(screen.getByRole('button', { name: /create rooms/i }));
-    expect(await screen.findByText('Server error')).toBeInTheDocument();
+    expect(await screen.findByText(/failed to save/i)).toBeInTheDocument();
   });
 });

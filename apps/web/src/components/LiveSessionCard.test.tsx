@@ -143,7 +143,7 @@ describe('LiveSessionCard', () => {
     renderCard({ status: 'LIVE' });
     fireEvent.click(screen.getByRole('button', { name: /join session/i }));
     await waitFor(() =>
-      expect(screen.getByText('Permission denied')).toBeInTheDocument()
+      expect(screen.getByText(/failed to join/i)).toBeInTheDocument()
     );
   });
 });

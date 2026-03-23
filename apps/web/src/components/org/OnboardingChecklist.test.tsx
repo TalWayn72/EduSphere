@@ -44,6 +44,20 @@ import { OnboardingChecklist } from './OnboardingChecklist';
 describe('OnboardingChecklist', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useOnboardingChecklist).mockReturnValue({
+      steps: [
+        { id: 'BRANDING_CONFIGURED', label: 'orgOnboarding.checklistBranding', completed: true },
+        { id: 'FIRST_USER_INVITED', label: 'orgOnboarding.checklistInvite', completed: false },
+        { id: 'FIRST_COURSE_CREATED', label: 'orgOnboarding.checklistCourse', completed: false },
+        { id: 'DOMAIN_CONFIGURED', label: 'orgOnboarding.checklistDomain', completed: false },
+        { id: 'SSO_CONFIGURED', label: 'orgOnboarding.checklistSSO', completed: false },
+      ],
+      completedCount: 1,
+      totalCount: 5,
+      isDismissed: false,
+      dismiss: mockDismiss,
+      completeStep: mockCompleteStep,
+    });
   });
 
   it('renders all checklist steps', () => {

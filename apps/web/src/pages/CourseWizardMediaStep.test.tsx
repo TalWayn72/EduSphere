@@ -21,6 +21,10 @@ vi.mock('react-i18next', () => ({
         'wizard.retryUpload': 'Retry',
         'wizard.networkError': 'Network error',
         'wizard.failedConfirm': 'Failed to confirm upload',
+        'wizard.createRichDocument': 'Create Rich Document',
+        'wizard.richDocTitlePlaceholder': 'Document title...',
+        'wizard.addRichDocument': 'Add Rich Document',
+        'wizard.richDocAdded': 'Added',
       };
       return map[key] ?? key;
     },

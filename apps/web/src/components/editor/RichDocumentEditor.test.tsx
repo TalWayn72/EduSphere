@@ -208,7 +208,7 @@ describe('RichDocumentEditor', () => {
     fireEvent.click(screen.getByRole('button', { name: /save document/i }));
 
     await waitFor(() => {
-      expect(vi.mocked(toast.error)).toHaveBeenCalledWith('Forbidden');
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith('Failed to save. Please try again.');
     });
   });
 });

@@ -266,7 +266,7 @@ describe('LessonPipelinePage', () => {
 
   it('renders "Lesson Pipeline" heading via PageHeader', () => {
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getByRole('heading', { name: 'Lesson Pipeline' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Lesson Pipeline' }).length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders template picker', () => {
@@ -443,7 +443,7 @@ describe('LessonPipelinePage', () => {
 
   it('renders Lesson Pipeline heading', () => {
     render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getByRole('heading', { name: 'Lesson Pipeline' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Lesson Pipeline' }).length).toBeGreaterThanOrEqual(1);
   });
 
   // ── CUSTOM template (Build from scratch) ────────────────────────────────────

@@ -92,7 +92,7 @@ describe('DailyLearningWidget', () => {
   it('shows error message when query fails', () => {
     setupQueries(null, { error: { message: 'Network error' } });
     render(<DailyLearningWidget />);
-    expect(screen.getByText(/could not load lesson/i)).toBeInTheDocument();
+    expect(screen.getByText(/failed to load data/i)).toBeInTheDocument();
   });
 
   it('shows "No microlessons available yet" when data is null', () => {

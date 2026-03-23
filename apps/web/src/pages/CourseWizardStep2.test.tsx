@@ -21,6 +21,9 @@ vi.mock('react-i18next', () => ({
         'wizard.addModuleTitlePlaceholder': 'Enter module title',
         'wizard.addModuleDescriptionLabel': 'Description (optional)',
         'wizard.addModuleDescriptionPlaceholder': 'Brief description',
+        'wizard.moveUpAriaLabel': 'Move up',
+        'wizard.moveDownAriaLabel': 'Move down',
+        'wizard.removeModuleAriaLabel': 'Remove module',
       };
       if (key === 'wizard.moduleNumber' && opts)
         return `Module ${opts['n'] as number}`;

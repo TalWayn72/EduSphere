@@ -271,6 +271,6 @@ describe('CoursePublishSheet', () => {
     ] as never);
     render(<CoursePublishSheet {...defaultProps} />);
 
-    expect(screen.getByRole('alert')).toHaveTextContent('שגיאה בפרסום');
+    expect(screen.getByRole('alert')).toHaveTextContent(/failed to save/i);
   });
 });

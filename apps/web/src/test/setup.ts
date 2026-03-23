@@ -41,6 +41,14 @@ import gamificationEn from '../../../../packages/i18n/src/locales/en/gamificatio
 import offlineEn from '../../../../packages/i18n/src/locales/en/offline.json';
 import profileEn from '../../../../packages/i18n/src/locales/en/profile.json';
 import socialEn from '../../../../packages/i18n/src/locales/en/social.json';
+import srsEn from '../../../../packages/i18n/src/locales/en/srs.json';
+import orgOnboardingEn from '../../../../packages/i18n/src/locales/en/orgOnboarding.json';
+import orgAdminEn from '../../../../packages/i18n/src/locales/en/orgAdmin.json';
+import orgBrandingEn from '../../../../packages/i18n/src/locales/en/orgBranding.json';
+import orgMarketplaceEn from '../../../../packages/i18n/src/locales/en/orgMarketplace.json';
+import orgAnalyticsEn from '../../../../packages/i18n/src/locales/en/orgAnalytics.json';
+import orgGamificationEn from '../../../../packages/i18n/src/locales/en/orgGamification.json';
+import orgApiEn from '../../../../packages/i18n/src/locales/en/orgApi.json';
 
 type TranslationRecord = Record<string, unknown>;
 
@@ -62,6 +70,14 @@ const EN_RESOURCES: Record<string, TranslationRecord> = {
   profile: profileEn as TranslationRecord,
   settings: settingsEn as TranslationRecord,
   social: socialEn as TranslationRecord,
+  srs: srsEn as TranslationRecord,
+  orgOnboarding: orgOnboardingEn as TranslationRecord,
+  orgAdmin: orgAdminEn as TranslationRecord,
+  orgBranding: orgBrandingEn as TranslationRecord,
+  orgMarketplace: orgMarketplaceEn as TranslationRecord,
+  orgAnalytics: orgAnalyticsEn as TranslationRecord,
+  orgGamification: orgGamificationEn as TranslationRecord,
+  orgApi: orgApiEn as TranslationRecord,
 };
 
 /** Resolve a dot-notation key path inside a translation object. */
@@ -76,6 +92,20 @@ function resolvePath(
     current = (current as TranslationRecord)[part];
   }
   return typeof current === 'string' ? current : undefined;
+}
+
+/** Resolve a dot-notation key path, returning any value (arrays, objects, strings). */
+function resolvePathAny(
+  obj: TranslationRecord,
+  keyPath: string
+): unknown {
+  const parts = keyPath.split('.');
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current == null || typeof current !== 'object') return undefined;
+    current = (current as TranslationRecord)[part];
+  }
+  return current;
 }
 
 /** Apply simple {{variable}} interpolation. */
@@ -118,17 +148,41 @@ function resolveWithPlurals(
 function makeTFunction(ns: string | string[]) {
   const namespaces = Array.isArray(ns) ? ns : [ns];
 
-  return (key: string, options?: Record<string, unknown>): string => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (key: string, optionsOrDefault?: string | Record<string, unknown>): any => {
+    // i18next supports t('key', 'default string') as well as t('key', { option })
+    const defaultString = typeof optionsOrDefault === 'string' ? optionsOrDefault : undefined;
+    const options = typeof optionsOrDefault === 'object' ? optionsOrDefault : undefined;
     let resolveKey = key;
     let resolveNs = namespaces;
     const count =
       typeof options?.count === 'number' ? options.count : undefined;
+    const returnObjects = options?.returnObjects === true;
 
     // Support "namespace:key" prefix syntax
     if (key.includes(':')) {
       const colonIdx = key.indexOf(':');
       resolveNs = [key.slice(0, colonIdx)];
       resolveKey = key.slice(colonIdx + 1);
+    }
+
+    // When returnObjects is true, resolve to any value (arrays, objects)
+    if (returnObjects) {
+      for (const namespace of resolveNs) {
+        const dict = EN_RESOURCES[namespace];
+        if (dict) {
+          const value = resolvePathAny(dict, resolveKey);
+          if (value !== undefined) return value;
+        }
+      }
+      if (!resolveNs.includes('common')) {
+        const commonDict = EN_RESOURCES['common'];
+        if (commonDict) {
+          const value = resolvePathAny(commonDict, resolveKey);
+          if (value !== undefined) return value;
+        }
+      }
+      return options?.defaultValue ?? resolveKey;
     }
 
     for (const namespace of resolveNs) {
@@ -152,8 +206,9 @@ function makeTFunction(ns: string | string[]) {
       }
     }
 
-    // Last resort: return the key itself (without namespace prefix)
-    return resolveKey;
+    // Last resort: return default string/value if provided, otherwise the key itself
+    const optDefaultValue = typeof options?.defaultValue === 'string' ? options.defaultValue : undefined;
+    return defaultString ?? optDefaultValue ?? resolveKey;
   };
 }
 

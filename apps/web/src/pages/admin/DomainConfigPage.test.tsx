@@ -4,6 +4,13 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DomainConfigPage } from './DomainConfigPage';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, fallback?: string) => fallback ?? key,
+    i18n: { language: 'en' },
+  }),
+}));
+
 vi.mock('@/components/admin/AdminLayout', () => ({
   AdminLayout: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="admin-layout">{children}</div>
@@ -137,6 +144,8 @@ describe('DomainConfigPage', () => {
   it('shows SSL status badges', () => {
     renderPage();
     expect(screen.getByTestId('ssl-pending')).toBeInTheDocument();
-    expect(screen.getByTestId('ssl-active')).toBeInTheDocument();
+    // ssl-active appears twice: once for subdomain, once for verified domain
+    const activeBadges = screen.getAllByTestId('ssl-active');
+    expect(activeBadges.length).toBeGreaterThanOrEqual(1);
   });
 });

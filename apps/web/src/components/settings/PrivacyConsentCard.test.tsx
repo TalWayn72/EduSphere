@@ -2,6 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PrivacyConsentCard } from './PrivacyConsentCard';
 
+vi.mock('urql', () => ({
+  useMutation: vi.fn(() => [{}, vi.fn().mockResolvedValue({ data: {}, error: undefined })]),
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) => strings.join(''),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {

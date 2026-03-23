@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * UsageMeter — unit tests (pure SVG, no mocks needed)
  */

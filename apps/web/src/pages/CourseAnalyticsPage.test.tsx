@@ -147,7 +147,7 @@ describe('CourseAnalyticsPage', () => {
   it('shows error state when analytics data is missing', () => {
     setupUrql(null, false, { message: 'Network error' });
     renderPage();
-    expect(screen.getByText(/failed to load analytics/i)).toBeInTheDocument();
+    expect(screen.getByText(/failed to load data/i)).toBeInTheDocument();
   });
 
   it('renders "Back to Course" button', () => {

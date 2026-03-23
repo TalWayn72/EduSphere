@@ -256,11 +256,10 @@ describe('ProfilePage', () => {
       tenantId: '',
     });
     renderPage();
-    // t('profile.fields.tenantIdMissing', ...) returns the key when not in
-    // the test translation resources — the important thing is the fallback
-    // branch of `{tenantId || (...)}` is exercised
+    // t('profile.fields.tenantIdMissing', 'Not available') returns the default
+    // string since the key does not exist in EN translation resources
     expect(
-      screen.getByText('profile.fields.tenantIdMissing')
+      screen.getByText('Not available')
     ).toBeInTheDocument();
   });
 

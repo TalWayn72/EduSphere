@@ -86,6 +86,8 @@ describe('useAgentChat timer cleanup (memory safety)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
+    // SI-10: consent gate — must be set for sendMessage to proceed to backend
+    localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
   });
 
   afterEach(() => {

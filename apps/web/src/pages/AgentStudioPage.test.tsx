@@ -3,7 +3,12 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { AgentStudioPage } from './AgentStudioPage';
+
+function renderPage() {
+  return render(<MemoryRouter><AgentStudioPage /></MemoryRouter>);
+}
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -47,40 +52,40 @@ describe('AgentStudioPage', () => {
   // ── Layout / rendering ────────────────────────────────────────────────────
 
   it('renders the workflow name input', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('workflow-name-input')).toBeInTheDocument();
   });
 
   it('renders Save and Deploy buttons', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('save-workflow-btn')).toBeInTheDocument();
     expect(screen.getByTestId('deploy-workflow-btn')).toBeInTheDocument();
   });
 
   it('renders the node palette', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('node-palette')).toBeInTheDocument();
   });
 
   it('renders all 6 node types in the palette', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     for (const type of ['start', 'assess', 'explain', 'quiz', 'debate', 'end']) {
       expect(screen.getByTestId(`palette-${type}`)).toBeInTheDocument();
     }
   });
 
   it('renders the workflow canvas', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('workflow-canvas')).toBeInTheDocument();
   });
 
   it('renders the properties panel', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('properties-panel')).toBeInTheDocument();
   });
 
   it('shows empty-state prompt on canvas when no nodes', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(
       screen.getByText(/drag nodes here/i)
     ).toBeInTheDocument();
@@ -89,7 +94,7 @@ describe('AgentStudioPage', () => {
   // ── Workflow name ─────────────────────────────────────────────────────────
 
   it('updates workflow name on input change', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const input = screen.getByTestId('workflow-name-input') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'New Workflow Name' } });
     expect(input.value).toBe('New Workflow Name');
@@ -98,19 +103,19 @@ describe('AgentStudioPage', () => {
   // ── Save / Deploy disabled when no nodes ─────────────────────────────────
 
   it('Save button is disabled when canvas is empty', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('save-workflow-btn')).toBeDisabled();
   });
 
   it('Deploy button is disabled when canvas is empty', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     expect(screen.getByTestId('deploy-workflow-btn')).toBeDisabled();
   });
 
   // ── Drop to add nodes ─────────────────────────────────────────────────────
 
   it('adds a node to canvas on drop', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     // Simulate drop event
     fireEvent.drop(canvas, {
@@ -124,7 +129,7 @@ describe('AgentStudioPage', () => {
   });
 
   it('enables Save button after a node is dropped', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 200,
@@ -135,7 +140,7 @@ describe('AgentStudioPage', () => {
   });
 
   it('shows "Drag nodes here" prompt disappears after drop', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 200,
@@ -148,7 +153,7 @@ describe('AgentStudioPage', () => {
   // ── Select node ───────────────────────────────────────────────────────────
 
   it('shows properties panel with node type when a node is clicked', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 200,
@@ -163,7 +168,7 @@ describe('AgentStudioPage', () => {
   });
 
   it('label input reflects the node label', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 200,
@@ -179,7 +184,7 @@ describe('AgentStudioPage', () => {
   // ── Delete node ───────────────────────────────────────────────────────────
 
   it('removes node from canvas when Delete button clicked', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 200,
@@ -195,7 +200,7 @@ describe('AgentStudioPage', () => {
   // ── Connect nodes ─────────────────────────────────────────────────────────
 
   it('shows connection-mode indicator when first node is clicked', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 100,
@@ -208,7 +213,7 @@ describe('AgentStudioPage', () => {
   });
 
   it('creates an edge SVG path when two nodes are connected', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
 
     // Drop two nodes
@@ -237,7 +242,7 @@ describe('AgentStudioPage', () => {
   // ── Properties panel stats ────────────────────────────────────────────────
 
   it('shows node and connection count in properties panel', () => {
-    render(<AgentStudioPage />);
+    renderPage();
     const canvas = screen.getByTestId('workflow-canvas');
     fireEvent.drop(canvas, {
       clientX: 100,

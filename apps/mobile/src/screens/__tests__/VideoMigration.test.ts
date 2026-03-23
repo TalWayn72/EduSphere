@@ -8,8 +8,8 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { execSync } from 'child_process';
 
-const MOBILE_ROOT = resolve(__dirname, '../../../../');
-const SRC_ROOT = resolve(__dirname, '../../../');
+const MOBILE_ROOT = resolve(__dirname, '../../..');
+const SRC_ROOT = resolve(__dirname, '../..');
 
 function readPkg(): Record<string, unknown> & { dependencies?: Record<string, string>; devDependencies?: Record<string, string> } {
   return JSON.parse(readFileSync(resolve(MOBILE_ROOT, 'package.json'), 'utf8')) as Record<string, unknown> & { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };

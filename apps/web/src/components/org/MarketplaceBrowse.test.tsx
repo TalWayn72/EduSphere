@@ -43,6 +43,17 @@ import { MarketplaceBrowse } from './MarketplaceBrowse';
 describe('MarketplaceBrowse', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useMarketplace).mockReturnValue({
+      listings: [
+        { id: 'l1', title: 'Introduction to AI', category: 'Technology', priceUsdCents: 9900, instructor: 'Dr. Smith' },
+        { id: 'l2', title: 'Data Science Basics', category: 'Technology', priceUsdCents: 7900, instructor: 'Prof. Jones' },
+        { id: 'l3', title: 'Business Writing', category: 'Business', priceUsdCents: 4900, instructor: 'Jane Doe' },
+      ],
+      isLoading: false,
+      totalCount: 3,
+      licenseCourse: mockLicense,
+      categories: ['Technology', 'Business', 'Education', 'Healthcare'],
+    });
   });
 
   it('renders course listings', () => {

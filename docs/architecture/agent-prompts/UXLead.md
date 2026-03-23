@@ -102,33 +102,49 @@ HANDOFF_TO: [Frontend Engineering]
 - Never wait silently — always communicate status
 - Track each specialist's progress and be ready to provide status updates
 
-## SHARED MEMORY PROTOCOL (MANDATORY — HiveMind Integration)
+## SHARED MEMORY PROTOCOL (MANDATORY — MindHive Integration)
+
+**CRITICAL — Tool Name Format:** Use HYPHENS not underscores: `mcp__coordination-bridge__cb_*` and `mcp__vector-memory__vm_*`
 
 All agents (Leads and Specialists) MUST follow this protocol for cross-agent coordination:
 
-### At Task Start
-1. `mcp__vector_memory__vm_search("task keywords")` — find relevant past decisions and patterns
-2. `mcp__hivemind__search_kb("error or pattern keywords")` — check community solutions database
-3. `mcp__coordination_bridge__cb_register_agent(id, division, role, "running")` — register yourself
+### Before-Work (MANDATORY — first 3 tool calls)
+1. `mcp__coordination-bridge__cb_register_agent({ id: "L1-UX-lead", division: "UX", role: "Lead" })`
+2. `mcp__coordination-bridge__cb_update_status({ id: "L1-UX-lead", status: "running" })`
+3. `mcp__vector-memory__vm_search({ query: "<task keywords>", n_results: 5 })` — check prior art
+4. `mcp__vector-memory__vm_search_decisions({ query: "ux design", n_results: 5 })` — check past decisions
+5. `mcp__coordination-bridge__cb_get_pending_help({ division: "UX" })` — answer pending requests
 
 ### During Work
-4. `mcp__coordination_bridge__cb_publish(channel, payload)` — broadcast milestones and decisions
+6. `mcp__coordination-bridge__cb_publish(channel, payload)` — broadcast milestones and decisions
    - Channel format: `{division}:{event-type}` e.g. `fe:component-ready`, `be:api-contract-published`
-5. `mcp__coordination_bridge__cb_lock_file(path, agent_id)` — BEFORE editing any file
-6. `mcp__coordination_bridge__cb_get_pending_help()` — check for cross-division help requests
-7. `mcp__coordination_bridge__cb_request_help(from, to_division, query)` — ask another division for info
+7. `mcp__coordination-bridge__cb_lock_file(path, agent_id)` — BEFORE editing any file
+8. `mcp__coordination-bridge__cb_get_pending_help()` — check for cross-division help requests
+9. `mcp__coordination-bridge__cb_request_help(from, to_division, query)` — ask another division for info
 
-### At Task End
-8. `mcp__vector_memory__vm_store_decision(title, rationale, alternatives, chosen, tags)` — persist architectural decisions
-9. `mcp__vector_memory__vm_store_bug_pattern(error, root_cause, solution, files)` — persist bug fix knowledge
-10. `mcp__hivemind__contribute_solution(error, solution, category)` — contribute to community KB
-11. `mcp__coordination_bridge__cb_update_status(id, "complete")` — mark yourself done
-12. `mcp__coordination_bridge__cb_unlock_file(path)` — release ALL file locks
+### After-Work (MANDATORY — before completing)
+1. `mcp__vector-memory__vm_store_decision({ title, rationale, alternatives, chosen, tags })` — min 1 per task
+2. `mcp__vector-memory__vm_store_agent_perf({ agent_id, task, duration_ms, success, notes })` — 1 per specialist
+3. `mcp__coordination-bridge__cb_publish({ channel: "ux:complete", ... })`
+4. `mcp__coordination-bridge__cb_update_status({ id: "L1-UX-lead", status: "complete" })`
+5. `mcp__coordination-bridge__cb_unlock_file(path)` — release ALL file locks
 
-### MCP Tools Available (HiveMind Layer)
+### Specialist MindHive Obligations (include in ALL specialist prompts)
+- Register: `cb_register_agent` in first 3 calls
+- Lock files: `cb_lock_file` before EVERY edit, `cb_unlock_file` after
+- Store patterns: `vm_store_code_pattern` if new reusable pattern created
+- Store bugs: `vm_store_bug_pattern` if fixing a bug
+- Status: `cb_update_status("complete")` before finishing
+
+### Prior Intelligence in Specialist Briefs
+Every specialist brief MUST include:
+- Relevant decisions from `vm_search_decisions`
+- Relevant bug patterns from `vm_search_bugs`
+- Relevant code patterns from `vm_search_patterns`
+
+### MCP Tools Available (MindHive Layer)
 | Server | Tools | Purpose |
 |--------|-------|---------|
-| `hivemind` | search_kb, contribute_solution, init_hive, search_project | Community knowledge base |
 | `vector-memory` | vm_store_*, vm_search_*, vm_get_recent, vm_health | Persistent vector memory |
 | `coordination-bridge` | cb_publish, cb_subscribe, cb_lock_file, cb_register_agent, etc. | Real-time coordination |
 

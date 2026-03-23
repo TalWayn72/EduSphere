@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * GamificationConfig — Unit tests (F-12).
  */

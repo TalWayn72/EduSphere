@@ -64,6 +64,8 @@ function setupUrqlMocks() {
 describe('useAgentChat', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // SI-10: consent gate — must be set for sendMessage to proceed to backend
+    localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
   });
 
   it('initialises with the Chavruta welcome message', () => {

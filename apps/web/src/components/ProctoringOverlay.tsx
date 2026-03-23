@@ -81,7 +81,7 @@ export function ProctoringOverlay({ assessmentId, onFlagCountChange }: Props) {
         playsInline
         width={128}
         height={96}
-        className={`rounded border border-border bg-black  dark:bg-black${isActive ? 'block' : 'hidden'}`}
+        className={`rounded border border-border bg-black dark:bg-black ${isActive ? 'block' : 'hidden'}`}
         aria-label="Webcam preview"
       />
 

@@ -44,6 +44,7 @@ vi.mock('@/lib/auth', () => ({
 
 import { Dashboard } from './Dashboard';
 import { useQuery } from 'urql';
+import { getCurrentUser } from '@/lib/auth';
 import {
   MOCK_LEARNING_STREAK,
   MOCK_CONCEPTS_MASTERED,
@@ -175,48 +176,30 @@ describe('Dashboard', () => {
   });
 
   it('shows personalised greeting with firstName when ME_QUERY succeeds', () => {
-    vi.mocked(useQuery)
-      .mockReturnValueOnce([
-        {
-          data: {
-            me: {
-              id: 'u-1',
-              email: 'alice@example.com',
-              firstName: 'Alice',
-              lastName: 'Smith',
-              role: 'STUDENT',
-              tenantId: 't-1',
-              createdAt: '',
-              updatedAt: '',
-            },
-          },
-          fetching: false,
-          error: undefined,
-        },
-        vi.fn(),
-      ] as unknown as ReturnType<typeof useQuery>)
-      .mockReturnValueOnce([
-        { data: undefined, fetching: false, error: undefined },
-        vi.fn(),
-      ] as unknown as ReturnType<typeof useQuery>);
+    // Use getCurrentUser fallback (localUser) so greeting works even with
+    // mounted-guard delaying the real useQuery dispatch.
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u-1',
+      email: 'alice@example.com',
+      firstName: 'Alice',
+      lastName: 'Smith',
+      role: 'STUDENT',
+      tenantId: 't-1',
+    } as ReturnType<typeof getCurrentUser>);
     renderDashboard();
     expect(screen.getByText(/welcome back, alice/i)).toBeInTheDocument();
   });
 
   it('shows error card when ME_QUERY fails', () => {
-    vi.mocked(useQuery)
-      .mockReturnValueOnce([
-        {
-          data: undefined,
-          fetching: false,
-          error: new Error('Network error') as never,
-        },
-        vi.fn(),
-      ] as unknown as ReturnType<typeof useQuery>)
-      .mockReturnValueOnce([
-        { data: undefined, fetching: false, error: undefined },
-        vi.fn(),
-      ] as unknown as ReturnType<typeof useQuery>);
+    // Use mockReturnValue (not Once) so all re-renders see the error
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('Network error') as never,
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
     renderDashboard();
     expect(screen.getByText(/error loading user data/i)).toBeInTheDocument();
   });

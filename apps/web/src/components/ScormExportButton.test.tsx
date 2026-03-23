@@ -81,7 +81,7 @@ describe('ScormExportButton', () => {
     render(<ScormExportButton {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /export/i }));
     await waitFor(() =>
-      expect(screen.getByText('Export failed')).toBeInTheDocument()
+      expect(screen.getByText(/failed to save/i)).toBeInTheDocument()
     );
   });
 

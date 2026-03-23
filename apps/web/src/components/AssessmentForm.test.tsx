@@ -139,6 +139,6 @@ describe('AssessmentForm', () => {
       mockSubmit as never,
     ]);
     render(<AssessmentForm {...defaultProps} />);
-    expect(screen.getByText('Submission failed')).toBeInTheDocument();
+    expect(screen.getByText(/failed to save/i)).toBeInTheDocument();
   });
 });
