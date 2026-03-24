@@ -91,7 +91,7 @@ function CartSidebar({
               <button
                 onClick={() => onRemove(ci.itemId)}
                 aria-label={`Remove ${ci.title}`}
-                className="text-red-500 text-xs hover:underline"
+                className="text-red-500 dark:text-red-400 text-xs hover:underline"
               >
                 Remove
               </button>

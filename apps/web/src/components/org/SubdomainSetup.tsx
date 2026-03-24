@@ -115,7 +115,7 @@ export function SubdomainSetup() {
           {!validation.isValid && subdomain && (
             <span
               role="alert"
-              className="text-xs text-red-600"
+              className="text-xs text-red-600 dark:text-red-400"
             >
               {validation.error}
             </span>

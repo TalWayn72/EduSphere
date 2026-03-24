@@ -64,6 +64,7 @@ export function useSubdomainProvisioning(): UseSubdomainProvisioningReturn {
 
   useEffect(() => {
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- ref.current intentionally read at cleanup for timer cancellation
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
