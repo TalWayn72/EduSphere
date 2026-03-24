@@ -70,5 +70,6 @@
   "consentDescription": "Chavruta uses a third-party AI service (OpenAI / Anthropic) to generate debate responses. Your arguments will be processed by that service. Please consent before continuing. (EU AI Act Art. 50 / SI-10)",
   "consentButton": "I Consent — Start Debating",
   "noDiscussions": "No discussions yet — join a course to start discussing!",
-  "messagesCount": "messages"
+  "messagesCount": "messages",
+  "schemaUpgradeNotice": "Some collaboration features are being upgraded. Your existing sessions are safe."
 }

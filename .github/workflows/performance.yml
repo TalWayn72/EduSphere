@@ -30,7 +30,7 @@ jobs:
 
     services:
       postgres:
-        image: pgvector/pgvector:pg16
+        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
         env:
           POSTGRES_DB: edusphere_test
           POSTGRES_USER: edusphere

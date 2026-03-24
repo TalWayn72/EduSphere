@@ -15,7 +15,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16-alpine
+        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere
           POSTGRES_PASSWORD: edusphere

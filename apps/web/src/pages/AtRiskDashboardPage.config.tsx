@@ -10,9 +10,48 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 
+const STORAGE_KEY = 'edusphere_risk_thresholds';
+
+interface RiskThresholds {
+  inactiveDays: number;
+  completionThreshold: number;
+}
+
+/** Load persisted thresholds from localStorage */
+function loadThresholds(): RiskThresholds {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<RiskThresholds>;
+      return {
+        inactiveDays: parsed.inactiveDays ?? 7,
+        completionThreshold: parsed.completionThreshold ?? 30,
+      };
+    }
+  } catch {
+    console.error('[RiskThresholdConfig] Failed to load saved thresholds');
+  }
+  return { inactiveDays: 7, completionThreshold: 30 };
+}
+
+/**
+ * Persist thresholds. Currently uses localStorage.
+ * TODO: Replace with GraphQL mutation (e.g. updateRiskThresholds) once
+ * the backend admin config API is available in the supergraph.
+ */
+function persistThresholds(thresholds: RiskThresholds): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(thresholds));
+  } catch {
+    console.error('[RiskThresholdConfig] Failed to persist thresholds');
+    throw new Error('Failed to save risk thresholds');
+  }
+}
+
 export function RiskThresholdConfig() {
-  const [inactiveDays, setInactiveDays] = useState(7);
-  const [completionThreshold, setCompletionThreshold] = useState(30);
+  const defaults = loadThresholds();
+  const [inactiveDays, setInactiveDays] = useState(defaults.inactiveDays);
+  const [completionThreshold, setCompletionThreshold] = useState(defaults.completionThreshold);
   const [saving, setSaving] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -27,12 +66,17 @@ export function RiskThresholdConfig() {
 
   function handleSave() {
     setSaving(true);
-    // Saves locally — backend admin config API not yet available in supergraph.
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
+    try {
+      persistThresholds({ inactiveDays, completionThreshold });
+      saveTimerRef.current = setTimeout(() => {
+        setSaving(false);
+        toast.success('Risk thresholds saved');
+      }, 600);
+    } catch {
       setSaving(false);
-      toast.success('Risk thresholds saved');
-    }, 600);
+      toast.error('Failed to save thresholds. Please try again.');
+    }
   }
 
   return (

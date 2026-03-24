@@ -204,6 +204,49 @@ describe('Dashboard', () => {
     expect(screen.getByText(/error loading user data/i)).toBeInTheDocument();
   });
 
+  it('uses myStats backend data for stats when available', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: {
+          myStats: {
+            conceptsMastered: 99,
+            coursesEnrolled: 12,
+            annotationsCreated: 55,
+            totalLearningMinutes: 150,
+            weeklyActivity: [],
+          },
+        },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
+    renderDashboard();
+    // myStats.coursesEnrolled = 12 should appear
+    expect(screen.getAllByText('12').length).toBeGreaterThanOrEqual(1);
+    // myStats.annotationsCreated = 55
+    expect(screen.getByText('55')).toBeInTheDocument();
+    // myStats.conceptsMastered = 99
+    expect(screen.getByText('99')).toBeInTheDocument();
+    // myStats.totalLearningMinutes = 150 → "2h 30m"
+    expect(screen.getByText('2h 30m')).toBeInTheDocument();
+  });
+
+  it('falls back to MOCK_STATS when myStats query fails', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('myStats failed') as never,
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
+    renderDashboard();
+    // Should still render the page with mock fallback values
+    expect(screen.getByText('Concepts Mastered')).toBeInTheDocument();
+    expect(screen.getByText(String(MOCK_CONCEPTS_MASTERED))).toBeInTheDocument();
+  });
+
   it('shows course count from real query data', () => {
     // Use stable mock (not Once) so re-renders also see courses data
     vi.mocked(useQuery).mockReturnValue([

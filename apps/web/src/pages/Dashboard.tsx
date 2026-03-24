@@ -19,16 +19,12 @@ import { SRSWidget } from '@/components/SRSWidget';
 import { LeaderboardWidget } from '@/components/LeaderboardWidget';
 import { SkillGapWidget } from '@/components/SkillGapWidget';
 import { DailyLearningWidget } from '@/components/DailyLearningWidget';
-import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
+import { ME_QUERY, COURSES_QUERY, MY_STATS_QUERY } from '@/lib/queries';
 import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
 import {
   MOCK_COURSE_PROGRESS,
   MOCK_WEEKLY_STATS,
   MOCK_ACTIVITY_FEED,
-  // myStats resolver is not yet in the deployed supergraph — mock is the fallback.
-  // weeklyActivity, totalLearningMinutes, conceptsMastered: no backend query yet (mock).
-  // coursesEnrolled: resolved from COURSES_QUERY.data.courses.length (real).
-  // annotationsCreated: resolved from MY_ANNOTATIONS_QUERY count (real).
   MOCK_STATS,
 } from '@/lib/mock-analytics';
 import {
@@ -82,6 +78,16 @@ interface MyAnnotationsQueryResult {
   annotationsByUser: AnnotationNode[];
 }
 
+interface MyStatsQueryResult {
+  myStats: {
+    coursesEnrolled: number;
+    annotationsCreated: number;
+    conceptsMastered: number;
+    totalLearningMinutes: number;
+    weeklyActivity: { date: string; count: number }[];
+  };
+}
+
 export function Dashboard() {
   const { t } = useTranslation(['dashboard', 'common']);
   const localUser = getCurrentUser();
@@ -107,32 +113,42 @@ export function Dashboard() {
     pause: !mounted || !currentUserId,
   });
 
-  // --- Derived real stats (fall back to MOCK_STATS when real data unavailable) ---
+  // Backend myStats resolver — provides real stats with MOCK_STATS as fallback.
+  const [statsResult] = useQuery<MyStatsQueryResult>({
+    query: MY_STATS_QUERY,
+    pause: !mounted,
+  });
+  const myStats = statsResult.data?.myStats;
 
-  // REAL: total courses from the catalog (limit raised to 100 so the count is meaningful)
-  const coursesEnrolled = coursesResult.fetching
+  if (statsResult.error) {
+    console.error('[Dashboard] myStats query error:', statsResult.error.message);
+  }
+
+  // --- Derived stats: prefer myStats backend data, then per-query fallback, then MOCK ---
+
+  const coursesEnrolled = statsResult.fetching && coursesResult.fetching
     ? null
-    : (coursesResult.data?.courses?.length ?? MOCK_STATS.coursesEnrolled);
+    : (myStats?.coursesEnrolled
+        ?? coursesResult.data?.courses?.length
+        ?? MOCK_STATS.coursesEnrolled);
 
-  // REAL: annotation count from annotationsByUser
-  const annotationsCreated =
-    !currentUserId || annotationsResult.fetching
-      ? null
-      : (annotationsResult.data?.annotationsByUser?.length ??
-        MOCK_STATS.annotationsCreated);
+  const annotationsCreated = statsResult.fetching && annotationsResult.fetching
+    ? null
+    : (myStats?.annotationsCreated
+        ?? annotationsResult.data?.annotationsByUser?.length
+        ?? MOCK_STATS.annotationsCreated);
 
-  // MOCK: no backend query yet for study time or concepts mastered
-  const totalLearningMinutes = MOCK_STATS.totalLearningMinutes;
+  const totalLearningMinutes = myStats?.totalLearningMinutes ?? MOCK_STATS.totalLearningMinutes;
   const totalMinutesDisplay =
     totalLearningMinutes >= 60
       ? `${Math.floor(totalLearningMinutes / 60)}h ${totalLearningMinutes % 60}m`
       : `${totalLearningMinutes}m`;
 
+  const conceptsMastered = myStats?.conceptsMastered ?? MOCK_STATS.conceptsMastered;
+
   // useDeferredValue defers rendering of the data-intensive ActivityHeatmap.
-  // React will render the heatmap with the previous (stale) data first while
-  // computing the updated layout, keeping the rest of the page responsive.
-  // weeklyActivity has no backend endpoint yet — still mock.
-  const deferredActivity = useDeferredValue(MOCK_STATS.weeklyActivity);
+  const weeklyActivity = myStats?.weeklyActivity ?? MOCK_STATS.weeklyActivity;
+  const deferredActivity = useDeferredValue(weeklyActivity);
 
   const firstName = meResult.data?.me?.firstName ?? localUser?.firstName;
 
@@ -236,7 +252,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {MOCK_STATS.conceptsMastered}
+                {statsResult.fetching ? '...' : conceptsMastered}
               </div>
               <p className="text-xs text-muted-foreground">
                 Estimated — real tracking coming soon

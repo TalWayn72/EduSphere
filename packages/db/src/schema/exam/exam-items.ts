@@ -168,7 +168,7 @@ export const examItemEmbeddings = pgTable(
 export const examItemEmbeddingsHnswIdx = sql`
 CREATE INDEX IF NOT EXISTS idx_exam_item_embeddings_hnsw
   ON exam_item_embeddings USING hnsw (embedding vector_cosine_ops)
-  WITH (m = 16, ef_construction = 64);
+  WITH (m = 32, ef_construction = 128);
 `;
 
 export type ExamItem = typeof examItems.$inferSelect;

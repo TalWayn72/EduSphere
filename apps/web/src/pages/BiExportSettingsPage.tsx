@@ -6,6 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
@@ -52,6 +53,7 @@ interface BiApiToken {
 }
 
 export function BiExportSettingsPage() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const role = useAuthRole();
   const [showModal, setShowModal] = useState(false);
@@ -242,13 +244,13 @@ export function BiExportSettingsPage() {
             className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-semibold">Generate BI API Token</h2>
+            <h2 className="text-lg font-semibold">{t('biExport.generateModalTitle')}</h2>
             {generatedToken ? (
               <div className="space-y-3">
                 <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm dark:bg-amber-950 dark:border-amber-700">
                   <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 dark:text-amber-400" />
                   <span className="text-amber-800 dark:text-amber-200">
-                    Save this token now — it will not be shown again.
+                    {t('biExport.tokenWarning')}
                   </span>
                 </div>
                 <div className="p-3 bg-muted rounded-md font-mono text-xs break-all select-all">
@@ -261,18 +263,18 @@ export function BiExportSettingsPage() {
                     setGeneratedToken(null);
                   }}
                 >
-                  Done
+                  {t('biExport.done')}
                 </Button>
               </div>
             ) : (
               <div className="space-y-3">
                 <div>
                   <label className="text-sm font-medium block mb-1">
-                    Description
+                    {t('biExport.description')}
                   </label>
                   <input
                     className="w-full border rounded-md px-3 py-2 text-sm"
-                    placeholder="e.g. Power BI Production"
+                    placeholder={t('biExport.descriptionPlaceholder')}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
@@ -283,14 +285,14 @@ export function BiExportSettingsPage() {
                     className="flex-1"
                     onClick={() => setShowModal(false)}
                   >
-                    Cancel
+                    {t('biExport.cancel')}
                   </Button>
                   <Button
                     className="flex-1"
                     disabled={!description.trim()}
                     onClick={() => void handleGenerate()}
                   >
-                    Generate
+                    {t('biExport.generate')}
                   </Button>
                 </div>
               </div>

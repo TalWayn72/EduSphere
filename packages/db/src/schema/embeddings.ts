@@ -48,19 +48,19 @@ export const concept_embeddings = pgTable('concept_embeddings', {
 export const contentEmbeddingsHnswIdx = sql`
 CREATE INDEX IF NOT EXISTS idx_content_embeddings_hnsw
   ON content_embeddings USING hnsw (embedding vector_cosine_ops)
-  WITH (m = 16, ef_construction = 64);
+  WITH (m = 32, ef_construction = 128);
 `;
 
 export const annotationEmbeddingsHnswIdx = sql`
 CREATE INDEX IF NOT EXISTS idx_annotation_embeddings_hnsw
   ON annotation_embeddings USING hnsw (embedding vector_cosine_ops)
-  WITH (m = 16, ef_construction = 64);
+  WITH (m = 32, ef_construction = 128);
 `;
 
 export const conceptEmbeddingsHnswIdx = sql`
 CREATE INDEX IF NOT EXISTS idx_concept_embeddings_hnsw
   ON concept_embeddings USING hnsw (embedding vector_cosine_ops)
-  WITH (m = 16, ef_construction = 64);
+  WITH (m = 32, ef_construction = 128);
 `;
 
 export type ContentEmbedding = typeof content_embeddings.$inferSelect;

@@ -57,6 +57,40 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
     RETURN tc
   `
   );
+
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
+    CREATE (t:Term {
+      id: gen_random_uuid()::text,
+      tenant_id: 'default',
+      name: 'Sample Term',
+      definition: 'Test term for graph initialization',
+      language: 'en',
+      created_at: timestamp(),
+      updated_at: timestamp()
+    })
+    RETURN t
+  `
+  );
+
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
+    CREATE (s:Source {
+      id: gen_random_uuid()::text,
+      tenant_id: 'default',
+      name: 'Sample Source',
+      url: 'https://example.com/sample-source',
+      source_type: 'document',
+      created_at: timestamp(),
+      updated_at: timestamp()
+    })
+    RETURN s
+  `
+  );
 }
 
 /**

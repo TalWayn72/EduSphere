@@ -222,7 +222,7 @@ export function CollaborationPage() {
           </CardContent>
         </Card>
 
-        {/* Error state — hide schema-validation errors (field not yet in deployed subgraph) */}
+        {/* Error state — network/server errors */}
         {error && !isSchemaValidationError && (
           <div
             role="alert"
@@ -241,6 +241,19 @@ export function CollaborationPage() {
             >
               {t('common:retry')}
             </button>
+          </div>
+        )}
+
+        {/* Schema-validation error — surface as informational notice */}
+        {error && isSchemaValidationError && (
+          <div
+            role="status"
+            aria-live="polite"
+            data-testid="collab-schema-banner"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs text-blue-800 bg-blue-50 border border-blue-200 rounded-md dark:text-blue-200 dark:bg-blue-950 dark:border-blue-700"
+          >
+            <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+            <span>{t('schemaUpgradeNotice')}</span>
           </div>
         )}
 

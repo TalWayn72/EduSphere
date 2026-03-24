@@ -157,11 +157,12 @@ describe('SEC-3: JWT audience validation present', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// BE-7: Header fallback allows all gateway-validated roles including SUPER_ADMIN
+// BE-7 / W0-3: Header fallback allows standard roles but NEVER SUPER_ADMIN
+// SUPER_ADMIN must only come from validated JWT — never from spoofable headers.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('BE-7: header fallback allows gateway-validated roles', () => {
-  it('packages/auth/src/middleware.ts includes all roles in ALLOWED_HEADER_ROLES', () => {
+describe('BE-7: header fallback allows gateway-validated roles (excluding SUPER_ADMIN)', () => {
+  it('packages/auth/src/middleware.ts includes standard roles in ALLOWED_HEADER_ROLES', () => {
     const content = readSource('packages/auth/src/middleware.ts');
     // ALLOWED_HEADER_ROLES must exist
     expect(content).toContain('ALLOWED_HEADER_ROLES');
@@ -171,21 +172,29 @@ describe('BE-7: header fallback allows gateway-validated roles', () => {
     const setEnd = content.indexOf(']);', setStart);
     const setBlock = content.substring(setStart, setEnd);
 
-    // Must include ALL roles — gateway validates JWT before forwarding headers
-    expect(setBlock).toContain('SUPER_ADMIN');
+    // Must include standard roles
     expect(setBlock).toContain('ORG_ADMIN');
     expect(setBlock).toContain('INSTRUCTOR');
     expect(setBlock).toContain('STUDENT');
     expect(setBlock).toContain('RESEARCHER');
   });
 
-  it('packages/auth/src/middleware.ts maps SUPER_ADMIN role to isSuperAdmin: true in header fallback', () => {
+  it('packages/auth/src/middleware.ts EXCLUDES SUPER_ADMIN from ALLOWED_HEADER_ROLES (W0-3 security fix)', () => {
     const content = readSource('packages/auth/src/middleware.ts');
-    // The fallback path derives isSuperAdmin from the role value
-    expect(content).toMatch(/isSuperAdmin.*role\s*===\s*['"]SUPER_ADMIN['"]/);
 
-    // Verify the comment documents that gateway validated the JWT
-    expect(content).toMatch(/gateway.*validated.*JWT|gateway.*already.*validated/i);
+    // Extract the ALLOWED_HEADER_ROLES set definition
+    const setStart = content.indexOf('ALLOWED_HEADER_ROLES');
+    const setEnd = content.indexOf(']);', setStart);
+    const setBlock = content.substring(setStart, setEnd);
+
+    // SUPER_ADMIN must NOT be in the set — only JWT-validated tokens grant it
+    expect(setBlock).not.toContain('SUPER_ADMIN');
+  });
+
+  it('packages/auth/src/middleware.ts documents that SUPER_ADMIN is restricted to JWT only', () => {
+    const content = readSource('packages/auth/src/middleware.ts');
+    // The comment must document the security decision
+    expect(content).toMatch(/SUPER_ADMIN.*JWT|JWT.*SUPER_ADMIN/i);
   });
 
   it('packages/auth/src/middleware.ts logs when using header fallback', () => {

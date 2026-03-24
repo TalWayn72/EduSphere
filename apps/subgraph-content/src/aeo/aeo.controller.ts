@@ -36,7 +36,7 @@ export class AeoController {
   @Get('courses')
   @Header('Content-Type', 'application/json')
   @Header('Cache-Control', 'public, max-age=300')
-  @Header('Access-Control-Allow-Origin', '*')
+  // CORS handled at gateway level — no per-endpoint wildcard origin (SI-2)
   async getCourses(): Promise<PublicCourse[]> {
     this.logger.debug('[AeoController] public course catalog requested');
     return this.aeoService.getPublicCourses();
@@ -45,7 +45,7 @@ export class AeoController {
   @Get('features')
   @Header('Content-Type', 'application/json')
   @Header('Cache-Control', 'public, max-age=86400')
-  @Header('Access-Control-Allow-Origin', '*')
+  // CORS handled at gateway level — no per-endpoint wildcard origin (SI-2)
   getFeatures(): FeatureItem[] {
     return this.aeoService.getFeatures();
   }
@@ -53,7 +53,7 @@ export class AeoController {
   @Get('faq')
   @Header('Content-Type', 'application/json')
   @Header('Cache-Control', 'public, max-age=3600')
-  @Header('Access-Control-Allow-Origin', '*')
+  // CORS handled at gateway level — no per-endpoint wildcard origin (SI-2)
   getFaq(): FaqItem[] {
     return this.aeoService.getFaq();
   }
@@ -61,7 +61,7 @@ export class AeoController {
   @Get('catalog')
   @Header('Content-Type', 'application/json')
   @Header('Cache-Control', 'public, max-age=3600')
-  @Header('Access-Control-Allow-Origin', '*')
+  // CORS handled at gateway level — no per-endpoint wildcard origin (SI-2)
   getCatalog(): CatalogCourse[] {
     this.logger.debug('[AeoController] public catalog requested');
     return this.aeoService.getCatalog();
@@ -70,7 +70,7 @@ export class AeoController {
   @Get('instructors')
   @Header('Content-Type', 'application/json')
   @Header('Cache-Control', 'public, max-age=3600')
-  @Header('Access-Control-Allow-Origin', '*')
+  // CORS handled at gateway level — no per-endpoint wildcard origin (SI-2)
   getInstructors(): InstructorProfile[] {
     this.logger.debug('[AeoController] instructor directory requested');
     return this.aeoService.getInstructors();

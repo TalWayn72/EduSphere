@@ -118,4 +118,4 @@ If a vendor reports a security incident affecting EduSphere data:
 - [INFORMATION_SECURITY_POLICY.md](./INFORMATION_SECURITY_POLICY.md)
 - [GDPR_COMPLIANCE_POLICY.md](./GDPR_COMPLIANCE_POLICY.md)
 - [AI_USAGE_POLICY.md](./AI_USAGE_POLICY.md)
-- [docs/ai/MODEL_CARDS.md](../security/MODEL_CARDS.md)
+- [docs/ai/MODEL_CARDS.md](../ai/MODEL_CARDS.md)

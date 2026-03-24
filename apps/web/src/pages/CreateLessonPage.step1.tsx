@@ -1,14 +1,9 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import type { LessonFormData } from './CreateLessonPage';
-
-const Step1Schema = z.object({
-  title: z.string().min(3, 'כותרת חייבת להכיל לפחות 3 תווים'),
-  type: z.enum(['THEMATIC', 'SEQUENTIAL']),
-  lessonDate: z.string().optional().default(''),
-});
 
 interface Props {
   initialData: LessonFormData;
@@ -16,6 +11,14 @@ interface Props {
 }
 
 export function CreateLessonStep1({ initialData, onSubmit }: Props) {
+  const { t } = useTranslation('courses');
+
+  const Step1Schema = z.object({
+    title: z.string().min(3, t('createLesson.titleMinLength')),
+    type: z.enum(['THEMATIC', 'SEQUENTIAL']),
+    lessonDate: z.string().optional().default(''),
+  });
+
   const {
     register,
     handleSubmit,
@@ -31,15 +34,15 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <h2 className="text-xl font-semibold mb-4">פרטי שיעור</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('createLesson.step1Title')}</h2>
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">
-            כותרת השיעור *
+            {t('createLesson.lessonTitleLabel')}
           </label>
           <input
             {...register('title')}
-            placeholder="לדוג׳: שיעור עץ חיים — שער הנסירה פסקה ג׳"
+            placeholder={t('createLesson.lessonTitlePlaceholder')}
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.title && (
@@ -48,19 +51,21 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">סוג שיעור *</label>
+          <label className="block text-sm font-medium mb-2">{t('createLesson.lessonType')}</label>
           <div className="flex gap-3">
-            {(['THEMATIC', 'SEQUENTIAL'] as const).map((t) => (
-              <label key={t} className="flex items-center gap-2 cursor-pointer">
+            {(['THEMATIC', 'SEQUENTIAL'] as const).map((lessonType) => (
+              <label key={lessonType} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
-                  value={t}
-                  checked={selectedType === t}
-                  onChange={() => setValue('type', t)}
+                  value={lessonType}
+                  checked={selectedType === lessonType}
+                  onChange={() => setValue('type', lessonType)}
                   className="w-4 h-4"
                 />
                 <span className="text-sm">
-                  {t === 'THEMATIC' ? 'כללי (נושאי)' : 'על הסדר'}
+                  {lessonType === 'THEMATIC'
+                    ? t('createLesson.typeThematic')
+                    : t('createLesson.typeSequential')}
                 </span>
               </label>
             ))}
@@ -68,7 +73,7 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">תאריך שיעור</label>
+          <label className="block text-sm font-medium mb-1">{t('createLesson.lessonDate')}</label>
           <input
             type="date"
             {...register('lessonDate')}
@@ -78,7 +83,7 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
       </div>
 
       <Button type="submit" className="mt-6 w-full">
-        המשך לחומרים ←
+        {t('createLesson.continueToMaterials')}
       </Button>
     </form>
   );

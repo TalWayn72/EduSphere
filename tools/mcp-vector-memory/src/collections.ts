@@ -1,4 +1,5 @@
 import { ChromaClient, type Collection } from 'chromadb';
+import { withRetry, logError } from './resilience.js';
 
 /** All managed collection names. */
 export const COLLECTION_NAMES = [
@@ -30,16 +31,32 @@ export function getClient(): ChromaClient {
 
 /**
  * Get or create a ChromaDB collection by name (lazy init).
- * Uses ChromaDB's default embedding function.
+ * Uses retry with exponential backoff for transient failures.
  */
 export async function getCollection(name: CollectionName): Promise<Collection> {
   const cached = collectionCache.get(name);
   if (cached) return cached;
 
   const client = getClient();
-  const collection = await client.getOrCreateCollection({ name });
+  const collection = await withRetry(
+    () => client.getOrCreateCollection({ name }),
+    { maxAttempts: 3, initialDelayMs: 500 },
+  );
   collectionCache.set(name, collection);
   return collection;
+}
+
+/**
+ * Safe version of getCollection — returns null instead of throwing.
+ * Logs the error to stderr when ChromaDB is unreachable.
+ */
+export async function getCollectionSafe(name: CollectionName): Promise<Collection | null> {
+  try {
+    return await getCollection(name);
+  } catch (e) {
+    logError('getCollectionSafe', e);
+    return null;
+  }
 }
 
 /**
@@ -55,7 +72,8 @@ export async function listCollectionsWithCounts(): Promise<
       const collection = await getCollection(name);
       const count = await collection.count();
       results.push({ name, count });
-    } catch {
+    } catch (e) {
+      logError('listCollectionsWithCounts', e);
       results.push({ name, count: -1 });
     }
   }

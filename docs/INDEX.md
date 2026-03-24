@@ -14,6 +14,7 @@
 | [OPEN_ISSUES.md](../OPEN_ISSUES.md) | Live bug tracker and task status |
 | [IMPLEMENTATION_ROADMAP.md](../IMPLEMENTATION_ROADMAP.md) | Phase order, acceptance criteria, phase gates |
 | [API_CONTRACTS_GRAPHQL_FEDERATION.md](../API_CONTRACTS_GRAPHQL_FEDERATION.md) | GraphQL schema contracts, all types/mutations/subscriptions |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | Contribution guidelines, branching, PR process, code conventions |
 | [CHANGELOG.md](../CHANGELOG.md) | Release history and version changelog |
 
 ---
@@ -103,8 +104,6 @@
 | [SETUP_INSTRUCTIONS.md](development/SETUP_INSTRUCTIONS.md) | Full local environment setup |
 | [DOCKER_SETUP.md](development/DOCKER_SETUP.md) | Docker development environment |
 | [GITHUB_SETUP.md](development/GITHUB_SETUP.md) | GitHub Actions, CI/CD setup |
-| [CICD_FIX_PLAN.md](development/CICD_FIX_PLAN.md) | CI/CD pipeline fix and improvement plan |
-| [DESIGN_SYSTEM.md](development/DESIGN_SYSTEM.md) | Indigo Design System tokens, ThemeProvider, MasteryBadge, AppSidebar |
 | [STORYBOOK.md](development/STORYBOOK.md) | Storybook component development guide |
 
 ---
@@ -275,7 +274,6 @@
 | [COMPLIANCE_ACTION_PLAN.md](security/COMPLIANCE_ACTION_PLAN.md) | Compliance gap remediation plan |
 | [LIA_PLATFORM_ANALYTICS.md](security/LIA_PLATFORM_ANALYTICS.md) | Legitimate Interest Assessment — analytics |
 | [LIA_SECURITY_MONITORING.md](security/LIA_SECURITY_MONITORING.md) | Legitimate Interest Assessment — monitoring |
-| [MODEL_CARDS.md](security/MODEL_CARDS.md) | AI model cards (security/compliance view) — canonical copy in docs/ai/ |
 | [SESSION_26_SECURITY_AUDIT.md](security/SESSION_26_SECURITY_AUDIT.md) | Session 26 security audit findings |
 | [GVISOR_SETUP.md](security/GVISOR_SETUP.md) | gVisor container sandboxing setup |
 | [TDE_COLUMN_ENCRYPTION.md](security/TDE_COLUMN_ENCRYPTION.md) | Transparent data encryption setup |

@@ -54,14 +54,14 @@ describe('CreateLessonStep2', () => {
     ] as never);
   });
 
-  it('renders the step heading', () => {
+  it('renders the step heading via i18n', () => {
     renderStep2({});
-    expect(screen.getByText('הוספת חומרים')).toBeInTheDocument();
+    expect(screen.getByText('Add Materials')).toBeInTheDocument();
   });
 
-  it('renders the skip hint paragraph', () => {
+  it('renders the skip hint paragraph via i18n', () => {
     renderStep2({});
-    expect(screen.getByText(/ניתן לדלג/i)).toBeInTheDocument();
+    expect(screen.getByText(/You can skip this step/i)).toBeInTheDocument();
   });
 
   it('renders YouTube URL input with placeholder', () => {
@@ -76,34 +76,33 @@ describe('CreateLessonStep2', () => {
     expect(fileInput).toHaveAttribute('accept', '.pdf,.docx,.txt');
   });
 
-  it('shows "הוסף" (Add) button when lessonId is provided', () => {
+  it('shows "Add" button when lessonId is provided', () => {
     renderStep2({ lessonId: 'lesson-1' });
-    expect(screen.getByRole('button', { name: /הוסף/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Add$/i })).toBeInTheDocument();
   });
 
-  it('does NOT show "הוסף" button when lessonId is empty', () => {
+  it('does NOT show "Add" button when lessonId is empty', () => {
     renderStep2({ lessonId: '' });
-    expect(
-      screen.queryByRole('button', { name: /הוסף/i })
-    ).not.toBeInTheDocument();
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.every(b => !(/^Add$/i.test(b.textContent ?? '')))).toBe(true);
   });
 
-  it('shows deferred hint text when lessonId is empty', () => {
+  it('shows deferred hint text when lessonId is empty via i18n', () => {
     renderStep2({ lessonId: '' });
     expect(
-      screen.getByText(/הקישור יתווסף לאחר יצירת השיעור/i)
+      screen.getByText(/link will be added after creating/i)
     ).toBeInTheDocument();
   });
 
-  it('shows validation error for invalid YouTube URL', async () => {
+  it('shows i18n validation error for invalid YouTube URL', async () => {
     renderStep2({ lessonId: 'lesson-1' });
     fireEvent.change(screen.getByPlaceholderText(/youtube\.com/i), {
       target: { value: 'https://vimeo.com/123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /הוסף/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Add$/i }));
     await waitFor(() =>
       expect(
-        screen.getByText(/חייב להיות כתובת YouTube תקינה/i)
+        screen.getByText(/Must be a valid YouTube URL/i)
       ).toBeInTheDocument()
     );
   });
@@ -113,7 +112,7 @@ describe('CreateLessonStep2', () => {
     fireEvent.change(screen.getByPlaceholderText(/youtube\.com/i), {
       target: { value: 'https://youtube.com/watch?v=abc123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /הוסף/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Add$/i }));
     await waitFor(() =>
       expect(NOOP_EXECUTE).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -124,17 +123,17 @@ describe('CreateLessonStep2', () => {
     );
   });
 
-  it('calls onNext when "דלג" (Skip) button is clicked', () => {
+  it('calls onNext when "Skip" button is clicked', () => {
     const onNext = vi.fn();
     renderStep2({ onNext });
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Skip/i }));
     expect(onNext).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onNext when "המשך" (Continue) button is clicked', () => {
+  it('calls onNext when "Continue to Template" button is clicked', () => {
     const onNext = vi.fn();
     renderStep2({ onNext });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לבחירת תבנית/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Template/i }));
     expect(onNext).toHaveBeenCalledTimes(1);
   });
 });

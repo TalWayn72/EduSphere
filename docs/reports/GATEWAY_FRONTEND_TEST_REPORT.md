@@ -396,11 +396,10 @@ apps/web uses react@^19.0.0
 
 **Status:** ⚠️ **Known Issue**
 
-- Expo SDK 54 requires React 18
-- Web app uses React 19 for latest features
-- Managed by pnpm workspaces (isolated node_modules)
+- Expo SDK 54 uses React Native 0.81, compatible with React 19
+- Both web and mobile now use React 19
 
-**Resolution:** No action needed (intentional separation)
+**Resolution:** No action needed (unified on React 19)
 
 ---
 

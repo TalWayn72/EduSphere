@@ -622,5 +622,32 @@
       "netRoi": "Net ROI",
       "getReport": "Get Your Custom ROI Report"
     }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "goToPage": "Go to page {{page}}"
+  },
+  "emptyState": {
+    "defaultTitle": "Nothing here yet",
+    "defaultDescription": "There are no items to display at the moment."
+  },
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "sunday": "Sun",
+    "monday": "Mon",
+    "tuesday": "Tue",
+    "wednesday": "Wed",
+    "thursday": "Thu",
+    "friday": "Fri",
+    "saturday": "Sat"
   }
 }

@@ -13,15 +13,27 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: edusphere_test
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      nats:
+        image: nats:2.10-alpine
+        ports:
+          - 4222:4222
+          - 8222:8222
+        options: >-
+          --health-cmd "nats-server --help"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
 
     steps:
       - uses: actions/checkout@v4

@@ -4,6 +4,10 @@ import { Login } from '@/pages/Login';
 import { SmartRoot } from '@/components/SmartRoot';
 import { publicPage } from './helpers';
 
+const NotFoundPage = lazy(() =>
+  import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
+);
+
 // ── Lazy loaded public pages ─────────────────────────────────────────────────
 const LandingPage = lazy(() =>
   import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage }))
@@ -148,5 +152,5 @@ export const publicRoutes: RouteObject[] = [
   { path: '/u/:userId', element: publicPage(<PublicProfilePage />) },
   // Root + catch-all
   { path: '/', element: <SmartRoot /> },
-  { path: '*', element: <SmartRoot /> },
+  { path: '*', element: publicPage(<NotFoundPage />) },
 ];

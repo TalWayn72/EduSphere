@@ -180,6 +180,14 @@ describe('BiExportSettingsPage', () => {
     expect(screen.getByText('Description')).toBeInTheDocument();
   });
 
+  it('shows i18n placeholder in description input', () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /generate token/i }));
+    expect(
+      screen.getByPlaceholderText('e.g. Power BI Production')
+    ).toBeInTheDocument();
+  });
+
   it('has "Generate" button disabled when description is empty', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /generate token/i }));

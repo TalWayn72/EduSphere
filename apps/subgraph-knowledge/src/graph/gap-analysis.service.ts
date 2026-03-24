@@ -9,7 +9,7 @@
  * Returns actionable gap report with recommended courses/lessons.
  */
 
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import { createDatabaseConnection, closeAllPools, schema, eq } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 
@@ -41,15 +41,6 @@ const SEVERITY_ORDER: Record<KnowledgeGap['severity'], number> = {
 // Mastery levels that indicate sufficient knowledge (PROFICIENT or MASTERED)
 const SUFFICIENT_LEVELS = new Set(['PROFICIENT', 'MASTERED']);
 
-// Stub topic set used when live DB query returns no skill rows
-const STUB_TOPICS = [
-  { id: 'topic-algebra', name: 'Algebra Fundamentals' },
-  { id: 'topic-calculus', name: 'Differential Calculus' },
-  { id: 'topic-graph-theory', name: 'Graph Theory' },
-  { id: 'topic-probability', name: 'Probability & Statistics' },
-  { id: 'topic-linear-algebra', name: 'Linear Algebra' },
-];
-
 function gapFromMasteryLevel(
   conceptId: string,
   masteryLevel: string | null
@@ -72,17 +63,6 @@ function gapFromMasteryLevel(
     severity: masteryLevel === 'ATTEMPTED' ? 'HIGH' : 'MEDIUM',
     affectedUserCount: 1,
     recommendedAction: `Review and reinforce ${topicName} — current level: ${masteryLevel}`,
-  };
-}
-
-function stubGap(topicId: string, topicName: string): KnowledgeGap {
-  return {
-    topicId,
-    topicName,
-    gapType: 'NOT_STARTED',
-    severity: 'HIGH',
-    affectedUserCount: 0,
-    recommendedAction: `Begin foundational lessons for ${topicName}`,
   };
 }
 
@@ -116,22 +96,19 @@ export class GapAnalysisService implements OnModuleDestroy {
         .from(schema.userSkillMastery)
         .where(eq(schema.userSkillMastery.tenantId, tenantId));
 
-      if (masteryRows.length === 0) {
-        // Stub: generate synthetic gaps from fixed topic set
-        gaps = STUB_TOPICS.map((t) => stubGap(t.id, t.name));
-      } else {
-        // Filter rows where mastery is insufficient
-        gaps = masteryRows
-          .filter((row) => !SUFFICIENT_LEVELS.has(row.masteryLevel))
-          .map((row) => gapFromMasteryLevel(row.conceptId, row.masteryLevel));
-      }
+      // Filter rows where mastery is insufficient
+      gaps = masteryRows
+        .filter((row) => !SUFFICIENT_LEVELS.has(row.masteryLevel))
+        .map((row) => gapFromMasteryLevel(row.conceptId, row.masteryLevel));
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
       this.logger.error(
-        { tenantId, error: error instanceof Error ? error.message : String(error) },
-        'GapAnalysisService: DB query failed, using stub gaps'
+        { tenantId, error: errorMsg },
+        '[GapAnalysisService] DB query failed during gap analysis'
       );
-      // Fallback to stub gaps on DB error
-      gaps = STUB_TOPICS.map((t) => stubGap(t.id, t.name));
+      throw new InternalServerErrorException(
+        `Gap analysis failed for tenant ${tenantId}: database query error`
+      );
     }
 
     const sorted = sortBySeverity(gaps).slice(0, MAX_GAPS_IN_REPORT);

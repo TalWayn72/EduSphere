@@ -413,6 +413,28 @@
     "importing": "מייבא…",
     "startImport": "התחל ייבוא"
   },
+  "biExport": {
+    "title": "ייצוא כלי BI",
+    "subtitle": "נקודות קצה OData v4 עבור Power BI, Tableau וכלי BI אחרים",
+    "odataEndpoints": "נקודות קצה OData",
+    "odataDescription": "חבר את כלי ה-BI שלך לכתובות OData v4 אלו באמצעות אימות Bearer token",
+    "copied": "הועתק!",
+    "copy": "העתק",
+    "apiTokens": "אסימוני API",
+    "apiTokensDescription": "אסימוני Bearer לאימות OData בכלי BI",
+    "generateToken": "צור אסימון",
+    "loading": "טוען...",
+    "noTokens": "אין אסימונים עדיין. צור אחד כדי לחבר את כלי ה-BI שלך.",
+    "active": "פעיל",
+    "revoked": "בוטל",
+    "generateModalTitle": "צור אסימון API עבור BI",
+    "tokenWarning": "שמור את האסימון הזה עכשיו — הוא לא יוצג שוב.",
+    "done": "סיום",
+    "description": "תיאור",
+    "descriptionPlaceholder": "לדוג׳ Power BI Production",
+    "cancel": "ביטול",
+    "generate": "צור"
+  },
   "notifications": {
     "analyticsTitle": "אנליטיקת התראות",
     "startDate": "תאריך התחלה",

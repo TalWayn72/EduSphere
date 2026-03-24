@@ -1,6 +1,7 @@
 import type { CollectionName } from './collections.js';
-import { getCollection, COLLECTION_NAMES, listCollectionsWithCounts, getClient } from './collections.js';
+import { getCollection, COLLECTION_NAMES, listCollectionsWithCounts } from './collections.js';
 import { readMarkdownFile, mapTypeToCollection, generateDocId, isoTimestamp } from './embeddings.js';
+import { isChromaAvailable, logError } from './resilience.js';
 
 type McpResult = { content: Array<{ type: 'text'; text: string }>; isError?: boolean };
 type SearchHit = { id: string; document: string | null; metadata: Record<string, unknown> | null; distance: number; collection: string };
@@ -26,7 +27,10 @@ async function searchSingleCollection(name: CollectionName, query: string, nResu
       id: id ?? '', document: docs[i] ?? null, metadata: metas[i] ?? null,
       distance: dists[i] ?? Infinity, collection: name,
     }));
-  } catch { return []; }
+  } catch (e) {
+    logError(`searchSingleCollection:${name}`, e);
+    return [];
+  }
 }
 
 export async function searchAll(args: Record<string, unknown>): Promise<McpResult> {
@@ -43,6 +47,7 @@ export async function searchAll(args: Record<string, unknown>): Promise<McpResul
     allHits.sort((a, b) => a.distance - b.distance);
     return ok({ results: allHits.slice(0, nResults), total_searched: COLLECTION_NAMES.length });
   } catch (e) {
+    logError('searchAll', e);
     return err(`Search failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
@@ -57,6 +62,7 @@ export async function searchCollection(
     const hits = await searchSingleCollection(collectionName, query, nResults);
     return ok({ results: hits, collection: collectionName });
   } catch (e) {
+    logError('searchCollection', e);
     return err(`Search failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
@@ -93,6 +99,7 @@ export async function getRecent(args: Record<string, unknown>): Promise<McpResul
 
     return ok({ results: allDocs.slice(0, n) });
   } catch (e) {
+    logError('getRecent', e);
     return err(`Get recent failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
@@ -102,6 +109,7 @@ export async function listCollections(): Promise<McpResult> {
     const collections = await listCollectionsWithCounts();
     return ok({ collections });
   } catch (e) {
+    logError('listCollections', e);
     return err(`List collections failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
@@ -127,19 +135,35 @@ export async function migrateMarkdown(args: Record<string, unknown>): Promise<Mc
 
     return ok({ id, stored: true, collection: collectionName, source: filePath, timestamp: ts });
   } catch (e) {
+    logError('migrateMarkdown', e);
     return err(`Migrate failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 
 export async function healthCheck(): Promise<McpResult> {
+  const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8100';
+  const available = await isChromaAvailable();
+
+  if (!available) {
+    logError('healthCheck', 'ChromaDB is unreachable');
+    return ok({
+      status: 'degraded',
+      message: 'ChromaDB unreachable — search/store operations will return empty results or be skipped',
+      chromadb_url: chromadbUrl,
+      collections: 0,
+    });
+  }
+
   try {
-    const client = getClient();
-    const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8100';
-    await client.heartbeat();
     const collections = await listCollectionsWithCounts();
     return ok({ status: 'ok', collections: collections.length, chromadb_url: chromadbUrl });
   } catch (e) {
-    const chromadbUrl = process.env['CHROMADB_URL'] || 'http://localhost:8100';
-    return ok({ status: 'error', error: e instanceof Error ? e.message : String(e), chromadb_url: chromadbUrl });
+    logError('healthCheck', e);
+    return ok({
+      status: 'degraded',
+      message: 'ChromaDB reachable but collection listing failed',
+      error: e instanceof Error ? e.message : String(e),
+      chromadb_url: chromadbUrl,
+    });
   }
 }

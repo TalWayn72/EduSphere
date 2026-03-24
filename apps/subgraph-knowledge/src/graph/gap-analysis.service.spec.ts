@@ -100,16 +100,15 @@ describe('GapAnalysisService', () => {
     expect(report.totalGaps).toBe(2);
   });
 
-  it('analyzeGaps returns stub gaps when DB returns empty array', async () => {
+  it('analyzeGaps returns empty gaps when DB returns empty array', async () => {
     mockSelectWhereFn.mockResolvedValue([]);
 
     const report = await service.analyzeGaps('tenant-empty');
 
     expect(report.tenantId).toBe('tenant-empty');
-    expect(report.totalGaps).toBeGreaterThan(0);
-    expect(report.allGaps.length).toBeGreaterThan(0);
-    // Stub gaps have gapType NOT_STARTED
-    expect(report.allGaps.every((g) => g.gapType === 'NOT_STARTED')).toBe(true);
+    expect(report.totalGaps).toBe(0);
+    expect(report.allGaps).toEqual([]);
+    expect(report.criticalGaps).toEqual([]);
   });
 
   it('getTopGaps returns array with length <= limit', async () => {

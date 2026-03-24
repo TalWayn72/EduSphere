@@ -3,9 +3,11 @@ import {
   Logger,
   BadRequestException,
   NotFoundException,
+  type OnModuleDestroy,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
+  closeAllPools,
   schema,
   eq,
   and,
@@ -52,10 +54,15 @@ export type UpdatePipelineTemplateInput = z.infer<typeof updateTemplateSchema>;
 // ─── Service ───────────────────────────────────────────────────────────────
 
 @Injectable()
-export class LessonPipelineTemplateService {
+export class LessonPipelineTemplateService implements OnModuleDestroy {
   private readonly logger = new Logger(LessonPipelineTemplateService.name);
   private readonly db = createDatabaseConnection();
   private readonly tbl = schema.lesson_pipeline_templates;
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[LessonPipelineTemplateService] DB pools closed on destroy');
+  }
 
   private mapRow(row: typeof this.tbl.$inferSelect) {
     return {

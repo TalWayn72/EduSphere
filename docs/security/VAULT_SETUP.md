@@ -179,4 +179,4 @@ vault operator unseal <key-share-3>
 - [HashiCorp Vault documentation](https://developer.hashicorp.com/vault/docs)
 - [Vault AppRole authentication](https://developer.hashicorp.com/vault/docs/auth/approle)
 - [EduSphere Security Plan](./SECURITY_PLAN.md)
-- [EduSphere TDE Column Encryption](./tde-column-encryption.md)
+- [EduSphere TDE Column Encryption](./TDE_COLUMN_ENCRYPTION.md)

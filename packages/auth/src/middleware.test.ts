@@ -169,9 +169,11 @@ describe('AuthMiddleware.validateRequest', () => {
 
   // ── Dev bypass ────────────────────────────────────────────────────────────
 
-  it('sets authContext for dev-token-mock-jwt when NODE_ENV is not production', async () => {
-    const original = process.env.NODE_ENV;
+  it('sets authContext for dev-token-mock-jwt when NODE_ENV is not production AND ALLOW_DEV_TOKEN=true', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    const originalAllow = process.env.ALLOW_DEV_TOKEN;
     process.env.NODE_ENV = 'test';
+    process.env.ALLOW_DEV_TOKEN = 'true';
     try {
       const ctx = makeContext('Bearer dev-token-mock-jwt');
       await middleware.validateRequest(ctx);
@@ -182,7 +184,44 @@ describe('AuthMiddleware.validateRequest', () => {
       );
       expect(ctx.authContext?.isSuperAdmin).toBe(true);
     } finally {
-      process.env.NODE_ENV = original;
+      process.env.NODE_ENV = originalEnv;
+      process.env.ALLOW_DEV_TOKEN = originalAllow;
+    }
+  });
+
+  it('rejects dev-token-mock-jwt when ALLOW_DEV_TOKEN is not set (W0-2 regression)', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    const originalAllow = process.env.ALLOW_DEV_TOKEN;
+    process.env.NODE_ENV = 'test';
+    delete process.env.ALLOW_DEV_TOKEN;
+    try {
+      mockJwtVerify.mockRejectedValueOnce(new Error('Invalid token'));
+      const ctx = makeContext('Bearer dev-token-mock-jwt');
+      await middleware.validateRequest(ctx);
+
+      // Dev token should NOT be accepted without ALLOW_DEV_TOKEN=true
+      // It falls through to JWT validation which fails, leaving authContext undefined
+      expect(ctx.authContext).toBeUndefined();
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+      process.env.ALLOW_DEV_TOKEN = originalAllow;
+    }
+  });
+
+  it('rejects dev-token-mock-jwt when ALLOW_DEV_TOKEN is "false"', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    const originalAllow = process.env.ALLOW_DEV_TOKEN;
+    process.env.NODE_ENV = 'test';
+    process.env.ALLOW_DEV_TOKEN = 'false';
+    try {
+      mockJwtVerify.mockRejectedValueOnce(new Error('Invalid token'));
+      const ctx = makeContext('Bearer dev-token-mock-jwt');
+      await middleware.validateRequest(ctx);
+
+      expect(ctx.authContext).toBeUndefined();
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+      process.env.ALLOW_DEV_TOKEN = originalAllow;
     }
   });
 
@@ -285,7 +324,7 @@ describe('AuthMiddleware.validateRequest', () => {
     expect(ctx.authContext?.isSuperAdmin).toBe(false);
   });
 
-  it('sets isSuperAdmin=true when x-user-role is SUPER_ADMIN in fallback', async () => {
+  it('does NOT grant SUPER_ADMIN via x-user-role header in fallback (W0-3 regression)', async () => {
     mockJwtVerify.mockRejectedValueOnce(new Error('JWKS fetch failed'));
 
     const ctx: GraphQLContext = {
@@ -303,8 +342,10 @@ describe('AuthMiddleware.validateRequest', () => {
 
     await middleware.validateRequest(ctx);
 
-    expect(ctx.authContext?.isSuperAdmin).toBe(true);
-    expect(ctx.authContext?.roles).toEqual(['SUPER_ADMIN']);
+    // SUPER_ADMIN must NOT be grantable via header — only via validated JWT.
+    // The role is stripped, so authContext has empty roles and isSuperAdmin=false.
+    expect(ctx.authContext?.isSuperAdmin).toBe(false);
+    expect(ctx.authContext?.roles).toEqual([]);
   });
 
   // ── BUG-073 regression: audience must NOT be checked in subgraph middleware ─

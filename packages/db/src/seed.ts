@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
 import { sql, type SQL } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from './schema';
+import { getOrCreatePool, closeAllPools } from './index';
 import { initializeGraphOntology } from './graph';
 import { seedNaharShalomCourse } from './seed/nahar-shalom-course.js';
 import { seedNaharShalomSource } from './seed/nahar-shalom-source.js';
@@ -16,7 +16,7 @@ async function seed() {
     process.env.DATABASE_URL ||
     'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere';
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = getOrCreatePool(process.env.DATABASE_URL);
 
   const db = drizzle(pool, { schema });
 
@@ -217,7 +217,7 @@ async function seed() {
     console.error('❌ Seed failed:', error);
     process.exit(1);
   } finally {
-    await pool.end();
+    await closeAllPools();
   }
 }
 

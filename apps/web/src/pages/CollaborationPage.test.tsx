@@ -114,6 +114,25 @@ describe('CollaborationPage', () => {
     expect(screen.getByText(/Failed to load sessions/i)).toBeInTheDocument();
   });
 
+  it('shows schema upgrade notice for schema validation errors', () => {
+    mockUseQuery.mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Cannot query field "myDiscussions" on type "Query"' },
+      },
+      vi.fn(),
+    ]);
+    renderPage();
+    // Should NOT show the network error banner
+    expect(screen.queryByTestId('collab-offline-banner')).not.toBeInTheDocument();
+    // Should show the schema upgrade banner
+    expect(screen.getByTestId('collab-schema-banner')).toBeInTheDocument();
+    expect(
+      screen.getByText(/collaboration features are being upgraded/i)
+    ).toBeInTheDocument();
+  });
+
   it('shows empty discussions message when no sessions', () => {
     mockUseQuery.mockReturnValue([
       { data: { myDiscussions: [] }, fetching: false, error: undefined },

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
+  initializeGraphOntology,
   findRelatedConcepts,
   findContradictions,
   findLearningPath,
@@ -31,6 +32,70 @@ const mockExecuteCypher = vi.mocked(executeCypher);
 function buildMockDb(): DrizzleDB {
   return {} as unknown as DrizzleDB;
 }
+
+// ---------------------------------------------------------------------------
+// initializeGraphOntology — all 5 vertex types
+// ---------------------------------------------------------------------------
+
+describe('initializeGraphOntology()', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExecuteCypher.mockResolvedValue([]);
+  });
+
+  it('calls executeCypher exactly 5 times (one per vertex type)', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    expect(mockExecuteCypher).toHaveBeenCalledTimes(5);
+  });
+
+  it('creates a Concept vertex', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    expect(queries.some((q) => q.includes(':Concept'))).toBe(true);
+  });
+
+  it('creates a Person vertex', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    expect(queries.some((q) => q.includes(':Person'))).toBe(true);
+  });
+
+  it('creates a TopicCluster vertex', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    expect(queries.some((q) => q.includes(':TopicCluster'))).toBe(true);
+  });
+
+  it('creates a Term vertex', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    expect(queries.some((q) => q.includes(':Term'))).toBe(true);
+  });
+
+  it('creates a Source vertex', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    expect(queries.some((q) => q.includes(':Source'))).toBe(true);
+  });
+
+  it('all 5 vertex types are initialized with tenant_id=default', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    const vertexTypes = ['Concept', 'Person', 'TopicCluster', 'Term', 'Source'];
+    for (const vtype of vertexTypes) {
+      const matching = queries.find((q) => q.includes(`:${vtype}`));
+      expect(matching).toBeDefined();
+      expect(matching).toContain("'default'");
+    }
+  });
+});
 
 // ---------------------------------------------------------------------------
 // findRelatedConcepts

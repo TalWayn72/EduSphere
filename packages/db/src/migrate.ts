@@ -2,7 +2,8 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getOrCreatePool, closeAllPools } from './index';
 
 /**
  * Custom SQL migrations runner.
@@ -49,11 +50,10 @@ async function runCustomMigrations(pool: Pool): Promise<void> {
 }
 
 async function runMigrations(): Promise<void> {
-  const pool = new Pool({
-    connectionString:
-      process.env.DATABASE_URL ||
-      'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
-  });
+  const connectionString =
+    process.env.DATABASE_URL ||
+    'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere';
+  const pool = getOrCreatePool(connectionString);
 
   const db = drizzle(pool);
 
@@ -65,7 +65,7 @@ async function runMigrations(): Promise<void> {
   await runCustomMigrations(pool);
   process.stderr.write('[migrate] Custom migrations complete.\n');
 
-  await pool.end();
+  await closeAllPools();
 }
 
 runMigrations().catch((error: unknown) => {

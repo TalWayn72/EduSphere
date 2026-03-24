@@ -285,7 +285,6 @@ jobs:
     name: E2E Tests (Playwright — frontend only)
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    continue-on-error: true
 
     steps:
       - name: Checkout repository
@@ -525,7 +524,8 @@ jobs:
                 "${{ needs.security-scan.result }}" != "success" || \
                 "${{ needs.security-policy-tests.result }}" != "success" || \
                 "${{ needs.build.result }}" != "success" || \
-                "${{ needs.codegen-validation.result }}" != "success" ]]; then
+                "${{ needs.codegen-validation.result }}" != "success" || \
+                "${{ needs.e2e-tests.result }}" != "success" ]]; then
             echo "One or more CI jobs failed"
             exit 1
           fi

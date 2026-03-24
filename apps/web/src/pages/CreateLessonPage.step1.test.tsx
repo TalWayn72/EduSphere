@@ -24,26 +24,25 @@ describe('CreateLessonStep1', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the step heading', () => {
+  it('renders the step heading via i18n', () => {
     renderStep1();
-    expect(screen.getByText('פרטי שיעור')).toBeInTheDocument();
+    expect(screen.getByText('Lesson Details')).toBeInTheDocument();
   });
 
-  it('renders the title input with correct placeholder', () => {
+  it('renders the title input with i18n placeholder', () => {
     renderStep1();
-    expect(screen.getByPlaceholderText(/שיעור עץ חיים/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Tree of Life lesson/i)).toBeInTheDocument();
   });
 
-  it('renders THEMATIC and SEQUENTIAL radio options', () => {
+  it('renders THEMATIC and SEQUENTIAL radio options via i18n', () => {
     renderStep1();
-    expect(screen.getByText('כללי (נושאי)')).toBeInTheDocument();
-    expect(screen.getByText('על הסדר')).toBeInTheDocument();
+    expect(screen.getByText('General (Thematic)')).toBeInTheDocument();
+    expect(screen.getByText('Sequential')).toBeInTheDocument();
   });
 
-  it('"סדרת שיעורים" field is not visible (removed)', () => {
+  it('series field is not visible (removed)', () => {
     renderStep1();
     expect(screen.queryByPlaceholderText(/ספר עץ חיים/i)).not.toBeInTheDocument();
-    expect(screen.queryByText('סדרת שיעורים')).not.toBeInTheDocument();
   });
 
   it('renders lesson date input (type=date)', () => {
@@ -52,19 +51,19 @@ describe('CreateLessonStep1', () => {
     expect(dateInputs.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders submit button', () => {
+  it('renders submit button with i18n text', () => {
     renderStep1();
     expect(
-      screen.getByRole('button', { name: /המשך לחומרים/i })
+      screen.getByRole('button', { name: /Continue to Materials/i })
     ).toBeInTheDocument();
   });
 
-  it('shows validation error when title is too short (< 3 chars)', async () => {
+  it('shows i18n validation error when title is too short (< 3 chars)', async () => {
     renderStep1();
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
     await waitFor(() => {
       expect(
-        screen.getByText('כותרת חייבת להכיל לפחות 3 תווים')
+        screen.getByText('Title must contain at least 3 characters')
       ).toBeInTheDocument();
     });
   });
@@ -72,13 +71,13 @@ describe('CreateLessonStep1', () => {
   it('calls onSubmit with title and THEMATIC type when form is submitted', async () => {
     const onSubmit = vi.fn();
     renderStep1(onSubmit);
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
+    fireEvent.change(screen.getByPlaceholderText(/Tree of Life lesson/i), {
+      target: { value: 'Test Lesson' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     const callArg = onSubmit.mock.calls[0]![0]! as LessonFormData;
-    expect(callArg.title).toBe('שיעור בדיקה');
+    expect(callArg.title).toBe('Test Lesson');
     expect(callArg.type).toBe('THEMATIC');
   });
 
@@ -88,10 +87,10 @@ describe('CreateLessonStep1', () => {
     const radios = screen.getAllByRole('radio');
     // SEQUENTIAL is the second radio
     fireEvent.click(radios[1]!);
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
+    fireEvent.change(screen.getByPlaceholderText(/Tree of Life lesson/i), {
+      target: { value: 'Test Lesson' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     const callArg = onSubmit.mock.calls[0]![0]! as LessonFormData;
     expect(callArg.type).toBe('SEQUENTIAL');
@@ -99,11 +98,11 @@ describe('CreateLessonStep1', () => {
 
   it('populates initial data from props', () => {
     const initial: LessonFormData = {
-      title: 'קיים',
+      title: 'Existing',
       type: 'SEQUENTIAL',
       lessonDate: '2026-03-01',
     };
     renderStep1(vi.fn(), initial);
-    expect(screen.getByDisplayValue('קיים')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Existing')).toBeInTheDocument();
   });
 });

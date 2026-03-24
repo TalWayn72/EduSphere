@@ -112,6 +112,10 @@ describe('storeDecision (mocked ChromaDB)', () => {
       listCollectionsWithCounts: vi.fn(),
       getClient: vi.fn(),
     }));
+    vi.doMock('../src/resilience.js', () => ({
+      isChromaAvailable: vi.fn().mockResolvedValue(true),
+      logError: vi.fn(),
+    }));
 
     const { storeDecision } = await import('../src/handlers.js');
     const result = await storeDecision({
@@ -151,6 +155,10 @@ describe('storeBugPattern (mocked ChromaDB)', () => {
       COLLECTION_NAMES: ['edusphere_bug_patterns'],
       listCollectionsWithCounts: vi.fn(),
       getClient: vi.fn(),
+    }));
+    vi.doMock('../src/resilience.js', () => ({
+      isChromaAvailable: vi.fn().mockResolvedValue(true),
+      logError: vi.fn(),
     }));
 
     const { storeBugPattern } = await import('../src/handlers.js');

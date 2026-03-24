@@ -1,3 +1,41 @@
 #!/bin/sh
+
+# Git LFS check
 command -v git-lfs >/dev/null 2>&1 || { printf >&2 "\n%s\n\n" "This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'pre-push' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks')."; exit 2; }
 git lfs pre-push "$@"
+
+# Quality gates — lint and typecheck changed packages only (fast)
+# Uses Turborepo's --filter to scope to packages changed since last push
+echo "Running pre-push quality gates (lint + typecheck on changed packages)..."
+
+# Detect changed files between HEAD and the remote tracking branch
+CHANGED_PACKAGES=$(git diff --name-only @{push}.. 2>/dev/null | grep -E '^(apps|packages)/' | cut -d'/' -f1-2 | sort -u || true)
+
+if [ -z "$CHANGED_PACKAGES" ]; then
+  echo "No app/package changes detected — skipping lint/typecheck."
+  exit 0
+fi
+
+echo "Changed packages: $CHANGED_PACKAGES"
+
+# Build Turborepo filter args from changed paths
+FILTER_ARGS=""
+for pkg in $CHANGED_PACKAGES; do
+  FILTER_ARGS="$FILTER_ARGS --filter=./$pkg"
+done
+
+# Run lint on changed packages (fail-fast)
+echo "Linting changed packages..."
+pnpm turbo lint $FILTER_ARGS || {
+  echo "Lint failed — fix errors before pushing."
+  exit 1
+}
+
+# Run typecheck on changed packages
+echo "Type-checking changed packages..."
+pnpm turbo typecheck $FILTER_ARGS || {
+  echo "Typecheck failed — fix type errors before pushing."
+  exit 1
+}
+
+echo "Pre-push quality gates passed."

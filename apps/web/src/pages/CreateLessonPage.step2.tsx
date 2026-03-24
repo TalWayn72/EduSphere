@@ -1,16 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from 'urql';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ADD_LESSON_ASSET_MUTATION } from '@/lib/graphql/lesson.queries';
-
-const youtubeUrlSchema = z
-  .string()
-  .url()
-  .refine(
-    (url) => url.includes('youtube.com') || url.includes('youtu.be'),
-    'חייב להיות כתובת YouTube תקינה'
-  );
 
 interface Props {
   lessonId: string;
@@ -23,14 +16,23 @@ export function CreateLessonStep2({
   courseId: _courseId,
   onNext,
 }: Props) {
+  const { t } = useTranslation('courses');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoError, setVideoError] = useState('');
   const [, addAsset] = useMutation(ADD_LESSON_ASSET_MUTATION);
 
+  const youtubeUrlSchema = z
+    .string()
+    .url()
+    .refine(
+      (url) => url.includes('youtube.com') || url.includes('youtu.be'),
+      t('createLesson.youtubeValidation')
+    );
+
   const handleAddVideo = async () => {
     const parsed = youtubeUrlSchema.safeParse(videoUrl);
     if (!parsed.success) {
-      setVideoError(parsed.error.issues[0]?.message ?? 'כתובת לא תקינה');
+      setVideoError(parsed.error.issues[0]?.message ?? t('createLesson.invalidUrl'));
       return;
     }
     setVideoError('');
@@ -44,15 +46,15 @@ export function CreateLessonStep2({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">הוספת חומרים</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('createLesson.step2Title')}</h2>
       <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
-        ניתן לדלג על שלב זה ולהוסיף חומרים לאחר יצירת השיעור
+        {t('createLesson.step2Hint')}
       </p>
 
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium mb-1">
-            🎥 קישור YouTube
+            {t('createLesson.youtubeLink')}
           </label>
           <div className="flex gap-2">
             <input
@@ -64,7 +66,7 @@ export function CreateLessonStep2({
             />
             {lessonId && (
               <Button size="sm" variant="outline" onClick={handleAddVideo}>
-                הוסף
+                {t('createLesson.addButton')}
               </Button>
             )}
           </div>
@@ -73,14 +75,14 @@ export function CreateLessonStep2({
           )}
           {!lessonId && (
             <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
-              הקישור יתווסף לאחר יצירת השיעור
+              {t('createLesson.linkAddedAfterCreation')}
             </p>
           )}
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">
-            📄 קובץ הערות (PDF)
+            {t('createLesson.notesFile')}
           </label>
           <input
             type="file"
@@ -88,17 +90,17 @@ export function CreateLessonStep2({
             className="w-full border rounded-lg px-3 py-2 text-sm"
           />
           <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
-            תמיכה בקבצי PDF, Word, TXT
+            {t('createLesson.supportedFormats')}
           </p>
         </div>
       </div>
 
       <div className="flex gap-3 mt-6">
         <Button variant="outline" className="flex-1" onClick={onNext}>
-          דלג
+          {t('createLesson.skip')}
         </Button>
         <Button className="flex-1" onClick={onNext}>
-          המשך לבחירת תבנית ←
+          {t('createLesson.continueToTemplate')}
         </Button>
       </div>
     </div>

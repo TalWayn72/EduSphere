@@ -137,7 +137,7 @@ if docker exec edusphere-all-in-one bash -c "test -f /tmp/nats-test/node_modules
 else
   echo -e "${YELLOW}missing — installing...${NC}"
   if docker exec edusphere-all-in-one bash -c \
-    "mkdir -p /tmp/nats-test && cd /tmp/nats-test && NODE_TLS_REJECT_UNAUTHORIZED=0 npm install mcp-nats --save --loglevel=error" \
+    "mkdir -p /tmp/nats-test && cd /tmp/nats-test && npm install mcp-nats --save --loglevel=error" \
     > /dev/null 2>&1; then
     echo -e "  ${GREEN}✓ mcp-nats installed${NC}"
   else

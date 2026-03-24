@@ -623,5 +623,32 @@
       "netRoi": "ROI נטו",
       "getReport": "קבלו דוח ROI מותאם אישית"
     }
+  },
+  "notFound": {
+    "title": "הדף לא נמצא",
+    "description": "הדף שחיפשת אינו קיים או שהועבר למיקום אחר.",
+    "backToDashboard": "חזרה ללוח הבקרה"
+  },
+  "pagination": {
+    "previous": "הקודם",
+    "next": "הבא",
+    "page": "עמוד",
+    "of": "מתוך",
+    "goToPage": "עבור לעמוד {{page}}"
+  },
+  "emptyState": {
+    "defaultTitle": "אין כאן עדיין כלום",
+    "defaultDescription": "אין פריטים להצגה כרגע."
+  },
+  "calendar": {
+    "previousMonth": "חודש קודם",
+    "nextMonth": "חודש הבא",
+    "sunday": "א׳",
+    "monday": "ב׳",
+    "tuesday": "ג׳",
+    "wednesday": "ד׳",
+    "thursday": "ה׳",
+    "friday": "ו׳",
+    "saturday": "ש׳"
   }
 }

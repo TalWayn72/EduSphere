@@ -53,7 +53,12 @@ export class AuthMiddleware {
 
       // Dev bypass: accept dev-token-mock-jwt in non-production environments
       // so Playwright/integration tests work without a live Keycloak.
-      if (process.env.NODE_ENV !== 'production' && token === 'dev-token-mock-jwt') {
+      // SEC-1 hardening: requires ALLOW_DEV_TOKEN=true AND non-production env.
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        process.env['ALLOW_DEV_TOKEN'] === 'true' &&
+        token === 'dev-token-mock-jwt'
+      ) {
         context.authContext = {
           userId: '00000000-0000-0000-0000-000000000001',
           email: 'super.admin@edusphere.dev',
@@ -110,10 +115,10 @@ export class AuthMiddleware {
       const userId = this.extractHeader(context, 'x-user-id');
       const tenantId = this.extractHeader(context, 'x-tenant-id');
       const rawRole = this.extractHeader(context, 'x-user-role');
-      // Allow all known roles (including SUPER_ADMIN) from gateway-forwarded headers.
-      // The gateway already validated the JWT before forwarding these headers.
+      // SEC-1/BE-7: Header fallback NEVER grants SUPER_ADMIN — an attacker who
+      // can reach a subgraph directly could spoof x-user-role: SUPER_ADMIN.
+      // Only JWT-validated tokens may grant SUPER_ADMIN.
       const ALLOWED_HEADER_ROLES = new Set([
-        'SUPER_ADMIN',
         'ORG_ADMIN',
         'INSTRUCTOR',
         'STUDENT',

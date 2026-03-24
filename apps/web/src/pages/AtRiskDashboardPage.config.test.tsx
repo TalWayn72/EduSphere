@@ -44,6 +44,7 @@ describe('RiskThresholdConfig', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    localStorage.clear();
   });
 
   afterEach(() => {
@@ -138,5 +139,36 @@ describe('RiskThresholdConfig', () => {
     // Timer is now running — unmount before it fires
     unmount();
     expect(clearTimeoutSpy).toHaveBeenCalled();
+  });
+
+  it('persists thresholds to localStorage on save', () => {
+    render(<RiskThresholdConfig />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '14' } });
+    fireEvent.click(screen.getByRole('button', { name: /Save Thresholds/i }));
+    const stored = JSON.parse(localStorage.getItem('edusphere_risk_thresholds') ?? '{}');
+    expect(stored.inactiveDays).toBe(14);
+    expect(stored.completionThreshold).toBe(30);
+  });
+
+  it('loads persisted thresholds from localStorage on mount', () => {
+    localStorage.setItem(
+      'edusphere_risk_thresholds',
+      JSON.stringify({ inactiveDays: 21, completionThreshold: 60 })
+    );
+    render(<RiskThresholdConfig />);
+    expect(screen.getByRole('spinbutton')).toHaveValue(21);
+    expect(screen.getByText(/60%/)).toBeInTheDocument();
+  });
+
+  it('shows error toast when localStorage.setItem throws', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota exceeded');
+    });
+    render(<RiskThresholdConfig />);
+    fireEvent.click(screen.getByRole('button', { name: /Save Thresholds/i }));
+    expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
+      'Failed to save thresholds. Please try again.'
+    );
   });
 });
