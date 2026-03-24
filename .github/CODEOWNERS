@@ -1,0 +1,40 @@
+# EduSphere Code Owners
+# Each line is a file pattern followed by one or more owners.
+# Order matters — last matching pattern takes precedence.
+
+# Default owner
+* @TalWayn72
+
+# Gateway & Federation
+apps/gateway/ @TalWayn72
+
+# Subgraphs
+apps/subgraph-core/ @TalWayn72
+apps/subgraph-content/ @TalWayn72
+apps/subgraph-annotation/ @TalWayn72
+apps/subgraph-collaboration/ @TalWayn72
+apps/subgraph-agent/ @TalWayn72
+apps/subgraph-knowledge/ @TalWayn72
+
+# Frontend
+apps/web/ @TalWayn72
+apps/mobile/ @TalWayn72
+
+# Shared Packages
+packages/db/ @TalWayn72
+packages/auth/ @TalWayn72
+packages/graphql-shared/ @TalWayn72
+packages/graphql-types/ @TalWayn72
+packages/nats-client/ @TalWayn72
+
+# Security
+tests/security/ @TalWayn72
+
+# Infrastructure & CI
+infrastructure/ @TalWayn72
+.github/workflows/ @TalWayn72
+docker-compose*.yml @TalWayn72
+
+# Documentation
+docs/ @TalWayn72
+*.md @TalWayn72
