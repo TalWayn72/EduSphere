@@ -7,7 +7,7 @@ import { useMarketplace } from '@/hooks/useMarketplace';
 
 export function MarketplaceBrowse() {
   const { t } = useTranslation('org');
-  const { listings, isLoading, totalCount, licenseCourse, categories } =
+  const { listings, isLoading, licenseCourse, categories } =
     useMarketplace();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');

@@ -6,7 +6,7 @@
 import { useMemo } from 'react';
 import { useQuery } from 'urql';
 import { BRANDED_LOGIN_DATA_QUERY } from '@/lib/graphql/branding.queries';
-import { DEFAULT_BRANDING, type TenantBrandingData } from '@/lib/branding';
+import { DEFAULT_BRANDING } from '@/lib/branding';
 
 export interface BrandedLoginConfig {
   /** Organization display name */

@@ -4,7 +4,7 @@ import { PrivacyConsentCard } from './PrivacyConsentCard';
 
 vi.mock('urql', () => ({
   useMutation: vi.fn(() => [{}, vi.fn().mockResolvedValue({ data: {}, error: undefined })]),
-  gql: (strings: TemplateStringsArray, ...values: unknown[]) => strings.join(''),
+  gql: (strings: TemplateStringsArray, ..._values: unknown[]) => strings.join(''),
 }));
 
 vi.mock('react-i18next', () => ({

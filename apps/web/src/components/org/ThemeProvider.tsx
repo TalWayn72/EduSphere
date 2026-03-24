@@ -31,8 +31,8 @@ interface OrgThemeProviderProps {
   children: React.ReactNode;
 }
 
-export function OrgThemeProvider({ slug, children }: OrgThemeProviderProps) {
-  const { branding, isLoading } = useTenantBranding();
+export function OrgThemeProvider({ slug: _slug, children }: OrgThemeProviderProps) {
+  const { branding } = useTenantBranding();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const theme: OrgTheme = branding ?? DEFAULT_THEME;

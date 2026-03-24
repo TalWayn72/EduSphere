@@ -14,7 +14,7 @@ function getUrgency(days: number): string {
 
 export function TrialBanner() {
   const { t } = useTranslation('org');
-  const { status, daysRemaining, planName } = useSubscription();
+  const { status, daysRemaining } = useSubscription();
 
   if (status === 'active') return null;
 
