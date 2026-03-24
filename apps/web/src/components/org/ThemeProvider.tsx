@@ -1,7 +1,7 @@
 /**
  * OrgThemeProvider — Injects tenant branding as CSS variables and React context.
  */
-import React, { createContext, useEffect, useRef } from 'react';
+import React, { createContext, useEffect, useMemo, useRef } from 'react';
 import { useTenantBranding } from '@/hooks/useTenantBranding';
 
 interface OrgTheme {
@@ -35,7 +35,7 @@ export function OrgThemeProvider({ slug: _slug, children }: OrgThemeProviderProp
   const { branding } = useTenantBranding();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const theme: OrgTheme = branding
+  const theme: OrgTheme = useMemo(() => branding
     ? {
         primaryColor: branding.primaryColor,
         secondaryColor: branding.secondaryColor,
@@ -45,7 +45,7 @@ export function OrgThemeProvider({ slug: _slug, children }: OrgThemeProviderProp
         logoUrl: branding.logoUrl,
         orgName: branding.organizationName,
       }
-    : DEFAULT_THEME;
+    : DEFAULT_THEME, [branding]);
 
   useEffect(() => {
     const el = wrapperRef.current;
