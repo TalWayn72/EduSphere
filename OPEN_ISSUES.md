@@ -91,6 +91,7 @@
 | BUG-104 | Knowledge Graph Page — "Invalid time value" GraphQL Error | ✅ Fixed | (pending commit) |
 | BUG-105 | Cannot return null for AgentTemplate.templateType | ✅ Fixed | (pending commit) |
 | BUG-106 | GraphQL 400 Bad Request errors on Lesson Pipeline page | ✅ Fixed | (pending commit) |
+| BUG-107 | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing) | ✅ Fixed | (pending commit) |
 
 ---
 
@@ -11132,3 +11133,43 @@ Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `
 
 - Field resolver ensures non-null contract is always satisfied regardless of DB field naming
 **Files:** `tools/` directory (new), `.mcp.json` (updated), 10 agent prompt templates (updated)
+
+---
+
+## BUG-107 — Knowledge Graph "Cannot return null for non-nullable field Concept.id" (23 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical (recurring — 3rd Knowledge Graph bug: BUG-096, BUG-104, BUG-107)
+- **Reported:** User screenshot — `localhost:5173/knowledge-graph` shows "Failed to load graph"
+- **Console Errors:**
+  1. `[Auth] Keycloak init timed out after 10000ms — continuing unauthenticated` (auth.ts:132)
+  2. `[KnowledgeGraph] Concepts query error: [GraphQL] Cannot return null for non-nullable field Concept.id` (use-graph-data.ts:171)
+
+### Root Cause
+**Primary:** `packages/db/src/graph/client.ts` — `executeCypher()` returned raw PostgreSQL rows with `{ result: "<agtype string>" }` without parsing the Apache AGE agtype column. All 10+ consumer services accessed `.id`, `.name` directly on the row, which were always `undefined` because actual data was inside the unparsed `result` string.
+
+**Secondary:** `packages/db/src/graph/ontology.ts` — `createConcept()` used `JSON.stringify({id: 'gen_random_uuid()::text'})` which stored the literal string as the concept ID instead of generating a UUID.
+
+**Why recurring:** The type mismatch between what `executeCypher` returned (raw pg rows) and what consumers expected (flat property objects) was systemic. Previous fixes (BUG-104 timestamp, BUG-096 error handling) addressed symptoms without fixing the underlying agtype parsing gap.
+
+### Fix (systemic — at executeCypher level)
+- Added `parseAgtypeValue()` — parses vertex/edge/scalar agtype strings into plain JS objects
+- Added `unwrapAgeRow()` — unwraps the `result` column from pg rows
+- Modified all `executeCypher` return paths to auto-parse agtype results
+- Fixed `createConcept` — uses `crypto.randomUUID()` instead of string literal
+- **All 10+ consumer services benefit automatically** — no more symptom-level fixes
+
+### Files Changed
+1. `packages/db/src/graph/client.ts` — `parseAgtypeValue()`, `unwrapAgeRow()`, modified `executeCypher` + `addVertex`
+2. `packages/db/src/graph/ontology.ts` — Fixed `createConcept` UUID generation
+3. `packages/db/src/graph/client.test.ts` — Updated assertions + 15 regression tests
+4. `packages/db/src/graph/ontology.test.ts` — 3 BUG-107 regression tests
+
+### Tests Added
+- 18 new tests total (533 passing in @edusphere/db, 690 in subgraph-knowledge)
+- Anti-recurrence: `parseAgtypeValue` unit tests ensure agtype parsing never regresses
+
+### Discovery List
+Wave 1: 10 cypher service files consume `executeCypher` — all now auto-fixed at source
+Wave 2: All subgraph-knowledge graph services checked — same pattern, all fixed by `unwrapAgeRow`
+Wave 3: `JSON.stringify` with Cypher function literals — same class as BUG-104, fixed in `ontology.ts`

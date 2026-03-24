@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { DrizzleDB } from './client';
 import { executeCypher } from './client';
 
@@ -73,15 +74,16 @@ export async function createConcept(
   db: DrizzleDB,
   props: ConceptProperties
 ): Promise<string> {
+  const conceptId = props.id || randomUUID();
   const propsJson = JSON.stringify({
     ...props,
-    id: props.id || 'gen_random_uuid()::text',
+    id: conceptId,
     source_ids: JSON.stringify(props.source_ids || []),
     created_at: Date.now(),
     updated_at: Date.now(),
   });
 
-  const result = await executeCypher<{ id: string }>(
+  await executeCypher(
     db,
     GRAPH_NAME,
     `
@@ -90,7 +92,7 @@ export async function createConcept(
   `
   );
 
-  return result[0]?.id || '';
+  return conceptId;
 }
 
 /** Shape returned by findRelatedConcepts Cypher query. */

@@ -3,6 +3,7 @@ import {
   executeCypher,
   toCypherLiteral,
   substituteParams,
+  parseAgtypeValue,
   addVertex,
   addEdge,
   queryNodes,
@@ -177,7 +178,8 @@ describe('executeCypher()', () => {
     expect(mockRelease).toHaveBeenCalledOnce();
   });
 
-  it('returns the rows from the result', async () => {
+  it('unwraps the result column and returns parsed values (BUG-107)', async () => {
+    // Simulate AGE returning a vertex in the `result` agtype column
     const rows = [{ result: { id: '1' } }];
     mockQuery
       .mockResolvedValueOnce(undefined) // LOAD 'age'
@@ -186,7 +188,8 @@ describe('executeCypher()', () => {
 
     const db = buildMockDb();
     const result = await executeCypher(db, GRAPH, 'MATCH (n) RETURN n');
-    expect(result).toEqual(rows);
+    // The `result` column wrapper is stripped; the inner value is returned directly
+    expect(result).toEqual([{ id: '1' }]);
   });
 
   it('uses the graph name in the cypher() call', async () => {
@@ -233,8 +236,8 @@ describe('executeCypher()', () => {
       { id: 'concept-1' }
     );
 
-    // Fallback succeeded
-    expect(result).toEqual([{ result: 'ok' }]);
+    // Fallback succeeded — result column unwrapped, 'ok' is a non-JSON string scalar
+    expect(result).toEqual(['ok']);
 
     // The retry call must NOT include $1 in the pg values array
     const calls = mockQuery.mock.calls;
@@ -346,11 +349,13 @@ describe('addVertex()', () => {
     expect(cypherCall).toContain('"Calculus"');
   });
 
-  it('returns the id from the first result row', async () => {
+  it('returns the id from the first result row (BUG-107: scalar agtype unwrapped)', async () => {
+    // AGE returns scalar RETURN v.id::text as { result: '"vertex-id-1"::text' }
+    // After parsing: the string "vertex-id-1" is extracted
     mockQuery
       .mockResolvedValueOnce(undefined) // LOAD 'age'
       .mockResolvedValueOnce(undefined) // SET search_path
-      .mockResolvedValueOnce({ rows: [{ id: 'vertex-id-1' }] });
+      .mockResolvedValueOnce({ rows: [{ result: '"vertex-id-1"' }] });
 
     const db = buildMockDb();
     const id = await addVertex(db, GRAPH, 'Concept', { name: 'Test' });
@@ -480,7 +485,7 @@ describe('queryNodes()', () => {
     expect(parsed).toMatchObject({ tenant_id: 't1', name: 'Algebra' });
   });
 
-  it('returns the rows from the cypher call', async () => {
+  it('returns unwrapped rows from the cypher call (BUG-107)', async () => {
     const rows = [{ result: { name: 'Algebra' } }];
     mockQuery
       .mockResolvedValueOnce(undefined)
@@ -489,7 +494,8 @@ describe('queryNodes()', () => {
 
     const db = buildMockDb();
     const result = await queryNodes(db, GRAPH, 'Concept');
-    expect(result).toEqual(rows);
+    // result column is unwrapped — inner object returned directly
+    expect(result).toEqual([{ name: 'Algebra' }]);
   });
 
   it('works with empty filters (no WHERE clause)', async () => {
@@ -579,7 +585,7 @@ describe('traverse()', () => {
     expect(cypherCall).toContain('1..2');
   });
 
-  it('returns the rows from the result', async () => {
+  it('returns unwrapped rows from the result (BUG-107)', async () => {
     const rows = [{ result: { id: 'related-1' } }];
     mockQuery
       .mockResolvedValueOnce(undefined)
@@ -588,12 +594,92 @@ describe('traverse()', () => {
 
     const db = buildMockDb();
     const result = await traverse(db, GRAPH, 'start-id', 'RELATED_TO', 2);
-    expect(result).toEqual(rows);
+    // result column unwrapped
+    expect(result).toEqual([{ id: 'related-1' }]);
   });
 
   it('releases pg client after traverse', async () => {
     const db = buildMockDb();
     await traverse(db, GRAPH, 'id', 'REL');
     expect(mockRelease).toHaveBeenCalledOnce();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseAgtypeValue — BUG-107 regression tests
+// ---------------------------------------------------------------------------
+
+describe('parseAgtypeValue()', () => {
+  it('returns null for null', () => {
+    expect(parseAgtypeValue(null)).toBeNull();
+  });
+
+  it('returns undefined for undefined', () => {
+    expect(parseAgtypeValue(undefined)).toBeUndefined();
+  });
+
+  it('passes through numbers unchanged', () => {
+    expect(parseAgtypeValue(42)).toBe(42);
+  });
+
+  it('passes through booleans unchanged', () => {
+    expect(parseAgtypeValue(true)).toBe(true);
+  });
+
+  it('passes through already-parsed objects unchanged', () => {
+    const obj = { id: '1', name: 'Test' };
+    expect(parseAgtypeValue(obj)).toBe(obj);
+  });
+
+  it('extracts properties from an AGE vertex string', () => {
+    const vertexStr =
+      '{"id": 844424930131969, "label": "Concept", "properties": {"id": "uuid-123", "name": "Algebra", "tenant_id": "t1"}}::vertex';
+    const result = parseAgtypeValue(vertexStr);
+    expect(result).toEqual({
+      id: 'uuid-123',
+      name: 'Algebra',
+      tenant_id: 't1',
+    });
+  });
+
+  it('extracts properties from an AGE edge string', () => {
+    const edgeStr =
+      '{"id": 1125899906842625, "label": "RELATED_TO", "start_id": 844424930131969, "end_id": 844424930131970, "properties": {"strength": 0.8}}::edge';
+    const result = parseAgtypeValue(edgeStr);
+    expect(result).toEqual({ strength: 0.8 });
+  });
+
+  it('unwraps a quoted string scalar', () => {
+    expect(parseAgtypeValue('"hello-world"::text')).toBe('hello-world');
+  });
+
+  it('unwraps a quoted string without ::type suffix', () => {
+    expect(parseAgtypeValue('"some-uuid"')).toBe('some-uuid');
+  });
+
+  it('unwraps a numeric scalar', () => {
+    expect(parseAgtypeValue('42::integer')).toBe(42);
+  });
+
+  it('unwraps a float scalar', () => {
+    expect(parseAgtypeValue('3.14::float')).toBe(3.14);
+  });
+
+  it('unwraps a boolean scalar', () => {
+    expect(parseAgtypeValue('true::boolean')).toBe(true);
+  });
+
+  it('returns a plain JSON object as-is (no label/properties = not a vertex)', () => {
+    expect(parseAgtypeValue('{"key": "value"}')).toEqual({ key: 'value' });
+  });
+
+  it('handles vertex with empty properties', () => {
+    const vertexStr =
+      '{"id": 1, "label": "Empty", "properties": {}}::vertex';
+    expect(parseAgtypeValue(vertexStr)).toEqual({});
+  });
+
+  it('handles non-JSON string (plain text)', () => {
+    expect(parseAgtypeValue('plain-text')).toBe('plain-text');
   });
 });

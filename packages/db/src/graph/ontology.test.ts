@@ -260,10 +260,10 @@ describe('createRelationship()', () => {
 // BUG-104: createConcept — timestamps must be numeric, not literal "timestamp()"
 // ---------------------------------------------------------------------------
 
-describe('createConcept() — BUG-104 regression', () => {
+describe('createConcept() — BUG-104 + BUG-107 regression', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockExecuteCypher.mockResolvedValue([{ id: 'new-concept-id' }]);
+    mockExecuteCypher.mockResolvedValue([]);
   });
 
   it('embeds numeric created_at/updated_at in the Cypher query (not string "timestamp()")', async () => {
@@ -299,5 +299,51 @@ describe('createConcept() — BUG-104 regression', () => {
     // BUG-104 root cause: JSON.stringify({created_at: 'timestamp()'}) produced
     // "created_at":"timestamp()" in the Cypher query, which AGE stored as a string.
     expect(query).not.toContain('"timestamp()"');
+  });
+
+  it('BUG-107: does NOT contain literal "gen_random_uuid()::text" in the embedded JSON', async () => {
+    const db = buildMockDb();
+    await createConcept(db, {
+      tenant_id: 'tenant-1',
+      name: 'Test',
+      definition: 'A test',
+    });
+
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    // BUG-107 root cause: JSON.stringify({id: 'gen_random_uuid()::text'}) produced
+    // "id":"gen_random_uuid()::text" in the Cypher query, stored as a string literal.
+    expect(query).not.toContain('"gen_random_uuid()::text"');
+  });
+
+  it('BUG-107: uses a valid UUID format for the id when no id is provided', async () => {
+    const db = buildMockDb();
+    const result = await createConcept(db, {
+      tenant_id: 'tenant-1',
+      name: 'Test',
+      definition: 'A test',
+    });
+
+    // createConcept now generates a UUID in JS and returns it directly
+    expect(result).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+
+    // The same UUID should appear in the Cypher query
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    expect(query).toContain(result);
+  });
+
+  it('BUG-107: preserves caller-provided id when present', async () => {
+    const db = buildMockDb();
+    const result = await createConcept(db, {
+      id: 'my-custom-id',
+      tenant_id: 'tenant-1',
+      name: 'Test',
+      definition: 'A test',
+    });
+
+    expect(result).toBe('my-custom-id');
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    expect(query).toContain('"my-custom-id"');
   });
 });

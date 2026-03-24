@@ -65,6 +65,95 @@ export function substituteParams(
 }
 
 /**
+ * Parse a single Apache AGE agtype value returned in a `result` column.
+ *
+ * AGE returns all values as strings via the pg wire protocol:
+ * - Vertex: `{"id": 123, "label": "Concept", "properties": {"id": "uuid", ...}}::vertex`
+ * - Edge:   `{"id": 456, "label": "RELATED_TO", "start_id": ..., "end_id": ..., "properties": {...}}::edge`
+ * - Scalar: `"some-text"::text`, `42::integer`, `true::boolean`, `3.14::float`
+ * - Map:    `{"key": "value"}` (no ::type suffix)
+ * - Path:   `[vertex, edge, vertex, ...]::path`
+ *
+ * This function extracts the useful JS value:
+ * - Vertices → return `properties` sub-object (the user-defined fields)
+ * - Edges   → return `properties` sub-object
+ * - Scalars → return the unwrapped primitive (string, number, boolean, null)
+ * - Already-parsed objects (from mock/test) → pass through unchanged
+ *
+ * BUG-107: Without this parsing, consumers received raw `{ result: "<agtype>" }`
+ * rows and accessed `.id`, `.name`, etc. which were always `undefined`, causing
+ * "Cannot return null for non-nullable field Concept.id" GraphQL errors.
+ */
+export function parseAgtypeValue(raw: unknown): unknown {
+  // null/undefined → pass through
+  if (raw === null || raw === undefined) return raw;
+
+  // Already a non-string value (e.g. number, boolean, object from mock) → pass through
+  if (typeof raw !== 'string') return raw;
+
+  // Strip the ::type suffix (e.g. ::vertex, ::edge, ::text, ::integer, ::float, ::boolean)
+  const cleaned = raw.replace(/::[\w.]+\s*$/, '').trim();
+
+  // Empty string after stripping
+  if (cleaned === '') return raw;
+
+  // Try JSON parse — vertices, edges, maps, and arrays are JSON
+  try {
+    const parsed = JSON.parse(cleaned);
+
+    // Vertex: has .label and .properties (AGE vertex structure)
+    if (
+      parsed !== null &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      'properties' in parsed &&
+      'label' in parsed
+    ) {
+      return parsed.properties as Record<string, unknown>;
+    }
+
+    // Edge: has .start_id, .end_id, and .properties
+    if (
+      parsed !== null &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      'start_id' in parsed &&
+      'end_id' in parsed &&
+      'properties' in parsed
+    ) {
+      return parsed.properties as Record<string, unknown>;
+    }
+
+    // Other JSON value (map, array, number, boolean, null) — return as-is
+    return parsed;
+  } catch {
+    // Not valid JSON — treat as a plain string scalar
+    // Remove surrounding quotes if present (AGE quotes string scalars)
+    if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+      return cleaned.slice(1, -1);
+    }
+    return cleaned;
+  }
+}
+
+/**
+ * Unwrap a single AGE result row.
+ *
+ * The SQL template `AS (result agtype)` means each row has a single column
+ * called `result`.  This function extracts that column and parses it.
+ *
+ * If the row does NOT have a `result` property (e.g. from a test mock that
+ * returns flat objects), it is returned unchanged for backward compatibility.
+ */
+function unwrapAgeRow(row: Record<string, unknown>): unknown {
+  if (row && typeof row === 'object' && 'result' in row) {
+    return parseAgtypeValue(row.result);
+  }
+  // Backward-compatible: row doesn't have a `result` column (test mock)
+  return row;
+}
+
+/**
  * Execute Apache AGE Cypher query with optional parameterized params.
  *
  * Uses raw pg client (simple query protocol) because LOAD 'age' and
@@ -116,7 +205,7 @@ export async function executeCypher<T = Record<string, unknown>>(
           `SELECT * FROM cypher('${graphName}', $$${query}$$, $1) AS (result agtype)`,
           [JSON.stringify(params)]
         );
-        return result.rows as T[];
+        return result.rows.map((row: Record<string, unknown>) => unwrapAgeRow(row)) as T[];
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         if (
@@ -130,14 +219,14 @@ export async function executeCypher<T = Record<string, unknown>>(
         const result = await client.query(
           `SELECT * FROM cypher('${graphName}', $$${substituted}$$) AS (result agtype)`
         );
-        return result.rows as T[];
+        return result.rows.map((row: Record<string, unknown>) => unwrapAgeRow(row)) as T[];
       }
     }
 
     const result = await client.query(
       `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`
     );
-    return result.rows as T[];
+    return result.rows.map((row: Record<string, unknown>) => unwrapAgeRow(row)) as T[];
   } finally {
     client.release();
   }
@@ -157,8 +246,8 @@ export async function addVertex(
     CREATE (v:${label} ${propsJson})
     RETURN v.id::text
   `;
-  const result = await executeCypher<{ id: string }>(db, graphName, query);
-  return result[0]?.id || '';
+  const result = await executeCypher<string>(db, graphName, query);
+  return typeof result[0] === 'string' ? result[0] : String(result[0] ?? '');
 }
 
 /**
