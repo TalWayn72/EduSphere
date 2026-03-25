@@ -45,6 +45,37 @@ vi.mock('@/lib/lesson-pipeline.store', () => ({
   ),
 }));
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'createLesson.step1Title': 'Lesson Details',
+        'createLesson.lessonTitleLabel': 'Lesson Title *',
+        'createLesson.lessonTitlePlaceholder': 'e.g. Tree of Life lesson — Gate of Cutting, paragraph 3',
+        'createLesson.titleMinLength': 'Title must contain at least 3 characters',
+        'createLesson.lessonType': 'Lesson Type *',
+        'createLesson.typeThematic': 'General (Thematic)',
+        'createLesson.typeSequential': 'Sequential',
+        'createLesson.lessonDate': 'Lesson Date',
+        'createLesson.continueToMaterials': 'Continue to Materials \u2190',
+        'createLesson.step2Title': 'Add Materials',
+        'createLesson.step2Hint': 'You can skip this step and add materials after creating the lesson',
+        'createLesson.youtubeLink': '\uD83C\uDFA5 YouTube Link',
+        'createLesson.youtubeValidation': 'Must be a valid YouTube URL',
+        'createLesson.invalidUrl': 'Invalid URL',
+        'createLesson.addButton': 'Add',
+        'createLesson.linkAddedAfterCreation': 'The link will be added after creating the lesson',
+        'createLesson.notesFile': '\uD83D\uDCC4 Notes File (PDF)',
+        'createLesson.supportedFormats': 'Supports PDF, Word, TXT files',
+        'createLesson.skip': 'Skip',
+        'createLesson.continueToTemplate': 'Continue to Template \u2190',
+      };
+      return translations[key] ?? key;
+    },
+    i18n: { language: 'en', dir: () => 'ltr' },
+  }),
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { CreateLessonPage } from './CreateLessonPage';
@@ -68,6 +99,24 @@ const NOOP_EXECUTE = vi
   .fn()
   .mockResolvedValue({ data: null, error: undefined });
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Fill step 1 with valid title and advance to step 2 */
+async function advanceToStep2() {
+  fireEvent.change(screen.getByPlaceholderText(/Tree of Life lesson/i), {
+    target: { value: 'Test Lesson Title' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
+  await waitFor(() => screen.getByText('Add Materials'));
+}
+
+/** Advance from step 2 to step 3 via skip */
+async function advanceToStep3() {
+  await advanceToStep2();
+  fireEvent.click(screen.getByRole('button', { name: /Skip/i }));
+  await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('CreateLessonPage', () => {
@@ -86,8 +135,8 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('פרטי שיעור')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/שיעור עץ חיים/i)).toBeInTheDocument();
+    expect(screen.getByText('Lesson Details')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Tree of Life lesson/i)).toBeInTheDocument();
   });
 
   it('renders THEMATIC and SEQUENTIAL radio buttons in step 1', () => {
@@ -96,8 +145,8 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('כללי (נושאי)')).toBeInTheDocument();
-    expect(screen.getByText('על הסדר')).toBeInTheDocument();
+    expect(screen.getByText('General (Thematic)')).toBeInTheDocument();
+    expect(screen.getByText('Sequential')).toBeInTheDocument();
   });
 
   it('shows validation error when title is too short', async () => {
@@ -106,10 +155,10 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
     await waitFor(() => {
       expect(
-        screen.getByText('כותרת חייבת להכיל לפחות 3 תווים')
+        screen.getByText('Title must contain at least 3 characters')
       ).toBeInTheDocument();
     });
   });
@@ -120,13 +169,8 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => {
-      expect(screen.getByText('הוספת חומרים')).toBeInTheDocument();
-    });
+    await advanceToStep2();
+    expect(screen.getByText('Add Materials')).toBeInTheDocument();
   });
 
   it('renders YouTube URL input in step 2', async () => {
@@ -135,13 +179,8 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText(/youtube\.com/i)).toBeInTheDocument();
-    });
+    await advanceToStep2();
+    expect(screen.getByPlaceholderText(/youtube\.com/i)).toBeInTheDocument();
   });
 
   it('advances to step 3 via skip button in step 2', async () => {
@@ -150,15 +189,8 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => {
-      expect(screen.getByText('בחר תבנית Pipeline')).toBeInTheDocument();
-    });
+    await advanceToStep3();
+    expect(screen.getByText('בחר תבנית Pipeline')).toBeInTheDocument();
   });
 
   it('shows both template cards in step 3', async () => {
@@ -167,16 +199,9 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
-      expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
-    });
+    await advanceToStep3();
+    expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
+    expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
   });
 
   it('submit button is disabled until a template is selected', async () => {
@@ -185,13 +210,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     expect(screen.getByRole('button', { name: /צור שיעור/i })).toBeDisabled();
   });
 
@@ -217,13 +236,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(
       screen
         .getByText(/שיעור כללי/i)
@@ -255,13 +268,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(
       screen
         .getByText(/שיעור כללי/i)
@@ -290,13 +297,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(
       screen
         .getByText(/שיעור כללי/i)
@@ -321,13 +322,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(
       screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement
     );
@@ -359,13 +354,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(
       screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement
     );
@@ -395,11 +384,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), { target: { value: 'שיעור בדיקה' } });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement);
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
     await waitFor(() => {
@@ -418,11 +403,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), { target: { value: 'שיעור' } });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     fireEvent.click(screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement);
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
     await waitFor(() => screen.getByRole('alert'));
@@ -435,7 +416,6 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    // The date input exists — RHF manages value internally (not via HTML defaultValue)
     const dateInput = container.querySelector<HTMLInputElement>(
       'input[type="date"][name="lessonDate"]'
     );
@@ -448,18 +428,17 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    // Series field was removed from CreateLessonPage.step1.tsx — only title, type, lessonDate remain
     expect(screen.queryByText('סדרת שיעורים')).not.toBeInTheDocument();
   });
 
-  it('type label shows "כללי (נושאי)" for THEMATIC and "על הסדר" for SEQUENTIAL', () => {
+  it('type label shows "General (Thematic)" for THEMATIC and "Sequential" for SEQUENTIAL', () => {
     render(
       <MemoryRouter>
         <CreateLessonPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('כללי (נושאי)')).toBeInTheDocument();
-    expect(screen.getByText('על הסדר')).toBeInTheDocument();
+    expect(screen.getByText('General (Thematic)')).toBeInTheDocument();
+    expect(screen.getByText('Sequential')).toBeInTheDocument();
   });
 
   it('template step 3 shows "שיעור כללי" card (THEMATIC) and "ספר עץ חיים" card (SEQUENTIAL)', async () => {
@@ -468,13 +447,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
-      target: { value: 'שיעור בדיקה' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
-    await waitFor(() => screen.getByText('הוספת חומרים'));
-    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
-    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    await advanceToStep3();
     expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
     expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
   });

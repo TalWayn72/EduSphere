@@ -50,6 +50,26 @@ import { AnalyticsDashboard } from './AnalyticsDashboard';
 describe('AnalyticsDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Restore default mock after tests that override it
+    vi.mocked(useOrgAnalytics).mockReturnValue({
+      kpis: {
+        totalUsers: 250,
+        activeUsers: 180,
+        totalCourses: 45,
+        storageGb: 12.5,
+        completionRate: 72,
+        yauCount: 200,
+      },
+      timeSeriesData: [
+        { date: '2026-01', activeUsers: 150, completions: 30 },
+        { date: '2026-02', activeUsers: 170, completions: 40 },
+        { date: '2026-03', activeUsers: 180, completions: 45 },
+      ],
+      isLoading: false,
+      dateRange: { start: new Date('2026-01-01'), end: new Date('2026-03-31') },
+      setDateRange: vi.fn(),
+      exportCsv: vi.fn(),
+    });
   });
 
   it('renders KPI cards', () => {

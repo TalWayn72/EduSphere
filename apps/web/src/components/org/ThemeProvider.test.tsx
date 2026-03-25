@@ -28,7 +28,7 @@ vi.mock('@/hooks/useTenantBranding', () => ({
       backgroundColor: '#ffffff',
       fontFamily: 'Inter',
       logoUrl: 'https://cdn.example.com/logo.png',
-      orgName: 'Acme University',
+      organizationName: 'Acme University',
     },
     isLoading: false,
   })),
