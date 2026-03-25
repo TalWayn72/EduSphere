@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('urql', () => ({ useMutation: vi.fn(() => [{}, vi.fn()]) }));
-vi.mock('@/components/ui/button', () => ({ Button: (p: any) => <button {...p} /> }));
+vi.mock('@/components/ui/button', () => ({ Button: (p: Record<string, unknown>) => <button {...p} /> }));
 vi.mock('lucide-react', () => ({ ThumbsUp: () => <span>Like</span>, CornerDownRight: () => <span>Reply</span> }));
 vi.mock('@/lib/graphql/discussion.queries', () => ({ LIKE_MESSAGE_MUTATION: 'LIKE_MESSAGE_MUTATION' }));
 

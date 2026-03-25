@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('lucide-react', () => ({ ClipboardList: () => <span />, Clock: () => <span />, Rocket: () => <span />, ChevronRight: () => <span /> }));
-vi.mock('@/components/ui/button', () => ({ Button: (p: any) => <button {...p} /> }));
+vi.mock('@/components/ui/button', () => ({ Button: (p: Record<string, unknown>) => <button {...p} /> }));
 
 import { HowPilotWorksSection } from './HowPilotWorksSection';
 

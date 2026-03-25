@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('@/components/ui/input', () => ({ Input: React.forwardRef((p: any, ref: any) => <input ref={ref} {...p} />) }));
-vi.mock('@/components/ui/button', () => ({ Button: (p: any) => <button onClick={p.onClick} {...p}>{p.children}</button> }));
-vi.mock('@/components/ui/label', () => ({ Label: (p: any) => <label {...p} /> }));
+vi.mock('@/components/ui/input', () => ({ Input: React.forwardRef((p: React.InputHTMLAttributes<HTMLInputElement>, ref: React.Ref<HTMLInputElement>) => <input ref={ref} {...p} />) }));
+vi.mock('@/components/ui/button', () => ({ Button: (p: React.ButtonHTMLAttributes<HTMLButtonElement>) => <button onClick={p.onClick} {...p}>{p.children}</button> }));
+vi.mock('@/components/ui/label', () => ({ Label: (p: React.LabelHTMLAttributes<HTMLLabelElement>) => <label {...p} /> }));
 vi.mock('lucide-react', () => ({ Trash2: () => <span>X</span> }));
 
 import React from 'react';

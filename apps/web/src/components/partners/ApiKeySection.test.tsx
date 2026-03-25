@@ -1,23 +1,24 @@
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...p }: any) => <div {...p}>{children}</div>,
-  CardContent: ({ children }: any) => <div>{children}</div>,
-  CardHeader: ({ children }: any) => <div>{children}</div>,
-  CardTitle: ({ children }: any) => <h3>{children}</h3>,
+  Card: ({ children, ...p }: React.HTMLAttributes<HTMLDivElement>) => <div {...p}>{children}</div>,
+  CardContent: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  CardHeader: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  CardTitle: ({ children }: React.PropsWithChildren) => <h3>{children}</h3>,
 }));
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...p }: any) => <button onClick={onClick} {...p}>{children}</button>,
+  Button: ({ children, onClick, ...p }: React.ButtonHTMLAttributes<HTMLButtonElement>) => <button onClick={onClick} {...p}>{children}</button>,
 }));
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
-  DialogContent: ({ children }: any) => <div>{children}</div>,
-  DialogHeader: ({ children }: any) => <div>{children}</div>,
-  DialogTitle: ({ children }: any) => <h2>{children}</h2>,
-  DialogDescription: ({ children }: any) => <p>{children}</p>,
-  DialogFooter: ({ children }: any) => <div>{children}</div>,
+  Dialog: ({ children, open }: React.PropsWithChildren<{ open?: boolean }>) => open ? <div>{children}</div> : null,
+  DialogContent: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  DialogHeader: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  DialogTitle: ({ children }: React.PropsWithChildren) => <h2>{children}</h2>,
+  DialogDescription: ({ children }: React.PropsWithChildren) => <p>{children}</p>,
+  DialogFooter: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 }));
 
 import { ApiKeySection } from './ApiKeySection';

@@ -1,9 +1,10 @@
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
-  AnimatePresence: ({ children }: any) => <div>{children}</div>,
-  motion: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
+  AnimatePresence: ({ children }: Record<string, unknown>) => <div>{children as React.ReactNode}</div>,
+  motion: { div: ({ children, ...p }: Record<string, unknown>) => <div {...p}>{children as React.ReactNode}</div> },
 }));
 vi.mock('@/providers/ReducedMotionProvider', () => ({ useReducedMotion: () => true }));
 

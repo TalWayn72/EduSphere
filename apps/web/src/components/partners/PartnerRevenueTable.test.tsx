@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...p }: any) => <div {...p}>{children}</div>,
-  CardContent: ({ children }: any) => <div>{children}</div>,
-  CardHeader: ({ children }: any) => <div>{children}</div>,
-  CardTitle: ({ children }: any) => <h3>{children}</h3>,
+  Card: ({ children, ...p }: React.HTMLAttributes<HTMLDivElement>) => <div {...p}>{children}</div>,
+  CardContent: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  CardHeader: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  CardTitle: ({ children }: React.PropsWithChildren) => <h3>{children}</h3>,
 }));
 
-import { vi } from 'vitest';
 import { PartnerRevenueTable } from './PartnerRevenueTable';
 
 const REVENUE = [

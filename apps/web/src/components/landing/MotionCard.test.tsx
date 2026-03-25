@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('framer-motion', () => ({ motion: { div: (p: any) => <div {...p} /> } }));
+vi.mock('framer-motion', () => ({ motion: { div: (p: Record<string, unknown>) => <div {...p} /> } }));
 vi.mock('@/providers/ReducedMotionProvider', () => ({ useReducedMotion: () => true }));
 
 import { MotionCard } from './MotionCard';
