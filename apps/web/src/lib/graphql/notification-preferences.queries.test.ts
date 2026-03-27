@@ -6,7 +6,7 @@ describe('notification-preferences.queries', () => {
     expect(MY_NOTIFICATION_PREFERENCES_QUERY).toBeDefined();
     expect(MY_NOTIFICATION_PREFERENCES_QUERY.kind).toBe('Document');
     expect(MY_NOTIFICATION_PREFERENCES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_NOTIFICATION_PREFERENCES_QUERY.definitions[0] as any;
+    const def = MY_NOTIFICATION_PREFERENCES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyNotificationPreferences');
@@ -16,7 +16,7 @@ describe('notification-preferences.queries', () => {
     expect(UPDATE_NOTIFICATION_PREFERENCE_MUTATION).toBeDefined();
     expect(UPDATE_NOTIFICATION_PREFERENCE_MUTATION.kind).toBe('Document');
     expect(UPDATE_NOTIFICATION_PREFERENCE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_NOTIFICATION_PREFERENCE_MUTATION.definitions[0] as any;
+    const def = UPDATE_NOTIFICATION_PREFERENCE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateNotificationPreference');
@@ -26,7 +26,7 @@ describe('notification-preferences.queries', () => {
     expect(MY_NOTIFICATION_HISTORY_QUERY).toBeDefined();
     expect(MY_NOTIFICATION_HISTORY_QUERY.kind).toBe('Document');
     expect(MY_NOTIFICATION_HISTORY_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_NOTIFICATION_HISTORY_QUERY.definitions[0] as any;
+    const def = MY_NOTIFICATION_HISTORY_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyNotificationHistory');
@@ -36,7 +36,7 @@ describe('notification-preferences.queries', () => {
     expect(NOTIFICATION_DELIVERY_ANALYTICS_QUERY).toBeDefined();
     expect(NOTIFICATION_DELIVERY_ANALYTICS_QUERY.kind).toBe('Document');
     expect(NOTIFICATION_DELIVERY_ANALYTICS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = NOTIFICATION_DELIVERY_ANALYTICS_QUERY.definitions[0] as any;
+    const def = NOTIFICATION_DELIVERY_ANALYTICS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('NotificationDeliveryAnalytics');
@@ -46,7 +46,7 @@ describe('notification-preferences.queries', () => {
     expect(MARK_NOTIFICATION_READ_MUTATION).toBeDefined();
     expect(MARK_NOTIFICATION_READ_MUTATION.kind).toBe('Document');
     expect(MARK_NOTIFICATION_READ_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MARK_NOTIFICATION_READ_MUTATION.definitions[0] as any;
+    const def = MARK_NOTIFICATION_READ_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('MarkNotificationDeliveryRead');
@@ -56,7 +56,7 @@ describe('notification-preferences.queries', () => {
     expect(MARK_ALL_NOTIFICATIONS_READ_MUTATION).toBeDefined();
     expect(MARK_ALL_NOTIFICATIONS_READ_MUTATION.kind).toBe('Document');
     expect(MARK_ALL_NOTIFICATIONS_READ_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MARK_ALL_NOTIFICATIONS_READ_MUTATION.definitions[0] as any;
+    const def = MARK_ALL_NOTIFICATIONS_READ_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('MarkAllNotificationDeliveriesRead');

@@ -6,7 +6,7 @@ describe('tenant-language.queries', () => {
     expect(MY_TENANT_LANGUAGE_SETTINGS_QUERY).toBeDefined();
     expect(MY_TENANT_LANGUAGE_SETTINGS_QUERY.kind).toBe('Document');
     expect(MY_TENANT_LANGUAGE_SETTINGS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_TENANT_LANGUAGE_SETTINGS_QUERY.definitions[0] as any;
+    const def = MY_TENANT_LANGUAGE_SETTINGS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyTenantLanguageSettings');
@@ -16,7 +16,7 @@ describe('tenant-language.queries', () => {
     expect(UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION).toBeDefined();
     expect(UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION.kind).toBe('Document');
     expect(UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION.definitions[0] as any;
+    const def = UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateTenantLanguageSettings');

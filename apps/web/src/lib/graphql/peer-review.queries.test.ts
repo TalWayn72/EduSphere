@@ -6,7 +6,7 @@ describe('peer-review.queries', () => {
     expect(MY_REVIEW_ASSIGNMENTS_QUERY).toBeDefined();
     expect(MY_REVIEW_ASSIGNMENTS_QUERY.kind).toBe('Document');
     expect(MY_REVIEW_ASSIGNMENTS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_REVIEW_ASSIGNMENTS_QUERY.definitions[0] as any;
+    const def = MY_REVIEW_ASSIGNMENTS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyReviewAssignments');
@@ -16,7 +16,7 @@ describe('peer-review.queries', () => {
     expect(MY_SUBMISSIONS_QUERY).toBeDefined();
     expect(MY_SUBMISSIONS_QUERY.kind).toBe('Document');
     expect(MY_SUBMISSIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_SUBMISSIONS_QUERY.definitions[0] as any;
+    const def = MY_SUBMISSIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MySubmissions');
@@ -26,7 +26,7 @@ describe('peer-review.queries', () => {
     expect(PEER_REVIEW_RUBRIC_QUERY).toBeDefined();
     expect(PEER_REVIEW_RUBRIC_QUERY.kind).toBe('Document');
     expect(PEER_REVIEW_RUBRIC_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PEER_REVIEW_RUBRIC_QUERY.definitions[0] as any;
+    const def = PEER_REVIEW_RUBRIC_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('PeerReviewRubric');
@@ -36,7 +36,7 @@ describe('peer-review.queries', () => {
     expect(SUBMIT_PEER_REVIEW_MUTATION).toBeDefined();
     expect(SUBMIT_PEER_REVIEW_MUTATION.kind).toBe('Document');
     expect(SUBMIT_PEER_REVIEW_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SUBMIT_PEER_REVIEW_MUTATION.definitions[0] as any;
+    const def = SUBMIT_PEER_REVIEW_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('SubmitPeerReview');

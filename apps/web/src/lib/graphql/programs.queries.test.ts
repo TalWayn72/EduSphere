@@ -6,7 +6,7 @@ describe('programs.queries', () => {
     expect(PROGRAMS_QUERY).toBeDefined();
     expect(PROGRAMS_QUERY.kind).toBe('Document');
     expect(PROGRAMS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PROGRAMS_QUERY.definitions[0] as any;
+    const def = PROGRAMS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Programs');
@@ -16,7 +16,7 @@ describe('programs.queries', () => {
     expect(PROGRAM_QUERY).toBeDefined();
     expect(PROGRAM_QUERY.kind).toBe('Document');
     expect(PROGRAM_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PROGRAM_QUERY.definitions[0] as any;
+    const def = PROGRAM_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Program');
@@ -26,7 +26,7 @@ describe('programs.queries', () => {
     expect(MY_PROGRAM_ENROLLMENTS_QUERY).toBeDefined();
     expect(MY_PROGRAM_ENROLLMENTS_QUERY.kind).toBe('Document');
     expect(MY_PROGRAM_ENROLLMENTS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_PROGRAM_ENROLLMENTS_QUERY.definitions[0] as any;
+    const def = MY_PROGRAM_ENROLLMENTS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyProgramEnrollments');
@@ -36,7 +36,7 @@ describe('programs.queries', () => {
     expect(PROGRAM_PROGRESS_QUERY).toBeDefined();
     expect(PROGRAM_PROGRESS_QUERY.kind).toBe('Document');
     expect(PROGRAM_PROGRESS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PROGRAM_PROGRESS_QUERY.definitions[0] as any;
+    const def = PROGRAM_PROGRESS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('ProgramProgress');
@@ -46,7 +46,7 @@ describe('programs.queries', () => {
     expect(ENROLL_IN_PROGRAM_MUTATION).toBeDefined();
     expect(ENROLL_IN_PROGRAM_MUTATION.kind).toBe('Document');
     expect(ENROLL_IN_PROGRAM_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ENROLL_IN_PROGRAM_MUTATION.definitions[0] as any;
+    const def = ENROLL_IN_PROGRAM_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('EnrollInProgram');
@@ -56,7 +56,7 @@ describe('programs.queries', () => {
     expect(CREATE_PROGRAM_MUTATION).toBeDefined();
     expect(CREATE_PROGRAM_MUTATION.kind).toBe('Document');
     expect(CREATE_PROGRAM_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_PROGRAM_MUTATION.definitions[0] as any;
+    const def = CREATE_PROGRAM_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateProgram');
@@ -66,7 +66,7 @@ describe('programs.queries', () => {
     expect(UPDATE_PROGRAM_MUTATION).toBeDefined();
     expect(UPDATE_PROGRAM_MUTATION.kind).toBe('Document');
     expect(UPDATE_PROGRAM_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_PROGRAM_MUTATION.definitions[0] as any;
+    const def = UPDATE_PROGRAM_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateProgram');

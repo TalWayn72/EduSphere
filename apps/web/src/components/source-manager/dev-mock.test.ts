@@ -1,7 +1,7 @@
 /**
  * Tests for source-manager/dev-mock.ts — DEV_MODE mock data store.
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   getDevSources,
   devQueryFn,

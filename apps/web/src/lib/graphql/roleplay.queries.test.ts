@@ -6,7 +6,7 @@ describe('roleplay.queries', () => {
     expect(SCENARIO_TEMPLATES_QUERY).toBeDefined();
     expect(SCENARIO_TEMPLATES_QUERY.kind).toBe('Document');
     expect(SCENARIO_TEMPLATES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SCENARIO_TEMPLATES_QUERY.definitions[0] as any;
+    const def = SCENARIO_TEMPLATES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('ScenarioTemplates');
@@ -16,7 +16,7 @@ describe('roleplay.queries', () => {
     expect(START_ROLEPLAY_MUTATION).toBeDefined();
     expect(START_ROLEPLAY_MUTATION.kind).toBe('Document');
     expect(START_ROLEPLAY_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = START_ROLEPLAY_MUTATION.definitions[0] as any;
+    const def = START_ROLEPLAY_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('StartRoleplaySession');
@@ -26,7 +26,7 @@ describe('roleplay.queries', () => {
     expect(SEND_ROLEPLAY_MESSAGE_MUTATION).toBeDefined();
     expect(SEND_ROLEPLAY_MESSAGE_MUTATION.kind).toBe('Document');
     expect(SEND_ROLEPLAY_MESSAGE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SEND_ROLEPLAY_MESSAGE_MUTATION.definitions[0] as any;
+    const def = SEND_ROLEPLAY_MESSAGE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('SendRoleplayMessage');
@@ -36,7 +36,7 @@ describe('roleplay.queries', () => {
     expect(MY_SCENARIO_SESSION_QUERY).toBeDefined();
     expect(MY_SCENARIO_SESSION_QUERY.kind).toBe('Document');
     expect(MY_SCENARIO_SESSION_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_SCENARIO_SESSION_QUERY.definitions[0] as any;
+    const def = MY_SCENARIO_SESSION_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyScenarioSession');
@@ -46,7 +46,7 @@ describe('roleplay.queries', () => {
     expect(CREATE_SCENARIO_TEMPLATE_MUTATION).toBeDefined();
     expect(CREATE_SCENARIO_TEMPLATE_MUTATION.kind).toBe('Document');
     expect(CREATE_SCENARIO_TEMPLATE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_SCENARIO_TEMPLATE_MUTATION.definitions[0] as any;
+    const def = CREATE_SCENARIO_TEMPLATE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateScenarioTemplate');

@@ -6,7 +6,7 @@ describe('social-links.queries', () => {
     expect(TENANT_SOCIAL_LINKS_QUERY).toBeDefined();
     expect(TENANT_SOCIAL_LINKS_QUERY.kind).toBe('Document');
     expect(TENANT_SOCIAL_LINKS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = TENANT_SOCIAL_LINKS_QUERY.definitions[0] as any;
+    const def = TENANT_SOCIAL_LINKS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('TenantSocialLinks');
@@ -16,7 +16,7 @@ describe('social-links.queries', () => {
     expect(UPDATE_TENANT_SOCIAL_LINKS_MUTATION).toBeDefined();
     expect(UPDATE_TENANT_SOCIAL_LINKS_MUTATION.kind).toBe('Document');
     expect(UPDATE_TENANT_SOCIAL_LINKS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_TENANT_SOCIAL_LINKS_MUTATION.definitions[0] as any;
+    const def = UPDATE_TENANT_SOCIAL_LINKS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateTenantSocialLinks');

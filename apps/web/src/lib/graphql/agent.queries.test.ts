@@ -6,7 +6,7 @@ describe('agent.queries', () => {
     expect(START_AGENT_SESSION_MUTATION).toBeDefined();
     expect(START_AGENT_SESSION_MUTATION.kind).toBe('Document');
     expect(START_AGENT_SESSION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = START_AGENT_SESSION_MUTATION.definitions[0] as any;
+    const def = START_AGENT_SESSION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('StartAgentSession');
@@ -16,7 +16,7 @@ describe('agent.queries', () => {
     expect(SEND_AGENT_MESSAGE_MUTATION).toBeDefined();
     expect(SEND_AGENT_MESSAGE_MUTATION.kind).toBe('Document');
     expect(SEND_AGENT_MESSAGE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SEND_AGENT_MESSAGE_MUTATION.definitions[0] as any;
+    const def = SEND_AGENT_MESSAGE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('SendAgentMessage');
@@ -26,7 +26,7 @@ describe('agent.queries', () => {
     expect(END_SESSION_MUTATION).toBeDefined();
     expect(END_SESSION_MUTATION.kind).toBe('Document');
     expect(END_SESSION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = END_SESSION_MUTATION.definitions[0] as any;
+    const def = END_SESSION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('EndAgentSession');
@@ -36,7 +36,7 @@ describe('agent.queries', () => {
     expect(AGENT_SESSION_QUERY).toBeDefined();
     expect(AGENT_SESSION_QUERY.kind).toBe('Document');
     expect(AGENT_SESSION_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = AGENT_SESSION_QUERY.definitions[0] as any;
+    const def = AGENT_SESSION_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('AgentSession');
@@ -46,7 +46,7 @@ describe('agent.queries', () => {
     expect(MY_SESSIONS_QUERY).toBeDefined();
     expect(MY_SESSIONS_QUERY.kind).toBe('Document');
     expect(MY_SESSIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_SESSIONS_QUERY.definitions[0] as any;
+    const def = MY_SESSIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyAgentSessions');
@@ -56,7 +56,7 @@ describe('agent.queries', () => {
     expect(AGENT_TEMPLATES_QUERY).toBeDefined();
     expect(AGENT_TEMPLATES_QUERY.kind).toBe('Document');
     expect(AGENT_TEMPLATES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = AGENT_TEMPLATES_QUERY.definitions[0] as any;
+    const def = AGENT_TEMPLATES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('AgentTemplates');
@@ -66,7 +66,7 @@ describe('agent.queries', () => {
     expect(MESSAGE_STREAM_SUBSCRIPTION).toBeDefined();
     expect(MESSAGE_STREAM_SUBSCRIPTION.kind).toBe('Document');
     expect(MESSAGE_STREAM_SUBSCRIPTION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MESSAGE_STREAM_SUBSCRIPTION.definitions[0] as any;
+    const def = MESSAGE_STREAM_SUBSCRIPTION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('subscription');
     expect(def.name?.value).toBe('MessageStream');
@@ -76,7 +76,7 @@ describe('agent.queries', () => {
     expect(CREATE_AGENT_WORKFLOW_MUTATION).toBeDefined();
     expect(CREATE_AGENT_WORKFLOW_MUTATION.kind).toBe('Document');
     expect(CREATE_AGENT_WORKFLOW_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_AGENT_WORKFLOW_MUTATION.definitions[0] as any;
+    const def = CREATE_AGENT_WORKFLOW_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateAgentWorkflow');

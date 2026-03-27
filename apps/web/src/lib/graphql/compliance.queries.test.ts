@@ -6,7 +6,7 @@ describe('compliance.queries', () => {
     expect(COMPLIANCE_COURSES_QUERY).toBeDefined();
     expect(COMPLIANCE_COURSES_QUERY.kind).toBe('Document');
     expect(COMPLIANCE_COURSES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = COMPLIANCE_COURSES_QUERY.definitions[0] as any;
+    const def = COMPLIANCE_COURSES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('ComplianceCourses');
@@ -16,7 +16,7 @@ describe('compliance.queries', () => {
     expect(GENERATE_COMPLIANCE_REPORT_MUTATION).toBeDefined();
     expect(GENERATE_COMPLIANCE_REPORT_MUTATION.kind).toBe('Document');
     expect(GENERATE_COMPLIANCE_REPORT_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GENERATE_COMPLIANCE_REPORT_MUTATION.definitions[0] as any;
+    const def = GENERATE_COMPLIANCE_REPORT_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('GenerateComplianceReport');
@@ -26,7 +26,7 @@ describe('compliance.queries', () => {
     expect(UPDATE_COURSE_COMPLIANCE_MUTATION).toBeDefined();
     expect(UPDATE_COURSE_COMPLIANCE_MUTATION.kind).toBe('Document');
     expect(UPDATE_COURSE_COMPLIANCE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_COURSE_COMPLIANCE_MUTATION.definitions[0] as any;
+    const def = UPDATE_COURSE_COMPLIANCE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateCourseComplianceSettings');

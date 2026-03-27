@@ -6,7 +6,7 @@ describe('cpd.queries', () => {
     expect(MY_CPD_REPORT_QUERY).toBeDefined();
     expect(MY_CPD_REPORT_QUERY.kind).toBe('Document');
     expect(MY_CPD_REPORT_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_CPD_REPORT_QUERY.definitions[0] as any;
+    const def = MY_CPD_REPORT_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyCpdReport');
@@ -16,7 +16,7 @@ describe('cpd.queries', () => {
     expect(CPD_CREDIT_TYPES_QUERY).toBeDefined();
     expect(CPD_CREDIT_TYPES_QUERY.kind).toBe('Document');
     expect(CPD_CREDIT_TYPES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CPD_CREDIT_TYPES_QUERY.definitions[0] as any;
+    const def = CPD_CREDIT_TYPES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('CpdCreditTypes');
@@ -26,7 +26,7 @@ describe('cpd.queries', () => {
     expect(EXPORT_CPD_REPORT_MUTATION).toBeDefined();
     expect(EXPORT_CPD_REPORT_MUTATION.kind).toBe('Document');
     expect(EXPORT_CPD_REPORT_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = EXPORT_CPD_REPORT_MUTATION.definitions[0] as any;
+    const def = EXPORT_CPD_REPORT_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('ExportCpdReport');
@@ -36,7 +36,7 @@ describe('cpd.queries', () => {
     expect(CREATE_CPD_CREDIT_TYPE_MUTATION).toBeDefined();
     expect(CREATE_CPD_CREDIT_TYPE_MUTATION.kind).toBe('Document');
     expect(CREATE_CPD_CREDIT_TYPE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_CPD_CREDIT_TYPE_MUTATION.definitions[0] as any;
+    const def = CREATE_CPD_CREDIT_TYPE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateCpdCreditType');
@@ -46,7 +46,7 @@ describe('cpd.queries', () => {
     expect(ASSIGN_CPD_CREDITS_MUTATION).toBeDefined();
     expect(ASSIGN_CPD_CREDITS_MUTATION.kind).toBe('Document');
     expect(ASSIGN_CPD_CREDITS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ASSIGN_CPD_CREDITS_MUTATION.definitions[0] as any;
+    const def = ASSIGN_CPD_CREDITS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AssignCpdCreditsToCourse');

@@ -6,7 +6,7 @@ describe('notifications.subscriptions', () => {
     expect(NOTIFICATION_RECEIVED_SUBSCRIPTION).toBeDefined();
     expect(NOTIFICATION_RECEIVED_SUBSCRIPTION.kind).toBe('Document');
     expect(NOTIFICATION_RECEIVED_SUBSCRIPTION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = NOTIFICATION_RECEIVED_SUBSCRIPTION.definitions[0] as any;
+    const def = NOTIFICATION_RECEIVED_SUBSCRIPTION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('subscription');
     expect(def.name?.value).toBe('NotificationReceived');

@@ -6,7 +6,7 @@ describe('xapi.queries', () => {
     expect(XAPI_TOKENS_QUERY).toBeDefined();
     expect(XAPI_TOKENS_QUERY.kind).toBe('Document');
     expect(XAPI_TOKENS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = XAPI_TOKENS_QUERY.definitions[0] as any;
+    const def = XAPI_TOKENS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('XapiTokens');
@@ -16,7 +16,7 @@ describe('xapi.queries', () => {
     expect(XAPI_STATEMENTS_QUERY).toBeDefined();
     expect(XAPI_STATEMENTS_QUERY.kind).toBe('Document');
     expect(XAPI_STATEMENTS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = XAPI_STATEMENTS_QUERY.definitions[0] as any;
+    const def = XAPI_STATEMENTS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('XapiStatements');
@@ -26,7 +26,7 @@ describe('xapi.queries', () => {
     expect(GENERATE_XAPI_TOKEN_MUTATION).toBeDefined();
     expect(GENERATE_XAPI_TOKEN_MUTATION.kind).toBe('Document');
     expect(GENERATE_XAPI_TOKEN_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GENERATE_XAPI_TOKEN_MUTATION.definitions[0] as any;
+    const def = GENERATE_XAPI_TOKEN_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('GenerateXapiToken');
@@ -36,7 +36,7 @@ describe('xapi.queries', () => {
     expect(REVOKE_XAPI_TOKEN_MUTATION).toBeDefined();
     expect(REVOKE_XAPI_TOKEN_MUTATION.kind).toBe('Document');
     expect(REVOKE_XAPI_TOKEN_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = REVOKE_XAPI_TOKEN_MUTATION.definitions[0] as any;
+    const def = REVOKE_XAPI_TOKEN_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('RevokeXapiToken');

@@ -6,7 +6,7 @@ describe('social.queries', () => {
     expect(SOCIAL_FEED_QUERY).toBeDefined();
     expect(SOCIAL_FEED_QUERY.kind).toBe('Document');
     expect(SOCIAL_FEED_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SOCIAL_FEED_QUERY.definitions[0] as any;
+    const def = SOCIAL_FEED_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SocialFeed');
@@ -16,7 +16,7 @@ describe('social.queries', () => {
     expect(SOCIAL_RECOMMENDATIONS_QUERY).toBeDefined();
     expect(SOCIAL_RECOMMENDATIONS_QUERY.kind).toBe('Document');
     expect(SOCIAL_RECOMMENDATIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SOCIAL_RECOMMENDATIONS_QUERY.definitions[0] as any;
+    const def = SOCIAL_RECOMMENDATIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SocialRecommendations');
@@ -26,7 +26,7 @@ describe('social.queries', () => {
     expect(MY_FOLLOWERS_QUERY).toBeDefined();
     expect(MY_FOLLOWERS_QUERY.kind).toBe('Document');
     expect(MY_FOLLOWERS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_FOLLOWERS_QUERY.definitions[0] as any;
+    const def = MY_FOLLOWERS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyFollowers');
@@ -36,7 +36,7 @@ describe('social.queries', () => {
     expect(MY_FOLLOWING_QUERY).toBeDefined();
     expect(MY_FOLLOWING_QUERY.kind).toBe('Document');
     expect(MY_FOLLOWING_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_FOLLOWING_QUERY.definitions[0] as any;
+    const def = MY_FOLLOWING_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyFollowing');
@@ -46,7 +46,7 @@ describe('social.queries', () => {
     expect(SEARCH_USERS_QUERY).toBeDefined();
     expect(SEARCH_USERS_QUERY.kind).toBe('Document');
     expect(SEARCH_USERS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SEARCH_USERS_QUERY.definitions[0] as any;
+    const def = SEARCH_USERS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SearchUsers');

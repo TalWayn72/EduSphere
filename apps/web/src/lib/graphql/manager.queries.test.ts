@@ -6,7 +6,7 @@ describe('manager.queries', () => {
     expect(MY_TEAM_OVERVIEW_QUERY).toBeDefined();
     expect(MY_TEAM_OVERVIEW_QUERY.kind).toBe('Document');
     expect(MY_TEAM_OVERVIEW_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_TEAM_OVERVIEW_QUERY.definitions[0] as any;
+    const def = MY_TEAM_OVERVIEW_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyTeamOverview');
@@ -16,7 +16,7 @@ describe('manager.queries', () => {
     expect(ADD_TEAM_MEMBER_MUTATION).toBeDefined();
     expect(ADD_TEAM_MEMBER_MUTATION.kind).toBe('Document');
     expect(ADD_TEAM_MEMBER_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_TEAM_MEMBER_MUTATION.definitions[0] as any;
+    const def = ADD_TEAM_MEMBER_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddTeamMember');
@@ -26,7 +26,7 @@ describe('manager.queries', () => {
     expect(REMOVE_TEAM_MEMBER_MUTATION).toBeDefined();
     expect(REMOVE_TEAM_MEMBER_MUTATION.kind).toBe('Document');
     expect(REMOVE_TEAM_MEMBER_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = REMOVE_TEAM_MEMBER_MUTATION.definitions[0] as any;
+    const def = REMOVE_TEAM_MEMBER_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('RemoveTeamMember');

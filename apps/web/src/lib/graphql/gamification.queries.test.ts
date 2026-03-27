@@ -6,7 +6,7 @@ describe('gamification.queries', () => {
     expect(MY_BADGES_QUERY).toBeDefined();
     expect(MY_BADGES_QUERY.kind).toBe('Document');
     expect(MY_BADGES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_BADGES_QUERY.definitions[0] as any;
+    const def = MY_BADGES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyBadges');
@@ -16,7 +16,7 @@ describe('gamification.queries', () => {
     expect(LEADERBOARD_QUERY).toBeDefined();
     expect(LEADERBOARD_QUERY.kind).toBe('Document');
     expect(LEADERBOARD_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LEADERBOARD_QUERY.definitions[0] as any;
+    const def = LEADERBOARD_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Leaderboard');
@@ -26,7 +26,7 @@ describe('gamification.queries', () => {
     expect(MY_RANK_QUERY).toBeDefined();
     expect(MY_RANK_QUERY.kind).toBe('Document');
     expect(MY_RANK_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_RANK_QUERY.definitions[0] as any;
+    const def = MY_RANK_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyRank');
@@ -36,7 +36,7 @@ describe('gamification.queries', () => {
     expect(MY_TOTAL_POINTS_QUERY).toBeDefined();
     expect(MY_TOTAL_POINTS_QUERY.kind).toBe('Document');
     expect(MY_TOTAL_POINTS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_TOTAL_POINTS_QUERY.definitions[0] as any;
+    const def = MY_TOTAL_POINTS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyTotalPoints');
@@ -46,7 +46,7 @@ describe('gamification.queries', () => {
     expect(MY_GAMIFICATION_STATS_QUERY).toBeDefined();
     expect(MY_GAMIFICATION_STATS_QUERY.kind).toBe('Document');
     expect(MY_GAMIFICATION_STATS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_GAMIFICATION_STATS_QUERY.definitions[0] as any;
+    const def = MY_GAMIFICATION_STATS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyGamificationStats');
@@ -56,7 +56,7 @@ describe('gamification.queries', () => {
     expect(TENANT_LEADERBOARD_QUERY).toBeDefined();
     expect(TENANT_LEADERBOARD_QUERY.kind).toBe('Document');
     expect(TENANT_LEADERBOARD_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = TENANT_LEADERBOARD_QUERY.definitions[0] as any;
+    const def = TENANT_LEADERBOARD_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('TenantLeaderboard');

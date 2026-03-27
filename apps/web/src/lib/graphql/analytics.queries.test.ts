@@ -6,7 +6,7 @@ describe('analytics.queries', () => {
     expect(INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY).toBeDefined();
     expect(INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY.kind).toBe('Document');
     expect(INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY.definitions[0] as any;
+    const def = INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('InstructorAnalyticsOverview');
@@ -16,7 +16,7 @@ describe('analytics.queries', () => {
     expect(INSTRUCTOR_AI_USAGE_QUERY).toBeDefined();
     expect(INSTRUCTOR_AI_USAGE_QUERY.kind).toBe('Document');
     expect(INSTRUCTOR_AI_USAGE_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = INSTRUCTOR_AI_USAGE_QUERY.definitions[0] as any;
+    const def = INSTRUCTOR_AI_USAGE_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('InstructorAiUsage');

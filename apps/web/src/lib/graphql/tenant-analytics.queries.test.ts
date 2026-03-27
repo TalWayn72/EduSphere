@@ -6,7 +6,7 @@ describe('tenant-analytics.queries', () => {
     expect(TENANT_ANALYTICS_QUERY).toBeDefined();
     expect(TENANT_ANALYTICS_QUERY.kind).toBe('Document');
     expect(TENANT_ANALYTICS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = TENANT_ANALYTICS_QUERY.definitions[0] as any;
+    const def = TENANT_ANALYTICS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('TenantAnalytics');
@@ -16,7 +16,7 @@ describe('tenant-analytics.queries', () => {
     expect(LEARNER_VELOCITY_QUERY).toBeDefined();
     expect(LEARNER_VELOCITY_QUERY.kind).toBe('Document');
     expect(LEARNER_VELOCITY_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LEARNER_VELOCITY_QUERY.definitions[0] as any;
+    const def = LEARNER_VELOCITY_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('LearnerVelocity');
@@ -26,7 +26,7 @@ describe('tenant-analytics.queries', () => {
     expect(COHORT_RETENTION_QUERY).toBeDefined();
     expect(COHORT_RETENTION_QUERY.kind).toBe('Document');
     expect(COHORT_RETENTION_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = COHORT_RETENTION_QUERY.definitions[0] as any;
+    const def = COHORT_RETENTION_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('CohortRetention');
@@ -36,7 +36,7 @@ describe('tenant-analytics.queries', () => {
     expect(EXPORT_TENANT_ANALYTICS_MUTATION).toBeDefined();
     expect(EXPORT_TENANT_ANALYTICS_MUTATION.kind).toBe('Document');
     expect(EXPORT_TENANT_ANALYTICS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = EXPORT_TENANT_ANALYTICS_MUTATION.definitions[0] as any;
+    const def = EXPORT_TENANT_ANALYTICS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('ExportTenantAnalytics');

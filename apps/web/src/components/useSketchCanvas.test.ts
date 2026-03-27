@@ -33,8 +33,8 @@ function createMockCtx(): CanvasRenderingContext2D {
     strokeStyle: '',
     fillStyle: '',
     lineWidth: 1,
-    lineCap: 'butt' as CanvasLineCap,
-    lineJoin: 'miter' as CanvasLineJoin,
+    lineCap: 'butt' as CanvasRenderingContext2D['lineCap'],
+    lineJoin: 'miter' as CanvasRenderingContext2D['lineJoin'],
     globalCompositeOperation: 'source-over',
     font: '',
   } as unknown as CanvasRenderingContext2D;

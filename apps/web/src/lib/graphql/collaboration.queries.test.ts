@@ -6,7 +6,7 @@ describe('collaboration.queries', () => {
     expect(DISCUSSIONS_QUERY).toBeDefined();
     expect(DISCUSSIONS_QUERY.kind).toBe('Document');
     expect(DISCUSSIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = DISCUSSIONS_QUERY.definitions[0] as any;
+    const def = DISCUSSIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Discussions');
@@ -16,7 +16,7 @@ describe('collaboration.queries', () => {
     expect(MY_DISCUSSIONS_QUERY).toBeDefined();
     expect(MY_DISCUSSIONS_QUERY.kind).toBe('Document');
     expect(MY_DISCUSSIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_DISCUSSIONS_QUERY.definitions[0] as any;
+    const def = MY_DISCUSSIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyDiscussions');
@@ -26,7 +26,7 @@ describe('collaboration.queries', () => {
     expect(DISCUSSION_QUERY).toBeDefined();
     expect(DISCUSSION_QUERY.kind).toBe('Document');
     expect(DISCUSSION_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = DISCUSSION_QUERY.definitions[0] as any;
+    const def = DISCUSSION_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Discussion');
@@ -36,7 +36,7 @@ describe('collaboration.queries', () => {
     expect(CREATE_DISCUSSION_MUTATION).toBeDefined();
     expect(CREATE_DISCUSSION_MUTATION.kind).toBe('Document');
     expect(CREATE_DISCUSSION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_DISCUSSION_MUTATION.definitions[0] as any;
+    const def = CREATE_DISCUSSION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateDiscussion');
@@ -46,7 +46,7 @@ describe('collaboration.queries', () => {
     expect(ADD_MESSAGE_MUTATION).toBeDefined();
     expect(ADD_MESSAGE_MUTATION.kind).toBe('Document');
     expect(ADD_MESSAGE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_MESSAGE_MUTATION.definitions[0] as any;
+    const def = ADD_MESSAGE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddMessage');
@@ -56,7 +56,7 @@ describe('collaboration.queries', () => {
     expect(JOIN_DISCUSSION_MUTATION).toBeDefined();
     expect(JOIN_DISCUSSION_MUTATION.kind).toBe('Document');
     expect(JOIN_DISCUSSION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = JOIN_DISCUSSION_MUTATION.definitions[0] as any;
+    const def = JOIN_DISCUSSION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('JoinDiscussion');
@@ -66,7 +66,7 @@ describe('collaboration.queries', () => {
     expect(LEAVE_DISCUSSION_MUTATION).toBeDefined();
     expect(LEAVE_DISCUSSION_MUTATION.kind).toBe('Document');
     expect(LEAVE_DISCUSSION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LEAVE_DISCUSSION_MUTATION.definitions[0] as any;
+    const def = LEAVE_DISCUSSION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('LeaveDiscussion');
@@ -76,7 +76,7 @@ describe('collaboration.queries', () => {
     expect(MESSAGE_ADDED_SUBSCRIPTION).toBeDefined();
     expect(MESSAGE_ADDED_SUBSCRIPTION.kind).toBe('Document');
     expect(MESSAGE_ADDED_SUBSCRIPTION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MESSAGE_ADDED_SUBSCRIPTION.definitions[0] as any;
+    const def = MESSAGE_ADDED_SUBSCRIPTION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('subscription');
     expect(def.name?.value).toBe('MessageAdded');

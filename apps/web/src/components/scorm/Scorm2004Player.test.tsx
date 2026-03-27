@@ -41,7 +41,7 @@ function dispatchScormMessage(
   const postMessageMock = vi.fn();
   const event = new MessageEvent('message', {
     data: { action, ...extra },
-    source: { postMessage: postMessageMock } as unknown as Window,
+    source: { postMessage: postMessageMock } as unknown as MessageEventSource,
   });
   window.dispatchEvent(event);
   return postMessageMock;

@@ -6,7 +6,7 @@ describe('competency.queries', () => {
     expect(MY_COMPETENCY_GOALS_QUERY).toBeDefined();
     expect(MY_COMPETENCY_GOALS_QUERY.kind).toBe('Document');
     expect(MY_COMPETENCY_GOALS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_COMPETENCY_GOALS_QUERY.definitions[0] as any;
+    const def = MY_COMPETENCY_GOALS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyCompetencyGoals');
@@ -16,7 +16,7 @@ describe('competency.queries', () => {
     expect(MY_LEARNING_PATH_QUERY).toBeDefined();
     expect(MY_LEARNING_PATH_QUERY.kind).toBe('Document');
     expect(MY_LEARNING_PATH_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_LEARNING_PATH_QUERY.definitions[0] as any;
+    const def = MY_LEARNING_PATH_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyLearningPath');
@@ -26,7 +26,7 @@ describe('competency.queries', () => {
     expect(ADD_COMPETENCY_GOAL_MUTATION).toBeDefined();
     expect(ADD_COMPETENCY_GOAL_MUTATION.kind).toBe('Document');
     expect(ADD_COMPETENCY_GOAL_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_COMPETENCY_GOAL_MUTATION.definitions[0] as any;
+    const def = ADD_COMPETENCY_GOAL_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddCompetencyGoal');
@@ -36,7 +36,7 @@ describe('competency.queries', () => {
     expect(REMOVE_COMPETENCY_GOAL_MUTATION).toBeDefined();
     expect(REMOVE_COMPETENCY_GOAL_MUTATION.kind).toBe('Document');
     expect(REMOVE_COMPETENCY_GOAL_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = REMOVE_COMPETENCY_GOAL_MUTATION.definitions[0] as any;
+    const def = REMOVE_COMPETENCY_GOAL_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('RemoveCompetencyGoal');

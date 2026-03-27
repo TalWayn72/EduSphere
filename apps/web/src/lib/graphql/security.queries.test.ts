@@ -6,7 +6,7 @@ describe('security.queries', () => {
     expect(SECURITY_SETTINGS_QUERY).toBeDefined();
     expect(SECURITY_SETTINGS_QUERY.kind).toBe('Document');
     expect(SECURITY_SETTINGS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SECURITY_SETTINGS_QUERY.definitions[0] as any;
+    const def = SECURITY_SETTINGS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MySecuritySettings');
@@ -16,7 +16,7 @@ describe('security.queries', () => {
     expect(UPDATE_SECURITY_SETTINGS_MUTATION).toBeDefined();
     expect(UPDATE_SECURITY_SETTINGS_MUTATION.kind).toBe('Document');
     expect(UPDATE_SECURITY_SETTINGS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_SECURITY_SETTINGS_MUTATION.definitions[0] as any;
+    const def = UPDATE_SECURITY_SETTINGS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateSecuritySettings');

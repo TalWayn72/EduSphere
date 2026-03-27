@@ -6,7 +6,7 @@ describe('skills.queries', () => {
     expect(SKILLS_QUERY).toBeDefined();
     expect(SKILLS_QUERY.kind).toBe('Document');
     expect(SKILLS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SKILLS_QUERY.definitions[0] as any;
+    const def = SKILLS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Skills');
@@ -16,7 +16,7 @@ describe('skills.queries', () => {
     expect(SKILL_PATHS_QUERY).toBeDefined();
     expect(SKILL_PATHS_QUERY.kind).toBe('Document');
     expect(SKILL_PATHS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SKILL_PATHS_QUERY.definitions[0] as any;
+    const def = SKILL_PATHS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SkillPaths');
@@ -26,7 +26,7 @@ describe('skills.queries', () => {
     expect(MY_SKILL_PROGRESS_QUERY).toBeDefined();
     expect(MY_SKILL_PROGRESS_QUERY.kind).toBe('Document');
     expect(MY_SKILL_PROGRESS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_SKILL_PROGRESS_QUERY.definitions[0] as any;
+    const def = MY_SKILL_PROGRESS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MySkillProgress');
@@ -36,7 +36,7 @@ describe('skills.queries', () => {
     expect(SKILL_GAP_ANALYSIS_QUERY).toBeDefined();
     expect(SKILL_GAP_ANALYSIS_QUERY.kind).toBe('Document');
     expect(SKILL_GAP_ANALYSIS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SKILL_GAP_ANALYSIS_QUERY.definitions[0] as any;
+    const def = SKILL_GAP_ANALYSIS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SkillGapAnalysis');
@@ -46,7 +46,7 @@ describe('skills.queries', () => {
     expect(UPDATE_SKILL_PROGRESS_MUTATION).toBeDefined();
     expect(UPDATE_SKILL_PROGRESS_MUTATION.kind).toBe('Document');
     expect(UPDATE_SKILL_PROGRESS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_SKILL_PROGRESS_MUTATION.definitions[0] as any;
+    const def = UPDATE_SKILL_PROGRESS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateMySkillProgress');

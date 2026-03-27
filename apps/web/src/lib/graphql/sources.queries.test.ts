@@ -6,7 +6,7 @@ describe('sources.queries', () => {
     expect(COURSE_KNOWLEDGE_SOURCES).toBeDefined();
     expect(COURSE_KNOWLEDGE_SOURCES.kind).toBe('Document');
     expect(COURSE_KNOWLEDGE_SOURCES.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = COURSE_KNOWLEDGE_SOURCES.definitions[0] as any;
+    const def = COURSE_KNOWLEDGE_SOURCES.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('CourseKnowledgeSources');
@@ -16,7 +16,7 @@ describe('sources.queries', () => {
     expect(KNOWLEDGE_SOURCE_DETAIL).toBeDefined();
     expect(KNOWLEDGE_SOURCE_DETAIL.kind).toBe('Document');
     expect(KNOWLEDGE_SOURCE_DETAIL.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = KNOWLEDGE_SOURCE_DETAIL.definitions[0] as any;
+    const def = KNOWLEDGE_SOURCE_DETAIL.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('KnowledgeSourceDetail');
@@ -26,7 +26,7 @@ describe('sources.queries', () => {
     expect(ADD_URL_SOURCE).toBeDefined();
     expect(ADD_URL_SOURCE.kind).toBe('Document');
     expect(ADD_URL_SOURCE.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_URL_SOURCE.definitions[0] as any;
+    const def = ADD_URL_SOURCE.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddUrlSource');
@@ -36,7 +36,7 @@ describe('sources.queries', () => {
     expect(ADD_TEXT_SOURCE).toBeDefined();
     expect(ADD_TEXT_SOURCE.kind).toBe('Document');
     expect(ADD_TEXT_SOURCE.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_TEXT_SOURCE.definitions[0] as any;
+    const def = ADD_TEXT_SOURCE.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddTextSource');
@@ -46,7 +46,7 @@ describe('sources.queries', () => {
     expect(ADD_YOUTUBE_SOURCE).toBeDefined();
     expect(ADD_YOUTUBE_SOURCE.kind).toBe('Document');
     expect(ADD_YOUTUBE_SOURCE.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_YOUTUBE_SOURCE.definitions[0] as any;
+    const def = ADD_YOUTUBE_SOURCE.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddYoutubeSource');
@@ -56,7 +56,7 @@ describe('sources.queries', () => {
     expect(ADD_FILE_SOURCE).toBeDefined();
     expect(ADD_FILE_SOURCE.kind).toBe('Document');
     expect(ADD_FILE_SOURCE.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_FILE_SOURCE.definitions[0] as any;
+    const def = ADD_FILE_SOURCE.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddFileSource');
@@ -66,7 +66,7 @@ describe('sources.queries', () => {
     expect(DELETE_KNOWLEDGE_SOURCE).toBeDefined();
     expect(DELETE_KNOWLEDGE_SOURCE.kind).toBe('Document');
     expect(DELETE_KNOWLEDGE_SOURCE.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = DELETE_KNOWLEDGE_SOURCE.definitions[0] as any;
+    const def = DELETE_KNOWLEDGE_SOURCE.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('DeleteKnowledgeSource');

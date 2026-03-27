@@ -6,7 +6,7 @@ describe('admin-roles.queries', () => {
     expect(ROLE_FIELDS).toBeDefined();
     expect(ROLE_FIELDS.kind).toBe('Document');
     expect(ROLE_FIELDS.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ROLE_FIELDS.definitions[0] as any;
+    const def = ROLE_FIELDS.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('FragmentDefinition');
     expect(def.name?.value).toBe('RoleFields');
   });
@@ -15,7 +15,7 @@ describe('admin-roles.queries', () => {
     expect(LIST_ROLES_QUERY).toBeDefined();
     expect(LIST_ROLES_QUERY.kind).toBe('Document');
     expect(LIST_ROLES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LIST_ROLES_QUERY.definitions[0] as any;
+    const def = LIST_ROLES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('ListRoles');
@@ -25,7 +25,7 @@ describe('admin-roles.queries', () => {
     expect(GET_ROLE_QUERY).toBeDefined();
     expect(GET_ROLE_QUERY.kind).toBe('Document');
     expect(GET_ROLE_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GET_ROLE_QUERY.definitions[0] as any;
+    const def = GET_ROLE_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('GetRole');
@@ -35,7 +35,7 @@ describe('admin-roles.queries', () => {
     expect(CREATE_ROLE_MUTATION).toBeDefined();
     expect(CREATE_ROLE_MUTATION.kind).toBe('Document');
     expect(CREATE_ROLE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_ROLE_MUTATION.definitions[0] as any;
+    const def = CREATE_ROLE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateRole');
@@ -45,7 +45,7 @@ describe('admin-roles.queries', () => {
     expect(UPDATE_ROLE_MUTATION).toBeDefined();
     expect(UPDATE_ROLE_MUTATION.kind).toBe('Document');
     expect(UPDATE_ROLE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_ROLE_MUTATION.definitions[0] as any;
+    const def = UPDATE_ROLE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateRole');
@@ -55,7 +55,7 @@ describe('admin-roles.queries', () => {
     expect(DELETE_ROLE_MUTATION).toBeDefined();
     expect(DELETE_ROLE_MUTATION.kind).toBe('Document');
     expect(DELETE_ROLE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = DELETE_ROLE_MUTATION.definitions[0] as any;
+    const def = DELETE_ROLE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('DeleteRole');

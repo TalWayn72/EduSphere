@@ -6,7 +6,7 @@ describe('scorm.queries', () => {
     expect(EXPORT_COURSE_AS_SCORM_MUTATION).toBeDefined();
     expect(EXPORT_COURSE_AS_SCORM_MUTATION.kind).toBe('Document');
     expect(EXPORT_COURSE_AS_SCORM_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = EXPORT_COURSE_AS_SCORM_MUTATION.definitions[0] as any;
+    const def = EXPORT_COURSE_AS_SCORM_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('ExportCourseAsScorm');

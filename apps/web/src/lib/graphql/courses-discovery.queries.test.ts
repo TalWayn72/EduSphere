@@ -6,7 +6,7 @@ describe('courses-discovery.queries', () => {
     expect(COURSES_DISCOVERY_QUERY).toBeDefined();
     expect(COURSES_DISCOVERY_QUERY.kind).toBe('Document');
     expect(COURSES_DISCOVERY_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = COURSES_DISCOVERY_QUERY.definitions[0] as any;
+    const def = COURSES_DISCOVERY_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('CoursesDiscovery');
@@ -16,7 +16,7 @@ describe('courses-discovery.queries', () => {
     expect(SEARCH_COURSES_DISCOVERY_QUERY).toBeDefined();
     expect(SEARCH_COURSES_DISCOVERY_QUERY.kind).toBe('Document');
     expect(SEARCH_COURSES_DISCOVERY_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SEARCH_COURSES_DISCOVERY_QUERY.definitions[0] as any;
+    const def = SEARCH_COURSES_DISCOVERY_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SearchCoursesDiscovery');

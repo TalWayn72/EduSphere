@@ -6,7 +6,7 @@ describe('lesson.queries', () => {
     expect(CREATE_LESSON_MUTATION).toBeDefined();
     expect(CREATE_LESSON_MUTATION.kind).toBe('Document');
     expect(CREATE_LESSON_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_LESSON_MUTATION.definitions[0] as any;
+    const def = CREATE_LESSON_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateLesson');
@@ -16,7 +16,7 @@ describe('lesson.queries', () => {
     expect(LESSONS_BY_COURSE_QUERY).toBeDefined();
     expect(LESSONS_BY_COURSE_QUERY.kind).toBe('Document');
     expect(LESSONS_BY_COURSE_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LESSONS_BY_COURSE_QUERY.definitions[0] as any;
+    const def = LESSONS_BY_COURSE_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('LessonsByCourse');
@@ -26,7 +26,7 @@ describe('lesson.queries', () => {
     expect(LESSON_QUERY).toBeDefined();
     expect(LESSON_QUERY.kind).toBe('Document');
     expect(LESSON_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LESSON_QUERY.definitions[0] as any;
+    const def = LESSON_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Lesson');
@@ -36,7 +36,7 @@ describe('lesson.queries', () => {
     expect(SAVE_LESSON_PIPELINE_MUTATION).toBeDefined();
     expect(SAVE_LESSON_PIPELINE_MUTATION.kind).toBe('Document');
     expect(SAVE_LESSON_PIPELINE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SAVE_LESSON_PIPELINE_MUTATION.definitions[0] as any;
+    const def = SAVE_LESSON_PIPELINE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('SaveLessonPipeline');
@@ -46,7 +46,7 @@ describe('lesson.queries', () => {
     expect(START_PIPELINE_RUN_MUTATION).toBeDefined();
     expect(START_PIPELINE_RUN_MUTATION.kind).toBe('Document');
     expect(START_PIPELINE_RUN_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = START_PIPELINE_RUN_MUTATION.definitions[0] as any;
+    const def = START_PIPELINE_RUN_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('StartLessonPipelineRun');
@@ -56,7 +56,7 @@ describe('lesson.queries', () => {
     expect(CANCEL_PIPELINE_RUN_MUTATION).toBeDefined();
     expect(CANCEL_PIPELINE_RUN_MUTATION.kind).toBe('Document');
     expect(CANCEL_PIPELINE_RUN_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CANCEL_PIPELINE_RUN_MUTATION.definitions[0] as any;
+    const def = CANCEL_PIPELINE_RUN_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CancelLessonPipelineRun');
@@ -66,7 +66,7 @@ describe('lesson.queries', () => {
     expect(ADD_LESSON_ASSET_MUTATION).toBeDefined();
     expect(ADD_LESSON_ASSET_MUTATION.kind).toBe('Document');
     expect(ADD_LESSON_ASSET_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADD_LESSON_ASSET_MUTATION.definitions[0] as any;
+    const def = ADD_LESSON_ASSET_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('AddLessonAsset');
@@ -76,7 +76,7 @@ describe('lesson.queries', () => {
     expect(PUBLISH_LESSON_MUTATION).toBeDefined();
     expect(PUBLISH_LESSON_MUTATION.kind).toBe('Document');
     expect(PUBLISH_LESSON_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PUBLISH_LESSON_MUTATION.definitions[0] as any;
+    const def = PUBLISH_LESSON_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('PublishLesson');
@@ -86,7 +86,7 @@ describe('lesson.queries', () => {
     expect(LESSON_PIPELINE_RUNS_QUERY).toBeDefined();
     expect(LESSON_PIPELINE_RUNS_QUERY.kind).toBe('Document');
     expect(LESSON_PIPELINE_RUNS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LESSON_PIPELINE_RUNS_QUERY.definitions[0] as any;
+    const def = LESSON_PIPELINE_RUNS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('LessonPipelineRunHistory');
@@ -96,7 +96,7 @@ describe('lesson.queries', () => {
     expect(PIPELINE_TEMPLATES_QUERY).toBeDefined();
     expect(PIPELINE_TEMPLATES_QUERY.kind).toBe('Document');
     expect(PIPELINE_TEMPLATES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PIPELINE_TEMPLATES_QUERY.definitions[0] as any;
+    const def = PIPELINE_TEMPLATES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('PipelineTemplates');
@@ -106,7 +106,7 @@ describe('lesson.queries', () => {
     expect(CREATE_PIPELINE_TEMPLATE_MUTATION).toBeDefined();
     expect(CREATE_PIPELINE_TEMPLATE_MUTATION.kind).toBe('Document');
     expect(CREATE_PIPELINE_TEMPLATE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_PIPELINE_TEMPLATE_MUTATION.definitions[0] as any;
+    const def = CREATE_PIPELINE_TEMPLATE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreatePipelineTemplate');
@@ -116,7 +116,7 @@ describe('lesson.queries', () => {
     expect(UPDATE_PIPELINE_TEMPLATE_MUTATION).toBeDefined();
     expect(UPDATE_PIPELINE_TEMPLATE_MUTATION.kind).toBe('Document');
     expect(UPDATE_PIPELINE_TEMPLATE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_PIPELINE_TEMPLATE_MUTATION.definitions[0] as any;
+    const def = UPDATE_PIPELINE_TEMPLATE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdatePipelineTemplate');
@@ -126,7 +126,7 @@ describe('lesson.queries', () => {
     expect(DELETE_PIPELINE_TEMPLATE_MUTATION).toBeDefined();
     expect(DELETE_PIPELINE_TEMPLATE_MUTATION.kind).toBe('Document');
     expect(DELETE_PIPELINE_TEMPLATE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = DELETE_PIPELINE_TEMPLATE_MUTATION.definitions[0] as any;
+    const def = DELETE_PIPELINE_TEMPLATE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('DeletePipelineTemplate');
@@ -136,7 +136,7 @@ describe('lesson.queries', () => {
     expect(LESSON_PIPELINE_PROGRESS_SUBSCRIPTION).toBeDefined();
     expect(LESSON_PIPELINE_PROGRESS_SUBSCRIPTION.kind).toBe('Document');
     expect(LESSON_PIPELINE_PROGRESS_SUBSCRIPTION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LESSON_PIPELINE_PROGRESS_SUBSCRIPTION.definitions[0] as any;
+    const def = LESSON_PIPELINE_PROGRESS_SUBSCRIPTION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('subscription');
     expect(def.name?.value).toBe('LessonPipelineProgress');

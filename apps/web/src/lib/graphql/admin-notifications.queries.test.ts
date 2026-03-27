@@ -6,7 +6,7 @@ describe('admin-notifications.queries', () => {
     expect(ADMIN_NOTIFICATION_TEMPLATES_QUERY).toBeDefined();
     expect(ADMIN_NOTIFICATION_TEMPLATES_QUERY.kind).toBe('Document');
     expect(ADMIN_NOTIFICATION_TEMPLATES_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ADMIN_NOTIFICATION_TEMPLATES_QUERY.definitions[0] as any;
+    const def = ADMIN_NOTIFICATION_TEMPLATES_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('AdminNotificationTemplates');
@@ -16,7 +16,7 @@ describe('admin-notifications.queries', () => {
     expect(UPDATE_NOTIFICATION_TEMPLATE_MUTATION).toBeDefined();
     expect(UPDATE_NOTIFICATION_TEMPLATE_MUTATION.kind).toBe('Document');
     expect(UPDATE_NOTIFICATION_TEMPLATE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_NOTIFICATION_TEMPLATE_MUTATION.definitions[0] as any;
+    const def = UPDATE_NOTIFICATION_TEMPLATE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateNotificationTemplate');
@@ -26,7 +26,7 @@ describe('admin-notifications.queries', () => {
     expect(RESET_NOTIFICATION_TEMPLATE_MUTATION).toBeDefined();
     expect(RESET_NOTIFICATION_TEMPLATE_MUTATION.kind).toBe('Document');
     expect(RESET_NOTIFICATION_TEMPLATE_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = RESET_NOTIFICATION_TEMPLATE_MUTATION.definitions[0] as any;
+    const def = RESET_NOTIFICATION_TEMPLATE_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('ResetNotificationTemplate');

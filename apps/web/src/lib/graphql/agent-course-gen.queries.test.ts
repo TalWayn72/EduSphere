@@ -6,7 +6,7 @@ describe('agent-course-gen.queries', () => {
     expect(GENERATE_COURSE_FROM_PROMPT_MUTATION).toBeDefined();
     expect(GENERATE_COURSE_FROM_PROMPT_MUTATION.kind).toBe('Document');
     expect(GENERATE_COURSE_FROM_PROMPT_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GENERATE_COURSE_FROM_PROMPT_MUTATION.definitions[0] as any;
+    const def = GENERATE_COURSE_FROM_PROMPT_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('GenerateCourseFromPrompt');
@@ -16,7 +16,7 @@ describe('agent-course-gen.queries', () => {
     expect(EXECUTION_STATUS_SUBSCRIPTION).toBeDefined();
     expect(EXECUTION_STATUS_SUBSCRIPTION.kind).toBe('Document');
     expect(EXECUTION_STATUS_SUBSCRIPTION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = EXECUTION_STATUS_SUBSCRIPTION.definitions[0] as any;
+    const def = EXECUTION_STATUS_SUBSCRIPTION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('subscription');
     expect(def.name?.value).toBe('ExecutionStatusChanged');
@@ -26,7 +26,7 @@ describe('agent-course-gen.queries', () => {
     expect(AGENT_EXECUTION_QUERY).toBeDefined();
     expect(AGENT_EXECUTION_QUERY.kind).toBe('Document');
     expect(AGENT_EXECUTION_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = AGENT_EXECUTION_QUERY.definitions[0] as any;
+    const def = AGENT_EXECUTION_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('AgentExecution');

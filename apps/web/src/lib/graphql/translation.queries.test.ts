@@ -6,7 +6,7 @@ describe('translation.queries', () => {
     expect(CONTENT_TRANSLATION_QUERY).toBeDefined();
     expect(CONTENT_TRANSLATION_QUERY.kind).toBe('Document');
     expect(CONTENT_TRANSLATION_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CONTENT_TRANSLATION_QUERY.definitions[0] as any;
+    const def = CONTENT_TRANSLATION_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('ContentTranslation');
@@ -16,7 +16,7 @@ describe('translation.queries', () => {
     expect(REQUEST_CONTENT_TRANSLATION_MUTATION).toBeDefined();
     expect(REQUEST_CONTENT_TRANSLATION_MUTATION.kind).toBe('Document');
     expect(REQUEST_CONTENT_TRANSLATION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = REQUEST_CONTENT_TRANSLATION_MUTATION.definitions[0] as any;
+    const def = REQUEST_CONTENT_TRANSLATION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('RequestContentTranslation');

@@ -6,7 +6,7 @@ describe('whatsapp.queries', () => {
     expect(REGISTER_WHATSAPP_MUTATION).toBeDefined();
     expect(REGISTER_WHATSAPP_MUTATION.kind).toBe('Document');
     expect(REGISTER_WHATSAPP_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = REGISTER_WHATSAPP_MUTATION.definitions[0] as any;
+    const def = REGISTER_WHATSAPP_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('RegisterWhatsApp');
@@ -16,7 +16,7 @@ describe('whatsapp.queries', () => {
     expect(VERIFY_WHATSAPP_MUTATION).toBeDefined();
     expect(VERIFY_WHATSAPP_MUTATION.kind).toBe('Document');
     expect(VERIFY_WHATSAPP_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = VERIFY_WHATSAPP_MUTATION.definitions[0] as any;
+    const def = VERIFY_WHATSAPP_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('VerifyWhatsApp');

@@ -6,7 +6,7 @@ describe('knowledge.queries', () => {
     expect(CONCEPT_QUERY).toBeDefined();
     expect(CONCEPT_QUERY.kind).toBe('Document');
     expect(CONCEPT_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CONCEPT_QUERY.definitions[0] as any;
+    const def = CONCEPT_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Concept');
@@ -16,7 +16,7 @@ describe('knowledge.queries', () => {
     expect(GET_CONCEPTS_QUERY).toBeDefined();
     expect(GET_CONCEPTS_QUERY.kind).toBe('Document');
     expect(GET_CONCEPTS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GET_CONCEPTS_QUERY.definitions[0] as any;
+    const def = GET_CONCEPTS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('GetConcepts');
@@ -26,7 +26,7 @@ describe('knowledge.queries', () => {
     expect(GET_RELATED_CONCEPTS_QUERY).toBeDefined();
     expect(GET_RELATED_CONCEPTS_QUERY.kind).toBe('Document');
     expect(GET_RELATED_CONCEPTS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GET_RELATED_CONCEPTS_QUERY.definitions[0] as any;
+    const def = GET_RELATED_CONCEPTS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('GetRelatedConcepts');
@@ -36,7 +36,7 @@ describe('knowledge.queries', () => {
     expect(CREATE_CONCEPT_MUTATION).toBeDefined();
     expect(CREATE_CONCEPT_MUTATION.kind).toBe('Document');
     expect(CREATE_CONCEPT_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = CREATE_CONCEPT_MUTATION.definitions[0] as any;
+    const def = CREATE_CONCEPT_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('CreateConcept');
@@ -46,7 +46,7 @@ describe('knowledge.queries', () => {
     expect(LINK_CONCEPTS_MUTATION).toBeDefined();
     expect(LINK_CONCEPTS_MUTATION.kind).toBe('Document');
     expect(LINK_CONCEPTS_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LINK_CONCEPTS_MUTATION.definitions[0] as any;
+    const def = LINK_CONCEPTS_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('LinkConcepts');
@@ -56,7 +56,7 @@ describe('knowledge.queries', () => {
     expect(SEARCH_SEMANTIC_QUERY).toBeDefined();
     expect(SEARCH_SEMANTIC_QUERY.kind).toBe('Document');
     expect(SEARCH_SEMANTIC_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = SEARCH_SEMANTIC_QUERY.definitions[0] as any;
+    const def = SEARCH_SEMANTIC_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('SearchSemantic');
@@ -66,7 +66,7 @@ describe('knowledge.queries', () => {
     expect(LEARNING_PATH_QUERY).toBeDefined();
     expect(LEARNING_PATH_QUERY.kind).toBe('Document');
     expect(LEARNING_PATH_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = LEARNING_PATH_QUERY.definitions[0] as any;
+    const def = LEARNING_PATH_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('LearningPath');
@@ -76,7 +76,7 @@ describe('knowledge.queries', () => {
     expect(RELATED_CONCEPTS_BY_NAME_QUERY).toBeDefined();
     expect(RELATED_CONCEPTS_BY_NAME_QUERY.kind).toBe('Document');
     expect(RELATED_CONCEPTS_BY_NAME_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = RELATED_CONCEPTS_BY_NAME_QUERY.definitions[0] as any;
+    const def = RELATED_CONCEPTS_BY_NAME_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('RelatedConceptsByName');
@@ -86,7 +86,7 @@ describe('knowledge.queries', () => {
     expect(PREREQUISITE_CHAIN_QUERY).toBeDefined();
     expect(PREREQUISITE_CHAIN_QUERY.kind).toBe('Document');
     expect(PREREQUISITE_CHAIN_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PREREQUISITE_CHAIN_QUERY.definitions[0] as any;
+    const def = PREREQUISITE_CHAIN_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('PrerequisiteChain');
@@ -96,7 +96,7 @@ describe('knowledge.queries', () => {
     expect(GET_SKILL_TREE_QUERY).toBeDefined();
     expect(GET_SKILL_TREE_QUERY.kind).toBe('Document');
     expect(GET_SKILL_TREE_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = GET_SKILL_TREE_QUERY.definitions[0] as any;
+    const def = GET_SKILL_TREE_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('GetSkillTree');
@@ -106,7 +106,7 @@ describe('knowledge.queries', () => {
     expect(UPDATE_MASTERY_LEVEL_MUTATION).toBeDefined();
     expect(UPDATE_MASTERY_LEVEL_MUTATION.kind).toBe('Document');
     expect(UPDATE_MASTERY_LEVEL_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_MASTERY_LEVEL_MUTATION.definitions[0] as any;
+    const def = UPDATE_MASTERY_LEVEL_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateMasteryLevel');

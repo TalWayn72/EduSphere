@@ -6,7 +6,7 @@ describe('annotation.queries', () => {
     expect(ANNOTATIONS_QUERY).toBeDefined();
     expect(ANNOTATIONS_QUERY.kind).toBe('Document');
     expect(ANNOTATIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = ANNOTATIONS_QUERY.definitions[0] as any;
+    const def = ANNOTATIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('Annotations');
@@ -16,7 +16,7 @@ describe('annotation.queries', () => {
     expect(MY_ANNOTATIONS_QUERY).toBeDefined();
     expect(MY_ANNOTATIONS_QUERY.kind).toBe('Document');
     expect(MY_ANNOTATIONS_QUERY.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = MY_ANNOTATIONS_QUERY.definitions[0] as any;
+    const def = MY_ANNOTATIONS_QUERY.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
     expect(def.name?.value).toBe('MyAnnotations');
@@ -26,7 +26,7 @@ describe('annotation.queries', () => {
     expect(REPLY_TO_ANNOTATION_MUTATION).toBeDefined();
     expect(REPLY_TO_ANNOTATION_MUTATION.kind).toBe('Document');
     expect(REPLY_TO_ANNOTATION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = REPLY_TO_ANNOTATION_MUTATION.definitions[0] as any;
+    const def = REPLY_TO_ANNOTATION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('ReplyToAnnotation');
@@ -36,7 +36,7 @@ describe('annotation.queries', () => {
     expect(PROMOTE_ANNOTATION_MUTATION).toBeDefined();
     expect(PROMOTE_ANNOTATION_MUTATION.kind).toBe('Document');
     expect(PROMOTE_ANNOTATION_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = PROMOTE_ANNOTATION_MUTATION.definitions[0] as any;
+    const def = PROMOTE_ANNOTATION_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('PromoteAnnotation');
