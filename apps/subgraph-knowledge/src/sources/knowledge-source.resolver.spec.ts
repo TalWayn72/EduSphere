@@ -16,11 +16,21 @@ vi.mock('./knowledge-source.service.js', () => ({
   },
 }));
 
+// ─── MinioUrlService mock ─────────────────────────────────────────────────────
+const mockGetPresignedUrl = vi.fn().mockResolvedValue('https://minio.local/presigned');
+
+vi.mock('./minio-url.service.js', () => ({
+  MinioUrlService: class {
+    getPresignedUrl = mockGetPresignedUrl;
+  },
+}));
+
 // ─── DB import mock ───────────────────────────────────────────────────────────
 vi.mock('@edusphere/db', () => ({}));
 
 import { KnowledgeSourceResolver } from './knowledge-source.resolver.js';
 import { KnowledgeSourceService } from './knowledge-source.service.js';
+import { MinioUrlService } from './minio-url.service.js';
 
 type KSRow = {
   id: string;
@@ -34,6 +44,7 @@ type KSRow = {
   chunk_count: number;
   error_message: string | null;
   metadata: unknown;
+  file_key: string | null;
   created_at: Date | string;
 };
 
@@ -49,6 +60,7 @@ const sampleRow: KSRow = {
   chunk_count: 10,
   error_message: null,
   metadata: {},
+  file_key: null,
   created_at: new Date('2024-01-01'),
 };
 
@@ -62,7 +74,8 @@ describe('KnowledgeSourceResolver', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resolver = new KnowledgeSourceResolver(
-      new KnowledgeSourceService({} as never)
+      new KnowledgeSourceService({} as never, {} as never, {} as never),
+      new MinioUrlService()
     );
   });
 
@@ -186,6 +199,26 @@ describe('KnowledgeSourceResolver', () => {
       const result = await resolver.deleteKnowledgeSource('ks-1', makeCtx());
       expect(mockDeleteSource).toHaveBeenCalledWith('ks-1', 'tenant-1');
       expect(result).toBe(true);
+    });
+  });
+
+  describe('fileUrl (ResolveField)', () => {
+    it('returns presigned URL when fileKey is present', async () => {
+      const result = await resolver.fileUrl({ fileKey: 'tenant-1/course-1/abc/file.pdf' });
+      expect(result).toBe('https://minio.local/presigned');
+      expect(mockGetPresignedUrl).toHaveBeenCalledWith('tenant-1/course-1/abc/file.pdf');
+    });
+
+    it('returns null when fileKey is null', async () => {
+      const result = await resolver.fileUrl({ fileKey: null });
+      expect(result).toBeNull();
+      expect(mockGetPresignedUrl).not.toHaveBeenCalled();
+    });
+
+    it('returns null and logs error when presigning fails', async () => {
+      mockGetPresignedUrl.mockRejectedValueOnce(new Error('S3 error'));
+      const result = await resolver.fileUrl({ fileKey: 'bad-key' });
+      expect(result).toBeNull();
     });
   });
 });

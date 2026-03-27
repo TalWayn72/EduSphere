@@ -139,7 +139,7 @@ describe('PlagiarismResolver', () => {
 
   describe('mySubmissions()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.mySubmissions('item-1', noAuthCtx)).rejects.toThrow(
+      await expect(resolver.myTextSubmissions('item-1', noAuthCtx)).rejects.toThrow(
         UnauthorizedException
       );
     });
@@ -150,7 +150,7 @@ describe('PlagiarismResolver', () => {
         tenantId: undefined as unknown as string,
         roles: [],
       });
-      await expect(resolver.mySubmissions('item-1', ctx)).rejects.toThrow(
+      await expect(resolver.myTextSubmissions('item-1', ctx)).rejects.toThrow(
         UnauthorizedException
       );
     });
@@ -158,7 +158,7 @@ describe('PlagiarismResolver', () => {
     it('delegates to submissionService.getMySubmissions with correct args', async () => {
       mockGetMySubmissions.mockResolvedValueOnce([MOCK_SUBMISSION]);
 
-      const result = await resolver.mySubmissions('item-1', makeCtx());
+      const result = await resolver.myTextSubmissions('item-1', makeCtx());
 
       expect(result).toEqual([MOCK_SUBMISSION]);
       expect(mockGetMySubmissions).toHaveBeenCalledWith(

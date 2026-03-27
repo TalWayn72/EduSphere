@@ -2839,10 +2839,21 @@ type SavedSearch @join__type(graph: CORE)  {
   createdAt: String!
 }
 
+enum SocialVerb @join__type(graph: CORE) {
+  ENROLLED @join__enumValue(graph: CORE)
+  COMPLETED @join__enumValue(graph: CORE)
+  COMMENTED @join__enumValue(graph: CORE)
+  LIKED @join__enumValue(graph: CORE)
+  SHARED @join__enumValue(graph: CORE)
+  FOLLOWED @join__enumValue(graph: CORE)
+  EARNED_BADGE @join__enumValue(graph: CORE)
+  POSTED @join__enumValue(graph: CORE)
+}
+
 type SocialFeedItem @join__type(graph: CORE)  {
   id: ID!
   actorId: ID!
-  verb: String!
+  verb: SocialVerb!
   objectType: String!
   objectId: ID!
   objectTitle: String!

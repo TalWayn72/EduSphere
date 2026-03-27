@@ -70,5 +70,6 @@
   "consentDescription": "Chavruta menggunakan layanan AI pihak ketiga untuk menghasilkan respons debat. Harap setujui sebelum melanjutkan.",
   "consentButton": "Saya Setuju — Mulai Berdebat",
   "noDiscussions": "Belum ada diskusi — bergabunglah dengan kursus untuk mulai berdiskusi!",
-  "messagesCount": "pesan"
+  "messagesCount": "pesan",
+  "schemaUpgradeNotice": "Some collaboration features are being upgraded. Your existing sessions are safe."
 }

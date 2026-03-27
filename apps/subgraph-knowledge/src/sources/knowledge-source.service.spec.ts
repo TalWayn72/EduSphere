@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* Tests for KnowledgeSourceService — no-explicit-any removed */
 /**
  * knowledge-source.service.spec.ts
  *
@@ -46,12 +46,21 @@ vi.mock('@edusphere/db', () => ({
       chunk_count: 'chunk_count',
       metadata: 'metadata',
       error_message: 'error_message',
+      file_key: 'file_key',
       created_at: 'created_at',
     },
   },
   eq: vi.fn((a, b) => ({ eq: [a, b] })),
   and: vi.fn((...args) => ({ and: args })),
   inArray: vi.fn((col, vals) => ({ inArray: [col, vals] })),
+}));
+
+vi.mock('./minio-url.service.js', () => ({
+  MinioUrlService: class {},
+}));
+
+vi.mock('node:crypto', () => ({
+  randomUUID: () => 'test-uuid-1234',
 }));
 
 import { KnowledgeSourceService } from './knowledge-source.service.js';
@@ -139,6 +148,11 @@ const mockEmbeddings = {
   generateEmbedding: vi.fn().mockResolvedValue({ id: 'emb-1' }),
 };
 
+const mockMinioUrl = {
+  uploadFile: vi.fn().mockResolvedValue(undefined),
+  getPresignedUrl: vi.fn().mockResolvedValue('https://minio.local/presigned'),
+};
+
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('KnowledgeSourceService', () => {
@@ -147,8 +161,9 @@ describe('KnowledgeSourceService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     service = new KnowledgeSourceService(
-      mockParser as any,
-      mockEmbeddings as any
+      mockParser as never,
+      mockEmbeddings as never,
+      mockMinioUrl as never
     );
   });
 
@@ -316,6 +331,78 @@ describe('KnowledgeSourceService', () => {
       await new Promise<void>((resolve) => setImmediate(resolve));
 
       expect(mockParser.parseDocx).toHaveBeenCalledWith('/path/to/file.docx');
+    });
+  });
+
+  // ── createAndProcess — FILE_PDF with MinIO upload ──────────────────────────
+
+  describe('createAndProcess() — FILE_PDF with MinIO upload', () => {
+    const pdfBuffer = Buffer.from('fake-pdf-content');
+
+    it('uploads file to MinIO and stores file_key in DB', async () => {
+      const sourceWithKey = {
+        ...PENDING_SOURCE,
+        source_type: 'FILE_PDF' as const,
+        file_key: 'tenant-abc/course-123/uuid/report.pdf',
+      };
+      mockInsert.mockImplementation(buildInsert(sourceWithKey));
+      mockUpdate.mockImplementation(buildUpdate({ ...sourceWithKey, status: 'READY' as const }));
+
+      const result = await service.createAndProcess({
+        tenantId: TENANT,
+        courseId: COURSE,
+        title: 'PDF Report',
+        sourceType: 'FILE_PDF',
+        origin: 'report.pdf',
+        fileBuffer: pdfBuffer,
+      });
+
+      expect(result.status).toBe('PENDING');
+      expect(mockMinioUrl.uploadFile).toHaveBeenCalledWith(
+        expect.stringContaining(`${TENANT}/${COURSE}/`),
+        pdfBuffer,
+        'application/pdf'
+      );
+    });
+
+    it('marks source FAILED when MinIO upload throws', async () => {
+      const failedSource = {
+        ...PENDING_SOURCE,
+        status: 'FAILED' as const,
+        error_message: 'MinIO upload failed: Error: S3 down',
+      };
+      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
+      mockUpdate.mockImplementation(buildUpdate(failedSource));
+      mockMinioUrl.uploadFile.mockRejectedValueOnce(new Error('S3 down'));
+
+      const result = await service.createAndProcess({
+        tenantId: TENANT,
+        courseId: COURSE,
+        title: 'Bad PDF',
+        sourceType: 'FILE_PDF',
+        origin: 'bad.pdf',
+        fileBuffer: pdfBuffer,
+      });
+
+      // Should return FAILED since upload failed
+      expect(result.status).toBe('FAILED');
+      expect(mockUpdate).toHaveBeenCalled();
+    });
+
+    it('does not upload to MinIO when no fileBuffer is provided', async () => {
+      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
+      mockUpdate.mockImplementation(buildUpdate({ ...PENDING_SOURCE, status: 'READY' as const }));
+
+      await service.createAndProcess({
+        tenantId: TENANT,
+        courseId: COURSE,
+        title: 'Text only',
+        sourceType: 'TEXT',
+        origin: 'manual',
+        rawText: 'no file here',
+      });
+
+      expect(mockMinioUrl.uploadFile).not.toHaveBeenCalled();
     });
   });
 

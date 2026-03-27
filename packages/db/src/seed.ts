@@ -5,6 +5,7 @@ import { getOrCreatePool, closeAllPools } from './index';
 import { initializeGraphOntology } from './graph';
 import { seedNaharShalomCourse } from './seed/nahar-shalom-course.js';
 import { seedNaharShalomSource } from './seed/nahar-shalom-source.js';
+import { seedEmbeddings } from './seed/seed-embeddings.js';
 
 const { tenants, users, courses, modules, media_assets } = schema;
 
@@ -198,6 +199,10 @@ async function seed() {
     console.log('📎 Attaching nahar-shalom.docx as KnowledgeSource...');
     await seedNaharShalomSource();
 
+    // Generate demo embeddings for knowledge graph concepts
+    console.log('🧠 Seeding demo embeddings for knowledge concepts...');
+    await seedEmbeddings();
+
     console.log('✅ Seed completed successfully!');
     console.log('');
     console.log('📊 Summary:');
@@ -212,6 +217,9 @@ async function seed() {
     console.log('   - 1 KnowledgeSource: נהר שלום DOCX (full text + chunks)');
     console.log(
       '   - Apache AGE graph initialized + 15 Kabbalistic concept nodes'
+    );
+    console.log(
+      '   - 5 concept embeddings (768-dim, Ollama or fixture vectors)'
     );
   } catch (error) {
     console.error('❌ Seed failed:', error);

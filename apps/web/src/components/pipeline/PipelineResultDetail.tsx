@@ -2,7 +2,8 @@
  * PipelineResultDetail — tabbed dialog for viewing a single pipeline module output.
  * Tabs: Summary | Diagram | QA Score | Raw JSON
  */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import {
   Dialog,
   DialogContent,
@@ -60,8 +61,14 @@ function ResultTabs({ result }: { result: PipelineResultData }) {
   const data = result.outputData ?? {};
   const summary = extractString(data, 'shortSummary') ?? extractString(data, 'outputSummary');
   const outputMarkdown = extractString(data, 'outputMarkdown');
-  const mermaidSvg = extractString(data, 'mermaidSvg') ?? extractString(data, 'diagramSvg');
+  const rawMermaidSvg = extractString(data, 'mermaidSvg') ?? extractString(data, 'diagramSvg');
   const qaScore = typeof data['qaScore'] === 'number' ? (data['qaScore'] as number) : null;
+
+  // Security: sanitize SVG to prevent XSS via injected <script>, event handlers, etc.
+  const mermaidSvg = useMemo(
+    () => (rawMermaidSvg ? DOMPurify.sanitize(rawMermaidSvg, { USE_PROFILES: { svg: true, html: true } }) : null),
+    [rawMermaidSvg],
+  );
 
   const hasDiagram = Boolean(mermaidSvg);
   const hasQa = qaScore !== null;

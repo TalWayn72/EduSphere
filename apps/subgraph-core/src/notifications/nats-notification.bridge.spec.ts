@@ -243,7 +243,12 @@ describe('NATS Notification Bridge — Phase 45 Social Types (source assertions)
     });
 
     it('SocialFeedItemPayload has correct verb union type', () => {
-      expect(events).toContain(
+      // The verb union is defined in social-events.ts, re-exported by events.ts barrel
+      const socialEvents = readFileSync(
+        resolve(root, 'packages/nats-client/src/social-events.ts'),
+        'utf8'
+      );
+      expect(socialEvents).toContain(
         "'COMPLETED' | 'ENROLLED' | 'ACHIEVED_BADGE' | 'DISCUSSED' | 'STARTED_LEARNING'"
       );
     });

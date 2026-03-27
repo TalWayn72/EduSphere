@@ -157,7 +157,10 @@ describe('UserResolver', () => {
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const input = { email: 'new@x.com', firstName: 'New', lastName: 'User' };
       const result = await resolver.createUser(input, ctx);
-      expect(mockUserService.create).toHaveBeenCalledWith(input, MOCK_AUTH);
+      expect(mockUserService.create).toHaveBeenCalledWith(
+        expect.objectContaining(input),
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_USER);
     });
 

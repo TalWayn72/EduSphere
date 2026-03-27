@@ -59,9 +59,9 @@ export function SearchPage() {
       <PageHeader title="Search" className="sr-only" />
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Search input */}
-        <div className="flex items-center gap-2">
+        <div role="search" aria-label={t('searchLabel', 'Content search')} className="flex items-center gap-2">
           <div className="relative flex-1">
-            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
             <input
               ref={inputRef}
               value={inputValue}
@@ -70,10 +70,12 @@ export function SearchPage() {
                 if (e.key === 'Escape') navigate(-1);
               }}
               placeholder={t('searchFullPlaceholder')}
+              aria-label={t('searchInputLabel', 'Search courses, lessons, and knowledge sources')}
+              role="searchbox"
               className="w-full pl-12 pr-4 py-3 text-lg border-2 border-primary/30 rounded-xl bg-background focus:outline-none focus:border-primary transition-colors shadow-sm"
             />
             {loading && (
-              <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+              <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
             )}
           </div>
           {query.length >= 2 && (
@@ -82,10 +84,11 @@ export function SearchPage() {
               size="icon"
               className="h-9 w-9"
               title={t('saveSearch', 'Save Search')}
+              aria-label={t('saveSearch', 'Save Search')}
               data-testid="save-search-btn"
               onClick={() => openSaveModal(query)}
             >
-              <Bookmark className="h-4 w-4" />
+              <Bookmark className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
           <Button
@@ -93,10 +96,12 @@ export function SearchPage() {
             size="icon"
             className="h-9 w-9"
             title={t('savedSearches', 'Saved Searches')}
+            aria-label={t('savedSearches', 'Saved Searches')}
+            aria-expanded={showSavedPanel}
             data-testid="saved-searches-toggle"
             onClick={() => setShowSavedPanel((prev) => !prev)}
           >
-            <BookmarkCheck className="h-4 w-4" />
+            <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
 
@@ -128,25 +133,47 @@ export function SearchPage() {
           </div>
         )}
 
-        {/* Result count */}
+        {/* Result count + empty state */}
         {query.length >= 2 && !loading && (
-          <p className="text-sm text-muted-foreground px-1">
-            {results.length === 0
-              ? t('noResults')
-              : `${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"`}
-          </p>
+          <>
+            <p className="text-sm text-muted-foreground px-1" role="status" aria-live="polite">
+              {results.length === 0
+                ? t('noResults')
+                : `${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"`}
+            </p>
+            {results.length === 0 && (
+              <div
+                className="text-center py-10 space-y-3 rounded-xl border bg-muted/20"
+                data-testid="search-empty-state"
+              >
+                <SearchIcon className="h-10 w-10 text-muted-foreground/30 mx-auto" aria-hidden="true" />
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  {DEV_MODE
+                    ? t(
+                        'searchDevHint',
+                        'Search requires embeddings. Run seed:embeddings to index demo content.',
+                      )
+                    : t(
+                        'searchEmptyHint',
+                        'No matching content found. Try different keywords or ask your instructor to add sources.',
+                      )}
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Empty state */}
         {query.length < 2 && (
           <div className="text-center py-16 space-y-3">
-            <SearchIcon className="h-12 w-12 text-muted-foreground/30 mx-auto" />
+            <SearchIcon className="h-12 w-12 text-muted-foreground/30 mx-auto" aria-hidden="true" />
             <p className="text-muted-foreground">{t('searchHint')}</p>
             <div className="flex flex-wrap gap-2 justify-center mt-4">
               {SUGGESTED_QUERIES.map((s) => (
                 <button
                   key={s}
                   onClick={() => setInputValue(s)}
+                  aria-label={t('searchSuggestion', { query: s, defaultValue: `Search for: ${s}` })}
                   className="px-3 py-1.5 rounded-full border text-sm hover:bg-muted/60 transition-colors"
                 >
                   {s}

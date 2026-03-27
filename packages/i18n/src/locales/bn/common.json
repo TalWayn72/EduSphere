@@ -708,5 +708,32 @@
         "Integrated with course completion tracking"
       ]
     }
+  },
+  "notFound": {
+    "title": "পৃষ্ঠা পাওয়া যায়নি",
+    "description": "আপনি যে পৃষ্ঠাটি খুঁজছেন সেটি বিদ্যমান নেই বা সরানো হয়েছে।",
+    "backToDashboard": "ড্যাশবোর্ডে ফিরুন"
+  },
+  "pagination": {
+    "previous": "পূর্ববর্তী",
+    "next": "পরবর্তী",
+    "page": "পৃষ্ঠা",
+    "of": "এর",
+    "goToPage": "পৃষ্ঠা {{page}} এ যান"
+  },
+  "emptyState": {
+    "defaultTitle": "এখানে এখনও কিছু নেই",
+    "defaultDescription": "এই মুহূর্তে প্রদর্শনের জন্য কোনো আইটেম নেই।"
+  },
+  "calendar": {
+    "previousMonth": "আগের মাস",
+    "nextMonth": "পরের মাস",
+    "sunday": "রবি",
+    "monday": "সোম",
+    "tuesday": "মঙ্গল",
+    "wednesday": "বুধ",
+    "thursday": "বৃহ",
+    "friday": "শুক্র",
+    "saturday": "শনি"
   }
 }

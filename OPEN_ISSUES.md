@@ -94,13 +94,15 @@
 | BUG-107 | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing) | ✅ Fixed | (pending commit) |
 | FEAT-TEST-COVERAGE | Web Unit Test Coverage Improvement (57% → 95%+) | ✅ Fixed | (24 Mar 2026) |
 | FEAT-COVERAGE-001 | Web Unit Test Coverage Boost to 95%+ (177 new test files) | ✅ Fixed | (25 Mar 2026) |
-| FEAT-RAG-ACTIVATION | RAG Pipeline Activation — wire HNSW indexes, content indexing, concept publisher, seed embeddings, graph traversal | 🟡 In Progress | — |
+| FEAT-RAG-ACTIVATION | RAG Pipeline Activation — wire HNSW indexes, content indexing, concept publisher, seed embeddings, graph traversal | ✅ Fixed (Sprint 1) | (pending commit) |
+| FEAT-PDF-VIEWER | PDF Experience — in-browser PDF viewer, text annotation, sketch overlay, presigned URLs | ✅ Fixed (Sprint 2) | (pending commit) |
+| FEAT-OBSERVABILITY | Observability — EmbeddingCoverageChart, EmbeddingActivityLog, enhanced admin dashboard | ✅ Fixed (Sprint 3) | (pending commit) |
 
 ---
 
 ## FEAT-RAG-ACTIVATION — Wire RAG Pipeline for Production Use (27 Mar 2026)
 
-- **Status:** 🟡 In Progress
+- **Status:** ✅ Fixed (Sprint 1)
 - **Date:** 2026-03-27
 - **Severity:** 🔴 Critical (core AI feature blocked)
 - **PRD:** `docs/plans/features/FEAT-RAG-ACTIVATION.md`
@@ -108,19 +110,47 @@
 **Problem:** All RAG components exist individually (pgvector schema, HNSW index SQL, Apache AGE graph, HybridRAG engine, NATS consumers, LLM integration) but they are NOT wired together. Content is not indexed, HNSW indexes are not applied, knowledge graph stays empty, seed data has no embeddings, and `findRelatedConcepts()` returns `[]`.
 
 **5 Work Items:**
-1. **WI-1: HNSW Index Migration** — Create Drizzle migration for 4 HNSW indexes (currently standalone SQL, not in migration runner)
-2. **WI-2: Content Indexing Pipeline** — Wire PDF/Image/Video upload → chunking → embedding as automated pipeline
-3. **WI-3: NATS Concept Publisher** — Bridge content uploads → NER extraction → `EDUSPHERE.content.*.ner.extracted` → Apache AGE graph
-4. **WI-4: Seed Data with Embeddings** — Pre-compute embeddings for Nahar Shalom seed content (~500 chunks)
-5. **WI-5: Transcript→KnowledgeSource Bridge + Graph Traversal** — Auto-create knowledge_sources for transcripts; implement `findRelatedConcepts()` with Apache AGE Cypher
+1. **WI-1: HNSW Index Migration** — Create Drizzle migration for 4 HNSW indexes (currently standalone SQL, not in migration runner) ✅
+2. **WI-2: Content Indexing Pipeline** — Wire PDF/Image/Video upload → chunking → embedding as automated pipeline ✅
+3. **WI-3: NATS Concept Publisher** — Bridge content uploads → NER extraction → `EDUSPHERE.content.*.ner.extracted` → Apache AGE graph ✅
+4. **WI-4: Seed Data with Embeddings** — Pre-compute embeddings for Nahar Shalom seed content (~500 chunks) ✅
+5. **WI-5: Transcript→KnowledgeSource Bridge + Graph Traversal** — Auto-create knowledge_sources for transcripts; implement `findRelatedConcepts()` with Apache AGE Cypher ✅
 
-**Key files affected:**
-- `packages/db/src/schema/embeddings.ts` — HNSW index definitions
-- `packages/db/src/migrations/0041_optimize_hnsw_indexes.sql` — Standalone SQL (needs Drizzle migration)
-- `packages/rag/src/hybridSearch.ts` — `findRelatedConcepts()` placeholder
-- `apps/subgraph-knowledge/src/nats/lesson-ner.consumer.ts` — Consumer exists, publisher missing
-- `apps/transcription-worker/src/embedding/embedding.worker.ts` — No knowledge_sources bridge
-- `packages/db/src/seed/nahar-shalom-source.ts` — No embeddings in seed
+**Solution (Sprint 1):**
+- HNSW indexes applied via Drizzle migration `0042_transcript_knowledge_bridge.sql`
+- Content ingestion pipeline wired for PDF, URL, YouTube, and Text source types
+- NATS concept extraction publisher bridges content uploads to Apache AGE graph
+- Transcript-to-KnowledgeSource bridge auto-creates knowledge_sources
+- Seed embeddings pre-computed for demo content
+- Admin embedding dashboard at `/admin/embeddings` with `reindexCourseEmbeddings` mutation
+- `findRelatedConcepts()` implemented with Apache AGE Cypher graph traversal
+
+**Files created/modified:**
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `packages/db/src/migrations/0042_transcript_knowledge_bridge.sql` | NEW | HNSW index migration + transcript-knowledge bridge tables |
+| `packages/db/src/seed/seed-embeddings.ts` | NEW | Pre-computed seed embeddings for demo content |
+| `packages/db/src/schema/knowledge-sources.ts` | MODIFIED | Knowledge source schema updates for bridge |
+| `packages/db/src/seed.ts` | MODIFIED | Wire seed-embeddings into seed runner |
+| `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` | MODIFIED | Content indexing pipeline (PDF, URL, YouTube, Text) |
+| `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts` | NEW | NATS publisher for NER extraction events |
+| `apps/subgraph-knowledge/src/nats/transcript-bridge.consumer.ts` | NEW | Transcript-to-KnowledgeSource bridge consumer |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.graphql` | MODIFIED | SDL updates for reindex mutation + ReindexResult type |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.ts` | MODIFIED | Resolver for reindexCourseEmbeddings |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts` | MODIFIED | Service logic for embedding reindex + graph traversal |
+| `apps/web/src/components/source-manager/SourceManager.tsx` | MODIFIED | Source manager UI updates for new source types |
+| `apps/web/src/pages/search/SearchPage.tsx` | MODIFIED | Search page wired to vector search backend |
+| `apps/web/src/pages/content-viewer/AiChatPanel.tsx` | MODIFIED | AI chat panel uses RAG context |
+| `apps/web/src/pages/admin/EmbeddingDashboardPage.tsx` | NEW | Admin embedding dashboard page |
+| `apps/web/src/pages/admin/EmbeddingDashboardPage.stats.tsx` | NEW | Embedding stats component |
+| `apps/web/src/lib/graphql/embedding.queries.ts` | NEW | GraphQL queries for embedding operations |
+| `apps/web/src/lib/graphql/agent.queries.ts` | MODIFIED | Agent queries updated for RAG integration |
+| `apps/web/src/lib/routes/admin-routes.tsx` | MODIFIED | Admin routes — added /admin/embeddings |
+| `apps/web/src/components/admin/AdminSidebar.tsx` | MODIFIED | Sidebar — added Embeddings nav item |
+
+**Tests added:** 125 unit tests + 96 security tests + E2E spec
+**E2E spec:** `apps/web/e2e/rag-activation.spec.ts`
 
 **Non-functional targets:** Vector search < 50ms at 100K vectors, content indexing < 120s for 50-page PDF, graph traversal < 100ms for 2-hop query.
 
@@ -11265,3 +11295,65 @@ Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `
 Wave 1: 10 cypher service files consume `executeCypher` — all now auto-fixed at source
 Wave 2: All subgraph-knowledge graph services checked — same pattern, all fixed by `unwrapAgeRow`
 Wave 3: `JSON.stringify` with Cypher function literals — same class as BUG-104, fixed in `ontology.ts`
+
+---
+
+## FEAT-PDF-VIEWER — PDF Experience (Sprint 2) (27 Mar 2026)
+
+- **Status:** ✅ Fixed (Sprint 2)
+- **Date:** 2026-03-27
+- **Severity:** 🟡 Medium (feature gap — PDF sources could not be viewed in-browser)
+
+**Problem:** PDF files uploaded as knowledge sources had no in-browser viewing experience. Users could not view, annotate text, or sketch on PDF documents. Additionally, PDF files were not actually stored in MinIO (missing `file_key`), so even downloading was broken.
+
+**Solution (Sprint 2):**
+- Built full PDF viewing experience with `pdfjs-dist` (PdfDocumentViewer component)
+- Added text annotation support on PDF pages (PdfAnnotationLayer via PdfViewer)
+- Added sketch drawing overlay on documents (PdfSketchOverlay with Konva.js)
+- Fixed MinIO upload — PDF files now stored with `file_key` and presigned URL generation for secure access
+- Barrel file (`index.ts`) for clean imports
+- 88 unit tests + 10 backend tests + E2E Playwright spec
+
+**Files created:**
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `apps/web/src/components/pdf/PdfSketchOverlay.tsx` | NEW | Sketch drawing overlay on PDF pages (Konva.js) |
+| `apps/web/src/components/pdf/PdfDocumentViewer.tsx` | NEW | Core PDF viewer component using pdfjs-dist |
+| `apps/web/src/components/pdf/index.ts` | NEW | Barrel file for PDF component exports |
+| `apps/web/src/components/pdf/PdfViewer.test.tsx` | NEW | Unit tests for PdfViewer |
+| `apps/web/src/components/pdf/PdfAnnotationLayer.test.tsx` | NEW | Unit tests for PdfAnnotationLayer |
+| `apps/web/src/components/pdf/PdfSketchOverlay.test.tsx` | NEW | Unit tests for PdfSketchOverlay |
+| `apps/web/src/components/pdf/PdfDocumentViewer.test.tsx` | NEW | Unit tests for PdfDocumentViewer |
+| `apps/web/e2e/pdf-viewer.spec.ts` | NEW | E2E Playwright spec for PDF viewer |
+
+**Files modified:**
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `apps/web/src/components/source-manager/SourceDetailDrawer.tsx` | MODIFIED | Integrated PDF viewer into source detail drawer |
+| `apps/web/src/lib/graphql/sources.queries.ts` | MODIFIED | Added `fileUrl` field to source queries |
+| `apps/web/src/components/source-manager/types.ts` | MODIFIED | Added `fileUrl` to source types |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts` | MODIFIED | Fixed MinIO upload — PDF files now stored with file_key |
+
+**Tests added:** 88 unit tests + 10 backend tests + E2E spec
+**E2E spec:** `apps/web/e2e/pdf-viewer.spec.ts`
+
+---
+
+## FEAT-OBSERVABILITY — Observability Enhancements (Sprint 3) (27 Mar 2026)
+
+- **Status:** ✅ Fixed (Sprint 3)
+- **Date:** 2026-03-27
+- **Severity:** 🟢 Low (admin tooling enhancement)
+
+**Problem:** The admin embedding dashboard lacked detailed visibility into embedding coverage and activity. Administrators needed charts and logs to monitor embedding pipeline health.
+
+**Solution (Sprint 3):**
+- Added `EmbeddingCoverageChart` component — visual chart showing embedding coverage across courses
+- Added `EmbeddingActivityLog` component — real-time activity log for embedding operations
+- Enhanced admin embedding dashboard page with new visualization components
+
+**Key improvement:** Admins can now monitor embedding pipeline health at a glance, identify courses with low coverage, and track reindexing activity.
+
+---

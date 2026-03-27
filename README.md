@@ -272,6 +272,24 @@ sequenceDiagram
 
 ## Features
 
+### Recently Added — PDF Viewer & Observability
+
+- **In-Browser PDF Viewing** — Full PDF viewing experience with `pdfjs-dist`, integrated into the source detail drawer for seamless document access
+- **PDF Text Annotation** — Text annotation support on PDF pages via PdfAnnotationLayer, enabling inline notes and highlights on documents
+- **PDF Sketch Overlay** — Freehand drawing overlay on PDF documents using Konva.js (PdfSketchOverlay), supporting visual markup and diagramming
+- **Presigned URL Generation** — Secure file access via MinIO presigned URLs; PDF files now properly stored with `file_key` for reliable retrieval
+- **Embedding Coverage Chart** — Admin visualization showing embedding coverage across courses for monitoring RAG pipeline health
+- **Embedding Activity Log** — Real-time activity log for embedding operations on the admin dashboard
+
+### Recently Added — RAG Pipeline Activation
+
+- **Content Indexing Pipeline** — Automated chunking and embedding generation for PDF, URL, YouTube, and Text source types via the Knowledge subgraph content ingestion service
+- **HNSW Vector Indexes** — pgvector HNSW indexes applied via Drizzle migration for sub-50ms semantic search at 100K+ vectors (768-dim nomic-embed-text embeddings)
+- **Knowledge Graph Concept Extraction** — NATS-driven concept extraction publisher bridges content uploads to Apache AGE graph via NER extraction events (`EDUSPHERE.content.*.ner.extracted`)
+- **Transcript-to-KnowledgeSource Bridge** — Auto-creates `knowledge_sources` entries from transcripts, enabling `findRelatedConcepts()` with Apache AGE Cypher graph traversal (< 100ms for 2-hop queries)
+- **Admin Embedding Dashboard** — New admin page at `/admin/embeddings` with embedding statistics, reindex controls, and the `reindexCourseEmbeddings` mutation for bulk re-indexing
+- **Seed Embeddings** — Pre-computed embeddings for Nahar Shalom demo content (~500 chunks) so the knowledge graph and vector search work out of the box
+
 ### Recently Added — Organization Self-Service Onboarding
 
 - **Org Onboarding** — Self-service signup wizard (3 steps), 8-step provisioning pipeline (Keycloak group + MinIO bucket + NATS events), 14-day free trial with grace period, onboarding checklist tracking

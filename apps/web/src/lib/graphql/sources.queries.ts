@@ -24,6 +24,7 @@ export const KNOWLEDGE_SOURCE_DETAIL = gql`
       sourceType
       origin
       rawContent
+      fileUrl
       status
       chunkCount
       createdAt

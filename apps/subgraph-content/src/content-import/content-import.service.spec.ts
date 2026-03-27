@@ -24,13 +24,16 @@ describe('ContentImportService', () => {
   let service: ContentImportService;
   let youtubeClient: { getPlaylistItems: ReturnType<typeof vi.fn> };
   let firecrawlClient: { crawlSite: ReturnType<typeof vi.fn> };
+  let driveIngestion: { cancelJob: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     youtubeClient = { getPlaylistItems: vi.fn() };
     firecrawlClient = { crawlSite: vi.fn() };
+    driveIngestion = { cancelJob: vi.fn().mockReturnValue(true) };
     service = new ContentImportService(
       youtubeClient as unknown as YouTubeClient,
-      firecrawlClient as unknown as FirecrawlClient
+      firecrawlClient as unknown as FirecrawlClient,
+      driveIngestion as never
     );
   });
 

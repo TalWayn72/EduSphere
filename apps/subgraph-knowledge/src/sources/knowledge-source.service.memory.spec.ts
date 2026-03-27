@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* Memory-safety tests for KnowledgeSourceService — no-explicit-any removed */
 /**
  * knowledge-source.service.memory.spec.ts
  *
@@ -93,6 +93,11 @@ const mockEmbeddings = {
   generateEmbedding: vi.fn().mockResolvedValue({ id: 'emb-1' }),
 };
 
+const mockMinioUrl = {
+  uploadFile: vi.fn().mockResolvedValue(undefined),
+  getPresignedUrl: vi.fn().mockResolvedValue('https://minio.test/presigned'),
+};
+
 describe('KnowledgeSourceService — memory safety', () => {
   let service: KnowledgeSourceService;
 
@@ -108,8 +113,9 @@ describe('KnowledgeSourceService — memory safety', () => {
     mockEmbeddings.generateEmbedding.mockResolvedValue({ id: 'emb-1' });
 
     service = new KnowledgeSourceService(
-      mockParser as any,
-      mockEmbeddings as any
+      mockParser as never,
+      mockEmbeddings as never,
+      mockMinioUrl as never
     );
   });
 

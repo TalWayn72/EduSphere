@@ -444,5 +444,27 @@
     "websitePlaceholder": "https://your-course-site.com",
     "importing": "Importing…",
     "startImport": "Start Import"
+  },
+  "biExport": {
+    "title": "BI Tool Export",
+    "subtitle": "OData v4 endpoints for Power BI, Tableau, and other BI tools",
+    "odataEndpoints": "OData Endpoints",
+    "odataDescription": "Connect your BI tool to these OData v4 URLs using Bearer token authentication",
+    "copied": "Copied!",
+    "copy": "Copy",
+    "apiTokens": "API Tokens",
+    "apiTokensDescription": "Bearer tokens for BI tool OData authentication",
+    "generateToken": "Generate Token",
+    "loading": "Loading...",
+    "noTokens": "No tokens yet. Generate one to connect your BI tool.",
+    "active": "Active",
+    "revoked": "Revoked",
+    "generateModalTitle": "Generate BI API Token",
+    "tokenWarning": "Save this token now — it will not be shown again.",
+    "done": "Done",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g. Power BI Production",
+    "cancel": "Cancel",
+    "generate": "Generate"
   }
 }

@@ -70,5 +70,6 @@
   "consentDescription": "চাভরুতা তৃতীয়-পক্ষের AI পরিষেবা ব্যবহার করে বিতর্কের উত্তর তৈরি করতে। অনুগ্রহ করে চালিয়ে যাওয়ার আগে সম্মতি দিন।",
   "consentButton": "আমি সম্মত — বিতর্ক শুরু করুন",
   "noDiscussions": "এখনো কোনো আলোচনা নেই — আলোচনা শুরু করতে একটি কোর্সে যোগ দিন!",
-  "messagesCount": "বার্তা"
+  "messagesCount": "বার্তা",
+  "schemaUpgradeNotice": "Some collaboration features are being upgraded. Your existing sessions are safe."
 }

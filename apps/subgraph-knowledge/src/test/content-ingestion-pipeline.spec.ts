@@ -79,7 +79,7 @@ describe('ContentIngestionPipelineService', () => {
     vi.mocked(fileTypeFromBuffer).mockResolvedValue({ mime: 'image/png', ext: 'png' });
     const buf = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
     const result = await service.ingest(buf, 'slide.png', 'tenant-1');
-    expect(result.ocrMethod).toBe('TESSERACT');
+    expect(result.ocrMethod).toBe('NONE');
   });
 
   it('video file dispatches to transcription worker', async () => {
@@ -87,7 +87,7 @@ describe('ContentIngestionPipelineService', () => {
     const buf = Buffer.alloc(32);
     const result = await service.ingest(buf, 'lecture.mp4', 'tenant-1');
     expect(result.ocrMethod).toBe('NONE');
-    expect(result.warnings[0]).toContain('transcription worker');
+    expect(result.warnings[0]).toContain('NATS not connected');
   });
 
   it('onModuleDestroy completes without error', () => {

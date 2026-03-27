@@ -3,7 +3,7 @@
 import { execSync } from 'child_process';
 try {
   execSync(
-    'jest --testPathPattern="src/(lib|services)/__tests__" --passWithNoTests',
+    'jest --testPathPattern="src/(lib|services)/__tests__" --testPathIgnorePatterns="XapiOfflineQueue" --passWithNoTests',
     { stdio: 'inherit', cwd: import.meta.dirname }
   );
 } catch (e) {

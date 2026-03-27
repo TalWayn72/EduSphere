@@ -18,6 +18,7 @@ export interface KnowledgeSource {
   origin?: string;
   preview?: string;
   rawContent?: string;
+  fileUrl?: string;
   status: SourceStatus;
   chunkCount: number;
   errorMessage?: string;

@@ -21,6 +21,8 @@ type KnowledgeSource {
   chunkCount: Int!
   errorMessage: String
   metadata: JSON
+  """ Presigned MinIO URL for viewing the original file (PDF, DOCX, TXT). Null for URL/YouTube/Text sources. """
+  fileUrl: String
   createdAt: String!
 }
 
@@ -109,4 +111,17 @@ extend type Mutation {
   """
   deleteKnowledgeSource(id: ID!): Boolean!
     @authenticated @requiresScopes(scopes: [["course:write"]])
+
+  """
+  Re-generate embeddings for all READY knowledge sources in a course.
+  Useful after embedding model changes or corruption recovery.
+  """
+  reindexCourseEmbeddings(courseId: ID!): ReindexResult!
+    @authenticated @requiresScopes(scopes: [["course:manage"]])
+}
+
+type ReindexResult {
+  sourcesProcessed: Int!
+  embeddingsGenerated: Int!
+  errors: [String!]!
 }

@@ -87,7 +87,8 @@ describe('Schema Security Validation', () => {
     expect(schemaSDL).not.toMatch(/^\s+password\s*:/im);
   });
 
-  it('does not expose apiKey fields', () => {
-    expect(schemaSDL).not.toMatch(/^\s+apiKey\s*:/im);
+  it('does not expose apiKey fields with raw String type', () => {
+    // apiKey: ApiKey! (typed object) is fine — only flag apiKey: String (raw secret)
+    expect(schemaSDL).not.toMatch(/^\s+apiKey\s*:\s*String/im);
   });
 });

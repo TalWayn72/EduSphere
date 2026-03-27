@@ -138,7 +138,7 @@ describe('Annotation Merge — promote workflow', () => {
   it('student cannot promote (reject — unauthorized to merge own annotation)', async () => {
     await expect(
       service.promote('ann-merge-1', studentAuth)
-    ).rejects.toThrow('Unauthorized: only instructors can promote annotations');
+    ).rejects.toThrow('Only instructors can promote annotations');
   });
 
   it('promote throws when annotation not found (merge request for nonexistent)', async () => {

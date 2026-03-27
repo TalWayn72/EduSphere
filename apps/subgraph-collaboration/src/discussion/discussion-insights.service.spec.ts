@@ -151,9 +151,9 @@ describe('DiscussionInsightsService', () => {
       );
 
       const call = vi.mocked(ai.generateText).mock.calls[0][0] as {
-        maxTokens: number;
+        maxOutputTokens: number;
       };
-      expect(call.maxTokens).toBe(300);
+      expect(call.maxOutputTokens).toBe(300);
     });
   });
 });

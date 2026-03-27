@@ -209,6 +209,9 @@ const WebhooksPage = lazy(() =>
 const DomainConfigPage = lazy(() =>
   import('@/pages/admin/DomainConfigPage').then((m) => ({ default: m.DomainConfigPage }))
 );
+const EmbeddingDashboardPage = lazy(() =>
+  import('@/pages/admin/EmbeddingDashboardPage').then((m) => ({ default: m.EmbeddingDashboardPage }))
+);
 
 const ADMIN_ROLES = { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] };
 
@@ -269,4 +272,5 @@ export const adminRoutes: RouteObject[] = [
   { path: '/admin/api-keys', element: guarded(<ApiKeysPage />, ADMIN_ROLES) },
   { path: '/admin/webhooks', element: guarded(<WebhooksPage />, ADMIN_ROLES) },
   { path: '/admin/domains', element: guarded(<DomainConfigPage />, ADMIN_ROLES) },
+  { path: '/admin/embeddings', element: guarded(<EmbeddingDashboardPage />, ADMIN_ROLES) },
 ];

@@ -2,10 +2,13 @@ import {
   Injectable,
   Logger,
   OnModuleDestroy,
+  OnModuleInit,
   BadRequestException,
   UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { fileTypeFromBuffer } from 'file-type';
+import { connect, NatsConnection, StringCodec } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 
 export interface IngestionResult {
   extractedText: string;
@@ -20,9 +23,37 @@ export interface IngestionResult {
   isHandwritten: boolean;
 }
 
+/** Factory for IngestionResult with sensible defaults — eliminates repeated boilerplate. */
+function createResult(overrides: Partial<IngestionResult> & Pick<IngestionResult, 'extractedText' | 'ocrMethod' | 'ocrConfidence'>): IngestionResult {
+  return {
+    topics: [],
+    thumbnailUrl: null,
+    estimatedDuration: 0,
+    pageCount: null,
+    warnings: [],
+    aiCaption: null,
+    isHandwritten: false,
+    ...overrides,
+  };
+}
+
 @Injectable()
-export class ContentIngestionPipelineService implements OnModuleDestroy {
+export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ContentIngestionPipelineService.name);
+  private natsConnection: NatsConnection | null = null;
+  private readonly sc = StringCodec();
+
+  async onModuleInit(): Promise<void> {
+    try {
+      this.natsConnection = await connect(buildNatsOptions());
+      this.logger.log('ContentIngestionPipeline connected to NATS');
+    } catch (err) {
+      this.logger.warn(
+        { err },
+        '[ContentIngestionPipelineService] NATS connection failed — video dispatch disabled',
+      );
+    }
+  }
 
   async ingest(buffer: Buffer, filename: string, tenantId: string): Promise<IngestionResult> {
     const fileType = await fileTypeFromBuffer(buffer);
@@ -37,16 +68,16 @@ export class ContentIngestionPipelineService implements OnModuleDestroy {
       return this.handlePdf(buffer, filename);
     }
     if (mime?.startsWith('image/')) {
-      return this.handleImage(buffer, filename);
+      return this.handleImage(filename);
     }
     if (mime?.startsWith('video/')) {
-      return this.handleVideo(buffer, filename);
+      return this.handleVideo(buffer, filename, tenantId);
     }
     if (mime?.startsWith('text/')) {
       return this.handleText(buffer, filename);
     }
     if (mime?.includes('officedocument') || mime?.includes('opendocument')) {
-      return this.handleOfficeDocument(buffer, filename);
+      return this.handleOfficeDocument(filename);
     }
 
     throw new UnsupportedMediaTypeException(`File type ${mime ?? 'unknown'} is not supported`);
@@ -54,10 +85,7 @@ export class ContentIngestionPipelineService implements OnModuleDestroy {
 
   private async handleZip(buffer: Buffer, filename: string, tenantId: string): Promise<IngestionResult> {
     const MAX_UNCOMPRESSED = 5 * 1024 * 1024 * 1024;
-
-    // Dynamic import to avoid loading unzipper at startup
     const { Open } = await import('unzipper');
-
     const directory = await Open.buffer(buffer);
 
     let totalSize = 0;
@@ -79,99 +107,140 @@ export class ContentIngestionPipelineService implements OnModuleDestroy {
     );
     warnings.push(`ZIP extracted: ${directory.files.length} files`);
 
-    return {
+    return createResult({
       extractedText: `ZIP archive with ${directory.files.length} files`,
       ocrMethod: 'NONE',
       ocrConfidence: 1,
-      topics: [],
-      thumbnailUrl: null,
-      estimatedDuration: 0,
-      pageCount: null,
       warnings,
-      aiCaption: null,
-      isHandwritten: false,
-    };
+    });
   }
 
-  private handlePdf(_buffer: Buffer, filename: string): IngestionResult {
-    this.logger.log(`PDF pipeline: ${filename}`);
-    return {
-      extractedText: '',
-      ocrMethod: 'EMBEDDED_TEXT',
-      ocrConfidence: 1,
-      topics: [],
-      thumbnailUrl: null,
-      estimatedDuration: 0,
-      pageCount: null,
-      warnings: ['PDF processing: stub implementation'],
-      aiCaption: null,
-      isHandwritten: false,
-    };
+  private async handlePdf(buffer: Buffer, filename: string): Promise<IngestionResult> {
+    this.logger.log(`[ContentIngestionPipelineService] PDF pipeline: ${filename}`);
+    const warnings: string[] = [];
+
+    try {
+      const { PDFParse } = await import('pdf-parse') as { PDFParse: new (opts: { data: Buffer }) => {
+        getText(): Promise<{ text: string; total: number }>;
+        destroy(): Promise<void>;
+      }};
+      const parser = new PDFParse({ data: buffer });
+      const result = await parser.getText();
+      await parser.destroy();
+
+      const text = result.text
+        .replace(/\r\n/g, '\n')
+        .replace(/\s{3,}/g, '\n')
+        .trim();
+
+      this.logger.log(
+        `[ContentIngestionPipelineService] PDF extracted: ${text.length} chars, ${result.total} pages from ${filename}`,
+      );
+
+      return createResult({
+        extractedText: text,
+        ocrMethod: 'EMBEDDED_TEXT',
+        ocrConfidence: text.length > 0 ? 0.95 : 0,
+        estimatedDuration: Math.ceil(text.split(/\s+/).filter(Boolean).length / 250),
+        pageCount: result.total,
+        warnings,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error(
+        { err, filename },
+        `[ContentIngestionPipelineService] PDF parsing failed: ${msg}`,
+      );
+      warnings.push(`PDF parsing failed: ${msg}`);
+      return createResult({
+        extractedText: '',
+        ocrMethod: 'EMBEDDED_TEXT',
+        ocrConfidence: 0,
+        warnings,
+      });
+    }
   }
 
-  private handleImage(_buffer: Buffer, filename: string): IngestionResult {
-    this.logger.log(`Image pipeline: ${filename}`);
-    return {
+  private handleImage(filename: string): IngestionResult {
+    this.logger.warn(
+      `[ContentIngestionPipelineService] OCR not yet available for image: ${filename} — returning empty text`,
+    );
+    return createResult({
       extractedText: '',
-      ocrMethod: 'TESSERACT',
+      ocrMethod: 'NONE',
       ocrConfidence: 0,
-      topics: [],
-      thumbnailUrl: null,
-      estimatedDuration: 0,
-      pageCount: null,
-      warnings: ['Image OCR: stub implementation'],
-      aiCaption: null,
-      isHandwritten: false,
-    };
+      warnings: ['Image OCR: not yet available — text extraction skipped'],
+    });
   }
 
-  private handleVideo(_buffer: Buffer, filename: string): IngestionResult {
-    this.logger.log(`Video pipeline (transcription worker): ${filename}`);
-    return {
+  private async handleVideo(
+    _buffer: Buffer,
+    filename: string,
+    tenantId: string,
+  ): Promise<IngestionResult> {
+    this.logger.log(
+      `[ContentIngestionPipelineService] Video pipeline — dispatching to transcription worker: ${filename}`,
+    );
+    const warnings: string[] = [];
+
+    if (this.natsConnection) {
+      try {
+        const js = this.natsConnection.jetstream();
+        const payload = {
+          fileKey: filename,
+          assetId: `pending-${Date.now()}`,
+          courseId: '',
+          tenantId,
+          fileName: filename,
+          contentType: 'video/*',
+        };
+        const data = this.sc.encode(JSON.stringify(payload));
+        await js.publish('media.uploaded', data);
+        this.logger.log(
+          `[ContentIngestionPipelineService] Published media.uploaded for ${filename} (tenant: ${tenantId})`,
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.error(
+          { err, filename, tenantId },
+          `[ContentIngestionPipelineService] Failed to dispatch video to transcription worker: ${msg}`,
+        );
+        warnings.push(`Video dispatch failed: ${msg}`);
+      }
+    } else {
+      this.logger.warn(
+        `[ContentIngestionPipelineService] NATS not connected — video ${filename} not dispatched`,
+      );
+      warnings.push('Video: NATS not connected — transcription not dispatched');
+    }
+
+    return createResult({
       extractedText: '',
       ocrMethod: 'NONE',
       ocrConfidence: 1,
-      topics: [],
-      thumbnailUrl: null,
-      estimatedDuration: 0,
-      pageCount: null,
-      warnings: ['Video: dispatched to transcription worker'],
-      aiCaption: null,
-      isHandwritten: false,
-    };
+      warnings: [...warnings, 'Video: dispatched to transcription worker — text available after processing'],
+    });
   }
 
   private handleText(buffer: Buffer, filename: string): IngestionResult {
     const text = buffer.toString('utf8');
     this.logger.log(`Text pipeline: ${filename}, ${text.length} chars`);
-    return {
+    return createResult({
       extractedText: text,
       ocrMethod: 'NONE',
       ocrConfidence: 1,
-      topics: [],
-      thumbnailUrl: null,
       estimatedDuration: Math.ceil(text.length / 1500),
-      pageCount: null,
-      warnings: [],
-      aiCaption: null,
-      isHandwritten: false,
-    };
+    });
   }
 
-  private handleOfficeDocument(_buffer: Buffer, filename: string): IngestionResult {
+  private handleOfficeDocument(filename: string): IngestionResult {
     this.logger.log(`Office document pipeline (LibreOffice): ${filename}`);
-    return {
+    return createResult({
       extractedText: '',
       ocrMethod: 'NONE',
       ocrConfidence: 1,
-      topics: [],
-      thumbnailUrl: null,
-      estimatedDuration: 0,
-      pageCount: null,
       warnings: ['Office document: dispatched to LibreOffice service'],
-      aiCaption: null,
-      isHandwritten: false,
-    };
+    });
   }
 
   private guessMimeFromExtension(filename: string): string | null {
@@ -197,7 +266,12 @@ export class ContentIngestionPipelineService implements OnModuleDestroy {
     return ext ? (map[ext] ?? null) : null;
   }
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
+    if (this.natsConnection) {
+      await this.natsConnection.drain().catch(() => undefined);
+      this.natsConnection = null;
+      this.logger.log('ContentIngestionPipelineService NATS connection drained');
+    }
     this.logger.log('ContentIngestionPipelineService destroyed');
   }
 }

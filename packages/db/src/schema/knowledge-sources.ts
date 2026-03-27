@@ -8,7 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps } from './_shared';
 import { tenants } from './tenants';
-import { courses } from './content';
+import { courses, transcripts } from './content';
 
 /** Source types — mirrors NotebookLM's ingestion capabilities */
 export const SOURCE_TYPES = [
@@ -75,6 +75,15 @@ export const knowledgeSources = pgTable('knowledge_sources', {
 
   /** Arbitrary metadata: page count, word count, language, etc. */
   metadata: jsonb('metadata').notNull().default({}),
+
+  /**
+   * Optional link to a transcript — bridges the transcription pipeline
+   * to the RAG knowledge source system. SET NULL on transcript deletion
+   * so the KnowledgeSource (and its embeddings) survives re-transcription.
+   */
+  transcript_id: uuid('transcript_id').references(() => transcripts.id, {
+    onDelete: 'set null',
+  }),
 
   ...timestamps,
 });

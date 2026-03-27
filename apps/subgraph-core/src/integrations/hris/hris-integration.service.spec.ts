@@ -3,6 +3,13 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
+
+// Mock credential helpers to avoid ENCRYPTION_MASTER_KEY requirement
+vi.mock('./hris-credential.helper.js', () => ({
+  decryptHrisCredentials: vi.fn((config: unknown) => config),
+  redactHrisConfig: vi.fn((config: Record<string, unknown>) => ({ ...config, clientSecret: '***' })),
+}));
+
 import { HrisIntegrationService } from './hris-integration.service.js';
 import { ScimAdapter } from './scim.adapter.js';
 import { WorkdayAdapter } from './workday.adapter.js';

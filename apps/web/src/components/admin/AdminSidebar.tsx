@@ -27,6 +27,7 @@ import {
   Lock,
   ScrollText,
   Bell,
+  Database,
 } from 'lucide-react';
 
 interface NavItem {
@@ -129,6 +130,11 @@ export function AdminSidebar() {
             to: '/admin/gamification',
             icon: Trophy,
             label: t('sidebar.nav.gamification'),
+          },
+          {
+            to: '/admin/embeddings',
+            icon: Database,
+            label: t('sidebar.nav.embeddings', 'Embeddings'),
           },
         ],
       },

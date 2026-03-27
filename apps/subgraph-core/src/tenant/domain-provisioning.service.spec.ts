@@ -52,28 +52,27 @@ vi.mock('@edusphere/db', () => {
     and: vi.fn((...args: unknown[]) => args),
     withTenantContext: vi.fn(
       (
-        _tenantId: string,
-        _userId: string,
-        _role: string,
-        fn: () => Promise<unknown>
-      ) => fn()
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) => fn(_db)
     ),
   };
 });
 
-// Mock @edusphere/dns-provider
+// Mock @edusphere/dns-provider — use class syntax so `new` works
 vi.mock('@edusphere/dns-provider', () => {
   return {
-    MockDnsProvider: vi.fn().mockImplementation(() => ({
-      createSubdomain: vi.fn().mockResolvedValue({ url: 'https://test.edusphere.io' }),
-      deleteSubdomain: vi.fn().mockResolvedValue(undefined),
-      requestDomainVerification: vi.fn().mockResolvedValue({
+    MockDnsProvider: class {
+      createSubdomain = vi.fn().mockResolvedValue({ url: 'https://test.edusphere.io' });
+      deleteSubdomain = vi.fn().mockResolvedValue(undefined);
+      requestDomainVerification = vi.fn().mockResolvedValue({
         token: 'verify-token-123',
         recordType: 'TXT',
         recordValue: '_edusphere-verification.learn.example.com',
-      }),
-      checkDomainVerification: vi.fn().mockResolvedValue(true),
-    })),
+      });
+      checkDomainVerification = vi.fn().mockResolvedValue(true);
+    },
   };
 });
 

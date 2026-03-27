@@ -239,5 +239,27 @@
   "listView": "List view",
   "viewMode": "View mode",
   "thumbnailPlaceholder": "e.g. 📚 or https://...",
-  "estimatedHoursEditPlaceholder": "e.g. 8"
+  "estimatedHoursEditPlaceholder": "e.g. 8",
+  "createLesson": {
+    "step1Title": "Lesson Details",
+    "lessonTitleLabel": "Lesson Title *",
+    "lessonTitlePlaceholder": "e.g. Tree of Life lesson — Gate of Cutting, paragraph 3",
+    "titleMinLength": "Title must contain at least 3 characters",
+    "lessonType": "Lesson Type *",
+    "typeThematic": "General (Thematic)",
+    "typeSequential": "Sequential",
+    "lessonDate": "Lesson Date",
+    "continueToMaterials": "Continue to Materials ←",
+    "step2Title": "Add Materials",
+    "step2Hint": "You can skip this step and add materials after creating the lesson",
+    "youtubeLink": "🎥 YouTube Link",
+    "youtubeValidation": "Must be a valid YouTube URL",
+    "invalidUrl": "Invalid URL",
+    "addButton": "Add",
+    "linkAddedAfterCreation": "The link will be added after creating the lesson",
+    "notesFile": "📄 Notes File (PDF)",
+    "supportedFormats": "Supports PDF, Word, TXT files",
+    "skip": "Skip",
+    "continueToTemplate": "Continue to Template ←"
+  }
 }

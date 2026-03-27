@@ -22,6 +22,11 @@ export const SEND_AGENT_MESSAGE_MUTATION = gql`
       role
       content
       createdAt
+      sources {
+        sourceId
+        sourceName
+        similarity
+      }
     }
   }
 `;
@@ -87,6 +92,11 @@ export const MESSAGE_STREAM_SUBSCRIPTION = gql`
       role
       content
       createdAt
+      sources {
+        sourceId
+        sourceName
+        similarity
+      }
     }
   }
 `;

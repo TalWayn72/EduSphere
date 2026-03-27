@@ -1,5 +1,6 @@
 /**
  * SourceDetailDrawer — Full-content view for a single knowledge source.
+ * Renders PdfDocumentViewer for PDF sources with fileUrl, plaintext otherwise.
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -9,6 +10,7 @@ import { KNOWLEDGE_SOURCE_DETAIL } from '@/lib/graphql/sources.queries';
 import type { KnowledgeSource } from './types';
 import { IS_DEV_MODE, authHeaders, hasValidAuth, getSourceErrorKey } from './utils';
 import { getDevSources } from './dev-mock';
+import { PdfDocumentViewer } from '@/components/pdf';
 
 export function SourceDetailDrawer({
   sourceId,
@@ -41,6 +43,8 @@ export function SourceDetailDrawer({
         },
   });
 
+  const isPdf = data?.sourceType === 'FILE_PDF';
+
   const formattedDate = data?.createdAt
     ? (() => {
         const d = new Date(data.createdAt);
@@ -49,28 +53,36 @@ export function SourceDetailDrawer({
     : '';
 
   return (
-    <div className="absolute inset-0 z-10 bg-white flex flex-col dark:bg-gray-900" dir={dir}>
+    <div role="dialog" aria-label={data?.title ?? t('sources.loading')} className="absolute inset-0 z-10 bg-white flex flex-col dark:bg-gray-900" dir={dir}>
       <div className="flex items-center gap-2 px-4 py-3 border-b">
         <button
           onClick={onClose}
+          aria-label={t('sources.backLabel', 'Go back to source list')}
           className="text-gray-400 hover:text-gray-700 dark:text-gray-500"
         >
           {t('sources.back')}
         </button>
-        <span className="font-medium truncate">{data?.title ?? '...'}</span>
+        <span className="font-medium truncate" aria-live="polite">{data?.title ?? '...'}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700 dark:text-gray-200">
         {isLoading
           ? t('sources.loading')
           : isError
             ? (
-              <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <div role="alert" className="flex flex-col items-center justify-center h-full text-center px-4">
                 <p className="text-sm font-medium text-red-600 dark:text-red-400">
                   {t(getSourceErrorKey(queryError))}
                 </p>
               </div>
             )
-            : (data?.rawContent ?? t('sources.noContent'))}
+            : isPdf && data?.fileUrl
+              ? (
+                <PdfDocumentViewer
+                  url={data.fileUrl}
+                  className="h-full -m-4"
+                />
+              )
+              : (data?.rawContent ?? t('sources.noContent'))}
       </div>
       <div className="px-4 py-2 border-t text-xs text-gray-400 dark:text-slate-400">
         {data &&

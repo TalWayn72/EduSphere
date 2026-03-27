@@ -26,10 +26,20 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { KnowledgeSource, SourceType } from '@edusphere/db';
+import { randomUUID } from 'node:crypto';
 import { DocumentParserService } from './document-parser.service.js';
 import { EmbeddingService } from '../embedding/embedding.service.js';
+import { MinioUrlService } from './minio-url.service.js';
 
 export { KnowledgeSource };
+
+/** Map source type to MIME for MinIO upload ContentType header. */
+const SOURCE_TYPE_MIME: Record<string, string> = {
+  FILE_PDF: 'application/pdf',
+  FILE_DOCX:
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  FILE_TXT: 'text/plain',
+};
 
 export type CreateSourceInput = {
   tenantId: string;
@@ -51,7 +61,8 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly parser: DocumentParserService,
-    private readonly embeddings: EmbeddingService
+    private readonly embeddings: EmbeddingService,
+    private readonly minioUrl: MinioUrlService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -127,7 +138,17 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
    * The client polls via refetchInterval (3 s) until status becomes READY/FAILED.
    */
   async createAndProcess(input: CreateSourceInput): Promise<KnowledgeSource> {
-    // 1. Insert as PENDING — returned to caller immediately
+    // 1. Compute MinIO file key if a file buffer is provided.
+    // Security: strip path traversal sequences from origin (user-provided filename).
+    const safeOrigin = input.origin
+      .replace(/\.\.\//g, '')
+      .replace(/\.\.\\/g, '')
+      .replace(/[/\\]/g, '_');
+    const fileKey = input.fileBuffer
+      ? `${input.tenantId}/${input.courseId}/${randomUUID()}/${safeOrigin}`
+      : undefined;
+
+    // 2. Insert as PENDING — returned to caller immediately
     const [source] = await this.db
       .insert(schema.knowledgeSources)
       .values({
@@ -138,12 +159,33 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
         origin: input.origin,
         status: 'PENDING',
         metadata: {},
+        ...(fileKey ? { file_key: fileKey } : {}),
       })
       .returning();
 
     if (!source) throw new InternalServerErrorException('Failed to create knowledge source');
 
-    // 2. Fire-and-forget with 5-min timeout (per memory-safety rules)
+    // 3. Upload file to MinIO before background processing (so fileUrl is available immediately)
+    if (input.fileBuffer && fileKey) {
+      const contentType =
+        SOURCE_TYPE_MIME[input.sourceType] ?? 'application/octet-stream';
+      try {
+        await this.minioUrl.uploadFile(fileKey, input.fileBuffer, contentType);
+      } catch (err) {
+        this.logger.error(
+          `[KnowledgeSourceService] MinIO upload failed for key=${fileKey}: ${err}`
+        );
+        // Mark FAILED and return — no point processing without the file stored
+        const [failed] = await this.db
+          .update(schema.knowledgeSources)
+          .set({ status: 'FAILED', error_message: `MinIO upload failed: ${err}` })
+          .where(eq(schema.knowledgeSources.id, source.id))
+          .returning();
+        return failed ?? source;
+      }
+    }
+
+    // 4. Fire-and-forget with 5-min timeout (per memory-safety rules)
     const processTask = this.processSource(source.id, input);
     const timeoutTask = new Promise<never>((_, reject) =>
       setTimeout(
@@ -248,7 +290,10 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
         `Source ${sourceId} ready: ${embeddedCount}/${chunks.length} chunks embedded`
       );
 
-      return updated!;
+      if (!updated) {
+        throw new InternalServerErrorException(`Failed to update source ${sourceId} to READY`);
+      }
+      return updated;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -260,7 +305,10 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
         .where(eq(schema.knowledgeSources.id, sourceId))
         .returning();
 
-      return failed!;
+      if (!failed) {
+        throw new InternalServerErrorException(`Failed to mark source ${sourceId} as FAILED`);
+      }
+      return failed;
     }
   }
 
@@ -275,5 +323,79 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
         )
       );
     this.logger.log(`Deleted knowledge source ${id}`);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Reindex
+  // ---------------------------------------------------------------------------
+
+  async reindexCourseEmbeddings(
+    tenantId: string,
+    courseId: string
+  ): Promise<{ sourcesProcessed: number; embeddingsGenerated: number; errors: string[] }> {
+    const sources = await this.db
+      .select()
+      .from(schema.knowledgeSources)
+      .where(
+        and(
+          eq(schema.knowledgeSources.tenant_id, tenantId),
+          eq(schema.knowledgeSources.course_id, courseId),
+          eq(schema.knowledgeSources.status, 'READY')
+        )
+      );
+
+    this.logger.log(
+      `Reindexing ${sources.length} READY sources for course ${courseId} (tenant: ${tenantId})`
+    );
+
+    let sourcesProcessed = 0;
+    let embeddingsGenerated = 0;
+    const errors: string[] = [];
+
+    for (const source of sources) {
+      try {
+        const text = source.raw_content ?? '';
+        if (text.trim().length === 0) {
+          errors.push(`Source ${source.id}: no raw_content available`);
+          continue;
+        }
+
+        const chunks = this.parser.chunkText(text);
+        let count = 0;
+
+        for (const chunk of chunks) {
+          try {
+            const segmentId = `ks:${source.id}:${chunk.index}`;
+            await this.embeddings.generateEmbedding(chunk.text, segmentId);
+            count++;
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            this.logger.warn(`Reindex embed failed for source ${source.id} chunk ${chunk.index}: ${msg}`);
+          }
+        }
+
+        // Update chunk_count
+        await this.db
+          .update(schema.knowledgeSources)
+          .set({ chunk_count: count })
+          .where(eq(schema.knowledgeSources.id, source.id));
+
+        embeddingsGenerated += count;
+        sourcesProcessed++;
+        this.logger.log(
+          `Reindexed source ${source.id}: ${count}/${chunks.length} chunks`
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        errors.push(`Source ${source.id}: ${msg}`);
+        this.logger.error(`Reindex failed for source ${source.id}: ${msg}`);
+      }
+    }
+
+    this.logger.log(
+      `Reindex complete: ${sourcesProcessed}/${sources.length} sources, ${embeddingsGenerated} embeddings`
+    );
+
+    return { sourcesProcessed, embeddingsGenerated, errors };
   }
 }

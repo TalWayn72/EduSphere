@@ -117,12 +117,13 @@ describe('searchKnowledgeGraph', () => {
     const results = await searchKnowledgeGraph('photosynthesis', TENANT, 2);
 
     expect(results).toHaveLength(2);
+    // similarity = parseFloat(row.similarity) * vectorWeight (0.5)
     expect(results[0]).toMatchObject({
       id: 'seg-1',
       type: 'transcript_segment',
-      similarity: 0.92,
+      similarity: 0.46,
     });
-    expect(results[1]).toMatchObject({ id: 'seg-2', similarity: 0.85 });
+    expect(results[1]).toMatchObject({ id: 'seg-2', similarity: 0.425 });
   });
 
   it('falls back to ILIKE when Ollama returns non-ok status', async () => {

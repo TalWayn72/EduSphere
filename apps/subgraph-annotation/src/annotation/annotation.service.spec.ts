@@ -299,7 +299,7 @@ describe('AnnotationService', () => {
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
       await expect(
         service.update('ann-1', { content: { text: 'x' } }, MOCK_AUTH)
-      ).rejects.toThrow('Unauthorized');
+      ).rejects.toThrow('You can only update your own annotations');
     });
 
     it('allows instructor to update any annotation', async () => {
@@ -338,7 +338,7 @@ describe('AnnotationService', () => {
       mockLimit.mockResolvedValue([otherAnnotation]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
       await expect(service.delete('ann-1', MOCK_AUTH)).rejects.toThrow(
-        'Unauthorized'
+        'You can only delete your own annotations'
       );
     });
 

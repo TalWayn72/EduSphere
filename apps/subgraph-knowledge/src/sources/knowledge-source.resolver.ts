@@ -1,12 +1,18 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { UnauthorizedException } from '@nestjs/common';
+import { Resolver, Query, Mutation, Args, Context, ResolveField, Parent } from '@nestjs/graphql';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import type { GraphQLContext } from '../auth/auth.middleware.js';
 import { KnowledgeSourceService } from './knowledge-source.service.js';
+import { MinioUrlService } from './minio-url.service.js';
 import type { KnowledgeSource } from '@edusphere/db';
 
 @Resolver('KnowledgeSource')
 export class KnowledgeSourceResolver {
-  constructor(private readonly service: KnowledgeSourceService) {}
+  private readonly logger = new Logger(KnowledgeSourceResolver.name);
+
+  constructor(
+    private readonly service: KnowledgeSourceService,
+    private readonly minioUrl: MinioUrlService
+  ) {}
 
   private auth(ctx: GraphQLContext) {
     if (!ctx.authContext?.tenantId)
@@ -29,11 +35,27 @@ export class KnowledgeSourceResolver {
       chunkCount: s.chunk_count,
       errorMessage: s.error_message,
       metadata: s.metadata,
+      fileKey: s.file_key ?? null,
       createdAt:
         s.created_at instanceof Date
           ? s.created_at.toISOString()
           : s.created_at,
     };
+  }
+
+  @ResolveField('fileUrl')
+  async fileUrl(
+    @Parent() source: { fileKey: string | null }
+  ): Promise<string | null> {
+    if (!source.fileKey) return null;
+    try {
+      return await this.minioUrl.getPresignedUrl(source.fileKey);
+    } catch (err) {
+      this.logger.error(
+        `[KnowledgeSourceResolver] Failed to generate presigned URL for key=${source.fileKey}: ${err}`
+      );
+      return null;
+    }
   }
 
   @Query()
@@ -149,5 +171,14 @@ export class KnowledgeSourceResolver {
     const { tenantId } = this.auth(ctx);
     await this.service.deleteSource(id, tenantId);
     return true;
+  }
+
+  @Mutation()
+  async reindexCourseEmbeddings(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GraphQLContext
+  ) {
+    const { tenantId } = this.auth(ctx);
+    return this.service.reindexCourseEmbeddings(tenantId, courseId);
   }
 }

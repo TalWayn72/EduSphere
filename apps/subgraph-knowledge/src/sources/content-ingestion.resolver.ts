@@ -1,9 +1,22 @@
 import { randomUUID } from 'node:crypto';
 import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import type { GraphQLContext } from '../auth/auth.middleware.js';
 import type { ContentIngestionResultDto } from './content-ingestion.dto.js';
 import { TesseractOcrService } from '../services/tesseract-ocr.service.js';
+
+/** SSRF guard: reject private/loopback URLs before fetch. */
+function assertSafeUrl(url: string): void {
+  const parsed = new URL(url);
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new BadRequestException(`Disallowed URL protocol: ${parsed.protocol}`);
+  }
+  const privateIpPattern =
+    /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1|0\.0\.0\.0|0000:)/i;
+  if (privateIpPattern.test(parsed.hostname)) {
+    throw new BadRequestException('SSRF protection: private/loopback host not allowed');
+  }
+}
 
 /**
  * ContentIngestionResolver — wires ingestContent mutation to TesseractOcrService.
@@ -65,10 +78,21 @@ export class ContentIngestionResolver {
       };
     }
 
+    // SSRF guard: validate URL before fetching
+    try {
+      assertSafeUrl(fileUrl);
+    } catch (err) {
+      this.logger.error(
+        { fileUrl, courseId, tenantId },
+        '[ContentIngestionResolver] SSRF blocked — unsafe URL',
+      );
+      throw err;
+    }
+
     // Download file from MinIO / URL
     let imageBuffer: Buffer;
     try {
-      const response = await fetch(fileUrl);
+      const response = await fetch(fileUrl, { signal: AbortSignal.timeout(30_000) });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

@@ -42,6 +42,9 @@
 | File | Purpose |
 |------|---------|
 | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | System architecture overview, 6-subgraph federation |
+| [ADR-RAG-ACTIVATION.md](architecture/ADR-RAG-ACTIVATION.md) | ADR: Wire existing RAG components into production pipeline |
+| [ADR-PDF-VIEWER.md](architecture/ADR-PDF-VIEWER.md) | ADR: In-browser PDF viewing with pdfjs-dist |
+| [RAG-ACTIVATION-DESIGN.md](architecture/RAG-ACTIVATION-DESIGN.md) | RAG pipeline technical architecture (HNSW, transcript bridge, concept publisher) |
 | [PGBOUNCER.md](architecture/PGBOUNCER.md) | PgBouncer architecture and connection pooling design |
 | [PHASE29-ARCHITECTURE-REVIEW.md](architecture/PHASE29-ARCHITECTURE-REVIEW.md) | Phase 29 architecture review findings |
 
@@ -151,6 +154,13 @@
 | [MASTER_WORK_PLAN_110_ITEMS.md](plans/MASTER_WORK_PLAN_110_ITEMS.md) | Enterprise Audit: 110 recommendations in 8 waves |
 | [AGENT_ONBOARDING_AUDIT_2026-03-17.md](plans/AGENT_ONBOARDING_AUDIT_2026-03-17.md) | Agent onboarding audit protocol |
 | [CODE_QUALITY_PLAN.md](plans/CODE_QUALITY_PLAN.md) | Code quality improvement plan |
+
+### docs/plans/features/ — Feature Implementation Specs
+
+| File | Purpose |
+|------|---------|
+| [FEAT-RAG-ACTIVATION.md](plans/features/FEAT-RAG-ACTIVATION.md) | RAG pipeline activation — 5 work items, acceptance criteria, dependency graph |
+| [RAG-ACTIVATION-UX.md](plans/features/RAG-ACTIVATION-UX.md) | RAG activation UX spec — embedding status, search empty states, admin dashboard, quality indicator |
 
 ### docs/plans/archive/ — Completed Plan History
 

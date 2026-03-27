@@ -97,9 +97,10 @@ describe('adminRoutes', () => {
     expect(paths).toContain('/admin/api-keys');
     expect(paths).toContain('/admin/webhooks');
     expect(paths).toContain('/admin/domains');
+    expect(paths).toContain('/admin/embeddings');
   });
 
-  it('has the expected total number of routes (49)', () => {
-    expect(adminRoutes.length).toBe(49);
+  it('has the expected total number of routes (50)', () => {
+    expect(adminRoutes.length).toBe(50);
   });
 });

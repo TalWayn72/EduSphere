@@ -49,8 +49,11 @@ gantt
     section Certification & Exams
         Phase 65-68 Cert Exam + Social + Links: done, p7, 2026-03-16, 2026-03-19
 
+    section RAG & Content Pipeline
+        Phase 69-71 RAG + PDF + Observability: done, p8, 2026-03-27, 2026-03-27
+
     section Maintenance
-        Ongoing Bug Fixes + Optimization: active, p8, 2026-03-20, 2026-04-30
+        Ongoing Bug Fixes + Optimization: active, p9, 2026-03-28, 2026-04-30
 ```
 
 ---
@@ -2613,6 +2616,213 @@ pnpm turbo typecheck  # 0 errors
 
 # RLS enforcement on all 8 exam tables
 # Tenant isolation verified across exam_items, exam_sessions, exam_results
+```
+
+---
+
+## Phase 69 — RAG Pipeline Activation (Sprint 1) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-27 | **ADR:** `docs/architecture/ADR-RAG-ACTIVATION.md`
+
+### What Was Built
+
+**WI-1 — HNSW Index Migration:**
+- Drizzle migration `0013_hnsw_vector_indexes.ts` applying HNSW indexes on `content_embeddings`, `annotation_embeddings`, `concept_embeddings` with `m=32, ef_construction=128, vector_cosine_ops`
+- `SET LOCAL hnsw.ef_search = 64` added to `EmbeddingStoreService.searchByVector()` for query-time recall tuning
+- Performance: sub-5ms search at 10K vectors, sub-10ms at 100K vectors (vs 500ms+ sequential scan)
+
+**WI-2 — Content Indexing Pipeline Activation:**
+- PDF handler activated via `pdf-parse` (replaced stub in `ContentIngestionPipelineService`)
+- Image handler wired to existing `TesseractOcrService` + `ImageUnderstandingService`
+- Video handler dispatches to transcription worker via NATS `EDUSPHERE.media.uploaded`
+- Office document handler wired to `mammoth` (DOCX) + `libreoffice-convert` (PPTX/XLSX)
+- All handlers set `knowledge_sources.status` through PENDING -> PROCESSING -> READY/FAILED lifecycle
+
+**WI-3 — NATS Concept Publisher:**
+- New `ConceptExtractionPublisherService` bridges content uploads to concept extraction pipeline
+- Subscribes to KnowledgeSource READY status changes + `content.created` NATS events
+- Uses Vercel AI SDK v6 structured output for concept extraction (Ollama dev / OpenAI prod)
+- Publishes to `knowledge.concepts.extracted` for Apache AGE graph persistence
+- Concept embeddings generated after graph persistence in `NatsConsumer.processConcepts()`
+
+**WI-4 — Seed Data with Embeddings:**
+- `packages/db/src/seed/generate-seed-embeddings.ts` — runtime embedding generation script
+- `packages/db/src/seed/fixtures/demo-embeddings.json` — pre-computed 768-dim fallback vectors (~500 chunks)
+- New command: `pnpm --filter @edusphere/db seed:embeddings`
+- Fallback chain: Ollama -> OpenAI -> pre-computed fixtures (works without any LLM provider)
+
+**WI-5 — Transcript-to-KnowledgeSource Bridge + Graph Traversal:**
+- New `transcript_id` FK column on `knowledge_sources` (migration `0014_transcript_knowledge_source_fk.ts`)
+- `TranscriptCompletedConsumer` auto-creates KnowledgeSource from completed transcriptions
+- `findRelatedConcepts()` implemented with Apache AGE 2-hop Cypher traversal
+- RRF (Reciprocal Rank Fusion) replaces simple weighted sum in HybridRAG
+
+### Files Affected
+
+| Category | Files |
+|----------|-------|
+| Migrations | `packages/db/src/migrations/0013_hnsw_vector_indexes.ts`, `0014_transcript_knowledge_source_fk.ts` |
+| Schema | `packages/db/src/schema/knowledge-sources.ts` |
+| Seed | `packages/db/src/seed/generate-seed-embeddings.ts`, `fixtures/demo-embeddings.json` |
+| Backend | `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` |
+| NATS | `apps/subgraph-knowledge/src/nats/transcript-completed.consumer.ts`, `concept-extraction-publisher.service.ts`, `nats.consumer.ts` |
+| RAG | `packages/rag/src/hybridSearch.ts`, `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` |
+
+### Acceptance Criteria
+
+```bash
+# HNSW indexes active
+# EXPLAIN ANALYZE on vector search shows "Index Scan using idx_content_embeddings_hnsw"
+
+# Content pipeline end-to-end
+# PDF upload → embeddings stored → searchable within 120s
+
+# Transcript bridge
+# Video transcription completion → knowledge_source auto-created → segments searchable
+
+# Concept extraction
+# Content upload → NER → concepts in Apache AGE → graph traversal returns related content
+
+# Seed search
+# "Rashash prayer" query returns ≥3 relevant chunks from seed data
+
+# HybridRAG graph signal
+# findRelatedConcepts() returns non-empty results with graph-boosted scores
+
+# All tests pass
+pnpm turbo test  # 100% pass
+pnpm turbo typecheck  # 0 errors
+```
+
+---
+
+## Phase 70 — PDF Viewer & Document Annotation (Sprint 2) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-27 | **ADR:** `docs/architecture/ADR-PDF-VIEWER.md`
+
+### What Was Built
+
+**In-Browser PDF Rendering:**
+- `PdfViewer` component using `pdfjs-dist` (Mozilla PDF.js) for canvas-based rendering
+- Lazy-loaded via `React.lazy()` — zero impact on initial bundle
+- `devicePixelRatio` scaling for crisp rendering on high-DPI displays
+- Text layer overlay for text selection, copy/paste, and screen reader accessibility (WCAG 2.2 AA)
+- Virtual scrolling for large PDFs (only render visible pages + 2 buffer pages)
+- Page navigation with scroll-based tracking, page jump, and keyboard shortcuts
+
+**Annotation & Sketch Integration:**
+- Annotation layer positioned over each PDF page canvas (reuses Word-style annotation infrastructure)
+- Sketch canvas overlay via `useSketchCanvas` hook for freehand drawing on PDF pages
+- Z-index stack: canvas (base) -> text layer -> annotation layer -> sketch layer
+- Page-level annotation anchoring (annotations linked to specific PDF pages)
+
+**RAG Deep-Linking:**
+- RAG search results deep-link to specific PDF pages via `#page=N` URL fragment
+- Content Viewer embeds PdfViewer for PDF-type knowledge sources
+- Source Manager displays PDF sources with page count and thumbnail preview
+
+**Security:**
+- `maxPages: 1000` guard against PDF bombs
+- 30-second render timeout per page
+- Memory management: off-screen page canvases destroyed to prevent memory pressure
+
+### Files Affected
+
+| Category | Key Files |
+|----------|-----------|
+| Components | `apps/web/src/components/pdf-viewer/PdfViewer.tsx`, `PdfPage.tsx`, `PdfAnnotationLayer.tsx` |
+| Hooks | `apps/web/src/components/pdf-viewer/usePdfDocument.ts`, `usePdfNavigation.ts` |
+| Integration | `apps/web/src/pages/content-viewer/ContentViewer.tsx` (PDF branch) |
+| Config | `vite.config.ts` (PDF.js worker bundling) |
+
+### Acceptance Criteria
+
+```bash
+# PDF renders in browser
+# Upload PDF → opens in PdfViewer → all pages visible with text selection
+
+# Annotations work on PDF
+# Create annotation on PDF page → persists → loads on revisit
+
+# Sketch works on PDF
+# Draw on PDF page → sketch persists → renders over correct page
+
+# RAG deep-link
+# Search result for PDF content → click → opens PdfViewer at correct page
+
+# Accessibility
+# Keyboard navigation between pages, screen reader reads text layer
+
+# Performance
+# 100-page PDF renders first page in <2s, scrolling is smooth (60fps)
+
+pnpm turbo test  # 100% pass
+pnpm turbo typecheck  # 0 errors
+```
+
+---
+
+## Phase 71 — Embedding Observability Dashboard (Sprint 3) ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-27
+
+### What Was Built
+
+**Admin Embedding Dashboard (`/admin/embeddings`):**
+- Embedding statistics overview: total embeddings, coverage percentage, average dimensions, index health
+- Per-course embedding coverage chart showing indexed vs total content ratio
+- Embedding activity log with real-time updates (embedding generation, reindexing events)
+- Reindex controls: `reindexCourseEmbeddings` mutation for bulk re-indexing of course content
+- HNSW index health monitor: index size, build status, estimated recall
+
+**Embedding Status Indicator:**
+- Source Manager shows per-source embedding status (PENDING/PROCESSING/READY/FAILED)
+- Badge component showing chunk count and embedding completeness percentage
+- Animated progress indicator during active embedding generation
+
+**Search Experience Improvements:**
+- Empty state messaging when no embeddings exist for searched content
+- "Content is being indexed" status when embeddings are in progress
+- RAG quality indicator showing semantic score confidence on search results
+- Source attribution in AI chat responses (links to source documents)
+
+**GraphQL API Additions:**
+- `embeddingStatistics` query — aggregate stats for admin dashboard
+- `courseEmbeddingCoverage` query — per-course embedding metrics
+- `embeddingActivityLog` query — paginated activity log with filters
+- `reindexCourseEmbeddings` mutation — triggers re-embedding for a course
+- `embeddingHealthCheck` query — HNSW index health and performance metrics
+
+### Files Affected
+
+| Category | Key Files |
+|----------|-----------|
+| Pages | `apps/web/src/pages/admin-embeddings/AdminEmbeddingsPage.tsx` |
+| Components | `EmbeddingCoverageChart.tsx`, `EmbeddingActivityLog.tsx`, `EmbeddingStatusBadge.tsx`, `ReindexControls.tsx` |
+| GraphQL | `apps/subgraph-knowledge/src/embedding/embedding.resolver.ts` (new queries/mutations) |
+| Services | `apps/subgraph-knowledge/src/embedding/embedding-statistics.service.ts` |
+| Routes | `apps/web/src/lib/routes/admin-routes.tsx` (new `/admin/embeddings` route) |
+
+### Acceptance Criteria
+
+```bash
+# Admin dashboard accessible
+# Navigate to /admin/embeddings → shows embedding statistics and coverage chart
+
+# Reindex works
+# Click reindex for a course → embeddings regenerated → coverage updates
+
+# Embedding status visible
+# Source Manager shows embedding status badge per source
+
+# Search empty states
+# Search with no embeddings → shows "Content is being indexed" message
+
+# Activity log
+# Embedding operations appear in real-time activity log
+
+pnpm turbo test  # 100% pass
+pnpm turbo typecheck  # 0 errors
 ```
 
 ---

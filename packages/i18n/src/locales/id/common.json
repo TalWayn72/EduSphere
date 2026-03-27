@@ -708,5 +708,32 @@
         "Integrated with course completion tracking"
       ]
     }
+  },
+  "notFound": {
+    "title": "Halaman tidak ditemukan",
+    "description": "Halaman yang Anda cari tidak ada atau telah dipindahkan.",
+    "backToDashboard": "Kembali ke dasbor"
+  },
+  "pagination": {
+    "previous": "Sebelumnya",
+    "next": "Berikutnya",
+    "page": "Halaman",
+    "of": "dari",
+    "goToPage": "Ke halaman {{page}}"
+  },
+  "emptyState": {
+    "defaultTitle": "Belum ada apa-apa di sini",
+    "defaultDescription": "Tidak ada item untuk ditampilkan saat ini."
+  },
+  "calendar": {
+    "previousMonth": "Bulan sebelumnya",
+    "nextMonth": "Bulan berikutnya",
+    "sunday": "Min",
+    "monday": "Sen",
+    "tuesday": "Sel",
+    "wednesday": "Rab",
+    "thursday": "Kam",
+    "friday": "Jum",
+    "saturday": "Sab"
   }
 }

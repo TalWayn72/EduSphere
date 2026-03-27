@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { Eye, Edit2, RefreshCw, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,12 +18,21 @@ interface Props {
   saved: boolean;
 }
 
-/** Strip script tags and inline event handlers to prevent XSS in the preview pane. */
+/**
+ * Sanitize email HTML for safe preview rendering.
+ * Uses DOMPurify instead of regex to handle edge cases (data: URIs,
+ * CSS expressions, nested encoding, <img onerror>, etc.).
+ */
 function sanitizeEmailHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
-    .replace(/\son\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
-    .replace(/javascript\s*:/gi, '');
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'div', 'span',
+      'a', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
+      'ul', 'ol', 'li', 'b', 'i', 'em', 'strong', 'u', 'blockquote', 'pre', 'code',
+    ],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'width', 'height', 'align', 'valign', 'colspan', 'rowspan'],
+    ALLOW_DATA_ATTR: false,
+  });
 }
 
 const ALL_VARIABLES = [
@@ -43,6 +53,7 @@ export function NotificationTemplateEditor({
   const [subject, setSubject] = useState(template.subject);
   const [bodyHtml, setBodyHtml] = useState(template.bodyHtml);
   const [tab, setTab] = useState<'edit' | 'preview'>('edit');
+  const sanitizedPreview = useMemo(() => sanitizeEmailHtml(bodyHtml), [bodyHtml]);
 
   const insertVariable = (variable: string) => {
     setBodyHtml((prev) => prev + variable);
@@ -113,7 +124,7 @@ export function NotificationTemplateEditor({
           <TabsContent value="preview">
             <div
               className="border rounded-md p-4 min-h-[14rem] text-sm prose prose-sm max-w-none overflow-auto"
-              dangerouslySetInnerHTML={{ __html: sanitizeEmailHtml(bodyHtml) }}
+              dangerouslySetInnerHTML={{ __html: sanitizedPreview }}
             />
           </TabsContent>
         </Tabs>

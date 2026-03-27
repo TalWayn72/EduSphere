@@ -70,5 +70,6 @@
   "consentDescription": "Хаврута использует сторонний сервис ИИ для генерации ответов. Пожалуйста, дайте согласие перед продолжением.",
   "consentButton": "Согласен — Начать Дебаты",
   "noDiscussions": "Пока нет обсуждений — присоединитесь к курсу, чтобы начать!",
-  "messagesCount": "сообщений"
+  "messagesCount": "сообщений",
+  "schemaUpgradeNotice": "Some collaboration features are being upgraded. Your existing sessions are safe."
 }

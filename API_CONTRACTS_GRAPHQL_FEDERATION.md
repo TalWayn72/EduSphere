@@ -4215,6 +4215,11 @@ type Source @key(fields: "id") {
   """
   externalUrl: URL
   """
+  Presigned URL for accessing the uploaded file (PDF, image, etc.) from MinIO.
+  Generated on-demand with time-limited access. Null if no file is stored.
+  """
+  fileUrl: String
+  """
   Internal media asset (if type is INTERNAL_ASSET)
   """
   internalAsset: MediaAsset
@@ -4337,6 +4342,144 @@ type SemanticSearchResult {
   relatedConcepts: [Concept!]!
 }
 
+"""
+Result of a course embedding reindex operation.
+Returned by the `reindexCourseEmbeddings` mutation.
+"""
+type ReindexResult {
+  """
+  Number of knowledge sources processed during reindex
+  """
+  sourcesProcessed: Int!
+  """
+  Total number of embeddings generated (across all chunks)
+  """
+  embeddingsGenerated: Int!
+  """
+  List of error messages for any sources that failed to reindex
+  """
+  errors: [String!]!
+}
+
+"""
+Aggregate embedding statistics for the admin dashboard (Phase 71).
+"""
+type EmbeddingStatistics {
+  """Total number of embeddings across all tables"""
+  totalEmbeddings: Int!
+  """Percentage of knowledge sources that have embeddings (0-100)"""
+  coveragePercentage: Float!
+  """Average embedding dimension (should be 768)"""
+  averageDimensions: Int!
+  """Number of HNSW indexes active"""
+  activeIndexCount: Int!
+  """Timestamp of last embedding generation"""
+  lastEmbeddingAt: DateTime
+}
+
+"""
+Per-course embedding coverage metrics.
+"""
+type CourseEmbeddingCoverage {
+  courseId: UUID!
+  courseTitle: String!
+  """Total knowledge sources in this course"""
+  totalSources: Int!
+  """Sources with at least one embedding"""
+  indexedSources: Int!
+  """Coverage ratio (0-1)"""
+  coverageRatio: Float!
+  """Total embeddings for this course"""
+  embeddingCount: Int!
+}
+
+type CourseEmbeddingCoverageConnection {
+  edges: [CourseEmbeddingCoverageEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CourseEmbeddingCoverageEdge {
+  node: CourseEmbeddingCoverage!
+  cursor: Cursor!
+}
+
+"""
+Single entry in the embedding activity log.
+"""
+type EmbeddingActivityEntry {
+  id: UUID!
+  """Operation type: GENERATE, REINDEX, DELETE, FAILED"""
+  operation: EmbeddingOperation!
+  """Source type that triggered the operation"""
+  sourceType: String
+  """Number of embeddings affected"""
+  embeddingCount: Int!
+  """Duration in milliseconds"""
+  durationMs: Int
+  """Error message if operation failed"""
+  errorMessage: String
+  createdAt: DateTime!
+}
+
+enum EmbeddingOperation {
+  GENERATE
+  REINDEX
+  DELETE
+  FAILED
+}
+
+input EmbeddingActivityFilterInput {
+  """Filter by operation type"""
+  operation: EmbeddingOperation
+  """Filter by date range start"""
+  since: DateTime
+  """Filter by date range end"""
+  until: DateTime
+}
+
+type EmbeddingActivityLogConnection {
+  edges: [EmbeddingActivityLogEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type EmbeddingActivityLogEdge {
+  node: EmbeddingActivityEntry!
+  cursor: Cursor!
+}
+
+"""
+HNSW index health metrics per embedding table.
+"""
+type EmbeddingHealthCheck {
+  """Overall health status"""
+  status: HealthStatus!
+  """Per-table index metrics"""
+  indexes: [HnswIndexHealth!]!
+}
+
+enum HealthStatus {
+  HEALTHY
+  DEGRADED
+  UNHEALTHY
+}
+
+type HnswIndexHealth {
+  """Table name (e.g., content_embeddings)"""
+  tableName: String!
+  """Index name"""
+  indexName: String!
+  """Whether the HNSW index exists"""
+  exists: Boolean!
+  """Estimated number of rows indexed"""
+  rowCount: Int!
+  """Index size in bytes"""
+  sizeBytes: BigInt!
+  """Estimated recall percentage at current ef_search setting"""
+  estimatedRecall: Float
+}
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Queries
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -4421,6 +4564,49 @@ type Query {
     first: PositiveInt = 20
     after: Cursor
   ): TopicClusterConnection! @authenticated
+
+  # ─── Embedding Admin queries (Phase 71) ───
+
+  """
+  Aggregate embedding statistics for the admin dashboard.
+  Returns total embeddings, coverage percentage, index health metrics.
+  Requires ORG_ADMIN or SUPER_ADMIN role.
+  """
+  embeddingStatistics: EmbeddingStatistics!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  """
+  Per-course embedding coverage: indexed vs total content ratio.
+  Requires ORG_ADMIN or SUPER_ADMIN role.
+  """
+  courseEmbeddingCoverage(
+    first: PositiveInt = 20
+    after: Cursor
+  ): CourseEmbeddingCoverageConnection!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  """
+  Paginated activity log for embedding operations (generation, reindex, failures).
+  Requires ORG_ADMIN or SUPER_ADMIN role.
+  """
+  embeddingActivityLog(
+    first: PositiveInt = 50
+    after: Cursor
+    filter: EmbeddingActivityFilterInput
+  ): EmbeddingActivityLogConnection!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  """
+  HNSW index health and performance metrics.
+  Returns index size, estimated recall, build status per embedding table.
+  Requires ORG_ADMIN or SUPER_ADMIN role.
+  """
+  embeddingHealthCheck: EmbeddingHealthCheck!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # ─── Person queries ───
 
@@ -4527,6 +4713,16 @@ type Mutation {
   Used after transcript updates or corrections.
   """
   reindexAssetEmbeddings(assetId: UUID!): Boolean!
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
+
+  """
+  Trigger re-indexing of all embeddings for a course's knowledge sources.
+  Processes all sources linked to the course, regenerates embeddings,
+  and updates the HNSW index. Returns a summary of the reindex operation.
+  Requires ORG_ADMIN or SUPER_ADMIN role.
+  """
+  reindexCourseEmbeddings(courseId: ID!): ReindexResult!
     @authenticated
     @requiresScopes(scopes: [["knowledge:write"]])
 
@@ -5798,6 +5994,10 @@ hive schema:check \
 | Knowledge     | `terms(domain, search, pagination)`             | ✅     |
 | Knowledge     | `source(id)`                                    | ✅     |
 | Knowledge     | `sources(type, search, pagination)`             | ✅     |
+| Knowledge     | `embeddingStatistics`                           | ✅     |
+| Knowledge     | `courseEmbeddingCoverage(pagination)`            | ✅     |
+| Knowledge     | `embeddingActivityLog(filter, pagination)`      | ✅     |
+| Knowledge     | `embeddingHealthCheck`                          | ✅     |
 
 ### Mutations (44 total)
 
@@ -5842,6 +6042,7 @@ hive schema:check \
 | Knowledge     | `deleteRelation`         | `knowledge:write`     |
 | Knowledge     | `createContradiction`    | `knowledge:write`     |
 | Knowledge     | `reindexAssetEmbeddings` | `knowledge:write`     |
+| Knowledge     | `reindexCourseEmbeddings` | `knowledge:write`    |
 | Knowledge     | `reviewInferredRelation` | `knowledge:write`     |
 | Knowledge     | `createPerson`           | `knowledge:write`     |
 | Knowledge     | `updatePerson`           | `knowledge:write`     |

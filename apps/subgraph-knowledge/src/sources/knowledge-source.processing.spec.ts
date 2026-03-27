@@ -155,11 +155,16 @@ async function buildService(opts: {
       : vi.fn().mockResolvedValue({ id: 'emb-1', segmentId: 'ks:src-1:0' }),
   };
 
-  const svc = new KnowledgeSourceService(parser as never, embeddings as never);
+  const minioUrl = {
+    uploadFile: vi.fn().mockResolvedValue(undefined),
+    getPresignedUrl: vi.fn().mockResolvedValue('https://minio.test/presigned'),
+  };
+
+  const svc = new KnowledgeSourceService(parser as never, embeddings as never, minioUrl as never);
   // Override db after construction (constructor receives mock from vi.mock above)
   Object.defineProperty(svc, 'db', { value: db, writable: true });
 
-  return { svc, db, parser, embeddings };
+  return { svc, db, parser, embeddings, minioUrl };
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────────

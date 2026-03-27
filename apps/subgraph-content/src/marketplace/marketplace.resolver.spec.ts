@@ -7,6 +7,12 @@ vi.mock('@edusphere/db', () => ({
   schema: {},
   withTenantContext: vi.fn(),
   eq: vi.fn(),
+  buildRelayConnection: vi.fn((items: Array<{ id: string }>, _first: number, totalCount: number) => ({
+    edges: items.map((node, i) => ({ cursor: String(i), node })),
+    nodes: items,
+    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: '0', endCursor: String(Math.max(0, items.length - 1)) },
+    totalCount,
+  })),
 }));
 vi.mock('@edusphere/auth', () => ({}));
 

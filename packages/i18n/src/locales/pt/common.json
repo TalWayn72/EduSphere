@@ -708,5 +708,32 @@
         "Integrated with course completion tracking"
       ]
     }
+  },
+  "notFound": {
+    "title": "Pagina nao encontrada",
+    "description": "A pagina que voce procura nao existe ou foi movida.",
+    "backToDashboard": "Voltar ao painel"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Proximo",
+    "page": "Pagina",
+    "of": "de",
+    "goToPage": "Ir para pagina {{page}}"
+  },
+  "emptyState": {
+    "defaultTitle": "Nada aqui ainda",
+    "defaultDescription": "Nao ha itens para exibir no momento."
+  },
+  "calendar": {
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Proximo mes",
+    "sunday": "Dom",
+    "monday": "Seg",
+    "tuesday": "Ter",
+    "wednesday": "Qua",
+    "thursday": "Qui",
+    "friday": "Sex",
+    "saturday": "Sab"
   }
 }

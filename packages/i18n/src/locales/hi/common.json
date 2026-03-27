@@ -708,5 +708,32 @@
         "Integrated with course completion tracking"
       ]
     }
+  },
+  "notFound": {
+    "title": "पेज नहीं मिला",
+    "description": "आप जिस पेज की तलाश कर रहे हैं वह मौजूद नहीं है या स्थानांतरित कर दिया गया है।",
+    "backToDashboard": "डैशबोर्ड पर वापस"
+  },
+  "pagination": {
+    "previous": "पिछला",
+    "next": "अगला",
+    "page": "पृष्ठ",
+    "of": "का",
+    "goToPage": "पृष्ठ {{page}} पर जाएं"
+  },
+  "emptyState": {
+    "defaultTitle": "यहां अभी कुछ नहीं है",
+    "defaultDescription": "इस समय प्रदर्शित करने के लिए कोई आइटम नहीं है।"
+  },
+  "calendar": {
+    "previousMonth": "पिछला महीना",
+    "nextMonth": "अगला महीना",
+    "sunday": "रवि",
+    "monday": "सोम",
+    "tuesday": "मंगल",
+    "wednesday": "बुध",
+    "thursday": "गुरु",
+    "friday": "शुक्र",
+    "saturday": "शनि"
   }
 }

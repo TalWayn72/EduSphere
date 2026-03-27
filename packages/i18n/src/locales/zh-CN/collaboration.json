@@ -70,5 +70,6 @@
   "consentDescription": "哈夫鲁塔使用第三方AI服务生成辩论回复。请在继续之前同意。",
   "consentButton": "我同意——开始辩论",
   "noDiscussions": "还没有讨论——加入课程开始讨论吧！",
-  "messagesCount": "条消息"
+  "messagesCount": "条消息",
+  "schemaUpgradeNotice": "Some collaboration features are being upgraded. Your existing sessions are safe."
 }

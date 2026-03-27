@@ -70,5 +70,6 @@
   "consentDescription": "Chavruta utiliza um serviço de IA de terceiros para gerar respostas de debate. Por favor, consinta antes de continuar.",
   "consentButton": "Eu Consinto — Começar a Debater",
   "noDiscussions": "Ainda não há discussões — participe de um curso para começar!",
-  "messagesCount": "mensagens"
+  "messagesCount": "mensagens",
+  "schemaUpgradeNotice": "Some collaboration features are being upgraded. Your existing sessions are safe."
 }
