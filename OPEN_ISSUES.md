@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 24 מרץ 2026
+**תאריך עדכון:** 27 מרץ 2026
 
 ---
 
@@ -93,6 +93,7 @@
 | BUG-106 | GraphQL 400 Bad Request errors on Lesson Pipeline page | ✅ Fixed | (pending commit) |
 | BUG-107 | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing) | ✅ Fixed | (pending commit) |
 | FEAT-TEST-COVERAGE | Web Unit Test Coverage Improvement (57% → 95%+) | ✅ Fixed | (24 Mar 2026) |
+| FEAT-COVERAGE-001 | Web Unit Test Coverage Boost to 95%+ (177 new test files) | ✅ Fixed | (25 Mar 2026) |
 
 ---
 
@@ -127,6 +128,33 @@
 - `contexts/DirectionContext.test.tsx`
 - `providers/ThemeProvider.test.tsx`, `ReducedMotionProvider.test.tsx`
 - 22+ page test files (Model3DPage, admin pages, analytics, etc.)
+
+---
+
+## FEAT-COVERAGE-001 — Web Unit Test Coverage Boost to 95%+ (25 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Date:** 2026-03-25
+- **Severity:** 🟡 Medium (quality/testing)
+- **Category:** QA & Validation
+
+**Problem:** Web app unit test file coverage was at 74% (approximately 632/849 source files had corresponding test files). Major gaps in lib/graphql (0%), lib/routes (0%), components/ui (13%).
+
+**Solution — 3-wave parallel execution:**
+- **Wave 1 (3 Leads):** lib/graphql 68 files 337 tests, components/ui 28 files 251 tests, lib/routes 10 files 123 tests
+- **Wave 2 (3 Leads):** Pages <80% 23 files 99 tests, Components <80% 16 files 145 tests, lib/ remaining 5 files 51 tests
+- **Wave 3 (2 Agents):** Hooks 11 files 117 tests, Remotion+misc 16 files 106 tests
+
+**Result:** 177 new test files, 1,229 new tests, coverage 74% → 98.4%
+
+**Test files:** See `apps/web/src/**/*.test.{ts,tsx}` (177 new files across all directories including):
+- `src/lib/graphql/*.test.ts` (68 files — all GraphQL operation modules)
+- `src/lib/routes/*.test.tsx` (10 files — all route modules)
+- `src/components/ui/*.test.tsx` (28 files — all shadcn/ui components)
+- `src/hooks/*.test.ts` (11 files — marketplace, analytics, exam, proctoring, etc.)
+- `src/remotion/*.test.tsx` (8 files — all Remotion compositions)
+- `src/pages/*/*.test.ts` (23 files — course-detail, dashboard, knowledge-graph, etc.)
+- `src/components/visual-anchoring/*.test.ts`, `src/components/source-manager/*.test.ts`, etc.
 
 ---
 

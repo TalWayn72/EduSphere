@@ -571,7 +571,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~4,504+ tests passing** (374 test files)  |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~5,653+ tests passing** (~547 test files)  |
 | **Security Tests**      | Vitest                  | `tests/security/*.spec.ts`                   | ✅ **1,370 tests passing** (48 spec files)     |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (core 879 / content 1,364 / agent 719 / knowledge 610) |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ✅ **134 E2E specs**                           |

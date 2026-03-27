@@ -12,6 +12,9 @@ const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
 // The stubs replace all GSAP calls with no-ops so component tests can run without crashing.
 const gsapStub = path.resolve(__dirname, './src/test/stubs/gsap-stub.ts');
 const gsapReactStub = path.resolve(__dirname, './src/test/stubs/gsap-react-stub.ts');
+// virtual:pwa-register — Vite virtual module not available outside Vite dev/build;
+// stub lets Vitest resolve the import in pwa.ts without crashing.
+const pwaRegisterStub = path.resolve(__dirname, './src/test/stubs/pwa-register-stub.ts');
 // Three.js stubs — package is not installed; stubs allow Vite import-analysis
 // to resolve the paths; vi.mock() replaces the exports at test runtime.
 const threeStub = path.resolve(__dirname, './src/test/stubs/three-stub.ts');
@@ -88,6 +91,8 @@ export default defineConfig({
       { find: /^gsap\/ScrollTrigger$/, replacement: gsapStub },
       { find: /^gsap$/, replacement: gsapStub },
       { find: /^@gsap\/react$/, replacement: gsapReactStub },
+      // virtual:pwa-register — Vite-only virtual module
+      { find: /^virtual:pwa-register$/, replacement: pwaRegisterStub },
     ],
   },
   test: {
