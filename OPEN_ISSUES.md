@@ -94,6 +94,35 @@
 | BUG-107 | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing) | ✅ Fixed | (pending commit) |
 | FEAT-TEST-COVERAGE | Web Unit Test Coverage Improvement (57% → 95%+) | ✅ Fixed | (24 Mar 2026) |
 | FEAT-COVERAGE-001 | Web Unit Test Coverage Boost to 95%+ (177 new test files) | ✅ Fixed | (25 Mar 2026) |
+| FEAT-RAG-ACTIVATION | RAG Pipeline Activation — wire HNSW indexes, content indexing, concept publisher, seed embeddings, graph traversal | 🟡 In Progress | — |
+
+---
+
+## FEAT-RAG-ACTIVATION — Wire RAG Pipeline for Production Use (27 Mar 2026)
+
+- **Status:** 🟡 In Progress
+- **Date:** 2026-03-27
+- **Severity:** 🔴 Critical (core AI feature blocked)
+- **PRD:** `docs/plans/features/FEAT-RAG-ACTIVATION.md`
+
+**Problem:** All RAG components exist individually (pgvector schema, HNSW index SQL, Apache AGE graph, HybridRAG engine, NATS consumers, LLM integration) but they are NOT wired together. Content is not indexed, HNSW indexes are not applied, knowledge graph stays empty, seed data has no embeddings, and `findRelatedConcepts()` returns `[]`.
+
+**5 Work Items:**
+1. **WI-1: HNSW Index Migration** — Create Drizzle migration for 4 HNSW indexes (currently standalone SQL, not in migration runner)
+2. **WI-2: Content Indexing Pipeline** — Wire PDF/Image/Video upload → chunking → embedding as automated pipeline
+3. **WI-3: NATS Concept Publisher** — Bridge content uploads → NER extraction → `EDUSPHERE.content.*.ner.extracted` → Apache AGE graph
+4. **WI-4: Seed Data with Embeddings** — Pre-compute embeddings for Nahar Shalom seed content (~500 chunks)
+5. **WI-5: Transcript→KnowledgeSource Bridge + Graph Traversal** — Auto-create knowledge_sources for transcripts; implement `findRelatedConcepts()` with Apache AGE Cypher
+
+**Key files affected:**
+- `packages/db/src/schema/embeddings.ts` — HNSW index definitions
+- `packages/db/src/migrations/0041_optimize_hnsw_indexes.sql` — Standalone SQL (needs Drizzle migration)
+- `packages/rag/src/hybridSearch.ts` — `findRelatedConcepts()` placeholder
+- `apps/subgraph-knowledge/src/nats/lesson-ner.consumer.ts` — Consumer exists, publisher missing
+- `apps/transcription-worker/src/embedding/embedding.worker.ts` — No knowledge_sources bridge
+- `packages/db/src/seed/nahar-shalom-source.ts` — No embeddings in seed
+
+**Non-functional targets:** Vector search < 50ms at 100K vectors, content indexing < 120s for 50-page PDF, graph traversal < 100ms for 2-hop query.
 
 ---
 
