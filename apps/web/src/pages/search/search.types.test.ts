@@ -3,7 +3,6 @@ import type {
   ResultType,
   SavedSearch,
   SearchResult,
-  TypeConfig,
 } from './search.types';
 
 describe('search/search.types', () => {
