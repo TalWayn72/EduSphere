@@ -1,6 +1,6 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 27 מרץ 2026
+**תאריך עדכון:** 28 מרץ 2026
 
 ---
 
@@ -97,6 +97,66 @@
 | FEAT-RAG-ACTIVATION | RAG Pipeline Activation — wire HNSW indexes, content indexing, concept publisher, seed embeddings, graph traversal | ✅ Fixed (Sprint 1) | (pending commit) |
 | FEAT-PDF-VIEWER | PDF Experience — in-browser PDF viewer, text annotation, sketch overlay, presigned URLs | ✅ Fixed (Sprint 2) | (pending commit) |
 | FEAT-OBSERVABILITY | Observability — EmbeddingCoverageChart, EmbeddingActivityLog, enhanced admin dashboard | ✅ Fixed (Sprint 3) | (pending commit) |
+| FEAT-VISUAL-TESTING | Visual Testing Expansion — 499→1,084 assertions, Lost Pixel, 69 Storybook story files (207 stories), dark mode/RTL/a11y coverage, CI sharding | ✅ Complete | 2026-03-28 |
+
+---
+
+## FEAT-VISUAL-TESTING — Visual Testing Expansion (28 Mar 2026)
+
+- **Status:** ✅ Complete
+- **Date:** 2026-03-28
+- **Severity:** 🟡 Medium (quality & regression coverage)
+
+### Summary
+
+Expanded visual regression testing from 499 to 1,084 assertions across 5 implementation waves. Added Lost Pixel integration for Storybook component regression, 69 Storybook story files (207 stories), dark mode/RTL/a11y coverage, and CI sharding across 4 parallel shards.
+
+### Waves
+
+| Wave | Deliverables |
+|------|-------------|
+| **Wave 1** | 54 Storybook stories, 3 viewport spec files (4K/laptop/small-mobile), config updates |
+| **Wave 2** | Lost Pixel config, 6 `visual-regression-*.spec.ts` files, CI workflow (`.github/workflows/visual-tests.yml`) |
+| **Wave 3** | 4 dark mode specs, 3 RTL specs, 3 a11y specs, 2 error/loading state specs |
+| **Wave 4** | 4 user flow specs, 3 chart/data-viz specs, PDF viewer spec, knowledge graph spec |
+| **Wave 5** | 2 cross-browser specs, coverage script (`visual-test-coverage.cjs`), CI sharding (4 shards), documentation |
+
+### Key E2E Spec Files Created
+
+- `apps/web/e2e/visual-regression-admin.spec.ts`
+- `apps/web/e2e/visual-regression-baseline.spec.ts`
+- `apps/web/e2e/visual-regression-public.spec.ts`
+- `apps/web/e2e/visual-regression-auth.spec.ts`
+- `apps/web/e2e/visual-regression-social.spec.ts`
+- `apps/web/e2e/visual-regression-content.spec.ts`
+- `apps/web/e2e/visual-dark-mode-public.spec.ts`
+- `apps/web/e2e/visual-dark-mode-dashboard.spec.ts`
+- `apps/web/e2e/visual-dark-mode-admin.spec.ts`
+- `apps/web/e2e/visual-dark-mode-learning.spec.ts`
+- `apps/web/e2e/visual-rtl-public.spec.ts`
+- `apps/web/e2e/visual-rtl-authenticated.spec.ts`
+- `apps/web/e2e/visual-rtl-forms.spec.ts`
+- `apps/web/e2e/visual-a11y-focus-states.spec.ts`
+- `apps/web/e2e/visual-a11y-high-contrast.spec.ts`
+- `apps/web/e2e/visual-a11y-reduced-motion.spec.ts`
+- `apps/web/e2e/visual-error-states.spec.ts`
+- `apps/web/e2e/visual-loading-states.spec.ts`
+- `apps/web/e2e/visual-flow-student-onboarding.spec.ts`
+- `apps/web/e2e/visual-flow-instructor-course.spec.ts`
+- `apps/web/e2e/visual-flow-exam-lifecycle.spec.ts`
+- `apps/web/e2e/visual-flow-collaboration.spec.ts`
+- `apps/web/e2e/visual-charts-assessment.spec.ts`
+- `apps/web/e2e/visual-charts-gamification.spec.ts`
+- `apps/web/e2e/visual-charts-analytics.spec.ts`
+- `apps/web/e2e/visual-cross-browser-critical.spec.ts`
+- `apps/web/e2e/visual-cross-browser-forms.spec.ts`
+- `apps/web/e2e/visual-viewport-4k.spec.ts`
+- `apps/web/e2e/visual-viewport-laptop.spec.ts`
+- `apps/web/e2e/visual-viewport-small-mobile.spec.ts`
+
+### Documentation
+
+- `docs/testing/VISUAL_TESTING_COVERAGE.md` — living coverage document with CI pipeline diagram
 
 ---
 

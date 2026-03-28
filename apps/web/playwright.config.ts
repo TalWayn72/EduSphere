@@ -213,6 +213,26 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] },
     },
+    {
+      name: 'tablet',
+      use: {
+        viewport: { width: 768, height: 1024 },
+        userAgent: devices['iPad (gen 7)'].userAgent,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: 'small-mobile',
+      use: {
+        viewport: { width: 320, height: 568 },
+        userAgent: devices['iPhone SE'].userAgent,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
   ],
 
   /**

@@ -10,6 +10,10 @@ jobs:
   visual-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/4, 2/4, 3/4, 4/4]
 
     services:
       postgres:
@@ -52,8 +56,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter @edusphere/web exec playwright install --with-deps chromium
+
+      - name: Install Playwright deps (cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter @edusphere/web exec playwright install-deps chromium
 
       - name: Build web app
         run: pnpm --filter @edusphere/web build
@@ -64,16 +82,123 @@ jobs:
           VITE_KEYCLOAK_REALM: edusphere
           VITE_KEYCLOAK_CLIENT_ID: edusphere-web
 
-      - name: Run visual E2E tests
-        run: pnpm --filter @edusphere/web test:e2e -- --project=chromium
+      - name: Run visual E2E tests (shard ${{ matrix.shard }})
+        run: pnpm --filter @edusphere/web test:e2e -- --project=chromium --shard=${{ matrix.shard }}
         env:
           ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
           VITE_GRAPHQL_URL: http://localhost:4000/graphql
 
-      - name: Upload Argos screenshots
+      - name: Upload shard results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-shard-${{ strategy.job-index }}
+          path: |
+            apps/web/visual-qa-results/
+            apps/web/test-results/
+          retention-days: 30
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ strategy.job-index }}
+          path: apps/web/blob-report/
+          retention-days: 7
+
+  merge-visual-reports:
+    needs: [visual-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download all blob reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-report-*
+          path: all-blob-reports
+          merge-multiple: true
+
+      - name: Merge Playwright reports
+        run: pnpm --filter @edusphere/web exec playwright merge-reports --reporter=html ./all-blob-reports
+        continue-on-error: true
+
+      - name: Upload merged HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Download all screenshots
+        uses: actions/download-artifact@v4
+        with:
+          pattern: visual-shard-*
+          path: all-screenshots
+          merge-multiple: true
+
+      - name: Upload merged screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: visual-regression-screenshots
-          path: apps/web/visual-qa-results/
+          path: all-screenshots/
+          retention-days: 30
+
+  lost-pixel-tests:
+    needs: [merge-visual-reports]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm --filter @edusphere/web build-storybook
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Run Lost Pixel
+        uses: lost-pixel/lost-pixel@v3
+        with:
+          workingDirectory: apps/web
+
+      - name: Upload Lost Pixel baselines
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lost-pixel-baselines
+          path: apps/web/.lostpixel/
           retention-days: 30
