@@ -169,6 +169,7 @@ async function mockInstructorAnchors(page: Page): Promise<void> {
 async function loginAndGoto(page: Page, path: string): Promise<void> {
   await login(page);
   await page.goto(path, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(500);
 }
 
 // ─── Suite: Visual Anchoring — Visual Regression ──────────────────────────────
@@ -188,8 +189,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
       });
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Prefer the specific sidebar element; fall back to the ARIA complementary landmark
     const sidebarLocator = page.locator('[data-testid="visual-sidebar"]').first();
@@ -233,8 +236,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
       .catch(() => {});
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
 
     const sidebarLocator = page.locator('[data-testid="visual-sidebar"]').first();
     const sidebarVisible = await sidebarLocator.isVisible().catch(() => false);
@@ -269,8 +274,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     const anchorFrame = page.locator('[data-testid="anchor-frame"]').first();
     const frameVisible = await anchorFrame.isVisible().catch(() => false);
@@ -301,8 +308,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1?lang=he`);
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Capture the full page to verify sidebar positioning (right side in RTL)
     await expect(page).toHaveScreenshot('sidebar-rtl-layout.png', {
@@ -317,8 +326,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     const uploader = page.locator('[data-testid="asset-uploader"]').first();
     const uploaderVisible = await uploader.isVisible().catch(() => false);
@@ -354,8 +365,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     const panel = page
       .locator('[aria-label="לוח עוגנים חזותיים"]')
@@ -396,8 +409,10 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
 
     // Try to trigger the bottom sheet if it has a trigger element
     const sheetTrigger = page
@@ -407,6 +422,7 @@ test.describe('Visual Anchoring — Visual Regression', () => {
     if (triggerVisible) {
       await sheetTrigger.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
     }
 
     // Capture the full mobile viewport including the bottom sheet

@@ -52,6 +52,7 @@ test.describe('Visual Regression — Public Pages Light Mode @visual', () => {
     test(`${pg.name} — light mode screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(`${pg.name}-light.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,
@@ -67,10 +68,12 @@ test.describe('Visual Regression — Public Pages Dark Mode @visual', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — dark mode screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(500);
       // Toggle dark mode via Tailwind dark class
       await page.evaluate(() => document.documentElement.classList.add('dark'));
       // Allow CSS transitions to settle
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(`${pg.name}-dark.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,
@@ -88,6 +91,7 @@ test.describe('Visual Regression — Public Pages Mobile @visual', () => {
       await page.setViewportSize({ width: 375, height: 812 });
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(`${pg.name}-mobile.png`, {
         fullPage: true,
         maxDiffPixelRatio: 0.02,

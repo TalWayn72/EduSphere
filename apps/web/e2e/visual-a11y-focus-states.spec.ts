@@ -17,18 +17,21 @@ import { test, expect } from '@playwright/test';
 import { BASE_URL } from './env';
 import { login } from './auth.helpers';
 import { STABLE_OPTS } from './helpers/visual-test-utils';
+test.use({ reducedMotion: 'reduce' });
 
 test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   // --- Login page focus rings ---
 
   test('login -- first focusable element has visible focus ring', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-login-first-tab.png', STABLE_OPTS);
   });
 
   test('login -- second tab stop has visible focus ring', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-login-second-tab.png', STABLE_OPTS);
@@ -36,6 +39,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
 
   test('login -- third tab stop has visible focus ring', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
@@ -44,6 +48,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
 
   test('login -- button focus ring visibility', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     // Tab through to the sign-in button
     for (let i = 0; i < 4; i++) {
       await page.keyboard.press('Tab');
@@ -53,6 +58,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
 
   test('login -- link focus ring visibility', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     // Tab to a link element
     for (let i = 0; i < 5; i++) {
       await page.keyboard.press('Tab');
@@ -65,6 +71,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('dashboard -- sidebar nav item focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-dashboard-first-tab.png', {
       ...STABLE_OPTS,
@@ -75,6 +82,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('dashboard -- second nav element focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-dashboard-second-tab.png', {
@@ -86,6 +94,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('dashboard -- third interactive element focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press('Tab');
     }
@@ -98,6 +107,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('dashboard -- button focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 5; i++) {
       await page.keyboard.press('Tab');
     }
@@ -112,6 +122,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('course create -- first form field focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-course-create-first-field.png', STABLE_OPTS);
   });
@@ -119,6 +130,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('course create -- second form field focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-course-create-second-field.png', STABLE_OPTS);
@@ -127,6 +139,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('course create -- third form field focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press('Tab');
     }
@@ -136,6 +149,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('course create -- submit button focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
     }
@@ -147,6 +161,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('search -- search input focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/search`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-search-input.png', STABLE_OPTS);
   });
@@ -154,6 +169,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('search -- filter button focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/search`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await expect(page).toHaveScreenshot('a11y-focus-search-filter.png', STABLE_OPTS);
@@ -162,6 +178,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('search -- third interactive element focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/search`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press('Tab');
     }
@@ -171,6 +188,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('search -- fourth interactive element focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/search`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 4; i++) {
       await page.keyboard.press('Tab');
     }
@@ -182,6 +200,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('dashboard -- fifth interactive element focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
     }
@@ -194,6 +213,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   test('course create -- fourth form field focus ring', async ({ page }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 4; i++) {
       await page.keyboard.press('Tab');
     }
@@ -202,6 +222,7 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
 
   test('login -- full page after tabbing to show focus state', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
     }

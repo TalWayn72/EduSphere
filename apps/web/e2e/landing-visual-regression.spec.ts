@@ -52,8 +52,10 @@ test.describe('Landing Page — Visual Regression @visual', () => {
   test.beforeEach(async ({ page }) => {
     await mockAllGraphQL(page);
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     // Allow fonts and images to settle
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
   });
 
   // ── Section-level screenshots ────────────────────────────────────────────────
@@ -114,6 +116,7 @@ test.describe('Landing Page — Visual Regression @visual', () => {
     await roi.scrollIntoViewIfNeeded();
     // Wait for any reactive state to settle
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(roi).toHaveScreenshot('roi-calculator.png', {
       threshold: 0.05,
       animations: 'disabled',
@@ -145,7 +148,8 @@ test.describe('Landing Page — Visual Regression @visual', () => {
   test('full page desktop screenshot (1440px)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('landing-desktop.png', {
       fullPage: true,
       threshold: 0.05,
@@ -156,7 +160,8 @@ test.describe('Landing Page — Visual Regression @visual', () => {
   test('full page mobile screenshot (375px)', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('landing-mobile.png', {
       fullPage: true,
       threshold: 0.05,
@@ -167,7 +172,8 @@ test.describe('Landing Page — Visual Regression @visual', () => {
   test('full page tablet screenshot (768px)', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('landing-tablet.png', {
       fullPage: true,
       threshold: 0.05,
@@ -221,6 +227,7 @@ test.describe('Landing Page — Visual Regression @visual', () => {
     const roi = page.locator('[data-testid="roi-calculator-section"]');
     await roi.scrollIntoViewIfNeeded();
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(roi).toHaveScreenshot('roi-calculator-numeric.png', {
       threshold: 0.05,

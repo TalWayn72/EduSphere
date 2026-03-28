@@ -13,6 +13,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { login } from './auth.helpers';
 import { BASE_URL } from './env';
 import { routeGraphQL } from './graphql-mock.helpers';
+test.use({ reducedMotion: 'reduce' });
 
 // ─── Shared mock data ───────────────────────────────────────────────────────
 
@@ -101,6 +102,7 @@ test.describe('Visual — Auto-Grading Results', () => {
     await login(page);
     await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-vis`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="auto-grading-page"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('auto-grading-data.png', SCREENSHOT_OPTS);
   });
@@ -110,6 +112,7 @@ test.describe('Visual — Auto-Grading Results', () => {
     await login(page);
     await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-vis-empty`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('auto-grading-empty.png', SCREENSHOT_OPTS);
   });
@@ -123,6 +126,7 @@ test.describe('Visual — Gap Analysis Dashboard', () => {
     await login(page);
     await page.goto(`${BASE_URL}/admin/gap-analysis`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="gap-analysis-page"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('gap-analysis-data.png', SCREENSHOT_OPTS);
   });
@@ -132,6 +136,7 @@ test.describe('Visual — Gap Analysis Dashboard', () => {
     await login(page);
     await page.goto(`${BASE_URL}/admin/gap-analysis`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('gap-analysis-empty.png', SCREENSHOT_OPTS);
   });
@@ -145,6 +150,7 @@ test.describe('Visual — Instructor Merge Queue', () => {
     await login(page);
     await page.goto(`${BASE_URL}/instructor/merge-queue?courseId=c-1`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="merge-queue-list"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('merge-queue-data.png', SCREENSHOT_OPTS);
   });
@@ -154,6 +160,7 @@ test.describe('Visual — Instructor Merge Queue', () => {
     await login(page);
     await page.goto(`${BASE_URL}/instructor/merge-queue?courseId=c-1`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('merge-queue-empty.png', SCREENSHOT_OPTS);
   });
@@ -167,6 +174,7 @@ test.describe('Visual — Partner Dashboard', () => {
     await login(page);
     await page.goto(`${BASE_URL}/partner/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="partner-dashboard-page"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('partner-dashboard-data.png', SCREENSHOT_OPTS);
   });
@@ -176,6 +184,7 @@ test.describe('Visual — Partner Dashboard', () => {
     await login(page);
     await page.goto(`${BASE_URL}/partner/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('partner-dashboard-empty.png', SCREENSHOT_OPTS);
   });
@@ -189,6 +198,7 @@ test.describe('Visual — Stripe Invoices', () => {
     await login(page);
     await page.goto(`${BASE_URL}/admin/invoices`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="stripe-invoice-page"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('stripe-invoices-data.png', SCREENSHOT_OPTS);
   });
@@ -198,6 +208,7 @@ test.describe('Visual — Stripe Invoices', () => {
     await login(page);
     await page.goto(`${BASE_URL}/admin/invoices`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('stripe-invoices-empty.png', SCREENSHOT_OPTS);
   });

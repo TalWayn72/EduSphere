@@ -154,6 +154,7 @@ async function mockSessionDetail(
 async function loginAndGoto(page: Page, path: string): Promise<void> {
   await login(page);
   await page.goto(path, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(500);
 }
 
 // ─── Suite 1: LiveSessionsPage — empty state ──────────────────────────────────
@@ -172,8 +173,10 @@ test.describe('LiveSessionsPage — visual regression', () => {
       });
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-sessions-empty-state.png', {
       fullPage: false,
@@ -221,8 +224,10 @@ test.describe('LiveSessionsPage — visual regression', () => {
       .catch(() => {});
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-sessions-upcoming-list.png', {
       fullPage: false,
@@ -243,8 +248,10 @@ test.describe('LiveSessionsPage — visual regression', () => {
     await pastTab.click();
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-sessions-past-list.png', {
       fullPage: false,
@@ -261,6 +268,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
 
     // Wait for page to settle then open the Create Session modal
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     const createBtn = page.getByTestId('create-session-btn');
     const hasTrigger = await createBtn
@@ -285,6 +293,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-sessions-create-modal-open.png', {
       fullPage: false,
@@ -305,6 +314,7 @@ test.describe('LiveSessionsPage — visual regression', () => {
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // REGRESSION GUARD: error state must NOT expose raw technical strings
     const body = (await page.locator('body').textContent()) ?? '';
@@ -326,7 +336,9 @@ test.describe('LiveSessionsPage — visual regression', () => {
     await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
     await loginAndGoto(page, SESSIONS_URL);
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-sessions-empty-state-dark.png', {
       fullPage: false,
@@ -347,7 +359,9 @@ test.describe('LiveSessionsPage — visual regression', () => {
       .catch(() => {});
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-sessions-upcoming-list-dark.png', {
       fullPage: false,
@@ -371,8 +385,10 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       .catch(() => {});
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Verify SCHEDULED badge is present (regression guard)
     const scheduledBadge = page.getByTestId('detail-status-scheduled');
@@ -403,8 +419,10 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       .catch(() => {});
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Verify LIVE badge is present (regression guard)
     const liveBadge = page.getByTestId('detail-status-live');
@@ -432,8 +450,10 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       .catch(() => {});
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // REGRESSION GUARD: ended state shows "Session Ended" message (not a crash)
     const endedState = page.getByTestId('session-ended-state');
@@ -461,8 +481,10 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
 
     await loginAndGoto(page, `${BASE_URL}/sessions/nonexistent-session`);
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('live-session-detail-not-found.png', {
       fullPage: false,

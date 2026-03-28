@@ -161,7 +161,7 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
   test('source manager with embedding status badges', async ({ page }) => {
     await mockSourceManager(page);
     await page.goto('/learn/courses', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot('source-manager-status-badges.png', STABLE_OPTS);
@@ -170,7 +170,7 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
   test('search page empty state', async ({ page }) => {
     await mockSearchEmpty(page);
     await page.goto('/search', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot('search-empty-state.png', STABLE_OPTS);
@@ -179,7 +179,7 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
   test('admin embedding dashboard with stats, chart, and table', async ({ page }) => {
     await mockEmbeddingDashboard(page);
     await page.goto('/admin/embeddings', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1500);
 
     await expect(page).toHaveScreenshot('admin-embedding-dashboard.png', LOOSE_OPTS);
@@ -224,7 +224,7 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
     });
 
     await page.goto('/learn', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1000);
 
     // If PDF viewer toolbar is visible, take a screenshot
@@ -253,7 +253,8 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
     });
 
     await page.goto('/learn', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Click PDF source and switch to sketch mode if available
     const pdfLink = page.locator('text=Test PDF Document, text=Visual Test PDF').first();

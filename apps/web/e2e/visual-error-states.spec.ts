@@ -14,6 +14,7 @@
  */
 import { test, expect } from '@playwright/test';
 import { STABLE_OPTS } from './helpers/visual-test-utils';
+test.use({ reducedMotion: 'reduce' });
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -56,7 +57,8 @@ test.describe('Visual Regression — Error States', () => {
   test.describe('404 — Not Found', () => {
     test('renders 404 page for nonexistent route', async ({ page }) => {
       await page.goto('/nonexistent-page-12345');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot('error-404-full.png', STABLE_OPTS);
     });
   });
@@ -80,7 +82,8 @@ test.describe('Visual Regression — Error States', () => {
       test(`GraphQL error on ${pg.name}`, async ({ page }) => {
         await mockGraphQLError(page);
         await page.goto(pg.path);
-        await page.waitForLoadState('networkidle').catch(() => {});
+        await page.waitForLoadState('domcontentloaded').catch(() => {});
+        await page.waitForTimeout(500);
         await expect(page).toHaveScreenshot(
           `error-graphql-${pg.name}.png`,
           STABLE_OPTS,
@@ -97,7 +100,8 @@ test.describe('Visual Regression — Error States', () => {
     test('dashboard with no data', async ({ page }) => {
       await mockGraphQLEmpty(page);
       await page.goto('/dashboard');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(
         'error-empty-dashboard.png',
         STABLE_OPTS,
@@ -113,7 +117,8 @@ test.describe('Visual Regression — Error States', () => {
         }),
       );
       await page.goto('/courses');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(
         'error-empty-courses.png',
         STABLE_OPTS,
@@ -129,7 +134,8 @@ test.describe('Visual Regression — Error States', () => {
         }),
       );
       await page.goto('/search?q=zzzznonexistent');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(
         'error-empty-search.png',
         STABLE_OPTS,
@@ -145,7 +151,8 @@ test.describe('Visual Regression — Error States', () => {
         }),
       );
       await page.goto('/exams');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(
         'error-empty-exams.png',
         STABLE_OPTS,
@@ -161,7 +168,8 @@ test.describe('Visual Regression — Error States', () => {
         }),
       );
       await page.goto('/social');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(
         'error-empty-social.png',
         STABLE_OPTS,
@@ -178,6 +186,7 @@ test.describe('Visual Regression — Error States', () => {
       await mockNetworkError(page);
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       // Allow error UI to render
       await page.waitForTimeout(1000);
       await expect(page).toHaveScreenshot(

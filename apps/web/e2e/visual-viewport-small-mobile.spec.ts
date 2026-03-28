@@ -42,6 +42,7 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
     test(`${pg.name} — small mobile screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
 
       await expect(page).toHaveScreenshot(`${pg.name}-small-mobile.png`, {
         ...LOOSE_OPTS,
@@ -52,6 +53,7 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
 
   test('no horizontal overflow at 320px', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     const hasOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );
@@ -61,6 +63,7 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
   test('touch targets are at least 44×44px', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Check that interactive elements meet minimum touch target size (WCAG 2.5.8)
     const buttons = page.locator('button:visible, a:visible').first();
@@ -77,6 +80,7 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
   test('text does not overflow container at 320px', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Check that no text element extends beyond the viewport
     const overflowingElements = await page.evaluate(() => {

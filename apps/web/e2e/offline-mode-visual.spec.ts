@@ -35,6 +35,7 @@ test.beforeEach(async ({ page }) => {
 async function gotoHome(page: Page): Promise<void> {
   await page.goto(HOME_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
 }
 
 /** Simulate the browser going offline and dispatch the DOM event */
@@ -176,6 +177,7 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
 
     await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('offline-banner-pending-sync-3.png', {
       clip: BANNER_CLIP,
@@ -194,6 +196,7 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
 
     await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('offline-banner-pending-sync-10.png', {
       clip: BANNER_CLIP,
@@ -268,6 +271,7 @@ test.describe('OfflineBanner — component-level screenshots', () => {
     await goOffline(page);
 
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     const banner = page.getByTestId('offline-banner');
     await expect(banner).toBeVisible({ timeout: 5_000 });

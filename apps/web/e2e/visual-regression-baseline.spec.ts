@@ -5,6 +5,7 @@
  * Serves as a baseline for future visual regression detection.
  */
 import { test, expect } from '@playwright/test';
+test.use({ reducedMotion: 'reduce' });
 
 const PUBLIC_PAGES = [
   { path: '/landing', name: 'landing' },
@@ -55,7 +56,8 @@ test.describe('Visual Regression Baseline — Public Pages', () => {
           waitUntil: 'domcontentloaded',
           timeout: 15000,
         });
-        await page.waitForLoadState('networkidle').catch(() => {});
+        await page.waitForLoadState('domcontentloaded').catch(() => {});
+        await page.waitForTimeout(500);
 
         await expect(page).toHaveScreenshot(
           `${pg.name}-${vp.label}.png`,

@@ -80,6 +80,7 @@ function dynamicMasks(page: Page) {
 async function goTo(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   // Suppress animated spinners before snapping
   await page.emulateMedia({ reducedMotion: 'reduce' });
   // Wait for React to finish rendering: the app root must have at least one child
@@ -93,6 +94,7 @@ async function goTo(page: Page, path: string) {
     });
   // Extra settle tick to let CSS transitions complete
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -188,6 +190,7 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
     if (submitVisible) {
       await submitBtn.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
     }
 
     await expect(page).toHaveScreenshot('quiz-result-view.png', {
@@ -304,6 +307,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     if (cardVisible) {
       await firstCard.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       // Wait for the simulator overlay to appear and stabilise
       await page
         .locator('.fixed.inset-0')
@@ -311,6 +315,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
         .waitFor({ state: 'visible', timeout: 8_000 })
         .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
     }
     await expect(page).toHaveScreenshot('roleplay-simulator-chat.png', {
       ...LOOSE_OPTS,
@@ -340,6 +345,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
         .waitFor({ state: 'visible', timeout: 8_000 })
         .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
     }
     const header = page.locator('.bg-gray-900').first();
     const headerVisible = await header.isVisible().catch(() => false);
@@ -378,6 +384,7 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
         .waitFor({ state: 'visible', timeout: 8_000 })
         .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
     }
     const inputArea = page.locator('.bg-gray-900').last();
     const inputVisible = await inputArea.isVisible().catch(() => false);
@@ -539,6 +546,7 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     if (startVisible) {
       await startBtn.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
     }
     const widget = page
       .locator('.card', { hasText: /all done for today/i })
@@ -610,6 +618,7 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     if (btnVisible) {
       await newProfileBtn.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       const dialog = page.locator('[role="dialog"]');
       const dialogVisible = await dialog.isVisible().catch(() => false);
       if (dialogVisible) {
@@ -829,6 +838,7 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     if (btnVisible) {
       await registerBtn.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       const form = page.locator('.card', {
         hasText: /Register LTI 1.3 Platform/i,
       });
@@ -868,6 +878,7 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     if (btnVisible) {
       await generateBtn.click();
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
       const modal = page.locator('[class*="fixed inset-0"]').first();
       const modalVisible = await modal.isVisible().catch(() => false);
       if (modalVisible) {

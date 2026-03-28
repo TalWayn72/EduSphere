@@ -15,6 +15,7 @@ import { loginViaKeycloak } from './auth.helpers';
 import { BASE_URL, TEST_USERS } from './env';
 import path from 'path';
 import { fileURLToPath } from 'url';
+test.use({ reducedMotion: 'reduce' });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

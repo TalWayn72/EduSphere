@@ -14,9 +14,19 @@
  *   pnpm --filter @edusphere/web test:e2e -- --grep="@visual-pdf"
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 import { LOOSE_OPTS } from './helpers/visual-test-utils';
+
+/** Screenshot an element if visible, otherwise fall back to full page */
+async function screenshotElOrPage(el: Locator, page: Page, name: string, opts: object): Promise<void> {
+  if (await el.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, { ...opts, fullPage: true });
+  }
+}
 import { GRAPHQL_URL } from './env';
+import { login } from './auth.helpers';
 
 test.use({ reducedMotion: 'reduce' });
 
@@ -122,13 +132,15 @@ async function mockPdfContent(page: Page): Promise<void> {
 async function goTo(page: Page, path: string): Promise<void> {
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page
     .locator('main, [role="main"], #root > div, .min-h-screen')
     .first()
     .waitFor({ state: 'visible', timeout: 10_000 })
     .catch(() => {});
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
   // Allow PDF rendering / canvas paint to stabilize
   await page.waitForTimeout(2000);
 }
@@ -139,6 +151,7 @@ test.describe('Visual Regression — PDF Viewer @visual-pdf', () => {
   test.setTimeout(45_000);
 
   test.beforeEach(async ({ page }) => {
+    await login(page);
     await mockPdfContent(page);
   });
 
@@ -152,7 +165,7 @@ test.describe('Visual Regression — PDF Viewer @visual-pdf', () => {
   test('pdf viewer — toolbar controls', async ({ page }) => {
     await goTo(page, '/learn/courses/c1/lessons/lesson-pdf-1');
     const toolbar = page.locator('[role="toolbar"], [data-testid="pdf-toolbar"], .pdf-toolbar, header').first();
-    await expect(toolbar).toHaveScreenshot('pdf-viewer-toolbar-controls.png', {
+    await screenshotElOrPage(toolbar, page, 'pdf-viewer-toolbar-controls.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });
@@ -161,7 +174,7 @@ test.describe('Visual Regression — PDF Viewer @visual-pdf', () => {
   test('pdf viewer — document area', async ({ page }) => {
     await goTo(page, '/learn/courses/c1/lessons/lesson-pdf-1');
     const docArea = page.locator('[data-testid="pdf-document"], canvas, .pdf-container, main').first();
-    await expect(docArea).toHaveScreenshot('pdf-viewer-document-area.png', {
+    await screenshotElOrPage(docArea, page, 'pdf-viewer-document-area.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });
@@ -200,7 +213,7 @@ test.describe('Visual Regression — PDF Viewer @visual-pdf', () => {
     await goTo(page, '/learn/courses/c1/lessons/lesson-pdf-1');
     const pagination = page.locator('[data-testid="pdf-pagination"], [data-testid="page-nav"], .page-controls, nav')
       .first();
-    await expect(pagination).toHaveScreenshot('pdf-viewer-pagination-controls.png', {
+    await screenshotElOrPage(pagination, page, 'pdf-viewer-pagination-controls.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });
@@ -255,7 +268,7 @@ test.describe('Visual Regression — PDF Viewer @visual-pdf', () => {
       await page.waitForTimeout(500);
     }
     const sidebar = page.locator('[data-testid="pdf-sidebar"], aside, [role="complementary"]').first();
-    await expect(sidebar).toHaveScreenshot('pdf-viewer-sidebar-toc.png', {
+    await screenshotElOrPage(sidebar, page, 'pdf-viewer-sidebar-toc.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });

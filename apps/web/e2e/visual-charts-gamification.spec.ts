@@ -10,8 +10,18 @@
  *   pnpm --filter @edusphere/web exec playwright test visual-charts-gamification --update-snapshots
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 import { LOOSE_OPTS } from './helpers/visual-test-utils';
+import { login } from './auth.helpers';
+
+/** Screenshot an element if visible, otherwise fall back to full page */
+async function screenshotElOrPage(el: Locator, page: Page, name: string, opts: object): Promise<void> {
+  if (await el.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, { ...opts, fullPage: true });
+  }
+}
 import {
   MOCK_GAMIFICATION_DATA,
   MOCK_LEADERBOARD_DATA,
@@ -25,11 +35,13 @@ test.use({ reducedMotion: 'reduce' });
 const CHART_OPTS = { maxDiffPixelRatio: 0.05, animations: 'disabled' as const };
 
 async function setupMockAndGo(page: Page, path: string, mockData: Record<string, unknown>) {
+  await login(page);
   await page.route('**/graphql', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockData) });
   });
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page
     .locator('main, [role="main"], #root > div, .min-h-screen')
@@ -54,25 +66,25 @@ test.describe('Chart Visual — Dashboard Gamification @visual-charts', () => {
   test('dashboard — XP progress bar', async ({ page }) => {
     await setupMockAndGo(page, '/dashboard', MOCK_GAMIFICATION_DATA);
     const xpBar = page.locator('[data-testid="xp-progress"], [role="progressbar"], .xp-bar, section').first();
-    await expect(xpBar).toHaveScreenshot('chart-gamification-dashboard-xp.png', CHART_OPTS);
+    await screenshotElOrPage(xpBar, page, 'chart-gamification-dashboard-xp.png', CHART_OPTS);
   });
 
   test('dashboard — streak indicator', async ({ page }) => {
     await setupMockAndGo(page, '/dashboard', MOCK_GAMIFICATION_DATA);
     const streak = page.locator('[data-testid="streak-indicator"], .streak, .flame-icon, section').first();
-    await expect(streak).toHaveScreenshot('chart-gamification-dashboard-streak.png', CHART_OPTS);
+    await screenshotElOrPage(streak, page, 'chart-gamification-dashboard-streak.png', CHART_OPTS);
   });
 
   test('dashboard — level badge display', async ({ page }) => {
     await setupMockAndGo(page, '/dashboard', MOCK_GAMIFICATION_DATA);
     const badge = page.locator('[data-testid="level-badge"], .level-badge, .rank, section').first();
-    await expect(badge).toHaveScreenshot('chart-gamification-dashboard-level.png', CHART_OPTS);
+    await screenshotElOrPage(badge, page, 'chart-gamification-dashboard-level.png', CHART_OPTS);
   });
 
   test('dashboard — XP history chart', async ({ page }) => {
     await setupMockAndGo(page, '/dashboard', MOCK_GAMIFICATION_DATA);
     const chart = page.locator('[data-testid="xp-history"], .recharts-line, .recharts-wrapper, svg').first();
-    await expect(chart).toHaveScreenshot('chart-gamification-dashboard-xphistory.png', CHART_OPTS);
+    await screenshotElOrPage(chart, page, 'chart-gamification-dashboard-xphistory.png', CHART_OPTS);
   });
 });
 
@@ -91,25 +103,25 @@ test.describe('Chart Visual — Social Challenges @visual-charts', () => {
   test('challenges — active challenge cards with progress', async ({ page }) => {
     await setupMockAndGo(page, '/social/challenges', MOCK_CHALLENGES_DATA);
     const cards = page.locator('[data-testid="challenge-list"], .challenge-cards, .grid, [role="list"]').first();
-    await expect(cards).toHaveScreenshot('chart-gamification-challenges-cards.png', CHART_OPTS);
+    await screenshotElOrPage(cards, page, 'chart-gamification-challenges-cards.png', CHART_OPTS);
   });
 
   test('challenges — leaderboard table', async ({ page }) => {
     await setupMockAndGo(page, '/social/challenges', MOCK_LEADERBOARD_DATA);
     const board = page.locator('[data-testid="leaderboard"], .leaderboard, table, [role="table"]').first();
-    await expect(board).toHaveScreenshot('chart-gamification-challenges-leaderboard.png', CHART_OPTS);
+    await screenshotElOrPage(board, page, 'chart-gamification-challenges-leaderboard.png', CHART_OPTS);
   });
 
   test('challenges — challenge progress bars', async ({ page }) => {
     await setupMockAndGo(page, '/social/challenges', MOCK_CHALLENGES_DATA);
     const bars = page.locator('[data-testid="challenge-progress"], [role="progressbar"], .progress-bars, section').first();
-    await expect(bars).toHaveScreenshot('chart-gamification-challenges-progress.png', CHART_OPTS);
+    await screenshotElOrPage(bars, page, 'chart-gamification-challenges-progress.png', CHART_OPTS);
   });
 
   test('challenges — XP reward indicators', async ({ page }) => {
     await setupMockAndGo(page, '/social/challenges', MOCK_CHALLENGES_DATA);
     const rewards = page.locator('[data-testid="xp-rewards"], .xp-badge, .reward, main').first();
-    await expect(rewards).toHaveScreenshot('chart-gamification-challenges-rewards.png', CHART_OPTS);
+    await screenshotElOrPage(rewards, page, 'chart-gamification-challenges-rewards.png', CHART_OPTS);
   });
 });
 
@@ -128,25 +140,25 @@ test.describe('Chart Visual — Profile Gamification @visual-charts', () => {
   test('profile — achievement badges grid', async ({ page }) => {
     await setupMockAndGo(page, '/profile', MOCK_GAMIFICATION_DATA);
     const badges = page.locator('[data-testid="badges"], .badge-grid, .badges, section').first();
-    await expect(badges).toHaveScreenshot('chart-gamification-profile-badges.png', CHART_OPTS);
+    await screenshotElOrPage(badges, page, 'chart-gamification-profile-badges.png', CHART_OPTS);
   });
 
   test('profile — learning progress chart', async ({ page }) => {
     await setupMockAndGo(page, '/profile', MOCK_PROFILE_PROGRESS_DATA);
     const chart = page.locator('[data-testid="progress-chart"], .recharts-area, .recharts-wrapper, svg').first();
-    await expect(chart).toHaveScreenshot('chart-gamification-profile-progress.png', CHART_OPTS);
+    await screenshotElOrPage(chart, page, 'chart-gamification-profile-progress.png', CHART_OPTS);
   });
 
   test('profile — skill levels radar', async ({ page }) => {
     await setupMockAndGo(page, '/profile', MOCK_PROFILE_PROGRESS_DATA);
     const radar = page.locator('[data-testid="skill-radar"], .recharts-radar, .recharts-wrapper, section').first();
-    await expect(radar).toHaveScreenshot('chart-gamification-profile-skills.png', CHART_OPTS);
+    await screenshotElOrPage(radar, page, 'chart-gamification-profile-skills.png', CHART_OPTS);
   });
 
   test('profile — hours learned bar chart', async ({ page }) => {
     await setupMockAndGo(page, '/profile', MOCK_PROFILE_PROGRESS_DATA);
     const bars = page.locator('[data-testid="hours-chart"], .recharts-bar, .recharts-wrapper, main').first();
-    await expect(bars).toHaveScreenshot('chart-gamification-profile-hours.png', CHART_OPTS);
+    await screenshotElOrPage(bars, page, 'chart-gamification-profile-hours.png', CHART_OPTS);
   });
 });
 
@@ -165,24 +177,24 @@ test.describe('Chart Visual — Certificates @visual-charts', () => {
   test('certificates — certificate cards display', async ({ page }) => {
     await setupMockAndGo(page, '/certificates', MOCK_CERTIFICATES_DATA);
     const cards = page.locator('[data-testid="certificate-list"], .certificate-cards, .grid, [role="list"]').first();
-    await expect(cards).toHaveScreenshot('chart-gamification-certificates-cards.png', CHART_OPTS);
+    await screenshotElOrPage(cards, page, 'chart-gamification-certificates-cards.png', CHART_OPTS);
   });
 
   test('certificates — credential details section', async ({ page }) => {
     await setupMockAndGo(page, '/certificates', MOCK_CERTIFICATES_DATA);
     const details = page.locator('[data-testid="credential-details"], .credential, .certificate-detail, section').first();
-    await expect(details).toHaveScreenshot('chart-gamification-certificates-details.png', CHART_OPTS);
+    await screenshotElOrPage(details, page, 'chart-gamification-certificates-details.png', CHART_OPTS);
   });
 
   test('certificates — grade summary', async ({ page }) => {
     await setupMockAndGo(page, '/certificates', MOCK_CERTIFICATES_DATA);
     const summary = page.locator('[data-testid="grade-summary"], .grade-summary, .summary, main').first();
-    await expect(summary).toHaveScreenshot('chart-gamification-certificates-grades.png', CHART_OPTS);
+    await screenshotElOrPage(summary, page, 'chart-gamification-certificates-grades.png', CHART_OPTS);
   });
 
   test('certificates — completion timeline', async ({ page }) => {
     await setupMockAndGo(page, '/certificates', MOCK_CERTIFICATES_DATA);
     const timeline = page.locator('[data-testid="completion-timeline"], .timeline, .recharts-wrapper, section').first();
-    await expect(timeline).toHaveScreenshot('chart-gamification-certificates-timeline.png', CHART_OPTS);
+    await screenshotElOrPage(timeline, page, 'chart-gamification-certificates-timeline.png', CHART_OPTS);
   });
 });

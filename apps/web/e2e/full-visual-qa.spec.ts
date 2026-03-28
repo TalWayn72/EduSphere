@@ -14,6 +14,7 @@ import { test, expect, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { BASE_URL as BASE } from './env';
+test.use({ reducedMotion: 'reduce' });
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
 const USERS = {
@@ -197,7 +198,8 @@ async function keycloakLogin(
   await page
     .click('#kc-login')
     .catch(() => page.click('button[type="submit"]').catch(() => {}));
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
   return true;
 }
 
@@ -210,7 +212,8 @@ async function doLogin(
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   // Click Sign In button
   const signInBtn = page.getByRole('button', {
@@ -219,7 +222,8 @@ async function doLogin(
   const btnVisible = await signInBtn.isVisible().catch(() => false);
   if (btnVisible) {
     await signInBtn.click();
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
   }
 
   // Handle Keycloak redirect
@@ -227,7 +231,8 @@ async function doLogin(
 
   // Wait for redirect back to app
   await page.waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 20000 }).catch(() => {});
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   // If still on login page, try once more (session may have been stale)
   if (page.url().includes('/login')) {
@@ -237,12 +242,14 @@ async function doLogin(
     const retryVisible = await retryBtn.isVisible().catch(() => false);
     if (retryVisible) {
       await retryBtn.click();
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       await keycloakLogin(page, email, password);
       await page
         .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 20000 })
         .catch(() => {});
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
     }
   }
 }
@@ -259,6 +266,7 @@ async function doLogout(page: Page): Promise<void> {
   if (menuVisible) {
     await menuBtn.click();
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
   }
 
   const logoutItem = page
@@ -269,7 +277,8 @@ async function doLogout(page: Page): Promise<void> {
   const logoutVisible = await logoutItem.isVisible().catch(() => false);
   if (logoutVisible) {
     await logoutItem.click();
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
   }
 }
 
@@ -298,7 +307,8 @@ test('S1.01 — Login page initial render', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -405,7 +415,8 @@ test('S1.03 — Student — Dashboard', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -473,7 +484,8 @@ test('S1.04 — Student — Courses', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -530,7 +542,8 @@ test('S1.05 — Student — Content Viewer (/learn/content-1)', async ({
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -593,7 +606,8 @@ test('S1.06 — Student — Agents page', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -655,7 +669,8 @@ test('S1.07 — Student — Knowledge Graph', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   const urlAfterKG = page.url();
   if (
@@ -667,7 +682,8 @@ test('S1.07 — Student — Knowledge Graph', async ({ page }) => {
       waitUntil: 'domcontentloaded',
       timeout: 15000,
     });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
   }
 
   entry.url = page.url();
@@ -719,7 +735,8 @@ test('S1.08 — Student — Collaboration', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -762,7 +779,8 @@ test('S1.09 — Student — Search for Talmud', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   // Empty state screenshot
   await snap(page, 'S1.09a-search-empty');
@@ -776,7 +794,8 @@ test('S1.09 — Student — Search for Talmud', async ({ page }) => {
 
   if (inputVisible) {
     await searchInput.fill('Talmud');
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
   } else {
     entry.notes.push('MISSING: Search input not found');
   }
@@ -822,7 +841,8 @@ test('S1.10 — Student — Profile page', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -874,7 +894,8 @@ test('S1.11 — Student — UserMenu open and Logout', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   // Identify and click user menu
   const menuBtn = page
@@ -887,6 +908,7 @@ test('S1.11 — Student — UserMenu open and Logout', async ({ page }) => {
   if (menuVisible) {
     await menuBtn.click();
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
     await snap(page, 'S1.11a-usermenu-open');
 
     const dropdown = page.locator('[role="menu"]');
@@ -913,7 +935,8 @@ test('S1.11 — Student — UserMenu open and Logout', async ({ page }) => {
 
     if (logoutVisible) {
       await logoutEl.click();
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       const finalUrl = page.url();
       entry.notes.push(`After logout URL: ${finalUrl}`);
       const backToLogin =
@@ -968,7 +991,8 @@ test('S2.01 — Instructor — Dashboard', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -1033,7 +1057,8 @@ test('S2.02 — Instructor — Courses with management options', async ({
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -1091,7 +1116,8 @@ test('S3.01 — Super Admin — Dashboard', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   entry.url = page.url();
   const info = await getInfo(page);
@@ -1166,7 +1192,8 @@ test('S3.02 — Super Admin — All routes accessible', async ({ page }) => {
       waitUntil: 'domcontentloaded',
       timeout: 10000,
     });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
     const crashed = await page
       .getByText(/something went wrong/i)
       .isVisible()

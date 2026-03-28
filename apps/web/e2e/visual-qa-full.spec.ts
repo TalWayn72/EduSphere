@@ -15,6 +15,7 @@ import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { BASE_URL as BASE } from './env';
+test.use({ reducedMotion: 'reduce' });
 
 // Known seed data IDs (from nahar-shalom-course.ts + DB query)
 const SEED = {
@@ -169,7 +170,8 @@ async function keycloakLogin(
   await page
     .click('#kc-login')
     .catch(() => page.click('button[type="submit"]').catch(() => {}));
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 }
 
 async function login(
@@ -180,18 +182,21 @@ async function login(
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   const btn = page.getByRole('button', { name: /sign in with keycloak/i });
   if (await btn.isVisible().catch(() => false)) {
     await btn.click();
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
   }
 
   if (page.url().includes('8080') || page.url().includes('auth')) {
     await keycloakLogin(page, user.email, user.password);
     await page.waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 25000 }).catch(() => {});
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
   }
 
   // Retry if still on login
@@ -201,13 +206,15 @@ async function login(
     });
     if (await retryBtn.isVisible().catch(() => false)) {
       await retryBtn.click();
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
+      await page.waitForTimeout(500);
       if (page.url().includes('8080')) {
         await keycloakLogin(page, user.email, user.password);
         await page
           .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 25000 })
           .catch(() => {});
-        await page.waitForLoadState('networkidle').catch(() => {});
+        await page.waitForLoadState('domcontentloaded').catch(() => {});
+        await page.waitForTimeout(500);
       }
     }
   }
@@ -228,6 +235,7 @@ async function visitRoute(
     .goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded', timeout: 20000 })
     .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
 
   r.url = page.url();
   r.headings = await headings(page);
@@ -275,7 +283,8 @@ test('01 — Public: Login page', async ({ page }) => {
     waitUntil: 'domcontentloaded',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
 
   r.url = page.url();
   r.headings = await headings(page);

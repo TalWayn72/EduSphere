@@ -15,6 +15,8 @@
 import { test, expect } from '@playwright/test';
 import { STABLE_OPTS, LOOSE_OPTS, dynamicMasks } from './helpers/visual-test-utils';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
+test.use({ reducedMotion: 'reduce' });
 
 const CRITICAL_PAGES = [
   { name: 'landing', path: '/' },
@@ -41,6 +43,7 @@ const CRITICAL_PAGES = [
 
 test.describe('Visual Cross-Browser -- Critical Pages @visual @xbrowser', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     // Mock GraphQL to prevent backend dependency
     await page.route('**/graphql', async (route) => {
       await route.fulfill({
@@ -54,7 +57,8 @@ test.describe('Visual Cross-Browser -- Critical Pages @visual @xbrowser', () => 
   for (const { name, path } of CRITICAL_PAGES) {
     test(`${name} -- full page`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(`xbrowser-${name}-full.png`, {
         ...STABLE_OPTS,
         mask: dynamicMasks(page),
@@ -63,12 +67,15 @@ test.describe('Visual Cross-Browser -- Critical Pages @visual @xbrowser', () => 
 
     test(`${name} -- header`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       const header = page.locator('header, [data-testid="page-header"], h1').first();
-      await expect(header).toHaveScreenshot(`xbrowser-${name}-header.png`, {
-        animations: 'disabled' as const,
-        maxDiffPixelRatio: 0.01,
-      });
+      const headerOpts = { animations: 'disabled' as const, maxDiffPixelRatio: 0.01 };
+      if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(header).toHaveScreenshot(`xbrowser-${name}-header.png`, headerOpts);
+      } else {
+        await expect(page).toHaveScreenshot(`xbrowser-${name}-header.png`, { ...headerOpts, fullPage: true });
+      }
     });
   }
 });

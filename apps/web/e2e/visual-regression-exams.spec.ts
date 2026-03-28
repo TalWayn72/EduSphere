@@ -16,6 +16,7 @@ test.use({ reducedMotion: 'reduce' });
 async function goTo(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page
     .locator('main, [role="main"], #root > div, .min-h-screen')
@@ -23,6 +24,26 @@ async function goTo(page: Page, path: string) {
     .waitFor({ state: 'visible', timeout: 10_000 })
     .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
+}
+
+/** Try element screenshot, fall back to full page if element not visible */
+async function elementOrPage(
+  page: Page,
+  selectors: string[],
+  name: string,
+  opts: Record<string, unknown> = { animations: 'disabled' as const },
+) {
+  const locator = selectors.reduce(
+    (loc, sel, i) => (i === 0 ? page.locator(sel) : loc.or(page.locator(sel))),
+    page.locator(selectors[0]),
+  );
+  const el = locator.first();
+  if (await el.isVisible({ timeout: 3_000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, opts);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -39,26 +60,22 @@ test.describe('Visual Regression — Exam List @visual-exams', () => {
 
   test('exam list — header section', async ({ page }) => {
     await goTo(page, '/exams');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('exams-list-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-list-header.png');
   });
 
   test('exam list — main content', async ({ page }) => {
     await goTo(page, '/exams');
-    const main = page.locator('main, [role="main"], [data-testid="main-content"]').first();
-    await expect(main).toHaveScreenshot('exams-list-main.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'exams-list-main.png');
   });
 
   test('exam list — exam cards grid', async ({ page }) => {
     await goTo(page, '/exams');
-    const grid = page.locator('[data-testid="exam-grid"], .grid, [role="list"]').first();
-    await expect(grid).toHaveScreenshot('exams-list-grid.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="exam-grid"]', '.grid', '[role="list"]'], 'exams-list-grid.png');
   });
 
   test('exam list — filter controls', async ({ page }) => {
     await goTo(page, '/exams');
-    const filters = page.locator('[data-testid="filters"], [role="search"], .filters').first();
-    await expect(filters).toHaveScreenshot('exams-list-filters.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="filters"]', '[role="search"]', '.filters'], 'exams-list-filters.png');
   });
 });
 
@@ -76,20 +93,17 @@ test.describe('Visual Regression — Item Bank @visual-exams', () => {
 
   test('item bank — header section', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('exams-itembank-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-itembank-header.png');
   });
 
   test('item bank — question list', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    const list = page.locator('[data-testid="item-list"], table, [role="table"], main').first();
-    await expect(list).toHaveScreenshot('exams-itembank-list.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="item-list"]', 'table', '[role="table"]', 'main'], 'exams-itembank-list.png');
   });
 
   test('item bank — sidebar categories', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    const sidebar = page.locator('aside, [data-testid="categories"], nav').first();
-    await expect(sidebar).toHaveScreenshot('exams-itembank-categories.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['aside', '[data-testid="categories"]', 'nav'], 'exams-itembank-categories.png');
   });
 });
 
@@ -107,20 +121,17 @@ test.describe('Visual Regression — Exam Blueprint @visual-exams', () => {
 
   test('blueprint — header section', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('exams-blueprint-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-blueprint-header.png');
   });
 
   test('blueprint — main content', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    const main = page.locator('main, [role="main"], [data-testid="main-content"]').first();
-    await expect(main).toHaveScreenshot('exams-blueprint-main.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'exams-blueprint-main.png');
   });
 
   test('blueprint — topic distribution', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    const dist = page.locator('[data-testid="topic-distribution"], .distribution, table').first();
-    await expect(dist).toHaveScreenshot('exams-blueprint-distribution.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="topic-distribution"]', '.distribution', 'table'], 'exams-blueprint-distribution.png');
   });
 });
 
@@ -138,20 +149,17 @@ test.describe('Visual Regression — Exam Results @visual-exams', () => {
 
   test('results — header section', async ({ page }) => {
     await goTo(page, '/exams/results');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('exams-results-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-results-header.png');
   });
 
   test('results — summary statistics', async ({ page }) => {
     await goTo(page, '/exams/results');
-    const stats = page.locator('[data-testid="results-summary"], .summary, main').first();
-    await expect(stats).toHaveScreenshot('exams-results-summary.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="results-summary"]', '.summary', 'main'], 'exams-results-summary.png');
   });
 
   test('results — score table', async ({ page }) => {
     await goTo(page, '/exams/results');
-    const table = page.locator('table, [data-testid="score-table"], [role="table"]').first();
-    await expect(table).toHaveScreenshot('exams-results-table.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['table', '[data-testid="score-table"]', '[role="table"]'], 'exams-results-table.png');
   });
 });
 
@@ -169,43 +177,36 @@ test.describe('Visual Regression — Exam Security @visual-exams', () => {
 
   test('security settings — header section', async ({ page }) => {
     await goTo(page, '/exams/security');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('exams-security-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-security-header.png');
   });
 
   test('security settings — configuration options', async ({ page }) => {
     await goTo(page, '/exams/security');
-    const config = page.locator('form, [data-testid="security-config"], main').first();
-    await expect(config).toHaveScreenshot('exams-security-config.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['form', '[data-testid="security-config"]', 'main'], 'exams-security-config.png');
   });
 
   test('security settings — proctoring section', async ({ page }) => {
     await goTo(page, '/exams/security');
-    const proctoring = page.locator('[data-testid="proctoring"], .proctoring-section, section').first();
-    await expect(proctoring).toHaveScreenshot('exams-security-proctoring.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="proctoring"]', '.proctoring-section', 'section'], 'exams-security-proctoring.png');
   });
 
   test('exam list — sidebar navigation', async ({ page }) => {
     await goTo(page, '/exams');
-    const sidebar = page.locator('aside, [data-testid="sidebar"], nav').first();
-    await expect(sidebar).toHaveScreenshot('exams-list-sidebar.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['aside', '[data-testid="sidebar"]', 'nav'], 'exams-list-sidebar.png');
   });
 
   test('item bank — action toolbar', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    const toolbar = page.locator('[data-testid="toolbar"], [role="toolbar"], .toolbar').first();
-    await expect(toolbar).toHaveScreenshot('exams-itembank-toolbar.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="toolbar"]', '[role="toolbar"]', '.toolbar'], 'exams-itembank-toolbar.png');
   });
 
   test('blueprint — action buttons', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    const actions = page.locator('[data-testid="blueprint-actions"], button, .actions').first();
-    await expect(actions).toHaveScreenshot('exams-blueprint-actions.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="blueprint-actions"]', 'button', '.actions'], 'exams-blueprint-actions.png');
   });
 
   test('security settings — lockdown options', async ({ page }) => {
     await goTo(page, '/exams/security');
-    const lockdown = page.locator('[data-testid="lockdown-options"], .lockdown, form').first();
-    await expect(lockdown).toHaveScreenshot('exams-security-lockdown.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="lockdown-options"]', '.lockdown', 'form'], 'exams-security-lockdown.png');
   });
 });

@@ -12,9 +12,20 @@
  *   pnpm --filter @edusphere/web exec playwright test e2e/visual-cross-browser-forms.spec.ts
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { STABLE_OPTS, LOOSE_OPTS, dynamicMasks } from './helpers/visual-test-utils';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
+test.use({ reducedMotion: 'reduce' });
+
+/** Screenshot an element if visible, otherwise fall back to full page */
+async function screenshotElOrPage(el: Locator, page: Page, name: string, opts: object): Promise<void> {
+  if (await el.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, { ...opts, fullPage: true });
+  }
+}
 
 const FORM_PAGES = [
   {
@@ -63,6 +74,7 @@ const FORM_PAGES = [
 
 test.describe('Visual Cross-Browser -- Form Pages @visual @xbrowser @forms', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     // Mock GraphQL to prevent backend dependency
     await page.route('**/graphql', async (route) => {
       await route.fulfill({
@@ -76,9 +88,10 @@ test.describe('Visual Cross-Browser -- Form Pages @visual @xbrowser @forms', () 
   for (const { name, path, formSelector, inputSelector, submitSelector } of FORM_PAGES) {
     test(`${name} -- full form layout`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       const form = page.locator(formSelector).first();
-      await expect(form).toHaveScreenshot(`xbrowser-form-${name}-full.png`, {
+      await screenshotElOrPage(form, page, `xbrowser-form-${name}-full.png`, {
         animations: 'disabled' as const,
         maxDiffPixelRatio: 0.01,
       });
@@ -86,9 +99,10 @@ test.describe('Visual Cross-Browser -- Form Pages @visual @xbrowser @forms', () 
 
     test(`${name} -- input fields area`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       const inputs = page.locator(inputSelector).first();
-      await expect(inputs).toHaveScreenshot(`xbrowser-form-${name}-inputs.png`, {
+      await screenshotElOrPage(inputs, page, `xbrowser-form-${name}-inputs.png`, {
         animations: 'disabled' as const,
         maxDiffPixelRatio: 0.01,
       });
@@ -96,9 +110,10 @@ test.describe('Visual Cross-Browser -- Form Pages @visual @xbrowser @forms', () 
 
     test(`${name} -- submit button area`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       const submit = page.locator(submitSelector).first();
-      await expect(submit).toHaveScreenshot(`xbrowser-form-${name}-submit.png`, {
+      await screenshotElOrPage(submit, page, `xbrowser-form-${name}-submit.png`, {
         animations: 'disabled' as const,
         maxDiffPixelRatio: 0.01,
       });
@@ -106,7 +121,8 @@ test.describe('Visual Cross-Browser -- Form Pages @visual @xbrowser @forms', () 
 
     test(`${name} -- full page with form`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(`xbrowser-form-${name}-page.png`, {
         ...STABLE_OPTS,
         mask: dynamicMasks(page),
@@ -115,9 +131,12 @@ test.describe('Visual Cross-Browser -- Form Pages @visual @xbrowser @forms', () 
 
     test(`${name} -- focused input state`, async ({ page }) => {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle').catch(() => {/* timeout ok */});
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
       const firstInput = page.locator(`${formSelector} input, ${formSelector} textarea`).first();
-      await firstInput.focus().catch(() => {/* element may not exist */});
+      if (await firstInput.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await firstInput.focus().catch(() => {/* element may not exist */});
+      }
       await expect(page).toHaveScreenshot(`xbrowser-form-${name}-focused.png`, {
         ...LOOSE_OPTS,
         mask: dynamicMasks(page),

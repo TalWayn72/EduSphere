@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { login } from './auth.helpers';
 import { TEST_USERS } from './env';
+test.use({ reducedMotion: 'reduce' });
 
 /**
  * Visual Anchoring — Instructor Flow E2E Tests
@@ -141,6 +142,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     await page.goto('/learn/media-1');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Locate the asset uploader (instructor mode shows this component)
     const uploader = page.locator('[data-testid="asset-uploader"]');
@@ -198,6 +200,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     await page.goto('/learn/media-1');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Wait for the document viewer to render (instructor mode)
     const anchorEditor = page.locator('[data-testid="anchor-editor"]');
@@ -240,6 +243,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     await page.goto('/learn/media-1');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // InstructorAnchorPanel should be visible on the right side
     const anchorPanel = page.locator('[data-testid="instructor-anchor-panel"]');
@@ -279,6 +283,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     await page.goto('/learn/media-1');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     const anchorPanel = page.locator('[data-testid="instructor-anchor-panel"]');
     await expect(anchorPanel).toBeVisible({ timeout: 10_000 });
@@ -329,6 +334,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     await page.goto('/learn/media-1');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Verify instructor panel is visible before toggle
     const anchorPanel = page.locator('[data-testid="instructor-anchor-panel"]');

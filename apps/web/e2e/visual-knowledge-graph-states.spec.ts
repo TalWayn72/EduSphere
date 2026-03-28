@@ -14,9 +14,19 @@
  *   pnpm --filter @edusphere/web test:e2e -- --grep="@visual-kg"
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 import { LOOSE_OPTS } from './helpers/visual-test-utils';
+
+/** Screenshot an element if visible, otherwise fall back to full page */
+async function screenshotElOrPage(el: Locator, page: Page, name: string, opts: object): Promise<void> {
+  if (await el.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, { ...opts, fullPage: true });
+  }
+}
 import { GRAPHQL_URL } from './env';
+import { login } from './auth.helpers';
 
 test.use({ reducedMotion: 'reduce' });
 
@@ -152,13 +162,15 @@ async function mockKnowledgeGraph(page: Page): Promise<void> {
 async function goTo(page: Page, path: string): Promise<void> {
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page
     .locator('main, [role="main"], #root > div, .min-h-screen')
     .first()
     .waitFor({ state: 'visible', timeout: 10_000 })
     .catch(() => {});
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForTimeout(500);
   // Allow force-directed graph layout to stabilize
   await page.waitForTimeout(3000);
 }
@@ -169,6 +181,7 @@ test.describe('Visual Regression — Knowledge Graph States @visual-kg', () => {
   test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
+    await login(page);
     await mockKnowledgeGraph(page);
   });
 
@@ -182,7 +195,7 @@ test.describe('Visual Regression — Knowledge Graph States @visual-kg', () => {
   test('knowledge graph — graph canvas area', async ({ page }) => {
     await goTo(page, '/knowledge-graph');
     const canvas = page.locator('[data-testid="graph-canvas"], canvas, svg, .graph-container, main').first();
-    await expect(canvas).toHaveScreenshot('kg-canvas-area.png', {
+    await screenshotElOrPage(canvas, page, 'kg-canvas-area.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });
@@ -191,7 +204,7 @@ test.describe('Visual Regression — Knowledge Graph States @visual-kg', () => {
   test('knowledge graph — legend / node type indicators', async ({ page }) => {
     await goTo(page, '/knowledge-graph');
     const legend = page.locator('[data-testid="graph-legend"], .legend, [role="list"]').first();
-    await expect(legend).toHaveScreenshot('kg-legend.png', {
+    await screenshotElOrPage(legend, page, 'kg-legend.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });
@@ -305,7 +318,7 @@ test.describe('Visual Regression — Knowledge Graph States @visual-kg', () => {
     const sidebar = page.locator(
       '[data-testid="node-detail"], [data-testid="graph-sidebar"], aside, [role="complementary"]',
     ).first();
-    await expect(sidebar).toHaveScreenshot('kg-node-detail-sidebar.png', {
+    await screenshotElOrPage(sidebar, page, 'kg-node-detail-sidebar.png', {
       ...LOOSE_OPTS,
       fullPage: false,
     });

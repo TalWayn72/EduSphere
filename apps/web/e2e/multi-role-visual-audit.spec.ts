@@ -1,6 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { login } from './auth.helpers';
 import { BASE_URL } from './env';
+test.use({ reducedMotion: 'reduce' });
 
 /**
  * Multi-Role Visual E2E Audit
@@ -47,6 +48,7 @@ async function visitAndAudit(
 ): Promise<void> {
   await page.goto(`${BASE_URL}${route}`, NAV_TIMEOUT);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
 
   // 1. No error boundary visible
   const errorBoundary = page.locator('[data-testid="error-boundary"]');

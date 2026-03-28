@@ -43,6 +43,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // @hookform/resolvers@5.x imports "zod/v4/core" but pnpm strict mode
+      // doesn't hoist zod into @hookform's own node_modules. Vite's import
+      // analysis fails to resolve the subpath export from the hoisted location.
+      // This alias forces Vite to resolve zod/v4/core from the app's zod copy.
+      'zod/v4/core': path.resolve(__dirname, 'node_modules/zod/v4/core'),
+      'zod/v4': path.resolve(__dirname, 'node_modules/zod/v4'),
     },
   },
   server: {

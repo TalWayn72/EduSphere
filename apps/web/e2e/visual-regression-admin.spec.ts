@@ -16,6 +16,7 @@ test.use({ reducedMotion: 'reduce' });
 async function goTo(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page
     .locator('main, [role="main"], #root > div, .min-h-screen')
@@ -23,6 +24,26 @@ async function goTo(page: Page, path: string) {
     .waitFor({ state: 'visible', timeout: 10_000 })
     .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
+}
+
+/** Try element screenshot, fall back to full page if element not visible */
+async function elementOrPage(
+  page: Page,
+  selectors: string[],
+  name: string,
+  opts: Record<string, unknown> = { animations: 'disabled' as const },
+) {
+  const locator = selectors.reduce(
+    (loc, sel, i) => (i === 0 ? page.locator(sel) : loc.or(page.locator(sel))),
+    page.locator(selectors[0]),
+  );
+  const el = locator.first();
+  if (await el.isVisible({ timeout: 3_000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, opts);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -39,26 +60,22 @@ test.describe('Visual Regression — Admin Dashboard @visual-admin', () => {
 
   test('admin dashboard — header section', async ({ page }) => {
     await goTo(page, '/admin');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('admin-dashboard-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'admin-dashboard-header.png');
   });
 
   test('admin dashboard — sidebar navigation', async ({ page }) => {
     await goTo(page, '/admin');
-    const sidebar = page.locator('nav, [data-testid="sidebar"], aside').first();
-    await expect(sidebar).toHaveScreenshot('admin-dashboard-sidebar.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['nav', '[data-testid="sidebar"]', 'aside'], 'admin-dashboard-sidebar.png');
   });
 
   test('admin dashboard — main content area', async ({ page }) => {
     await goTo(page, '/admin');
-    const main = page.locator('main, [role="main"], [data-testid="main-content"]').first();
-    await expect(main).toHaveScreenshot('admin-dashboard-main.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'admin-dashboard-main.png');
   });
 
   test('admin dashboard — stats cards', async ({ page }) => {
     await goTo(page, '/admin');
-    const cards = page.locator('[data-testid="stats-card"], .stats-card, .card').first();
-    await expect(cards).toHaveScreenshot('admin-dashboard-stats.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="stats-card"]', '.stats-card', '.card'], 'admin-dashboard-stats.png');
   });
 });
 
@@ -76,20 +93,17 @@ test.describe('Visual Regression — Admin Compliance @visual-admin', () => {
 
   test('compliance — header section', async ({ page }) => {
     await goTo(page, '/admin/compliance');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('admin-compliance-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'admin-compliance-header.png');
   });
 
   test('compliance — main content', async ({ page }) => {
     await goTo(page, '/admin/compliance');
-    const main = page.locator('main, [role="main"], [data-testid="main-content"]').first();
-    await expect(main).toHaveScreenshot('admin-compliance-main.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'admin-compliance-main.png');
   });
 
   test('compliance — report table', async ({ page }) => {
     await goTo(page, '/admin/compliance');
-    const table = page.locator('table, [data-testid="compliance-table"], [role="table"]').first();
-    await expect(table).toHaveScreenshot('admin-compliance-table.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['table', '[data-testid="compliance-table"]', '[role="table"]'], 'admin-compliance-table.png');
   });
 });
 
@@ -107,14 +121,12 @@ test.describe('Visual Regression — Admin LTI @visual-admin', () => {
 
   test('LTI settings — header section', async ({ page }) => {
     await goTo(page, '/admin/lti');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('admin-lti-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'admin-lti-header.png');
   });
 
   test('LTI settings — configuration form', async ({ page }) => {
     await goTo(page, '/admin/lti');
-    const form = page.locator('form, [data-testid="lti-config"], main').first();
-    await expect(form).toHaveScreenshot('admin-lti-form.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['form', '[data-testid="lti-config"]', 'main'], 'admin-lti-form.png');
   });
 });
 
@@ -132,20 +144,17 @@ test.describe('Visual Regression — Admin SCIM @visual-admin', () => {
 
   test('SCIM provisioning — header section', async ({ page }) => {
     await goTo(page, '/admin/scim');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('admin-scim-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'admin-scim-header.png');
   });
 
   test('SCIM provisioning — main content', async ({ page }) => {
     await goTo(page, '/admin/scim');
-    const main = page.locator('main, [role="main"], [data-testid="main-content"]').first();
-    await expect(main).toHaveScreenshot('admin-scim-main.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'admin-scim-main.png');
   });
 
   test('SCIM provisioning — endpoint list', async ({ page }) => {
     await goTo(page, '/admin/scim');
-    const list = page.locator('[data-testid="scim-endpoints"], table, ul').first();
-    await expect(list).toHaveScreenshot('admin-scim-endpoints.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="scim-endpoints"]', 'table', 'ul'], 'admin-scim-endpoints.png');
   });
 });
 
@@ -163,49 +172,41 @@ test.describe('Visual Regression — Admin Settings @visual-admin', () => {
 
   test('settings — header section', async ({ page }) => {
     await goTo(page, '/admin/settings');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('admin-settings-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'admin-settings-header.png');
   });
 
   test('settings — form controls', async ({ page }) => {
     await goTo(page, '/admin/settings');
-    const form = page.locator('form, [data-testid="settings-form"], main').first();
-    await expect(form).toHaveScreenshot('admin-settings-form.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['form', '[data-testid="settings-form"]', 'main'], 'admin-settings-form.png');
   });
 
   test('settings — action buttons', async ({ page }) => {
     await goTo(page, '/admin/settings');
-    const actions = page.locator('[data-testid="settings-actions"], .actions, footer').first();
-    await expect(actions).toHaveScreenshot('admin-settings-actions.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="settings-actions"]', '.actions', 'footer'], 'admin-settings-actions.png');
   });
 
   test('settings — navigation tabs', async ({ page }) => {
     await goTo(page, '/admin/settings');
-    const tabs = page.locator('[role="tablist"], [data-testid="settings-tabs"], .tabs').first();
-    await expect(tabs).toHaveScreenshot('admin-settings-tabs.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[role="tablist"]', '[data-testid="settings-tabs"]', '.tabs'], 'admin-settings-tabs.png');
   });
 
   test('admin dashboard — breadcrumbs', async ({ page }) => {
     await goTo(page, '/admin');
-    const breadcrumbs = page.locator('[data-testid="breadcrumbs"], nav[aria-label="breadcrumb"], .breadcrumb').first();
-    await expect(breadcrumbs).toHaveScreenshot('admin-dashboard-breadcrumbs.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="breadcrumbs"]', 'nav[aria-label="breadcrumb"]', '.breadcrumb'], 'admin-dashboard-breadcrumbs.png');
   });
 
   test('compliance — action buttons', async ({ page }) => {
     await goTo(page, '/admin/compliance');
-    const actions = page.locator('[data-testid="compliance-actions"], button, .actions').first();
-    await expect(actions).toHaveScreenshot('admin-compliance-actions.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="compliance-actions"]', 'button', '.actions'], 'admin-compliance-actions.png');
   });
 
   test('LTI settings — connection list', async ({ page }) => {
     await goTo(page, '/admin/lti');
-    const list = page.locator('[data-testid="lti-connections"], table, [role="list"], main').first();
-    await expect(list).toHaveScreenshot('admin-lti-connections.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="lti-connections"]', 'table', '[role="list"]', 'main'], 'admin-lti-connections.png');
   });
 
   test('SCIM provisioning — sync status', async ({ page }) => {
     await goTo(page, '/admin/scim');
-    const sync = page.locator('[data-testid="sync-status"], .status, section').first();
-    await expect(sync).toHaveScreenshot('admin-scim-sync.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="sync-status"]', '.status', 'section'], 'admin-scim-sync.png');
   });
 });

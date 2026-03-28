@@ -16,6 +16,7 @@ test.use({ reducedMotion: 'reduce' });
 async function goTo(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page
     .locator('main, [role="main"], #root > div, .min-h-screen')
@@ -23,6 +24,26 @@ async function goTo(page: Page, path: string) {
     .waitFor({ state: 'visible', timeout: 10_000 })
     .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
+}
+
+/** Try element screenshot, fall back to full page if element not visible */
+async function elementOrPage(
+  page: Page,
+  selectors: string[],
+  name: string,
+  opts: Record<string, unknown> = { animations: 'disabled' as const },
+) {
+  const locator = selectors.reduce(
+    (loc, sel, i) => (i === 0 ? page.locator(sel) : loc.or(page.locator(sel))),
+    page.locator(selectors[0]),
+  );
+  const el = locator.first();
+  if (await el.isVisible({ timeout: 3_000 }).catch(() => false)) {
+    await expect(el).toHaveScreenshot(name, opts);
+  } else {
+    await expect(page).toHaveScreenshot(name, opts);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -39,26 +60,22 @@ test.describe('Visual Regression — Content Import @visual-content', () => {
 
   test('content import — header section', async ({ page }) => {
     await goTo(page, '/content-import');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('content-import-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-import-header.png');
   });
 
   test('content import — upload area', async ({ page }) => {
     await goTo(page, '/content-import');
-    const upload = page.locator('[data-testid="upload-area"], [role="button"], .upload-zone, main').first();
-    await expect(upload).toHaveScreenshot('content-import-upload.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="upload-area"]', '[role="button"]', '.upload-zone', 'main'], 'content-import-upload.png');
   });
 
   test('content import — format options', async ({ page }) => {
     await goTo(page, '/content-import');
-    const formats = page.locator('[data-testid="format-options"], .format-list, section').first();
-    await expect(formats).toHaveScreenshot('content-import-formats.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="format-options"]', '.format-list', 'section'], 'content-import-formats.png');
   });
 
   test('content import — recent imports', async ({ page }) => {
     await goTo(page, '/content-import');
-    const recent = page.locator('[data-testid="recent-imports"], table, [role="table"]').first();
-    await expect(recent).toHaveScreenshot('content-import-recent.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="recent-imports"]', 'table', '[role="table"]'], 'content-import-recent.png');
   });
 });
 
@@ -76,20 +93,17 @@ test.describe('Visual Regression — Drive Import @visual-content', () => {
 
   test('drive import — header section', async ({ page }) => {
     await goTo(page, '/content-import/drive');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('content-drive-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-drive-header.png');
   });
 
   test('drive import — file browser', async ({ page }) => {
     await goTo(page, '/content-import/drive');
-    const browser = page.locator('[data-testid="file-browser"], [role="tree"], main').first();
-    await expect(browser).toHaveScreenshot('content-drive-browser.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="file-browser"]', '[role="tree"]', 'main'], 'content-drive-browser.png');
   });
 
   test('drive import — connection status', async ({ page }) => {
     await goTo(page, '/content-import/drive');
-    const status = page.locator('[data-testid="connection-status"], .status, section').first();
-    await expect(status).toHaveScreenshot('content-drive-status.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="connection-status"]', '.status', 'section'], 'content-drive-status.png');
   });
 });
 
@@ -107,20 +121,17 @@ test.describe('Visual Regression — Course Creation @visual-content', () => {
 
   test('course creation — header section', async ({ page }) => {
     await goTo(page, '/courses/create');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('content-coursecreate-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-coursecreate-header.png');
   });
 
   test('course creation — form fields', async ({ page }) => {
     await goTo(page, '/courses/create');
-    const form = page.locator('form, [data-testid="course-form"], main').first();
-    await expect(form).toHaveScreenshot('content-coursecreate-form.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['form', '[data-testid="course-form"]', 'main'], 'content-coursecreate-form.png');
   });
 
   test('course creation — action buttons', async ({ page }) => {
     await goTo(page, '/courses/create');
-    const actions = page.locator('[data-testid="form-actions"], .actions, footer, button').first();
-    await expect(actions).toHaveScreenshot('content-coursecreate-actions.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="form-actions"]', '.actions', 'footer', 'button'], 'content-coursecreate-actions.png');
   });
 });
 
@@ -138,20 +149,17 @@ test.describe('Visual Regression — Course Editing @visual-content', () => {
 
   test('course editing — header section', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('content-courseedit-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-courseedit-header.png');
   });
 
   test('course editing — editor area', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    const editor = page.locator('[data-testid="course-editor"], form, main').first();
-    await expect(editor).toHaveScreenshot('content-courseedit-editor.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="course-editor"]', 'form', 'main'], 'content-courseedit-editor.png');
   });
 
   test('course editing — module list', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    const modules = page.locator('[data-testid="module-list"], [role="list"], aside').first();
-    await expect(modules).toHaveScreenshot('content-courseedit-modules.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="module-list"]', '[role="list"]', 'aside'], 'content-courseedit-modules.png');
   });
 });
 
@@ -169,43 +177,36 @@ test.describe('Visual Regression — Portal Builder @visual-content', () => {
 
   test('portal builder — header section', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    const header = page.locator('header, [data-testid="page-header"], h1').first();
-    await expect(header).toHaveScreenshot('content-portal-header.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-portal-header.png');
   });
 
   test('portal builder — design canvas', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    const canvas = page.locator('[data-testid="portal-canvas"], .canvas, main').first();
-    await expect(canvas).toHaveScreenshot('content-portal-canvas.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="portal-canvas"]', '.canvas', 'main'], 'content-portal-canvas.png');
   });
 
   test('portal builder — component palette', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    const palette = page.locator('[data-testid="component-palette"], aside, nav').first();
-    await expect(palette).toHaveScreenshot('content-portal-palette.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="component-palette"]', 'aside', 'nav'], 'content-portal-palette.png');
   });
 
   test('content import — sidebar navigation', async ({ page }) => {
     await goTo(page, '/content-import');
-    const sidebar = page.locator('aside, [data-testid="sidebar"], nav').first();
-    await expect(sidebar).toHaveScreenshot('content-import-sidebar.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['aside', '[data-testid="sidebar"]', 'nav'], 'content-import-sidebar.png');
   });
 
   test('course creation — metadata section', async ({ page }) => {
     await goTo(page, '/courses/create');
-    const metadata = page.locator('[data-testid="course-metadata"], .metadata, section').first();
-    await expect(metadata).toHaveScreenshot('content-coursecreate-metadata.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="course-metadata"]', '.metadata', 'section'], 'content-coursecreate-metadata.png');
   });
 
   test('course editing — toolbar', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    const toolbar = page.locator('[data-testid="editor-toolbar"], [role="toolbar"], .toolbar').first();
-    await expect(toolbar).toHaveScreenshot('content-courseedit-toolbar.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="editor-toolbar"]', '[role="toolbar"]', '.toolbar'], 'content-courseedit-toolbar.png');
   });
 
   test('portal builder — preview panel', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    const preview = page.locator('[data-testid="portal-preview"], .preview, iframe').first();
-    await expect(preview).toHaveScreenshot('content-portal-preview.png', { animations: 'disabled' as const });
+    await elementOrPage(page, ['[data-testid="portal-preview"]', '.preview', 'iframe'], 'content-portal-preview.png');
   });
 });

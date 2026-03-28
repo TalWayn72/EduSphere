@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from './auth.helpers';
+test.use({ reducedMotion: 'reduce' });
 
 test.describe('Visual Anchoring — Instructor Flow', () => {
   test.beforeEach(async ({ page }) => {

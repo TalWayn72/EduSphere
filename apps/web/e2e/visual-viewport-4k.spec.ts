@@ -44,6 +44,7 @@ test.describe('Visual Regression — 4K QHD 2560×1440 @visual', () => {
     test(`${pg.name} — 4K QHD screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
 
       await expect(page).toHaveScreenshot(`${pg.name}-4k-qhd.png`, {
         ...STABLE_OPTS,
@@ -55,6 +56,7 @@ test.describe('Visual Regression — 4K QHD 2560×1440 @visual', () => {
   test('landing — content is centered with max-width constraint', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // Verify main content area doesn't stretch beyond reasonable max-width
     const main = page.locator('main').first();
@@ -69,6 +71,7 @@ test.describe('Visual Regression — 4K QHD 2560×1440 @visual', () => {
 
   test('no horizontal overflow at 4K', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     const hasOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );

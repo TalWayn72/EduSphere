@@ -42,6 +42,7 @@ test.describe('Visual Regression — Laptop 1024×768 @visual', () => {
     test(`${pg.name} — laptop screenshot`, async ({ page }) => {
       await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
 
       await expect(page).toHaveScreenshot(`${pg.name}-laptop.png`, {
         ...STABLE_OPTS,
@@ -53,6 +54,7 @@ test.describe('Visual Regression — Laptop 1024×768 @visual', () => {
   test('navigation — desktop nav visible at 1024px', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
 
     // At 1024px, desktop navigation should be visible (not hamburger menu)
     const nav = page.locator('nav').first();
@@ -61,6 +63,7 @@ test.describe('Visual Regression — Laptop 1024×768 @visual', () => {
 
   test('no horizontal overflow at laptop width', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
     const hasOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );

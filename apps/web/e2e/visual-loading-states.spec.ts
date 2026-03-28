@@ -19,6 +19,7 @@
  */
 import { test, expect } from '@playwright/test';
 import { STABLE_OPTS } from './helpers/visual-test-utils';
+test.use({ reducedMotion: 'reduce' });
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
