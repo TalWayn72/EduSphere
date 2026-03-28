@@ -172,14 +172,16 @@ services:
     container_name: edusphere-clamav
     ports:
       - "3310:3310"
-    mem_limit: 1g
-    mem_reservation: 512m
+    mem_limit: 1536m
+    mem_reservation: 768m
     environment:
       - CLAMAV_NO_FRESHCLAMD=false
     volumes:
       - clamav_data:/var/lib/clamav
     healthcheck:
-      test: ["CMD", "clamdscan", "--ping", "-c", "/etc/clamav/clamd.conf"]
+      # Use direct TCP ping — clamdscan --ping has a known bug in ClamAV 1.5.x
+      # ("attempt_str would go past end of buffer", exit code 34)
+      test: ["CMD-SHELL", "echo PING | nc localhost 3310 | grep -q PONG"]
       interval: 60s
       timeout: 15s
       retries: 5
