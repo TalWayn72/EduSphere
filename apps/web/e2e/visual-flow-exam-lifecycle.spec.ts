@@ -84,4 +84,135 @@ test.describe('Visual Flow — Exam Lifecycle', () => {
       { ...LOOSE_OPTS, mask: dynamicMasks(page) },
     );
   });
+
+  // === EXPANDED — Header & main per step ===
+
+  test('exam flow — header sections', async ({ page }) => {
+    const steps = [
+      { path: '/exams', name: 'list' },
+      { path: '/exams/item-bank', name: 'item-bank' },
+      { path: '/exams/blueprint', name: 'blueprint' },
+      { path: '/exams/create', name: 'create' },
+      { path: '/exams/1/configure', name: 'configure' },
+      { path: '/exams/1/take', name: 'take' },
+      { path: '/exams/1/results', name: 'results' },
+      { path: '/exams/1/analytics', name: 'analytics' },
+    ];
+    for (const step of steps) {
+      await page.goto(step.path);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
+      const header = page.locator('header, nav, [data-testid="app-header"]').first();
+      if (await header.isVisible().catch(() => false)) {
+        await expect(header).toHaveScreenshot(
+          `flow-exam-header-${step.name}.png`,
+          { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+        );
+      }
+    }
+  });
+
+  test('exam flow — main content areas', async ({ page }) => {
+    const steps = [
+      { path: '/exams', name: 'list' },
+      { path: '/exams/create', name: 'create' },
+      { path: '/exams/1/take', name: 'take' },
+      { path: '/exams/1/results', name: 'results' },
+      { path: '/exams/1/review', name: 'review' },
+    ];
+    for (const step of steps) {
+      await page.goto(step.path);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
+      const main = page.locator('main, [role="main"]').first();
+      if (await main.isVisible().catch(() => false)) {
+        await expect(main).toHaveScreenshot(
+          `flow-exam-main-${step.name}.png`,
+          { ...LOOSE_OPTS, mask: dynamicMasks(page) },
+        );
+      }
+    }
+  });
+
+  // === EXPANDED — Tablet viewport ===
+
+  test('exam lifecycle at tablet viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
+
+    await page.goto('/exams');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-01-list.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+
+    await page.goto('/exams/item-bank');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-02-item-bank.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+
+    await page.goto('/exams/create');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-03-create.png', STABLE_OPTS);
+
+    await page.goto('/exams/1/configure');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-04-configure.png', STABLE_OPTS);
+
+    await page.goto('/exams/1/take');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-05-take.png', STABLE_OPTS);
+
+    await page.goto('/exams/1/results');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-06-results.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+
+    await page.goto('/exams/1/analytics');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-07-analytics.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+
+    await page.goto('/exams/1/review');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-tablet-08-review.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+  });
+
+  // === EXPANDED — Mobile viewport ===
+
+  test('exam lifecycle at mobile viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+
+    await page.goto('/exams');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-mobile-01-list.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+
+    await page.goto('/exams/create');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-mobile-02-create.png', STABLE_OPTS);
+
+    await page.goto('/exams/1/take');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-mobile-03-take.png', STABLE_OPTS);
+
+    await page.goto('/exams/1/submitted');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-mobile-04-submitted.png', STABLE_OPTS);
+
+    await page.goto('/exams/1/results');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-mobile-05-results.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+
+    await page.goto('/exams/1/review');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('flow-exam-mobile-06-review.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+  });
 });

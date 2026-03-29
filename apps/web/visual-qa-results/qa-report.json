@@ -1,50 +1,29 @@
 [
   {
-    "label": "01 — Login Page",
+    "label": "02 — Keycloak Auth Flow",
     "url": "http://localhost:5176/login",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\01-login-page.png",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\02-post-keycloak-login.png",
     "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
-      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+      "[Auth] GraphQL Unauthorized — session expired, redirecting to login. [GraphQL] Unauthenticated"
     ],
     "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
       "🔧 DEV MODE: Running without Keycloak authentication",
       "🔧 DEV MODE: Running without Keycloak authentication"
     ],
     "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+      "FAILED REQUEST — http://localhost:5176/src/hooks/useOfflineStatus.ts (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/lib/graphql/dashboard.queries.ts (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/pages/dashboard-page/mock-data.ts (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/lib/graphql/onboarding.queries.ts (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/hooks/useOfflineQueue.ts (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/components/ui/avatar.tsx (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
+      "FAILED REQUEST — http://localhost:5176/src/hooks/useNotifications.ts (net::ERR_ABORTED)"
     ],
     "loadedSuccessfully": false,
     "notes": [
-      "MISSING: \"Sign In with Keycloak\" button not visible"
+      "BUG: Still on /login after successful auth — redirect failed"
     ]
-  },
-  {
-    "label": "02 — Keycloak Auth Flow",
-    "url": "",
-    "screenshot": "",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
-      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
-      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
-      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
-      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
-      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
-      "WebSocket connection to 'ws://localhost:4000/graphql' failed: Connection closed before receiving a handshake response"
-    ],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
-    ],
-    "loadedSuccessfully": false,
-    "notes": []
   }
 ]

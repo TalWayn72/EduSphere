@@ -13,7 +13,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { STABLE_OPTS, LOOSE_OPTS, dynamicMasks } from './helpers/visual-test-utils';
+import { STABLE_OPTS, dynamicMasks } from './helpers/visual-test-utils';
 import { BASE_URL } from './env';
 import { login } from './auth.helpers';
 test.use({ reducedMotion: 'reduce' });
@@ -76,6 +76,101 @@ test.describe('Visual Cross-Browser -- Critical Pages @visual @xbrowser', () => 
       } else {
         await expect(page).toHaveScreenshot(`xbrowser-${name}-header.png`, { ...headerOpts, fullPage: true });
       }
+    });
+
+    test(`${name} -- main content area`, async ({ page }) => {
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
+      const main = page.locator('main, [role="main"], .content').first();
+      const mainOpts = { animations: 'disabled' as const, maxDiffPixelRatio: 0.01 };
+      if (await main.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(main).toHaveScreenshot(`xbrowser-${name}-main.png`, mainOpts);
+      } else {
+        await expect(page).toHaveScreenshot(`xbrowser-${name}-main.png`, { ...mainOpts, fullPage: true });
+      }
+    });
+
+    test(`${name} -- sidebar or nav`, async ({ page }) => {
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
+      const sidebar = page.locator('aside, [role="complementary"], nav, .sidebar').first();
+      const sidebarOpts = { animations: 'disabled' as const, maxDiffPixelRatio: 0.01 };
+      if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(sidebar).toHaveScreenshot(`xbrowser-${name}-sidebar.png`, sidebarOpts);
+      } else {
+        await expect(page).toHaveScreenshot(`xbrowser-${name}-sidebar.png`, { ...sidebarOpts, fullPage: true });
+      }
+    });
+
+    test(`${name} -- footer area`, async ({ page }) => {
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
+      const footer = page.locator('footer, [data-testid="footer"], [role="contentinfo"]').first();
+      const footerOpts = { animations: 'disabled' as const, maxDiffPixelRatio: 0.01 };
+      if (await footer.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(footer).toHaveScreenshot(`xbrowser-${name}-footer.png`, footerOpts);
+      } else {
+        await expect(page).toHaveScreenshot(`xbrowser-${name}-footer.png`, { ...footerOpts, fullPage: true });
+      }
+    });
+  }
+});
+
+// === EXPANDED VIEWPORT COVERAGE — TABLET ===
+
+test.describe('Visual Cross-Browser -- Critical Pages Tablet @visual @xbrowser', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    await page.route('**/graphql', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
+    });
+  });
+
+  for (const { name, path } of CRITICAL_PAGES) {
+    test(`${name} -- tablet full page`, async ({ page }) => {
+      await page.setViewportSize({ width: 768, height: 1024 });
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
+      await expect(page).toHaveScreenshot(`xbrowser-${name}-tablet-full.png`, {
+        ...STABLE_OPTS,
+        mask: dynamicMasks(page),
+      });
+    });
+  }
+});
+
+// === EXPANDED VIEWPORT COVERAGE — MOBILE ===
+
+test.describe('Visual Cross-Browser -- Critical Pages Mobile @visual @xbrowser', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    await page.route('**/graphql', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
+    });
+  });
+
+  for (const { name, path } of CRITICAL_PAGES) {
+    test(`${name} -- mobile full page`, async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('domcontentloaded').catch(() => {/* timeout ok */});
+      await page.waitForTimeout(500);
+      await expect(page).toHaveScreenshot(`xbrowser-${name}-mobile-full.png`, {
+        ...STABLE_OPTS,
+        mask: dynamicMasks(page),
+      });
     });
   }
 });

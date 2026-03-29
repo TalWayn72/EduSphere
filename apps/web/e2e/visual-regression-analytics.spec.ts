@@ -10,7 +10,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
-import { STABLE_OPTS, LOOSE_OPTS } from './helpers/visual-test-utils';
+import { LOOSE_OPTS } from './helpers/visual-test-utils';
 
 test.use({ reducedMotion: 'reduce' });
 
