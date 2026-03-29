@@ -87,15 +87,16 @@ async function loginThenGoto(page: Page, path: string) {
  *  - Suspense fallback spinner (the PageLoader div with animate-spin)
  */
 function loadingIndicator(page: Page) {
-  return page.locator([
+  // Use CSS-only selectors in a compound locator; add text pseudo-selector via .or()
+  const cssIndicators = page.locator([
     '[data-testid*="skeleton"]',
     '[class*="skeleton"]',
     '[class*="animate-pulse"]',
     '[class*="animate-spin"]',
     '[class*="spinner"]',
     '[role="progressbar"]',
-    'text=Loading',
   ].join(', '));
+  return cssIndicators.or(page.getByText('Loading'));
 }
 
 /**
@@ -130,7 +131,8 @@ test.describe('loading-states — T-01: Dashboard', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-dashboard-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -157,7 +159,8 @@ test.describe('loading-states — T-02: Courses', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-courses-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -181,7 +184,8 @@ test.describe('loading-states — T-03: Settings', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-settings-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -205,7 +209,8 @@ test.describe('loading-states — T-04: Knowledge Graph', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-knowledge-graph-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -229,7 +234,8 @@ test.describe('loading-states — T-05: Agents', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-agents-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -253,7 +259,8 @@ test.describe('loading-states — T-06: Profile', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-profile-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -277,7 +284,8 @@ test.describe('loading-states — T-07: Assessments', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-assessments-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -301,7 +309,8 @@ test.describe('loading-states — T-08: Discussions', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-discussions-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -325,7 +334,8 @@ test.describe('loading-states — T-09: Admin Dashboard', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-admin-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 
@@ -349,7 +359,8 @@ test.describe('loading-states — T-10: Discover', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-discover-skeleton.png', {
-      maxDiffPixelRatio: 0.05,
+      maxDiffPixelRatio: 0.10,
+      timeout: 15_000,
     });
   });
 

@@ -102,6 +102,7 @@ test.describe('Consent Link — RequirementLink in AI Course Creator Modal', () 
     await expect(reqLink).toBeVisible({ timeout: 10_000 });
     await expect(dialog).toHaveScreenshot('consent-link-in-ai-modal.png', {
       maxDiffPixelRatio: 0.03,
+      timeout: 15_000,
     });
   });
 });

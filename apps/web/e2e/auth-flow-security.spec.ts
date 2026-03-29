@@ -11,7 +11,7 @@
  * 7. LandingPage Sign In button navigates to /login
  */
 import { test, expect, type Page } from '@playwright/test';
-import { BASE_URL } from './env';
+import { BASE_URL, IS_DEV_MODE } from './env';
 import { login } from './auth.helpers';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -35,6 +35,9 @@ async function clearAuthState(page: Page): Promise<void> {
 // ── Test suite ────────────────────────────────────────────────────────────────
 
 test.describe('Auth Flow Security — Unauthenticated access', () => {
+  // DEV_MODE auto-authenticates — unauthenticated tests require VITE_DEV_MODE=false
+  test.skip(IS_DEV_MODE, 'Unauthenticated access tests require VITE_DEV_MODE=false');
+
   test.beforeEach(async ({ page }) => {
     // Start each test with zero auth state
     await clearAuthState(page);
@@ -134,6 +137,9 @@ test.describe('Auth Flow Security — Unauthenticated access', () => {
 });
 
 test.describe('Auth Flow Security — Public routes', () => {
+  // DEV_MODE auto-authenticates — landing-page visibility tests require VITE_DEV_MODE=false
+  test.skip(IS_DEV_MODE, 'Public route tests require VITE_DEV_MODE=false');
+
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
   });
@@ -171,6 +177,9 @@ test.describe('Auth Flow Security — Public routes', () => {
 });
 
 test.describe('Auth Flow Security — JWT tampering', () => {
+  // JWT tampering tests require a real GraphQL gateway, skip in DEV_MODE
+  test.skip(IS_DEV_MODE, 'JWT tampering tests require VITE_DEV_MODE=false with live gateway');
+
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
   });

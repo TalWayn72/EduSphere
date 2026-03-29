@@ -30,70 +30,97 @@ function emptyBadgesResponse() {
   };
 }
 
-/** Single valid badge response. */
+/** Single valid badge response — matches badges.queries.ts schema.
+ *  __typename is REQUIRED for urql graphcache normalization. */
 function singleBadgeResponse() {
   return {
     data: {
+      __typename: 'Query',
       myOpenBadges: [
         {
+          __typename: 'OpenBadgeAssertion',
           id: 'assertion-001',
+          badgeDefinitionId: 'def-001',
+          badgeName: 'Course Completion Hero',
+          badgeDescription: 'Awarded for completing the full EduSphere onboarding.',
+          imageUrl: null,
+          recipientId: 'user-001',
           issuedAt: '2025-09-01T10:00:00.000Z',
           expiresAt: null,
+          evidenceUrl: null,
           revoked: false,
           revokedAt: null,
           revokedReason: null,
-          evidenceUrl: null,
+          verifyUrl: 'https://edusphere.io/verify/assertion-001',
+          shareUrl: 'https://edusphere.io/share/assertion-001',
           vcDocument: JSON.stringify({
             '@context': 'https://w3id.org/openbadges/v3',
           }),
-          definition: {
-            id: 'def-001',
-            name: 'Course Completion Hero',
-            description:
-              'Awarded for completing the full EduSphere onboarding.',
-            imageUrl: null,
-            criteriaUrl: null,
-            tags: ['onboarding'],
-            issuerId: 'issuer-001',
-            createdAt: '2025-08-01T00:00:00.000Z',
-          },
         },
       ],
     },
   };
 }
 
-/** Single revoked badge response. */
+/** Single revoked badge response — matches badges.queries.ts schema.
+ *  __typename is REQUIRED for urql graphcache normalization. */
 function revokedBadgeResponse() {
   return {
     data: {
+      __typename: 'Query',
       myOpenBadges: [
         {
+          __typename: 'OpenBadgeAssertion',
           id: 'assertion-002',
+          badgeDefinitionId: 'def-002',
+          badgeName: 'Advanced Scholar',
+          badgeDescription: 'Revoked due to policy change.',
+          imageUrl: null,
+          recipientId: 'user-001',
           issuedAt: '2025-07-01T10:00:00.000Z',
           expiresAt: null,
+          evidenceUrl: null,
           revoked: true,
           revokedAt: '2025-08-15T12:00:00.000Z',
           revokedReason: 'Policy violation',
-          evidenceUrl: null,
+          verifyUrl: null,
+          shareUrl: null,
           vcDocument: JSON.stringify({
             '@context': 'https://w3id.org/openbadges/v3',
           }),
-          definition: {
-            id: 'def-002',
-            name: 'Advanced Scholar',
-            description: 'Revoked due to policy change.',
-            imageUrl: null,
-            criteriaUrl: null,
-            tags: [],
-            issuerId: 'issuer-001',
-            createdAt: '2025-06-01T00:00:00.000Z',
-          },
         },
       ],
     },
   };
 }
+
+// ─── CORS headers for mock responses ─────────────────────────────────────────
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'content-type, authorization',
+};
+
+/**
+ * Default responses for common queries fired by Layout/GlobalLocaleSync
+ * so they don't interfere with the badges mock.
+ */
+const DEFAULT_RESPONSES: Record<string, object> = {
+  Me: {
+    data: {
+      me: {
+        id: 'user-001',
+        email: 'super.admin@edusphere.dev',
+        firstName: 'Super',
+        lastName: 'Admin',
+        locale: 'en',
+        roles: ['SUPER_ADMIN'],
+        preferences: null,
+      },
+    },
+  },
+};
 
 // ─── Auth + navigation helper ─────────────────────────────────────────────────
 
@@ -101,26 +128,69 @@ async function gotoMyBadges(
   page: Parameters<typeof login>[0],
   mockResponse?: object
 ) {
+  // Login FIRST, then register the route handler.
+  // loginInDevMode does window.location.href='/' which triggers a full reload.
+  // page.route() handlers survive navigation, but registering after login
+  // ensures the handler is active for the /my-badges navigation.
+  await login(page);
+
   if (mockResponse !== undefined) {
-    // Intercept all GraphQL requests and return the mock payload
     await page.route(GRAPHQL_URL_PATTERN, async (route) => {
+      const method = route.request().method();
+      if (method === 'OPTIONS') {
+        await route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });
+        return;
+      }
+
+      // Parse the operation name from the request body
+      let operationName = '';
+      try {
+        const body = route.request().postDataJSON();
+        operationName = body?.operationName ?? '';
+      } catch {
+        // If we can't parse, fall through to default
+      }
+
+      // Return badge mock data ONLY for the MyOpenBadges query
+      if (operationName === 'MyOpenBadges') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify(mockResponse),
+        });
+        return;
+      }
+
+      // For known operations (Me, etc.) return sensible defaults
+      if (DEFAULT_RESPONSES[operationName]) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
+        });
+        return;
+      }
+
+      // For unknown operations, return empty data so they don't error
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify(mockResponse),
+        headers: CORS_HEADERS,
+        body: JSON.stringify({ data: {} }),
       });
     });
   }
 
-  await login(page);
-  await page.goto('/my-badges');
-  await page.waitForLoadState('domcontentloaded');
+  await page.goto('/my-badges', { waitUntil: 'domcontentloaded' });
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 // ─── Suite ───────────────────────────────────────────────────────────────────
 
 test.describe('My Open Badges', () => {
-  test.describe.configure({ mode: 'serial' });
+  // Each test needs its own page to avoid urql graphcache returning stale results
 
   // 1. Page loads with heading
   test('page renders the "My Open Badges" heading at /my-badges', async ({
@@ -165,8 +235,8 @@ test.describe('My Open Badges', () => {
       timeout: 10_000,
     });
 
-    // The "Revoked" status pill must be present
-    await expect(page.getByText('Revoked')).toBeVisible({ timeout: 10_000 });
+    // The "Revoked" status pill must be present (exact: true to avoid matching description text)
+    await expect(page.getByText('Revoked', { exact: true })).toBeVisible({ timeout: 10_000 });
   });
 
   // 5. Valid badge shows "Valid" status label (not revoked)
@@ -212,66 +282,61 @@ test.describe('My Open Badges', () => {
   }) => {
     const multiBadgeResponse = {
       data: {
+        __typename: 'Query',
         myOpenBadges: [
           {
+            __typename: 'OpenBadgeAssertion',
             id: 'assertion-010',
+            badgeDefinitionId: 'def-010',
+            badgeName: 'Fast Learner',
+            badgeDescription: 'Completed 5 courses in one week.',
+            imageUrl: null,
+            recipientId: 'user-001',
             issuedAt: '2025-09-01T10:00:00.000Z',
             expiresAt: null,
+            evidenceUrl: null,
             revoked: false,
             revokedAt: null,
             revokedReason: null,
-            evidenceUrl: null,
+            verifyUrl: 'https://edusphere.io/verify/assertion-010',
+            shareUrl: 'https://edusphere.io/share/assertion-010',
             vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
-            definition: {
-              id: 'def-010',
-              name: 'Fast Learner',
-              description: 'Completed 5 courses in one week.',
-              imageUrl: null,
-              criteriaUrl: null,
-              tags: ['speed'],
-              issuerId: 'issuer-001',
-              createdAt: '2025-08-01T00:00:00.000Z',
-            },
           },
           {
+            __typename: 'OpenBadgeAssertion',
             id: 'assertion-011',
+            badgeDefinitionId: 'def-011',
+            badgeName: 'Peer Reviewer',
+            badgeDescription: 'Reviewed 10 peer assignments.',
+            imageUrl: null,
+            recipientId: 'user-001',
             issuedAt: '2025-09-15T10:00:00.000Z',
             expiresAt: null,
+            evidenceUrl: null,
             revoked: false,
             revokedAt: null,
             revokedReason: null,
-            evidenceUrl: null,
+            verifyUrl: 'https://edusphere.io/verify/assertion-011',
+            shareUrl: 'https://edusphere.io/share/assertion-011',
             vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
-            definition: {
-              id: 'def-011',
-              name: 'Peer Reviewer',
-              description: 'Reviewed 10 peer assignments.',
-              imageUrl: null,
-              criteriaUrl: null,
-              tags: ['collaboration'],
-              issuerId: 'issuer-001',
-              createdAt: '2025-08-01T00:00:00.000Z',
-            },
           },
           {
+            __typename: 'OpenBadgeAssertion',
             id: 'assertion-012',
+            badgeDefinitionId: 'def-012',
+            badgeName: 'Knowledge Explorer',
+            badgeDescription: 'Explored all knowledge graph topics.',
+            imageUrl: null,
+            recipientId: 'user-001',
             issuedAt: '2025-10-01T10:00:00.000Z',
             expiresAt: null,
+            evidenceUrl: null,
             revoked: false,
             revokedAt: null,
             revokedReason: null,
-            evidenceUrl: null,
+            verifyUrl: 'https://edusphere.io/verify/assertion-012',
+            shareUrl: 'https://edusphere.io/share/assertion-012',
             vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
-            definition: {
-              id: 'def-012',
-              name: 'Knowledge Explorer',
-              description: 'Explored all knowledge graph topics.',
-              imageUrl: null,
-              criteriaUrl: null,
-              tags: ['knowledge'],
-              issuerId: 'issuer-001',
-              createdAt: '2025-08-01T00:00:00.000Z',
-            },
           },
         ],
       },
@@ -397,8 +462,8 @@ test.describe('My Open Badges', () => {
     await expect(page.getByText('Advanced Scholar')).toBeVisible({ timeout: 10_000 });
 
     // The valid badge shows "Valid" and revoked shows "Revoked"
-    await expect(page.getByText('Valid')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Revoked')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Valid', { exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Revoked', { exact: true })).toBeVisible({ timeout: 10_000 });
   });
 
   // 13. Progress toward next badge (if applicable)
@@ -436,19 +501,39 @@ test.describe('My Open Badges', () => {
       },
     };
 
-    await page.route(GRAPHQL_URL_PATTERN, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(multiBadgeResponse),
-      });
-    });
-
     await login(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    // Register route AFTER login to avoid being cleared by the full-page reload
+    await page.route(GRAPHQL_URL_PATTERN, async (route) => {
+      const method = route.request().method();
+      if (method === 'OPTIONS') {
+        await route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });
+        return;
+      }
+      let operationName = '';
+      try { operationName = route.request().postDataJSON()?.operationName ?? ''; } catch { /* ignore */ }
+      if (operationName === 'MyOpenBadges') {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          headers: CORS_HEADERS, body: JSON.stringify(multiBadgeResponse),
+        });
+      } else if (DEFAULT_RESPONSES[operationName]) {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          headers: CORS_HEADERS, body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
+        });
+      } else {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          headers: CORS_HEADERS, body: JSON.stringify({ data: {} }),
+        });
+      }
+    });
+
     await page.goto('/my-badges');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('badges-grid-mixed.png', {
       fullPage: false,
@@ -459,19 +544,39 @@ test.describe('My Open Badges', () => {
 
   // 15. Visual regression — empty badges state
   test('visual regression — empty badges state', async ({ page }) => {
-    await page.route(GRAPHQL_URL_PATTERN, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(emptyBadgesResponse()),
-      });
-    });
-
     await login(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    // Register route AFTER login to avoid being cleared by the full-page reload
+    await page.route(GRAPHQL_URL_PATTERN, async (route) => {
+      const method = route.request().method();
+      if (method === 'OPTIONS') {
+        await route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });
+        return;
+      }
+      let operationName = '';
+      try { operationName = route.request().postDataJSON()?.operationName ?? ''; } catch { /* ignore */ }
+      if (operationName === 'MyOpenBadges') {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          headers: CORS_HEADERS, body: JSON.stringify(emptyBadgesResponse()),
+        });
+      } else if (DEFAULT_RESPONSES[operationName]) {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          headers: CORS_HEADERS, body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
+        });
+      } else {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          headers: CORS_HEADERS, body: JSON.stringify({ data: {} }),
+        });
+      }
+    });
+
     await page.goto('/my-badges');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveScreenshot('badges-empty-state.png', {
       fullPage: false,

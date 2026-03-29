@@ -6,8 +6,11 @@
 
 | Metric | Count | Target |
 |--------|-------|--------|
-| **E2E Visual Assertions** | ~500+ | 500+ |
-| **Visual Spec Files** | 44+ | 40+ |
+| **E2E Visual Assertions** | 2,054 | 500+ |
+| **Visual Spec Files** | 215 | 40+ |
+| **Total E2E Spec Files** | 290 | — |
+| **Snapshot Baseline Dirs** | 163 | — |
+| **Baseline PNG Files** | 4,613 | — |
 | **Storybook Stories** | 69+ files | Full component coverage |
 | **CI Shards** | 4 parallel | Optimal for ~500 tests |
 
@@ -167,4 +170,4 @@ Playwright browser binaries are cached using `actions/cache@v4` with key based o
 
 ---
 
-*Last updated: 2026-03-28 | Generated with visual-test-coverage.cjs*
+*Last updated: 2026-03-29 | Generated with visual-test-coverage.cjs*

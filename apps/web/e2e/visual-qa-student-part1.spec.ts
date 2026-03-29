@@ -183,9 +183,10 @@ test('03 — Dashboard page — stats cards and user profile', async ({ page }) 
   await page.waitForTimeout(500);
   entry.url = page.url();
   entry.screenshot = await snap(page, '03-dashboard');
-  const heading = page.getByRole('heading', { name: 'Dashboard' });
+  // Dashboard uses "Welcome back, <name>!" heading, not a plain "Dashboard" heading
+  const heading = page.getByRole('heading', { level: 1 }).first();
   const headingVisible = await heading.isVisible().catch(() => false);
-  if (!headingVisible) entry.notes.push('MISSING: Dashboard heading not visible');
+  if (!headingVisible) entry.notes.push('MISSING: Dashboard main heading not visible');
   const statsToCheck = ['Study Time', 'Concepts Mastered', 'Active Courses', 'Annotations'];
   for (const stat of statsToCheck) {
     const el = page.getByText(stat).first();

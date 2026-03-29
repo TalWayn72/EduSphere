@@ -91,30 +91,9 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
     const loadingMsg = page.getByText(/Loading today's lesson/i);
     const errorMsg = page.getByText(/Could not load lesson/i);
 
-    const anyVisible = await Promise.any([
-      startBtn.isVisible().then((v) => {
-        if (!v) throw new Error();
-        return v;
-      }),
-      noLesson.isVisible().then((v) => {
-        if (!v) throw new Error();
-        return v;
-      }),
-      allDone.isVisible().then((v) => {
-        if (!v) throw new Error();
-        return v;
-      }),
-      loadingMsg.isVisible().then((v) => {
-        if (!v) throw new Error();
-        return v;
-      }),
-      errorMsg.isVisible().then((v) => {
-        if (!v) throw new Error();
-        return v;
-      }),
-    ]).catch(() => false);
-
-    expect(anyVisible).toBe(true);
+    // Wait for any one of the expected states to become visible (polling)
+    const combined = startBtn.or(noLesson).or(allDone).or(loadingMsg).or(errorMsg);
+    await expect(combined.first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('clicking "Start Today\'s Lesson" shows MicrolessonCard', async ({
@@ -325,7 +304,8 @@ test.describe('Dashboard Widgets — SkillGapWidget', () => {
   test('BarChart3 icon is visible in SkillGapWidget title', async ({
     page,
   }) => {
-    const icon = page.locator('svg.lucide-bar-chart3').first();
+    // lucide-react may use lucide-bar-chart3 or lucide-bar-chart-3 depending on version
+    const icon = page.locator('svg[class*="bar-chart"]').first();
     await expect(icon).toBeVisible({ timeout: 8_000 });
   });
 });

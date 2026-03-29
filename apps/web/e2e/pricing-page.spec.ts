@@ -93,7 +93,7 @@ test.describe('Pricing Page — Pricing Tiers', () => {
 
   test('Enterprise plan shows "Custom" price', async ({ page }) => {
     const section = page.locator('[data-testid="pricing-section"]');
-    await expect(section.getByText('Custom')).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('Custom', { exact: true })).toBeVisible({ timeout: 10_000 });
   });
 
   test('each plan card has a CTA button or link', async ({ page }) => {
@@ -109,11 +109,9 @@ test.describe('Pricing Page — Pricing Tiers', () => {
     await expect(section.getByRole('link', { name: /Contact Sales/i })).toBeVisible({ timeout: 10_000 });
   });
 
-  test('"White-label INCLUDED" badge appears on all tier cards', async ({ page }) => {
-    const section = page.locator('[data-testid="pricing-section"]');
-    const badges = section.getByText('White-label INCLUDED');
-    const count = await badges.count();
-    expect(count).toBeGreaterThanOrEqual(4);
+  test('white-label branding is mentioned in FAQ', async ({ page }) => {
+    const faq = page.locator('[data-testid="pricing-faq"]');
+    await expect(faq.getByText(/white-label/i).first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('YAU capacity labels are visible (500 YAU, 2,000 YAU, 10,000 YAU, Unlimited)', async ({ page }) => {

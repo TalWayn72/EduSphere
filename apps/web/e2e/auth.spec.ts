@@ -50,14 +50,13 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
     await login(page);
   });
 
-  test('root "/" redirects to /learn/content-1 (DEV_MODE auto-auth)', async ({
+  test('root "/" redirects to /dashboard (DEV_MODE auto-auth)', async ({
     page,
   }) => {
-    // In DEV_MODE initKeycloak() immediately sets devAuthenticated=true,
-    // so the ProtectedRoute passes and "/"  → Navigate to="/learn/content-1"
+    // SmartRoot redirects authenticated users to /dashboard
     await page.goto('/');
-    await page.waitForURL(/\/learn\/content-1/, { timeout: 10_000 });
-    expect(page.url()).toContain('/learn/content-1');
+    await page.waitForURL(/\/dashboard/, { timeout: 10_000 });
+    expect(page.url()).toContain('/dashboard');
   });
 
   test('authenticated user can reach /dashboard directly', async ({ page }) => {
@@ -150,8 +149,9 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
 
     // User is still on dashboard — session not expired
+    // Dashboard uses a personalized welcome heading (data-testid="welcome-heading")
     await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
-    ).toBeVisible();
+      page.getByTestId('welcome-heading').or(page.getByRole('heading', { name: /Dashboard|Welcome/i }))
+    ).toBeVisible({ timeout: 10_000 });
   });
 });

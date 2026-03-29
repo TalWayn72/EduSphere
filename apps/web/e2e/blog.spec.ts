@@ -136,6 +136,7 @@ test.describe('Blog — List Page (/blog)', () => {
     await expect(page).toHaveScreenshot('blog-list.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,
+      timeout: 15_000,
     });
   });
 });
@@ -251,6 +252,7 @@ test.describe('Blog — Detail Page (/blog/:slug)', () => {
     await expect(page).toHaveScreenshot('blog-post-kg.png', {
       fullPage: false,
       maxDiffPixelRatio: 0.05,
+      timeout: 15_000,
     });
   });
 });

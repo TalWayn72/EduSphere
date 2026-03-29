@@ -77,6 +77,25 @@ async function keycloakLogin(page: Page, email: string, password: string): Promi
 }
 
 async function login(page: Page, user: { email: string; password: string }): Promise<void> {
+  // DEV_MODE: use the dev-login-btn shortcut (no Keycloak required)
+  const isDevMode = process.env.VITE_DEV_MODE !== 'false';
+  if (isDevMode) {
+    await page.addInitScript(() => {
+      localStorage.setItem('edusphere_locale', 'en');
+      localStorage.setItem('edusphere-sidebar-collapsed', 'true');
+    });
+    await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.waitForTimeout(500);
+    const devBtn = page.locator('[data-testid="dev-login-btn"]');
+    if (await devBtn.isVisible({ timeout: 8000 }).catch(() => false)) {
+      await devBtn.click();
+      await page.waitForURL((url) => !url.toString().includes('/login'), { timeout: 20000 }).catch(() => {});
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
+      return;
+    }
+  }
+  // LIVE_BACKEND: use Keycloak OIDC flow
   await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 15000 });
   await page.waitForLoadState('domcontentloaded').catch(() => {});
   await page.waitForTimeout(500);
@@ -142,8 +161,11 @@ test('01 — Public: Login page', async ({ page }) => {
   r.url = page.url();
   r.headings = await headings(page);
   r.screenshot = await snap(page, '01-login');
-  const hasBtn = await page.getByRole('button', { name: /sign in with keycloak/i }).isVisible().catch(() => false);
-  r.notes.push(`Sign-in button: ${hasBtn}`);
+  // DEV_MODE shows "Sign In (Dev Mode)" button; LIVE shows "Sign In with Keycloak"
+  const hasKeycloakBtn = await page.getByRole('button', { name: /sign in with keycloak/i }).isVisible().catch(() => false);
+  const hasDevBtn = await page.locator('[data-testid="dev-login-btn"]').isVisible().catch(() => false);
+  const hasBtn = hasKeycloakBtn || hasDevBtn;
+  r.notes.push(`Sign-in button: ${hasBtn} (keycloak: ${hasKeycloakBtn}, dev: ${hasDevBtn})`);
   r.ok = hasBtn;
 });
 
