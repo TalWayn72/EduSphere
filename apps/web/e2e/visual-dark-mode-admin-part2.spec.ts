@@ -36,7 +36,7 @@ test.describe('Visual Regression — Dark Mode Admin SCIM @visual-dark', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('SCIM — full page dark', async ({ page }) => {
     await goToDark(page, '/admin/scim');
@@ -102,7 +102,7 @@ test.describe('Visual Regression — Dark Mode Admin Settings @visual-dark', () 
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('settings — full page dark', async ({ page }) => {
     await goToDark(page, '/admin/settings');

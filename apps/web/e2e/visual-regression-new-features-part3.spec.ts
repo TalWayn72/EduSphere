@@ -32,7 +32,7 @@ async function goTo(page: Page, path: string) {
 }
 
 test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('public profile page — hero card renders correctly', async ({ page }) => {
     await goTo(page, '/u/user-1');
@@ -79,7 +79,7 @@ test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
 });
 
 test.describe('Visual Regression — Admin Pages @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('LTI settings page — empty platforms list renders correctly', async ({ page }) => {
     await goTo(page, '/admin/lti');

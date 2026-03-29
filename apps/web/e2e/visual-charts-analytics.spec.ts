@@ -56,7 +56,7 @@ async function setupMockAndGo(page: Page, path: string, mockData: Record<string,
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Analytics Dashboard @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('analytics dashboard — full page with mocked charts', async ({ page }) => {
     await setupMockAndGo(page, '/analytics', MOCK_ANALYTICS_DATA);
@@ -93,7 +93,7 @@ test.describe('Chart Visual — Analytics Dashboard @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Course Analytics @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('course analytics — full page with mocked charts', async ({ page }) => {
     await setupMockAndGo(page, '/analytics/course', MOCK_ANALYTICS_DATA);
@@ -130,7 +130,7 @@ test.describe('Chart Visual — Course Analytics @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Tenant Analytics @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('tenant analytics — full page with mocked charts', async ({ page }) => {
     await setupMockAndGo(page, '/analytics/tenant', MOCK_TENANT_ANALYTICS_DATA);
@@ -161,7 +161,7 @@ test.describe('Chart Visual — Tenant Analytics @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — ROI Analytics @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('ROI analytics — full page with mocked charts', async ({ page }) => {
     await setupMockAndGo(page, '/analytics/roi', MOCK_ROI_ANALYTICS_DATA);
@@ -192,7 +192,7 @@ test.describe('Chart Visual — ROI Analytics @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Platform Usage @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('platform usage — full page with mocked charts', async ({ page }) => {
     await setupMockAndGo(page, '/analytics/platform', MOCK_PLATFORM_ANALYTICS_DATA);

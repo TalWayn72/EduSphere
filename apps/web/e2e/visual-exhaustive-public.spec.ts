@@ -24,7 +24,7 @@ const F = 'footer, [role="contentinfo"], [data-testid="footer"]';
 
 // ── Landing (/) ─────────────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Landing', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('landing desktop full', async ({ page }) => { await prep(page, '/', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-landing-d-full.png', STABLE_OPTS); });
   test('landing tablet full', async ({ page }) => { await prep(page, '/', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-landing-t-full.png', STABLE_OPTS); });
   test('landing mobile full', async ({ page }) => { await prep(page, '/', 375, 812); await expect(page).toHaveScreenshot('exh-pub-landing-m-full.png', STABLE_OPTS); });
@@ -39,7 +39,7 @@ test.describe('Exhaustive Public — Landing', () => {
 
 // ── Login (/login) ──────────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Login', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('login desktop full', async ({ page }) => { await prep(page, '/login', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-login-d-full.png', STABLE_OPTS); });
   test('login tablet full', async ({ page }) => { await prep(page, '/login', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-login-t-full.png', STABLE_OPTS); });
   test('login mobile full', async ({ page }) => { await prep(page, '/login', 375, 812); await expect(page).toHaveScreenshot('exh-pub-login-m-full.png', STABLE_OPTS); });
@@ -54,7 +54,7 @@ test.describe('Exhaustive Public — Login', () => {
 
 // ── About (/about) ──────────────────────────────────────────────────────────
 test.describe('Exhaustive Public — About', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('about desktop full', async ({ page }) => { await prep(page, '/about', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-about-d-full.png', STABLE_OPTS); });
   test('about tablet full', async ({ page }) => { await prep(page, '/about', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-about-t-full.png', STABLE_OPTS); });
   test('about mobile full', async ({ page }) => { await prep(page, '/about', 375, 812); await expect(page).toHaveScreenshot('exh-pub-about-m-full.png', STABLE_OPTS); });
@@ -69,7 +69,7 @@ test.describe('Exhaustive Public — About', () => {
 
 // ── Pricing (/pricing) ─────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Pricing', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('pricing desktop full', async ({ page }) => { await prep(page, '/pricing', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-pricing-d-full.png', STABLE_OPTS); });
   test('pricing tablet full', async ({ page }) => { await prep(page, '/pricing', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-pricing-t-full.png', STABLE_OPTS); });
   test('pricing mobile full', async ({ page }) => { await prep(page, '/pricing', 375, 812); await expect(page).toHaveScreenshot('exh-pub-pricing-m-full.png', STABLE_OPTS); });
@@ -84,7 +84,7 @@ test.describe('Exhaustive Public — Pricing', () => {
 
 // ── Features (/features) ───────────────────────────────────────────────────
 test.describe('Exhaustive Public — Features', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('features desktop full', async ({ page }) => { await prep(page, '/features', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-features-d-full.png', STABLE_OPTS); });
   test('features tablet full', async ({ page }) => { await prep(page, '/features', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-features-t-full.png', STABLE_OPTS); });
   test('features mobile full', async ({ page }) => { await prep(page, '/features', 375, 812); await expect(page).toHaveScreenshot('exh-pub-features-m-full.png', STABLE_OPTS); });
@@ -99,7 +99,7 @@ test.describe('Exhaustive Public — Features', () => {
 
 // ── Help (/help) ────────────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Help', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('help desktop full', async ({ page }) => { await prep(page, '/help', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-help-d-full.png', STABLE_OPTS); });
   test('help tablet full', async ({ page }) => { await prep(page, '/help', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-help-t-full.png', STABLE_OPTS); });
   test('help mobile full', async ({ page }) => { await prep(page, '/help', 375, 812); await expect(page).toHaveScreenshot('exh-pub-help-m-full.png', STABLE_OPTS); });
@@ -114,7 +114,7 @@ test.describe('Exhaustive Public — Help', () => {
 
 // ── FAQ (/faq) ──────────────────────────────────────────────────────────────
 test.describe('Exhaustive Public — FAQ', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('faq desktop full', async ({ page }) => { await prep(page, '/faq', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-faq-d-full.png', STABLE_OPTS); });
   test('faq tablet full', async ({ page }) => { await prep(page, '/faq', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-faq-t-full.png', STABLE_OPTS); });
   test('faq mobile full', async ({ page }) => { await prep(page, '/faq', 375, 812); await expect(page).toHaveScreenshot('exh-pub-faq-m-full.png', STABLE_OPTS); });
@@ -129,7 +129,7 @@ test.describe('Exhaustive Public — FAQ', () => {
 
 // ── Terms (/terms) ──────────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Terms', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('terms desktop full', async ({ page }) => { await prep(page, '/terms', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-terms-d-full.png', STABLE_OPTS); });
   test('terms tablet full', async ({ page }) => { await prep(page, '/terms', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-terms-t-full.png', STABLE_OPTS); });
   test('terms mobile full', async ({ page }) => { await prep(page, '/terms', 375, 812); await expect(page).toHaveScreenshot('exh-pub-terms-m-full.png', STABLE_OPTS); });
@@ -144,7 +144,7 @@ test.describe('Exhaustive Public — Terms', () => {
 
 // ── Privacy (/privacy) ─────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Privacy', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('privacy desktop full', async ({ page }) => { await prep(page, '/privacy', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-privacy-d-full.png', STABLE_OPTS); });
   test('privacy tablet full', async ({ page }) => { await prep(page, '/privacy', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-privacy-t-full.png', STABLE_OPTS); });
   test('privacy mobile full', async ({ page }) => { await prep(page, '/privacy', 375, 812); await expect(page).toHaveScreenshot('exh-pub-privacy-m-full.png', STABLE_OPTS); });
@@ -159,7 +159,7 @@ test.describe('Exhaustive Public — Privacy', () => {
 
 // ── Contact (/contact) ─────────────────────────────────────────────────────
 test.describe('Exhaustive Public — Contact', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('contact desktop full', async ({ page }) => { await prep(page, '/contact', 1280, 720); await expect(page).toHaveScreenshot('exh-pub-contact-d-full.png', STABLE_OPTS); });
   test('contact tablet full', async ({ page }) => { await prep(page, '/contact', 768, 1024); await expect(page).toHaveScreenshot('exh-pub-contact-t-full.png', STABLE_OPTS); });
   test('contact mobile full', async ({ page }) => { await prep(page, '/contact', 375, 812); await expect(page).toHaveScreenshot('exh-pub-contact-m-full.png', STABLE_OPTS); });

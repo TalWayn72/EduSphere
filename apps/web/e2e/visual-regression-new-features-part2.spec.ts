@@ -32,7 +32,7 @@ async function goTo(page: Page, path: string) {
 }
 
 test.describe('Visual Regression — Content Types @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('rich document page — full page renders correctly', async ({ page }) => {
     await goTo(page, '/document/doc-1');

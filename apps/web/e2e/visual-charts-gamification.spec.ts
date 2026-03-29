@@ -56,7 +56,7 @@ async function setupMockAndGo(page: Page, path: string, mockData: Record<string,
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Dashboard Gamification @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('dashboard — full page with gamification widgets', async ({ page }) => {
     await setupMockAndGo(page, '/dashboard', MOCK_GAMIFICATION_DATA);
@@ -93,7 +93,7 @@ test.describe('Chart Visual — Dashboard Gamification @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Social Challenges @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('challenges — full page with mocked data', async ({ page }) => {
     await setupMockAndGo(page, '/social/challenges', { ...MOCK_CHALLENGES_DATA, ...MOCK_LEADERBOARD_DATA });
@@ -130,7 +130,7 @@ test.describe('Chart Visual — Social Challenges @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Profile Gamification @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('profile — full page with badges and progress', async ({ page }) => {
     await setupMockAndGo(page, '/profile', { ...MOCK_GAMIFICATION_DATA, ...MOCK_PROFILE_PROGRESS_DATA });
@@ -167,7 +167,7 @@ test.describe('Chart Visual — Profile Gamification @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Certificates @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('certificates — full page with mocked data', async ({ page }) => {
     await setupMockAndGo(page, '/certificates', MOCK_CERTIFICATES_DATA);

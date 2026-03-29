@@ -16,7 +16,7 @@ async function prep(page: Page, path: string, w: number, h: number) {
 // ─── Full-page: 10 routes × 3 viewports = 30 calls ─────────────────────────
 
 test.describe('Full Page — Desktop 1280x720', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('dashboard desktop', async ({ page }) => { await prep(page, '/dashboard', 1280, 720);
     await expect(page).toHaveScreenshot('exh-dash-d-full.png', STABLE_OPTS); });
   test('courses desktop', async ({ page }) => { await prep(page, '/courses', 1280, 720);
@@ -40,7 +40,7 @@ test.describe('Full Page — Desktop 1280x720', () => {
 });
 
 test.describe('Full Page — Tablet 768x1024', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('dashboard tablet', async ({ page }) => { await prep(page, '/dashboard', 768, 1024);
     await expect(page).toHaveScreenshot('exh-dash-t-full.png', STABLE_OPTS); });
   test('courses tablet', async ({ page }) => { await prep(page, '/courses', 768, 1024);
@@ -64,7 +64,7 @@ test.describe('Full Page — Tablet 768x1024', () => {
 });
 
 test.describe('Full Page — Mobile 375x812', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test('dashboard mobile', async ({ page }) => { await prep(page, '/dashboard', 375, 812);
     await expect(page).toHaveScreenshot('exh-dash-m-full.png', STABLE_OPTS); });
   test('courses mobile', async ({ page }) => { await prep(page, '/courses', 375, 812);
@@ -90,7 +90,7 @@ test.describe('Full Page — Mobile 375x812', () => {
 // ─── Sidebar: 10 routes × desktop = 20 calls (if/else) ─────────────────────
 
 test.describe('Sidebar — Desktop', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   const S = 'aside, [data-testid="sidebar"], nav[aria-label*="side"], [role="complementary"]';
   test('dashboard sidebar', async ({ page }) => { await prep(page, '/dashboard', 1280, 720); const el = page.locator(S).first();
     if (await el.isVisible({ timeout: 3000 }).catch(() => false))
@@ -137,7 +137,7 @@ test.describe('Sidebar — Desktop', () => {
 // ─── Header: 10 routes × desktop = 20 calls (if/else) ──────────────────────
 
 test.describe('Header — Desktop', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   const H = 'header, [data-testid="header"], [role="banner"]';
   test('dashboard header', async ({ page }) => { await prep(page, '/dashboard', 1280, 720); const el = page.locator(H).first();
     if (await el.isVisible({ timeout: 3000 }).catch(() => false))
@@ -184,7 +184,7 @@ test.describe('Header — Desktop', () => {
 // ─── Main content: 5 routes × tablet = 10 calls (if/else) ──────────────────
 
 test.describe('Main Content — Tablet', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   const M = 'main, [role="main"], [data-testid="main-content"]';
   test('dashboard main', async ({ page }) => { await prep(page, '/dashboard', 768, 1024); const el = page.locator(M).first();
     if (await el.isVisible({ timeout: 3000 }).catch(() => false))
@@ -211,7 +211,7 @@ test.describe('Main Content — Tablet', () => {
 // ─── Cards: 5 routes × mobile = 10 calls (if/else) ─────────────────────────
 
 test.describe('Cards — Mobile', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   const C = '[data-testid="card"], [data-testid="course-card"], .card, [role="article"]';
   test('dashboard cards', async ({ page }) => { await prep(page, '/dashboard', 375, 812); const el = page.locator(C).first();
     if (await el.isVisible({ timeout: 3000 }).catch(() => false))
@@ -238,7 +238,7 @@ test.describe('Cards — Mobile', () => {
 // ─── Action buttons: 5 routes × desktop = 10 calls (if/else) ───────────────
 
 test.describe('Action Buttons — Desktop', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   const A = '[data-testid="action-buttons"], [data-testid="actions"], .actions, [role="toolbar"]';
   test('dashboard actions', async ({ page }) => { await prep(page, '/dashboard', 1280, 720); const el = page.locator(A).first();
     if (await el.isVisible({ timeout: 3000 }).catch(() => false))

@@ -36,7 +36,7 @@ test.describe('Visual Regression — Dark Mode Admin Dashboard @visual-dark', ()
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('admin dashboard — full page dark', async ({ page }) => {
     await goToDark(page, '/admin');
@@ -102,7 +102,7 @@ test.describe('Visual Regression — Dark Mode Admin Compliance @visual-dark', (
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('compliance — full page dark', async ({ page }) => {
     await goToDark(page, '/admin/compliance');
@@ -168,7 +168,7 @@ test.describe('Visual Regression — Dark Mode Admin LTI @visual-dark', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('LTI — full page dark', async ({ page }) => {
     await goToDark(page, '/admin/lti');

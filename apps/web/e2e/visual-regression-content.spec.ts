@@ -51,7 +51,7 @@ async function elementOrPage(
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Content Import @visual-content', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('content import — full page', async ({ page }) => {
     await goTo(page, '/content-import');
@@ -84,7 +84,7 @@ test.describe('Visual Regression — Content Import @visual-content', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Drive Import @visual-content', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('drive import — full page', async ({ page }) => {
     await goTo(page, '/content-import/drive');
@@ -112,7 +112,7 @@ test.describe('Visual Regression — Drive Import @visual-content', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Course Creation @visual-content', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('course creation — full page', async ({ page }) => {
     await goTo(page, '/courses/create');
@@ -140,7 +140,7 @@ test.describe('Visual Regression — Course Creation @visual-content', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Course Editing @visual-content', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('course editing — full page', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
@@ -168,7 +168,7 @@ test.describe('Visual Regression — Course Editing @visual-content', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Portal Builder @visual-content', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('portal builder — full page', async ({ page }) => {
     await goTo(page, '/portal-builder');

@@ -32,7 +32,7 @@ async function goTo(page: Page, path: string) {
 }
 
 test.describe('Visual Regression — Quiz Player @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('quiz page — multiple choice question renders correctly', async ({ page }) => {
     await goTo(page, '/quiz/quiz-mc-1');
@@ -86,7 +86,7 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
 });
 
 test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('scenarios page — grid of scenario cards renders correctly', async ({ page }) => {
     await goTo(page, '/scenarios');

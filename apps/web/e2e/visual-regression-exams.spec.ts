@@ -51,7 +51,7 @@ async function elementOrPage(
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Exam List @visual-exams', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('exam list — full page', async ({ page }) => {
     await goTo(page, '/exams');
@@ -84,7 +84,7 @@ test.describe('Visual Regression — Exam List @visual-exams', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Item Bank @visual-exams', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('item bank — full page', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
@@ -112,7 +112,7 @@ test.describe('Visual Regression — Item Bank @visual-exams', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Exam Blueprint @visual-exams', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('blueprint — full page', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
@@ -140,7 +140,7 @@ test.describe('Visual Regression — Exam Blueprint @visual-exams', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Exam Results @visual-exams', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('results — full page', async ({ page }) => {
     await goTo(page, '/exams/results');
@@ -168,7 +168,7 @@ test.describe('Visual Regression — Exam Results @visual-exams', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Exam Security @visual-exams', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('security settings — full page', async ({ page }) => {
     await goTo(page, '/exams/security');

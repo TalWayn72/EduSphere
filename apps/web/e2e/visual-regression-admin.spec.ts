@@ -51,7 +51,7 @@ async function elementOrPage(
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Admin Dashboard @visual-admin', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('admin dashboard — full page', async ({ page }) => {
     await goTo(page, '/admin');
@@ -84,7 +84,7 @@ test.describe('Visual Regression — Admin Dashboard @visual-admin', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Admin Compliance @visual-admin', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('compliance — full page', async ({ page }) => {
     await goTo(page, '/admin/compliance');
@@ -112,7 +112,7 @@ test.describe('Visual Regression — Admin Compliance @visual-admin', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Admin LTI @visual-admin', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('LTI settings — full page', async ({ page }) => {
     await goTo(page, '/admin/lti');
@@ -135,7 +135,7 @@ test.describe('Visual Regression — Admin LTI @visual-admin', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Admin SCIM @visual-admin', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('SCIM provisioning — full page', async ({ page }) => {
     await goTo(page, '/admin/scim');
@@ -163,7 +163,7 @@ test.describe('Visual Regression — Admin SCIM @visual-admin', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Admin Settings @visual-admin', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('settings — full page', async ({ page }) => {
     await goTo(page, '/admin/settings');

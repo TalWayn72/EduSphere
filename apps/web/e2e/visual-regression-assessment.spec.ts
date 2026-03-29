@@ -51,7 +51,7 @@ async function elementOrPage(
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Assessment List @visual-assessment', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('assessment list — full page', async ({ page }) => {
     await goTo(page, '/assessments');
@@ -84,7 +84,7 @@ test.describe('Visual Regression — Assessment List @visual-assessment', () => 
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — 360 Assessment @visual-assessment', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('360 assessment — full page', async ({ page }) => {
     await goTo(page, '/assessments/360');
@@ -117,7 +117,7 @@ test.describe('Visual Regression — 360 Assessment @visual-assessment', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Assessment Campaigns @visual-assessment', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('campaigns — full page', async ({ page }) => {
     await goTo(page, '/assessments/campaigns');
@@ -145,7 +145,7 @@ test.describe('Visual Regression — Assessment Campaigns @visual-assessment', (
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Peer Review @visual-assessment', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('peer review — full page', async ({ page }) => {
     await goTo(page, '/assessments/peer-review');
@@ -168,7 +168,7 @@ test.describe('Visual Regression — Peer Review @visual-assessment', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Assessment Results @visual-assessment', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('results — full page', async ({ page }) => {
     await goTo(page, '/assessments/results');

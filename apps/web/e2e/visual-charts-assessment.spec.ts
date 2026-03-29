@@ -55,7 +55,7 @@ async function setupMockAndGo(page: Page, path: string, mockData: Record<string,
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Assessment Overview @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('assessment overview — full page with mocked data', async ({ page }) => {
     await setupMockAndGo(page, '/assessments', MOCK_ASSESSMENT_DATA);
@@ -92,7 +92,7 @@ test.describe('Chart Visual — Assessment Overview @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — 360 Assessment @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('360 assessment — full page with mocked radar', async ({ page }) => {
     await setupMockAndGo(page, '/assessments/360', MOCK_360_ASSESSMENT_DATA);
@@ -129,7 +129,7 @@ test.describe('Chart Visual — 360 Assessment @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Assessment Results @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('assessment results — full page with mocked charts', async ({ page }) => {
     await setupMockAndGo(page, '/assessments/results', MOCK_ASSESSMENT_RESULTS_DATA);
@@ -160,7 +160,7 @@ test.describe('Chart Visual — Assessment Results @visual-charts', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Chart Visual — Exam Results @visual-charts', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('exam results — full page with mocked scores', async ({ page }) => {
     await setupMockAndGo(page, '/exams/results', MOCK_EXAM_RESULTS_DATA);

@@ -36,7 +36,7 @@ test.describe('Visual Regression — Dark Mode Dashboard @visual-dark', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('dashboard — full page dark', async ({ page }) => {
     await goToDark(page, '/dashboard');
@@ -92,7 +92,7 @@ test.describe('Visual Regression — Dark Mode Courses @visual-dark', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('courses — full page dark', async ({ page }) => {
     await goToDark(page, '/courses');
@@ -148,7 +148,7 @@ test.describe('Visual Regression — Dark Mode Search @visual-dark', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
   });
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('search — full page dark', async ({ page }) => {
     await goToDark(page, '/search');

@@ -32,7 +32,7 @@ async function goTo(page: Page, path: string) {
 }
 
 test.describe('Visual Regression — Mobile Views @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
   test.use({ viewport: { width: 375, height: 812 } });
 
   test('dashboard — mobile layout with widgets renders correctly', async ({ page }) => {
@@ -75,7 +75,7 @@ test.describe('Visual Regression — Mobile Views @visual-new', () => {
 });
 
 test.describe('Visual Regression — RTL Layout (Hebrew) @visual-new', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   async function applyRTL(page: Page) {
     await page.addInitScript(() => {

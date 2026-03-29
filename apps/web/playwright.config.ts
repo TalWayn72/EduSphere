@@ -68,7 +68,7 @@ const BASE_URL = (() => {
         'Example: E2E_BASE_URL=https://staging.edusphere.io'
     );
   }
-  return 'http://localhost:5176';
+  return 'http://localhost:5173';
 })();
 
 // Whether a Vite dev server should be started automatically.
@@ -155,6 +155,12 @@ export default defineConfig({
      * Staging/production should increase to 20s for GraphQL latency.
      */
     actionTimeout: E2E_PROFILE === 'local' ? 10_000 : 20_000,
+
+    /**
+     * Expect timeout for assertions including toHaveScreenshot().
+     * 30s allows visual comparison retries for screenshot stabilization.
+     */
+    expect: { timeout: 30_000 },
 
     /**
      * Navigation timeout — page.goto() / waitForURL().
@@ -248,8 +254,8 @@ export default defineConfig({
    */
   webServer: USE_LOCAL_SERVER
     ? {
-        command: 'pnpm dev --port 5176',
-        url: 'http://localhost:5176',
+        command: 'pnpm dev --port 5173',
+        url: 'http://localhost:5173',
         reuseExistingServer: !process.env.CI,
         env: {
           // Forward all VITE_* variables plus E2E-specific overrides

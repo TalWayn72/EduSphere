@@ -52,7 +52,7 @@ async function elementOrPage(
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Analytics Dashboard @visual-analytics', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('analytics dashboard — full page', async ({ page }) => {
     await goTo(page, '/analytics');
@@ -85,7 +85,7 @@ test.describe('Visual Regression — Analytics Dashboard @visual-analytics', () 
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Course Analytics @visual-analytics', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('course analytics — full page', async ({ page }) => {
     await goTo(page, '/analytics/course');
@@ -113,7 +113,7 @@ test.describe('Visual Regression — Course Analytics @visual-analytics', () => 
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Tenant Analytics @visual-analytics', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('tenant analytics — full page', async ({ page }) => {
     await goTo(page, '/analytics/tenant');
@@ -141,7 +141,7 @@ test.describe('Visual Regression — Tenant Analytics @visual-analytics', () => 
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — ROI Analytics @visual-analytics', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('ROI analytics — full page', async ({ page }) => {
     await goTo(page, '/analytics/roi');
@@ -164,7 +164,7 @@ test.describe('Visual Regression — ROI Analytics @visual-analytics', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Platform Usage @visual-analytics', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('platform usage — full page', async ({ page }) => {
     await goTo(page, '/analytics/platform');

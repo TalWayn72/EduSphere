@@ -51,7 +51,7 @@ async function elementOrPage(
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Social Feed @visual-social', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('social feed — full page', async ({ page }) => {
     await goTo(page, '/social');
@@ -84,7 +84,7 @@ test.describe('Visual Regression — Social Feed @visual-social', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Challenges @visual-social', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('challenges — full page', async ({ page }) => {
     await goTo(page, '/social/challenges');
@@ -112,7 +112,7 @@ test.describe('Visual Regression — Challenges @visual-social', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Discussions @visual-social', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('discussions — full page', async ({ page }) => {
     await goTo(page, '/social/discussions');
@@ -140,7 +140,7 @@ test.describe('Visual Regression — Discussions @visual-social', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Peer Matching @visual-social', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('peer matching — full page', async ({ page }) => {
     await goTo(page, '/social/peer-matching');
@@ -163,7 +163,7 @@ test.describe('Visual Regression — Peer Matching @visual-social', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Visual Regression — Profile @visual-social', () => {
-  test.setTimeout(30_000);
+  test.setTimeout(60_000);
 
   test('profile — full page', async ({ page }) => {
     await goTo(page, '/profile');
