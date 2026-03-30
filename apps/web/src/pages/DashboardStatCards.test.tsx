@@ -15,7 +15,7 @@
  * 11. Translation keys are used for card titles
  */
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { PrimaryStatCards, SecondaryStatCards } from './DashboardStatCards';
 
 // i18next is globally mocked in test/setup.ts — keys returned as-is
@@ -32,7 +32,6 @@ describe('PrimaryStatCards', () => {
 
   it('renders 3 stat cards', () => {
     const { container } = render(<PrimaryStatCards {...defaultProps} />);
-    const cards = container.querySelectorAll('[class*="rounded-"]');
     // At minimum we expect 3 top-level grid children
     const grid = container.firstElementChild;
     expect(grid?.children.length).toBe(3);

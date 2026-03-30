@@ -15,7 +15,7 @@
  * 11. HLS cleanup on unmount (memory safety)
  * 12. External seekTo prop syncs video position
  */
-import { describe, it, expect, vi, beforeEach, beforeAll, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // ── HLS mock ─────────────────────────────────────────────────────────────────
@@ -176,7 +176,6 @@ describe('useVideoPlayer', () => {
 
   it('keyboard Space key calls togglePlay', () => {
     const { result } = renderHook(() => useVideoPlayer(defaultOpts));
-    const preventDefault = vi.fn();
     act(() => {
       window.dispatchEvent(
         new KeyboardEvent('keydown', { code: 'Space' }),
