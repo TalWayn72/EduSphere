@@ -26,3 +26,14 @@ export const SESSION_CLEANUP_INTERVAL_MS = 30 * 60 * 1000;
  * Source: STALE_SESSION_AGE_MS = 24 * 60 * 60 * 1000 (session-cleanup.service.ts:6)
  */
 export const STALE_SESSION_AGE_MS = 24 * 60 * 60 * 1000;
+
+// ── Agent Sandbox Defaults ──────────────────────────────────────────────────
+
+/** Default max heap size per sandboxed agent execution (MB). Env: AGENT_MAX_MEMORY_MB */
+export const AGENT_DEFAULT_MAX_MEMORY_MB = 256;
+
+/** Default execution timeout per sandboxed agent (ms). Env: AGENT_TIMEOUT_MS */
+export const AGENT_DEFAULT_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+/** Max concurrent sandboxed agent executions per tenant. Env: AGENT_MAX_CONCURRENT_PER_TENANT */
+export const AGENT_MAX_CONCURRENT_PER_TENANT = 3;

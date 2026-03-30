@@ -4,6 +4,8 @@ import { trace, SpanStatusCode } from '@opentelemetry/api';
 import type { ConceptRelationshipType } from '@edusphere/db';
 import { GraphService } from './graph.service';
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
+import { MergeConceptsService } from './merge-concepts.service';
+import { MergeConceptsInputSchema } from './merge-concepts.schemas';
 import type { GraphQLContext } from '../auth/auth.middleware';
 
 const VALID_RELATIONSHIP_TYPES: ReadonlySet<string> = new Set<ConceptRelationshipType>([
@@ -61,7 +63,8 @@ export class GraphResolver {
 
   constructor(
     private readonly graphService: GraphService,
-    private readonly kMeansService: TopicClusterKMeansService
+    private readonly kMeansService: TopicClusterKMeansService,
+    private readonly mergeConceptsService: MergeConceptsService
   ) {}
 
   private getAuthContext(context: GraphQLContext) {
@@ -411,5 +414,19 @@ export class GraphResolver {
     const { tenantId } = this.getAuthContext(context);
     this.logger.log({ courseId, k }, '[GraphResolver] clusterTopics mutation');
     return this.kMeansService.clusterConceptsByCourse(courseId, k ?? 5, tenantId);
+  }
+
+  @Mutation()
+  async mergeConceptGraphNodes(
+    @Args('input') input: unknown,
+    @Context() context: GraphQLContext
+  ) {
+    const { tenantId } = this.getAuthContext(context);
+    const validated = MergeConceptsInputSchema.parse(input);
+    this.logger.log(
+      { input: validated, tenantId },
+      '[GraphResolver] mergeConceptGraphNodes mutation'
+    );
+    return this.mergeConceptsService.mergeNodes(validated, tenantId);
   }
 }

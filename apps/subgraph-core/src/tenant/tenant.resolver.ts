@@ -3,7 +3,10 @@ import { UnauthorizedException } from '@nestjs/common';
 import { TenantService } from './tenant.service';
 import { TenantLanguageService } from './tenant-language.service';
 import { TenantBrandingService } from './tenant-branding.service';
+import { OrgDomainService } from './org-domain.service';
+import { TenantPlanService } from './tenant-plan.service';
 import { UpdateTenantLanguageSettingsSchema } from './tenant-language.schemas';
+import { UpdateTenantPlanSchema } from './tenant-plan.schemas';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -16,8 +19,17 @@ export class TenantResolver {
   constructor(
     private readonly tenantService: TenantService,
     private readonly tenantLanguageService: TenantLanguageService,
-    private readonly tenantBrandingService: TenantBrandingService
+    private readonly tenantBrandingService: TenantBrandingService,
+    private readonly orgDomainService: OrgDomainService,
+    private readonly tenantPlanService: TenantPlanService
   ) {}
+
+  private getAuthContext(context: GraphQLContext) {
+    if (!context.authContext) {
+      throw new UnauthorizedException('Unauthenticated');
+    }
+    return context.authContext;
+  }
 
   @Query('tenant')
   async getTenant(@Args('id') id: string) {
@@ -34,12 +46,21 @@ export class TenantResolver {
 
   @Query('myTenantLanguageSettings')
   async getMyTenantLanguageSettings(@Context() context: GraphQLContext) {
-    if (!context.authContext) {
-      throw new UnauthorizedException('Unauthenticated');
-    }
-    return this.tenantLanguageService.getSettings(
-      context.authContext.tenantId || ''
-    );
+    const auth = this.getAuthContext(context);
+    return this.tenantLanguageService.getSettings(auth.tenantId || '');
+  }
+
+  @Query('organizationDomains')
+  async getOrganizationDomains(
+    @Args('orgId') orgId: string,
+    @Context() context: GraphQLContext
+  ) {
+    const auth = this.getAuthContext(context);
+    return this.orgDomainService.findByOrgId(orgId, {
+      tenantId: auth.tenantId || orgId,
+      userId: auth.userId,
+      role: auth.roles[0] || 'STUDENT',
+    });
   }
 
   @Mutation('updateTenantLanguageSettings')
@@ -47,12 +68,10 @@ export class TenantResolver {
     @Args('input') input: unknown,
     @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) {
-      throw new UnauthorizedException('Unauthenticated');
-    }
+    const auth = this.getAuthContext(context);
     const validated = UpdateTenantLanguageSettingsSchema.parse(input);
     return this.tenantLanguageService.updateSettings(
-      context.authContext.tenantId || '',
+      auth.tenantId || '',
       validated
     );
   }
@@ -71,12 +90,8 @@ export class TenantResolver {
 
   @Query('myTenantBranding')
   async getMyTenantBranding(@Context() context: GraphQLContext) {
-    if (!context.authContext) {
-      throw new UnauthorizedException('Unauthenticated');
-    }
-    return this.tenantBrandingService.getBranding(
-      context.authContext.tenantId || ''
-    );
+    const auth = this.getAuthContext(context);
+    return this.tenantBrandingService.getBranding(auth.tenantId || '');
   }
 
   @Mutation('updateTenantBranding')
@@ -84,12 +99,29 @@ export class TenantResolver {
     @Args('input') input: unknown,
     @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) {
-      throw new UnauthorizedException('Unauthenticated');
-    }
+    const auth = this.getAuthContext(context);
     return this.tenantBrandingService.updateBranding(
-      context.authContext.tenantId || '',
+      auth.tenantId || '',
       input as Parameters<TenantBrandingService['updateBranding']>[1]
+    );
+  }
+
+  @Mutation('updateTenantPlan')
+  async updateTenantPlan(
+    @Args('input') input: unknown,
+    @Context() context: GraphQLContext
+  ) {
+    const auth = this.getAuthContext(context);
+    const validated = UpdateTenantPlanSchema.parse(input);
+    return this.tenantPlanService.updatePlan(
+      validated.tenantId,
+      validated.plan,
+      validated.effectiveDate,
+      {
+        tenantId: auth.tenantId || validated.tenantId,
+        userId: auth.userId,
+        role: auth.roles[0] || 'SUPER_ADMIN',
+      }
     );
   }
 }

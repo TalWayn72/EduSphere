@@ -10,6 +10,7 @@ import { CourseGeneratorService } from '../ai/course-generator.service.js';
 import { LlmConsentGuard } from '../ai/llm-consent.guard.js';
 import { LessonPipelineResolver } from './lesson-pipeline.resolver.js';
 import { ExecutionPubSubProvider } from './execution-pubsub.provider.js';
+import { AgentSandboxService } from '../sandbox/agent-sandbox.service.js';
 
 @Module({
   providers: [
@@ -24,7 +25,8 @@ import { ExecutionPubSubProvider } from './execution-pubsub.provider.js';
     CourseGeneratorService,
     LlmConsentGuard,
     LessonPipelineResolver,
+    AgentSandboxService,
   ],
-  exports: [AgentService, AIService, CourseGeneratorService],
+  exports: [AgentService, AIService, CourseGeneratorService, AgentSandboxService],
 })
 export class AgentModule {}

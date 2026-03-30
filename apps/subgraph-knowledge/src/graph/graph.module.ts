@@ -30,6 +30,7 @@ import { SocialRecommendationsDataService } from './social-recommendations-data.
 import { SocialRecommendationsResolver } from './social-recommendations.resolver';
 import { SkillTreeService } from './skill-tree.service';
 import { SkillTreeResolver } from './skill-tree.resolver';
+import { MergeConceptsService } from './merge-concepts.service';
 
 @Module({
   imports: [EmbeddingModule],
@@ -70,6 +71,7 @@ import { SkillTreeResolver } from './skill-tree.resolver';
     SocialRecommendationsResolver,
     SkillTreeService,
     SkillTreeResolver,
+    MergeConceptsService,
   ],
   exports: [GraphService, CypherService],
 })

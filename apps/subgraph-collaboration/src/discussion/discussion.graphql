@@ -134,4 +134,17 @@ type DiscussionSummary {
 extend type Mutation {
   """Generate an AI-powered summary for a discussion thread"""
   generateDiscussionSummary(discussionId: ID!): DiscussionSummary! @authenticated
+
+  """Compact a collaborative document's CRDT state (remove tombstones, merge operations)"""
+  compactCollabDocument(documentId: ID!): CollabDocument! @authenticated
+}
+
+"""A collaborative document with CRDT state"""
+type CollabDocument {
+  id: ID!
+  title: String!
+  sizeBytes: Int!
+  compactedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }

@@ -8,6 +8,8 @@ import { OrgInvitationService } from './org-invitation.service';
 import { TrialService } from './trial.service';
 import { OrgLicensingService } from './org-licensing.service';
 import { DomainProvisioningService } from './domain-provisioning.service';
+import { OrgDomainService } from './org-domain.service';
+import { TenantPlanService } from './tenant-plan.service';
 import { OrgOnboardingResolver } from './org-onboarding.resolver';
 import { OrgAnalyticsService } from '../analytics/org-analytics.service';
 import { AtRiskLearnerService } from '../analytics/at-risk-learner.service';
@@ -28,6 +30,8 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     TrialService,
     OrgLicensingService,
     DomainProvisioningService,
+    OrgDomainService,
+    TenantPlanService,
     OrgOnboardingResolver,
     OrgAnalyticsService,
     AtRiskLearnerService,
@@ -46,6 +50,8 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     TrialService,
     OrgLicensingService,
     DomainProvisioningService,
+    OrgDomainService,
+    TenantPlanService,
     OrgAnalyticsService,
     AtRiskLearnerService,
     OrgGamificationService,

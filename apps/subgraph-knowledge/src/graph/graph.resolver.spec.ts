@@ -49,7 +49,7 @@ describe('GraphResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new GraphResolver(mockGraphService as any);
+    resolver = new GraphResolver(mockGraphService as any, {} as any, {} as any);
   });
 
   // ─── concept ──────────────────────────────────────────────────────────────

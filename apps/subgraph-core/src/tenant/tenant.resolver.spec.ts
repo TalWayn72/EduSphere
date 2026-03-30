@@ -4,8 +4,29 @@ import { TenantResolver } from './tenant.resolver';
 const MOCK_TENANT = {
   id: 'tenant-1',
   name: 'Acme Corp',
+  slug: 'acme',
   plan: 'PROFESSIONAL',
   createdAt: new Date('2026-01-01'),
+  updatedAt: new Date('2026-03-30'),
+};
+
+const MOCK_DOMAINS = [
+  {
+    id: 'dom-1',
+    domain: 'acme.edusphere.io',
+    verified: true,
+    createdAt: new Date('2026-01-01'),
+  },
+];
+
+const AUTH_CONTEXT = {
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  email: 'admin@test.com',
+  username: 'admin',
+  roles: ['SUPER_ADMIN' as const],
+  scopes: [],
+  isSuperAdmin: true,
 };
 
 describe('TenantResolver', () => {
@@ -14,15 +35,32 @@ describe('TenantResolver', () => {
     findById: ReturnType<typeof vi.fn>;
     findAll: ReturnType<typeof vi.fn>;
   };
+  let orgDomainService: {
+    findByOrgId: ReturnType<typeof vi.fn>;
+  };
+  let tenantPlanService: {
+    updatePlan: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     tenantService = {
       findById: vi.fn(),
       findAll: vi.fn(),
     };
-    // Direct instantiation — avoids NestJS module compilation overhead
+    orgDomainService = {
+      findByOrgId: vi.fn(),
+    };
+    tenantPlanService = {
+      updatePlan: vi.fn(),
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver = new TenantResolver(tenantService as any);
+    resolver = new TenantResolver(
+      tenantService as any,
+      {} as any, // tenantLanguageService
+      {} as any, // tenantBrandingService
+      orgDomainService as any,
+      tenantPlanService as any
+    );
   });
 
   describe('getTenant()', () => {
@@ -68,6 +106,75 @@ describe('TenantResolver', () => {
     it('propagates errors from TenantService', async () => {
       tenantService.findAll.mockRejectedValue(new Error('DB error'));
       await expect(resolver.getTenants(10, 0)).rejects.toThrow('DB error');
+    });
+  });
+
+  describe('getOrganizationDomains()', () => {
+    it('returns domains for an org', async () => {
+      orgDomainService.findByOrgId.mockResolvedValue(MOCK_DOMAINS);
+
+      const result = await resolver.getOrganizationDomains('org-1', {
+        req: {},
+        authContext: AUTH_CONTEXT,
+      });
+
+      expect(result).toEqual(MOCK_DOMAINS);
+      expect(orgDomainService.findByOrgId).toHaveBeenCalledWith(
+        'org-1',
+        expect.objectContaining({ tenantId: 'tenant-1' })
+      );
+    });
+
+    it('throws when unauthenticated', async () => {
+      await expect(
+        resolver.getOrganizationDomains('org-1', { req: {} })
+      ).rejects.toThrow('Unauthenticated');
+    });
+  });
+
+  describe('updateTenantPlan()', () => {
+    it('updates tenant plan successfully', async () => {
+      tenantPlanService.updatePlan.mockResolvedValue({
+        ...MOCK_TENANT,
+        plan: 'ENTERPRISE',
+      });
+
+      const result = await resolver.updateTenantPlan(
+        {
+          tenantId: '550e8400-e29b-41d4-a716-446655440000',
+          plan: 'ENTERPRISE',
+        },
+        { req: {}, authContext: AUTH_CONTEXT }
+      );
+
+      expect(result.plan).toBe('ENTERPRISE');
+      expect(tenantPlanService.updatePlan).toHaveBeenCalledWith(
+        '550e8400-e29b-41d4-a716-446655440000',
+        'ENTERPRISE',
+        undefined,
+        expect.objectContaining({ userId: 'user-1' })
+      );
+    });
+
+    it('throws when unauthenticated', async () => {
+      await expect(
+        resolver.updateTenantPlan(
+          {
+            tenantId: '550e8400-e29b-41d4-a716-446655440000',
+            plan: 'FREE',
+          },
+          { req: {} }
+        )
+      ).rejects.toThrow('Unauthenticated');
+    });
+
+    it('rejects invalid plan values via Zod', async () => {
+      await expect(
+        resolver.updateTenantPlan(
+          { tenantId: 'not-a-uuid', plan: 'INVALID' },
+          { req: {}, authContext: AUTH_CONTEXT }
+        )
+      ).rejects.toThrow();
     });
   });
 });

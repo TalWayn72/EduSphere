@@ -41,7 +41,7 @@ describe('GraphResolver extended', function () {
   var resolver;
   beforeEach(function () {
     vi.clearAllMocks();
-    resolver = new GraphResolver(mockSvc);
+    resolver = new GraphResolver(mockSvc, {} as never, {} as never);
   });
   it('term delegates to findTermById', async function () {
     mockSvc.findTermById.mockResolvedValue({ id: 't-1' });

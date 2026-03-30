@@ -1,6 +1,8 @@
 extend schema
   @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
 
+directive @requiresRole(roles: [String!]!) on FIELD_DEFINITION
+
 type Concept @key(fields: "id") {
   id: ID!
   tenantId: ID!
@@ -124,6 +126,15 @@ extend type Mutation {
   generateEmbedding(text: String!, entityType: String!, entityId: ID!): Boolean! @authenticated
 
   """
+  Merge two concept nodes in the knowledge graph.
+  Moves all edges from the source concept to the target, then deletes the source.
+  Returns the merged target concept.
+  """
+  mergeConceptGraphNodes(input: MergeConceptsInput!): Concept!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """
   Run k-means++ clustering on all concepts for a given course (default k=5).
   Returns the resulting TopicCluster nodes. Requires INSTRUCTOR or higher role.
   """
@@ -161,6 +172,12 @@ input CreateSourceInput {
 input CreateTopicClusterInput {
   name: String!
   description: String
+}
+
+input MergeConceptsInput {
+  sourceConceptId: ID!
+  targetConceptId: ID!
+  keepTarget: Boolean!
 }
 
 type SemanticResult {
