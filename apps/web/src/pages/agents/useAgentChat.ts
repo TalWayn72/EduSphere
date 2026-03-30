@@ -227,12 +227,7 @@ export function useAgentChat() {
   const messages = sessions[activeMode];
   const hasTemplatesError = !DEV_MODE && templatesResult.error;
 
-  if (hasTemplatesError) {
-    console.error(
-      '[AgentsPage] Failed to load agent templates:',
-      templatesResult.error?.message
-    );
-  }
+  // Templates error is exposed via hasTemplatesError for UI display — no render-time logging.
 
   return {
     activeMode,

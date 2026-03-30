@@ -57,9 +57,11 @@ const authErrorExchange = errorExchange({
         (d) => d.kind === 'OperationDefinition'
       ) as { name?: { value: string } } | undefined;
       const opName = opDef?.name?.value ?? 'unknown';
-      console.warn(
-        `[GraphQL][Network] ${operation.kind} "${opName}": ${error.networkError.message}`
-      );
+      if (import.meta.env.DEV) {
+        console.debug(
+          `[GraphQL][Network] ${operation.kind} "${opName}": ${error.networkError.message}`
+        );
+      }
     }
 
     if (operation.kind === 'subscription') {
@@ -70,10 +72,12 @@ const authErrorExchange = errorExchange({
         const opName = opDef?.name?.value ?? 'unknown';
         if (!_warnedSubscriptionOps.has(opName)) {
           _warnedSubscriptionOps.add(opName);
-          console.warn(
-            '[Auth] Subscription auth error — degrading gracefully (real-time updates paused).',
-            error.message
-          );
+          if (import.meta.env.DEV) {
+            console.debug(
+              '[Auth] Subscription auth error — degrading gracefully (real-time updates paused).',
+              error.message
+            );
+          }
         }
       }
       return;

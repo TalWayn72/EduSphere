@@ -3,7 +3,7 @@
  *
  * Features:
  *   - Endpoint registration with event type filtering
- *   - HMAC-SHA256 payload signing
+ *   - HMAC-SHA256 payload signing (via WebhookDeliveryService)
  *   - Retry with exponential backoff (3 attempts)
  *   - Auto-disable after 10 consecutive failures
  *   - Delivery audit log
@@ -23,7 +23,16 @@ import {
   sql,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
-import { createHmac, randomBytes } from 'crypto';
+import { randomBytes } from 'crypto';
+import {
+  validateWebhookUrl,
+  validateWebhookEvents,
+  MAX_WEBHOOKS_PER_ORG,
+} from './webhook-validation';
+import { WebhookDeliveryService } from './webhook-delivery.service';
+import type { Webhook, WebhookDelivery } from './webhook-delivery.service';
+
+export type { Webhook, WebhookDelivery };
 
 export interface CreateWebhookInput {
   url: string;
@@ -36,58 +45,12 @@ export interface UpdateWebhookInput {
   isActive?: boolean;
 }
 
-export interface Webhook {
-  id: string;
-  url: string;
-  events: string[];
-  isActive: boolean;
-  failureCount: number;
-  lastTriggeredAt: Date | null;
-  createdAt: Date;
-}
-
-export interface WebhookDelivery {
-  id: string;
-  eventType: string;
-  responseStatus: number | null;
-  attempt: number;
-  status: string;
-  deliveredAt: Date | null;
-  createdAt: Date;
-}
-
-const VALID_EVENTS = [
-  'course.completed',
-  'course.enrolled',
-  'badge.issued',
-  'user.invited',
-  'user.joined',
-  'org.provisioned',
-  'license.activated',
-];
-
-const MAX_WEBHOOKS_PER_ORG = 10;
-const MAX_RETRIES = 3;
-const AUTO_DISABLE_THRESHOLD = 10;
-const WEBHOOK_TIMEOUT_MS = 10_000;
-
-// SSRF protection: block private IP ranges
-const PRIVATE_IP_PATTERNS = [
-  /^10\./,
-  /^172\.(1[6-9]|2\d|3[01])\./,
-  /^192\.168\./,
-  /^127\./,
-  /^0\./,
-  /localhost/i,
-  /\[::1\]/,
-];
-
 @Injectable()
 export class WebhookService implements OnModuleDestroy {
   private readonly logger = new Logger(WebhookService.name);
   private readonly db: Database;
 
-  constructor() {
+  constructor(private readonly deliveryService: WebhookDeliveryService) {
     this.db = createDatabaseConnection();
   }
 
@@ -100,13 +63,12 @@ export class WebhookService implements OnModuleDestroy {
     input: CreateWebhookInput,
     ctx: TenantContext
   ): Promise<Webhook> {
-    this.validateUrl(input.url);
-    this.validateEvents(input.events);
+    validateWebhookUrl(input.url);
+    validateWebhookEvents(input.events);
 
     const secret = randomBytes(32).toString('hex');
 
     return withTenantContext(this.db, ctx, async (tx) => {
-      // Check max webhooks per org
       const countResult = await tx.execute<{ cnt: string }>(sql`
         SELECT COUNT(*)::text AS cnt FROM webhooks
         WHERE tenant_id = ${ctx.tenantId}::uuid
@@ -162,8 +124,8 @@ export class WebhookService implements OnModuleDestroy {
     input: UpdateWebhookInput,
     ctx: TenantContext
   ): Promise<Webhook> {
-    if (input.url) this.validateUrl(input.url);
-    if (input.events) this.validateEvents(input.events);
+    if (input.url) validateWebhookUrl(input.url);
+    if (input.events) validateWebhookEvents(input.events);
 
     return withTenantContext(this.db, ctx, async (tx) => {
       const result = await tx.execute<{
@@ -300,7 +262,9 @@ export class WebhookService implements OnModuleDestroy {
       webhookId: id,
     };
 
-    return this.dispatchToWebhook(webhook, 'test', testPayload, ctx);
+    return this.deliveryService.dispatchToWebhook(
+      this.db, webhook, 'test', testPayload, ctx
+    );
   }
 
   async dispatchToWebhook(
@@ -310,188 +274,8 @@ export class WebhookService implements OnModuleDestroy {
     ctx: TenantContext,
     attempt = 1
   ): Promise<WebhookDelivery> {
-    // Get webhook secret
-    const secretResult = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.execute<{ secret: string }>(sql`
-        SELECT secret FROM webhooks
-        WHERE id = ${webhook.id}::uuid
-      `)
+    return this.deliveryService.dispatchToWebhook(
+      this.db, webhook, eventType, payload, ctx, attempt
     );
-    const secret = secretResult.rows[0]?.secret ?? '';
-
-    // Sign payload with HMAC-SHA256
-    const payloadStr = JSON.stringify(payload);
-    const signature = createHmac('sha256', secret)
-      .update(payloadStr)
-      .digest('hex');
-
-    const deliveryId = randomBytes(16).toString('hex');
-
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(
-        () => controller.abort(),
-        WEBHOOK_TIMEOUT_MS
-      );
-
-      const res = await fetch(webhook.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-EduSphere-Signature': `sha256=${signature}`,
-          'X-EduSphere-Event': eventType,
-          'X-EduSphere-Delivery': deliveryId,
-          'X-EduSphere-Timestamp': String(Math.floor(Date.now() / 1000)),
-        },
-        body: payloadStr,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
-
-      const status = res.ok ? 'DELIVERED' : 'FAILED';
-
-      // Record delivery
-      return this.recordDelivery(
-        webhook.id,
-        ctx,
-        eventType,
-        payload,
-        res.status,
-        attempt,
-        status
-      );
-    } catch (err) {
-      this.logger.warn(
-        { webhookId: webhook.id, attempt, err },
-        '[WebhookService] Delivery failed'
-      );
-
-      if (attempt < MAX_RETRIES) {
-        const delay = [0, 60_000, 300_000][attempt] ?? 300_000;
-        // Schedule retry (in production this would be via NATS delayed message)
-        setTimeout(() => {
-          this.dispatchToWebhook(webhook, eventType, payload, ctx, attempt + 1)
-            .catch((e) =>
-              this.logger.error({ err: e }, '[WebhookService] Retry failed')
-            );
-        }, delay);
-      }
-
-      return this.recordDelivery(
-        webhook.id,
-        ctx,
-        eventType,
-        payload,
-        null,
-        attempt,
-        attempt >= MAX_RETRIES ? 'FAILED' : 'RETRYING'
-      );
-    }
-  }
-
-  private async recordDelivery(
-    webhookId: string,
-    ctx: TenantContext,
-    eventType: string,
-    payload: Record<string, unknown>,
-    responseStatus: number | null,
-    attempt: number,
-    status: string
-  ): Promise<WebhookDelivery> {
-    const result = await withTenantContext(this.db, ctx, async (tx) => {
-      const inserted = await tx.execute<{
-        id: string;
-        event_type: string;
-        response_status: number | null;
-        attempt: number;
-        status: string;
-        delivered_at: Date | null;
-        created_at: Date;
-      }>(sql`
-        INSERT INTO webhook_deliveries (
-          webhook_id, tenant_id, event_type, payload,
-          response_status, attempt, status,
-          delivered_at
-        ) VALUES (
-          ${webhookId}::uuid,
-          ${ctx.tenantId}::uuid,
-          ${eventType},
-          ${JSON.stringify(payload)}::jsonb,
-          ${responseStatus},
-          ${attempt},
-          ${status},
-          ${status === 'DELIVERED' ? sql`NOW()` : sql`NULL`}
-        )
-        RETURNING id, event_type, response_status, attempt,
-                  status, delivered_at, created_at
-      `);
-
-      // Update webhook last_triggered_at and failure_count
-      if (status === 'FAILED') {
-        await tx.execute(sql`
-          UPDATE webhooks SET
-            failure_count = failure_count + 1,
-            last_failure_at = NOW(),
-            last_triggered_at = NOW(),
-            is_active = CASE
-              WHEN failure_count + 1 >= ${AUTO_DISABLE_THRESHOLD}
-              THEN false ELSE is_active
-            END,
-            updated_at = NOW()
-          WHERE id = ${webhookId}::uuid
-        `);
-      } else if (status === 'DELIVERED') {
-        await tx.execute(sql`
-          UPDATE webhooks SET
-            failure_count = 0,
-            last_triggered_at = NOW(),
-            updated_at = NOW()
-          WHERE id = ${webhookId}::uuid
-        `);
-      }
-
-      return inserted.rows[0];
-    });
-
-    if (!result) {
-      throw new BadRequestException('Failed to record delivery');
-    }
-
-    return {
-      id: result.id,
-      eventType: result.event_type,
-      responseStatus: result.response_status,
-      attempt: result.attempt,
-      status: result.status,
-      deliveredAt: result.delivered_at,
-      createdAt: result.created_at,
-    };
-  }
-
-  private validateUrl(url: string): void {
-    try {
-      const parsed = new URL(url);
-      if (parsed.protocol !== 'https:') {
-        throw new BadRequestException('Webhook URL must use HTTPS');
-      }
-      for (const pattern of PRIVATE_IP_PATTERNS) {
-        if (pattern.test(parsed.hostname)) {
-          throw new BadRequestException('Webhook URL cannot target private IPs');
-        }
-      }
-    } catch (err) {
-      if (err instanceof BadRequestException) throw err;
-      throw new BadRequestException('Invalid webhook URL');
-    }
-  }
-
-  private validateEvents(events: string[]): void {
-    const invalid = events.filter((e) => !VALID_EVENTS.includes(e));
-    if (invalid.length > 0) {
-      throw new BadRequestException(
-        `Invalid events: ${invalid.join(', ')}`
-      );
-    }
   }
 }

@@ -16,7 +16,7 @@ export function useLoadAssets() {
         // Simulate loading
         await new Promise<void>((resolve) => setTimeout(resolve, 1000));
       } catch (e) {
-        console.warn(e);
+        console.error('[useLoadAssets] Asset loading failed:', e);
       } finally {
         setLoadingComplete(true);
         await SplashScreen.hideAsync();

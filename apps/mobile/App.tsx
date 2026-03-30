@@ -84,7 +84,7 @@ export default function App() {
         await database.init();
         setDbReady(true);
       } catch (error) {
-        console.error('Failed to initialize database:', error);
+        console.error('[App] Failed to initialize database:', error);
         setDbReady(true); // Continue anyway
       }
     }

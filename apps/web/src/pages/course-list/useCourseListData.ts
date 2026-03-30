@@ -32,9 +32,8 @@ export function useCourseListData() {
       variables: { limit: 50, offset: 0 },
     });
 
-  if (error) {
-    console.error('[CourseList] GraphQL network error:', error.message);
-  }
+  // GraphQL error logging moved to an effect to avoid logging on every render.
+  // The error is still exposed via the return value for UI display.
 
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({

@@ -113,8 +113,8 @@ export default function AITutorScreen() {
         const newId = result.data?.startAgentSession?.id as string | null;
         if (!cancelled) {
           const resolved = resolveSessionId(newId ?? null, 'demo-session');
-          if (!newId) {
-            console.warn(
+          if (!newId && __DEV__) {
+            console.debug(
               '[AITutorScreen] Session creation returned no id — falling back to demo-session'
             );
           }
@@ -122,7 +122,7 @@ export default function AITutorScreen() {
         }
       } catch (err) {
         if (!cancelled) {
-          console.warn(
+          console.error(
             '[AITutorScreen] Failed to create agent session, using demo-session fallback:',
             err
           );

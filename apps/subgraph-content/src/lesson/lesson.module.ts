@@ -4,6 +4,8 @@ import { LessonService } from './lesson.service';
 import { LessonAssetService } from './lesson-asset.service';
 import { LessonPipelineService } from './lesson-pipeline.service';
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service';
+import { PipelineModuleExecutorService } from './pipeline-module-executor.service';
+import { PipelineNatsService } from './pipeline-nats.service';
 import { LessonPipelineSubscriptionService } from './lesson-pipeline-subscription.service';
 import {
   LessonPipelineFieldResolver,
@@ -24,6 +26,8 @@ import { LessonPipelineTemplateResolver } from './lesson-pipeline-template.resol
     LessonAssetService,
     LessonPipelineService,
     LessonPipelineOrchestratorService,
+    PipelineModuleExecutorService,
+    PipelineNatsService,
     // Phase 65: Publish service for PUBLISH_SHARE pipeline module
     LessonPublishService,
     // Phase 65: Real-time pipeline progress via NATS → GraphQL subscriptions

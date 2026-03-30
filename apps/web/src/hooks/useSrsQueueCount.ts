@@ -30,9 +30,5 @@ export function useSrsQueueCount(pause = false): number {
     requestPolicy: 'network-only',
   });
 
-  if (result.error) {
-    console.error('[useSrsQueueCount] GraphQL error:', result.error.message);
-  }
-
   return result.data?.srsQueueCount ?? 0;
 }

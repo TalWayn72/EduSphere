@@ -12,52 +12,25 @@ import {
   schema,
   eq,
   and,
-  desc,
   withTenantContext,
   sql,
   closeAllPools,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
+import { isInstructorRole } from './annotation-access';
+import type { CreateAnnotationInput, UpdateAnnotationInput } from './annotation-access';
+import { AnnotationQueriesService } from './annotation-queries.service';
 
-type AnnotationLayer = 'PERSONAL' | 'SHARED' | 'INSTRUCTOR' | 'AI_GENERATED';
-type AnnotationType =
-  | 'TEXT'
-  | 'SKETCH'
-  | 'LINK'
-  | 'BOOKMARK'
-  | 'SPATIAL_COMMENT'
-  | 'INLINE_COMMENT'
-  | 'SUGGESTION';
-
-interface TextRange {
-  start: number;
-  end: number;
-  rangeType?: string;
-}
-
-interface CreateAnnotationInput {
-  assetId: string;
-  annotationType: AnnotationType;
-  layer?: AnnotationLayer;
-  content: Record<string, unknown>;
-  spatialData?: Record<string, unknown> | null;
-  textRange?: TextRange | null;
-  parentId?: string;
-}
-
-interface UpdateAnnotationInput {
-  content?: unknown;
-  spatialData?: unknown;
-  isResolved?: boolean;
-}
+export type { CreateAnnotationInput, UpdateAnnotationInput } from './annotation-access';
+export type { AnnotationLayer, AnnotationType, TextRange } from './annotation-access';
 
 @Injectable()
 export class AnnotationService implements OnModuleDestroy {
   private readonly logger = new Logger(AnnotationService.name);
   private db: Database;
 
-  constructor() {
+  constructor(private readonly queries: AnnotationQueriesService) {
     this.db = createDatabaseConnection();
   }
 
@@ -77,7 +50,6 @@ export class AnnotationService implements OnModuleDestroy {
     if (!authContext || !authContext.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [annotation] = await tx
@@ -90,7 +62,6 @@ export class AnnotationService implements OnModuleDestroy {
           )
         )
         .limit(1);
-
       return annotation || null;
     });
   }
@@ -105,57 +76,7 @@ export class AnnotationService implements OnModuleDestroy {
     },
     authContext?: AuthContext
   ) {
-    if (!authContext || !authContext.tenantId) {
-      throw new UnauthorizedException('Authentication required');
-    }
-
-    const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const conditions = [sql`${schema.annotations.deleted_at} IS NULL`];
-
-      if (filters.assetId) {
-        conditions.push(eq(schema.annotations.asset_id, filters.assetId));
-      }
-
-      if (filters.userId) {
-        conditions.push(eq(schema.annotations.user_id, filters.userId));
-      }
-
-      // Layer-based access control
-      const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
-        userRole
-      );
-
-      if (filters.layer) {
-        conditions.push(sql`${schema.annotations.layer} = ${filters.layer}`);
-        // PERSONAL layer only visible to owner
-        if (filters.layer === 'PERSONAL') {
-          conditions.push(eq(schema.annotations.user_id, authContext.userId));
-        }
-      } else {
-        // Apply default visibility rules if no layer filter specified
-        if (isInstructor) {
-          // Instructors see everything except others' PERSONAL annotations
-          conditions.push(
-            sql`(${schema.annotations.layer} != 'PERSONAL' OR ${schema.annotations.user_id} = ${authContext.userId})`
-          );
-        } else {
-          // Students see SHARED, INSTRUCTOR, AI_GENERATED, and own PERSONAL
-          conditions.push(
-            sql`(${schema.annotations.layer} IN ('SHARED', 'INSTRUCTOR', 'AI_GENERATED') OR (${schema.annotations.layer} = 'PERSONAL' AND ${schema.annotations.user_id} = ${authContext.userId}))`
-          );
-        }
-      }
-
-      return tx
-        .select()
-        .from(schema.annotations)
-        .where(and(...conditions))
-        .orderBy(desc(schema.annotations.created_at))
-        .limit(filters.limit)
-        .offset(filters.offset);
-    });
+    return this.queries.findAll(filters, authContext);
   }
 
   async findByAsset(
@@ -163,50 +84,7 @@ export class AnnotationService implements OnModuleDestroy {
     layer?: string,
     authContext?: AuthContext
   ) {
-    if (!authContext || !authContext.tenantId) {
-      throw new UnauthorizedException('Authentication required');
-    }
-
-    const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const conditions = [
-        eq(schema.annotations.asset_id, assetId),
-        sql`${schema.annotations.deleted_at} IS NULL`,
-      ];
-
-      // Layer-based access control
-      const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
-        userRole
-      );
-
-      if (layer) {
-        conditions.push(sql`${schema.annotations.layer} = ${layer}`);
-        // PERSONAL layer only visible to owner
-        if (layer === 'PERSONAL') {
-          conditions.push(eq(schema.annotations.user_id, authContext.userId));
-        }
-      } else {
-        // If no layer specified, apply visibility rules
-        if (isInstructor) {
-          // Instructors see everything except others' PERSONAL annotations
-          conditions.push(
-            sql`(${schema.annotations.layer} != 'PERSONAL' OR ${schema.annotations.user_id} = ${authContext.userId})`
-          );
-        } else {
-          // Students see SHARED, INSTRUCTOR, AI_GENERATED, and own PERSONAL
-          conditions.push(
-            sql`(${schema.annotations.layer} IN ('SHARED', 'INSTRUCTOR', 'AI_GENERATED') OR (${schema.annotations.layer} = 'PERSONAL' AND ${schema.annotations.user_id} = ${authContext.userId}))`
-          );
-        }
-      }
-
-      return tx
-        .select()
-        .from(schema.annotations)
-        .where(and(...conditions))
-        .orderBy(desc(schema.annotations.created_at));
-    });
+    return this.queries.findByAsset(assetId, layer, authContext);
   }
 
   async findByUser(
@@ -215,32 +93,13 @@ export class AnnotationService implements OnModuleDestroy {
     offset: number,
     authContext?: AuthContext
   ) {
-    if (!authContext || !authContext.tenantId) {
-      throw new UnauthorizedException('Authentication required');
-    }
-
-    const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      return tx
-        .select()
-        .from(schema.annotations)
-        .where(
-          and(
-            eq(schema.annotations.user_id, userId),
-            sql`${schema.annotations.deleted_at} IS NULL`
-          )
-        )
-        .orderBy(desc(schema.annotations.created_at))
-        .limit(limit)
-        .offset(offset);
-    });
+    return this.queries.findByUser(userId, limit, offset, authContext);
   }
 
   async create(input: CreateAnnotationInput, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [annotation] = await tx
@@ -264,7 +123,6 @@ export class AnnotationService implements OnModuleDestroy {
       if (!annotation) {
         throw new InternalServerErrorException('Failed to create annotation');
       }
-
       this.logger.log(
         `Annotation created: ${annotation.id} by user ${authContext.userId}`
       );
@@ -280,10 +138,8 @@ export class AnnotationService implements OnModuleDestroy {
     if (!authContext || !authContext.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Check ownership before updating
       const [existing] = await tx
         .select()
         .from(schema.annotations)
@@ -295,36 +151,17 @@ export class AnnotationService implements OnModuleDestroy {
         )
         .limit(1);
 
-      if (!existing) {
-        throw new NotFoundException('Annotation not found');
-      }
+      if (!existing) throw new NotFoundException('Annotation not found');
 
-      // Permission check: only owner or instructors can update
-      const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
-        userRole
-      );
       const isOwner = existing.user_id === authContext.userId;
-
-      if (!isOwner && !isInstructor) {
-        throw new ForbiddenException(
-          'You can only update your own annotations'
-        );
+      if (!isOwner && !isInstructorRole(authContext)) {
+        throw new ForbiddenException('You can only update your own annotations');
       }
 
       const updateData: Record<string, unknown> = {};
-
-      if (input.content !== undefined) {
-        updateData.content = input.content;
-      }
-
-      if (input.spatialData !== undefined) {
-        updateData.spatial_data = input.spatialData;
-      }
-
-      if (input.isResolved !== undefined) {
-        updateData.is_resolved = input.isResolved;
-      }
+      if (input.content !== undefined) updateData.content = input.content;
+      if (input.spatialData !== undefined) updateData.spatial_data = input.spatialData;
+      if (input.isResolved !== undefined) updateData.is_resolved = input.isResolved;
 
       const [annotation] = await tx
         .update(schema.annotations)
@@ -335,7 +172,6 @@ export class AnnotationService implements OnModuleDestroy {
       if (!annotation) {
         throw new InternalServerErrorException('Failed to update annotation');
       }
-
       this.logger.log(
         `Annotation updated: ${annotation.id} by user ${authContext.userId}`
       );
@@ -351,10 +187,7 @@ export class AnnotationService implements OnModuleDestroy {
     if (!authContext || !authContext.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-
-    const userRole = authContext.roles[0] || 'STUDENT';
-    const canPromote = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
-    if (!canPromote) {
+    if (!isInstructorRole(authContext)) {
       throw new ForbiddenException('Only instructors can promote annotations');
     }
 
@@ -371,9 +204,7 @@ export class AnnotationService implements OnModuleDestroy {
         )
         .limit(1);
 
-      if (!existing) {
-        throw new NotFoundException('Annotation not found');
-      }
+      if (!existing) throw new NotFoundException('Annotation not found');
 
       const [promoted] = await tx
         .update(schema.annotations)
@@ -384,7 +215,6 @@ export class AnnotationService implements OnModuleDestroy {
       if (!promoted) {
         throw new InternalServerErrorException('Failed to promote annotation');
       }
-
       this.logger.log(
         `Annotation promoted to INSTRUCTOR: ${id} by user ${authContext.userId}`
       );
@@ -396,12 +226,8 @@ export class AnnotationService implements OnModuleDestroy {
     if (!authContext || !authContext.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-
-    // Load parent to inherit layer and assetId
     const parent = await this.findById(parentId, authContext);
-    if (!parent) {
-      throw new NotFoundException('Parent annotation not found');
-    }
+    if (!parent) throw new NotFoundException('Parent annotation not found');
 
     return this.create(
       {
@@ -419,10 +245,8 @@ export class AnnotationService implements OnModuleDestroy {
     if (!authContext || !authContext.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Check ownership before deleting
       const [existing] = await tx
         .select()
         .from(schema.annotations)
@@ -434,21 +258,11 @@ export class AnnotationService implements OnModuleDestroy {
         )
         .limit(1);
 
-      if (!existing) {
-        throw new NotFoundException('Annotation not found');
-      }
+      if (!existing) throw new NotFoundException('Annotation not found');
 
-      // Permission check: only owner or instructors can delete
-      const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
-        userRole
-      );
       const isOwner = existing.user_id === authContext.userId;
-
-      if (!isOwner && !isInstructor) {
-        throw new ForbiddenException(
-          'You can only delete your own annotations'
-        );
+      if (!isOwner && !isInstructorRole(authContext)) {
+        throw new ForbiddenException('You can only delete your own annotations');
       }
 
       const [deleted] = await tx
@@ -463,7 +277,6 @@ export class AnnotationService implements OnModuleDestroy {
         );
         return true;
       }
-
       return false;
     });
   }

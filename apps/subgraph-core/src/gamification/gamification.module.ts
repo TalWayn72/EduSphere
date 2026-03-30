@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BadgeService } from './badge.service.js';
+import { BadgeEventHandlersService } from './badge-event-handlers.service.js';
+import { BadgeQueriesService } from './badge-queries.service.js';
 import { OpenBadgesService } from './open-badges.service.js';
 import { GamificationResolver } from './gamification.resolver.js';
 import { XpService } from './xp.service.js';
@@ -12,6 +14,8 @@ import { BadgeAutoAwardService } from './badge-auto-award.service.js';
 @Module({
   providers: [
     BadgeService,
+    BadgeEventHandlersService,
+    BadgeQueriesService,
     OpenBadgesService,
     GamificationResolver,
     XpService,

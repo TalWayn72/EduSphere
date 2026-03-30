@@ -55,7 +55,7 @@ export function useOfflineSync() {
           await database.updateMutationStatus(item.id, 'synced');
           setPendingCount((prev) => Math.max(0, prev - 1));
         } catch (error) {
-          console.error('Failed to sync mutation:', error);
+          console.error('[useOfflineSync] Failed to sync mutation:', error);
           await database.updateMutationStatus(item.id, 'failed');
         }
       }

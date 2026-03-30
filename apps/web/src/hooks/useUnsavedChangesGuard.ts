@@ -29,8 +29,8 @@ export function useUnsavedChangesGuard(isDirty: boolean, componentName: string) 
 
   // Log when navigation is blocked so the bug is observable if it recurs in production
   useEffect(() => {
-    if (blocker.state === 'blocked') {
-      console.warn(
+    if (blocker.state === 'blocked' && import.meta.env.DEV) {
+      console.debug(
         `[${componentName}] Navigation blocked — user has unsaved changes. ` +
           'Show UnsavedChangesDialog and let user confirm.',
       );

@@ -167,7 +167,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
         } catch (err: unknown) {
           // Abort errors are not retryable
           if (err instanceof DOMException && err.name === 'AbortError') {
-            console.warn(`${LOG_PREFIX} aborted`);
+            if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} aborted`);
             return null;
           }
 
@@ -187,9 +187,11 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
           }
 
           const backoffMs = BASE_DELAY_MS * Math.pow(2, attempt - 1);
-          console.warn(
-            `${LOG_PREFIX} attempt ${attempt}/${maxRetries} failed (${message}) — retrying in ${backoffMs}ms`,
-          );
+          if (import.meta.env.DEV) {
+            console.debug(
+              `${LOG_PREFIX} attempt ${attempt}/${maxRetries} failed (${message}) — retrying in ${backoffMs}ms`,
+            );
+          }
 
           try {
             await delay(backoffMs, controller.signal);
@@ -208,7 +210,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
   const retry = useCallback(async (): Promise<ConfirmResult | null> => {
     const file = lastFileRef.current;
     if (!file) {
-      console.warn(`${LOG_PREFIX} retry called with no previous file`);
+      if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} retry called with no previous file`);
       return null;
     }
     return executeUpload(file);

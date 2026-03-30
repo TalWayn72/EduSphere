@@ -20,7 +20,7 @@ export class BackgroundSyncService {
         await this.performSync();
         return BackgroundFetch.BackgroundFetchResult.NewData;
       } catch (error) {
-        console.error('Background sync failed:', error);
+        console.error('[BackgroundSyncService] Background sync failed:', error);
         return BackgroundFetch.BackgroundFetchResult.Failed;
       }
     });
@@ -38,10 +38,8 @@ export class BackgroundSyncService {
   }
 
   async performSync(): Promise<void> {
-    console.log('Performing background sync...');
-
     if (!this.apolloClient) {
-      console.warn('Apollo client not configured');
+      console.error('[BackgroundSyncService] Apollo client not configured — skipping sync');
       return;
     }
 
@@ -51,11 +49,8 @@ export class BackgroundSyncService {
     const pending = await database.getPendingMutations();
 
     if (pending.length === 0) {
-      console.log('No pending mutations');
       return;
     }
-
-    console.log(`Syncing ${pending.length} pending mutations`);
 
     for (const mutation of pending) {
       try {
@@ -67,9 +62,8 @@ export class BackgroundSyncService {
 
         // Mark as synced
         await database.updateMutationStatus(mutation.id, 'synced');
-        console.log(`Synced mutation ${mutation.id}`);
       } catch (error) {
-        console.error(`Failed to sync mutation ${mutation.id}:`, error);
+        console.error(`[BackgroundSyncService] Failed to sync mutation ${mutation.id}:`, error);
         await database.updateMutationStatus(mutation.id, 'failed');
       }
     }

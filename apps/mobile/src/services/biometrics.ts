@@ -48,7 +48,7 @@ export class BiometricService {
 
       return result.success;
     } catch (error) {
-      console.error('Biometric authentication error:', error);
+      console.error('[BiometricService] Biometric authentication error:', error);
       return false;
     }
   }
@@ -85,7 +85,7 @@ export class BiometricService {
       });
       return value;
     } catch (error) {
-      console.error('Failed to retrieve credential:', error);
+      console.error('[BiometricService] Failed to retrieve credential:', error);
       return null;
     }
   }

@@ -64,12 +64,7 @@ export function SRSWidget() {
     CREATE_REVIEW_CARD_MUTATION
   );
 
-  if (countResult.error) {
-    console.error(
-      '[SRSWidget] GraphQL error fetching queue count:',
-      countResult.error.message
-    );
-  }
+  // Queue count error is handled gracefully with fallback to 0 — no render-time logging.
 
   const queueCount = countResult.data?.srsQueueCount ?? 0;
   const cards = reviewsResult.data?.dueReviews ?? [];

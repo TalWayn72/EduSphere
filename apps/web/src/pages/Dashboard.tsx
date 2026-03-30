@@ -120,9 +120,7 @@ export function Dashboard() {
   });
   const myStats = statsResult.data?.myStats;
 
-  if (statsResult.error) {
-    console.error('[Dashboard] myStats query error:', statsResult.error.message);
-  }
+  // Stats error is handled gracefully via fallback data — no render-time logging.
 
   // --- Derived stats: prefer myStats backend data, then per-query fallback, then MOCK ---
 

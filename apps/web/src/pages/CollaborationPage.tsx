@@ -89,9 +89,7 @@ export function CollaborationPage() {
   const isSchemaValidationError =
     error?.message?.includes('Cannot query field');
 
-  if (error && !isSchemaValidationError) {
-    console.error('[CollaborationPage] GraphQL network error:', error.message);
-  }
+  // Error is exposed via the return value for UI display — no render-time logging.
   const discussions: BackendDiscussion[] =
     (data as { myDiscussions?: BackendDiscussion[] } | undefined)
       ?.myDiscussions ?? [];
