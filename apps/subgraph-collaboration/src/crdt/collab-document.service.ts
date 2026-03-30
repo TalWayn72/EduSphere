@@ -100,8 +100,8 @@ export class CollabDocumentService implements OnModuleDestroy {
       title: (updated as { name?: string })?.name ?? 'Untitled',
       sizeBytes: snapshotSize,
       compactedAt: new Date(),
-      createdAt: updated?.createdAt ?? new Date(),
-      updatedAt: updated?.updatedAt ?? new Date(),
+      createdAt: updated?.created_at ?? new Date(),
+      updatedAt: updated?.updated_at ?? new Date(),
     };
   }
 }
