@@ -3,7 +3,6 @@
  */
 import type { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AddTab } from './types';
 
 interface UrlPanelProps {
   url: string;

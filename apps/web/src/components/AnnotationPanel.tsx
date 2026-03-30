@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import {
   Annotation,
   AnnotationLayer,
-  ANNOTATION_LAYER_CONFIGS,
 } from '@/types/annotations';
 import {
   getThreadedAnnotations,
