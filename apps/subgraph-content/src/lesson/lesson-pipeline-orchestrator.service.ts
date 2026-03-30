@@ -14,7 +14,7 @@ import type { LessonPipelineModuleCompletedPayload } from '@edusphere/nats-clien
 
 function moduleEvent(
   lessonId: string, runId: string, moduleType: string,
-  status: string, tenantId: string
+  status: 'COMPLETED' | 'FAILED', tenantId: string
 ): LessonPipelineModuleCompletedPayload {
   return {
     type: 'lesson.pipeline.module.completed',
