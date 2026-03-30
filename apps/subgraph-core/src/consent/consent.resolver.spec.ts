@@ -39,6 +39,36 @@ describe('ConsentResolver', () => {
     ).rejects.toThrow('Unauthenticated');
   });
 
+  // BUG-092: missing tenantId must throw instead of causing DB null error
+  it('BUG-092: throws when tenantId is missing from auth context', async () => {
+    const context = {
+      req: {},
+      authContext: { userId: 'u-1', roles: ['STUDENT'] },
+    };
+    await expect(
+      resolver.updateConsent(
+        { consentType: 'AI_PROCESSING', given: true },
+        context,
+      ),
+    ).rejects.toThrow('Missing tenant context');
+    expect(mockUpdateConsent).not.toHaveBeenCalled();
+  });
+
+  // BUG-092: service errors must propagate (not swallowed)
+  it('BUG-092: re-throws service errors for GraphQL error response', async () => {
+    mockUpdateConsent.mockRejectedValueOnce(new Error('DB constraint'));
+    const context = {
+      req: {},
+      authContext: { tenantId: 't-1', userId: 'u-1', roles: ['STUDENT'] },
+    };
+    await expect(
+      resolver.updateConsent(
+        { consentType: 'ANALYTICS', given: true },
+        context,
+      ),
+    ).rejects.toThrow('DB constraint');
+  });
+
   // BUG-088 REGRESSION: consent withdrawal (given=false) must also sync
   it('REGRESSION BUG-088: passes given=false for consent withdrawal', async () => {
     const context = {
