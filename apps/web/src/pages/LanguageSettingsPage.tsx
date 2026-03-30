@@ -18,7 +18,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { useAuthRole } from '@/hooks/useAuthRole';
-import { Languages, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Languages, Loader2, CheckCircle2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
 import {

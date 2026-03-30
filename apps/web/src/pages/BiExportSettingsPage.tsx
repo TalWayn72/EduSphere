@@ -53,7 +53,7 @@ interface BiApiToken {
 }
 
 export function BiExportSettingsPage() {
-  const { t } = useTranslation('admin');
+  useTranslation('admin');
   const navigate = useNavigate();
   const role = useAuthRole();
   const [showModal, setShowModal] = useState(false);

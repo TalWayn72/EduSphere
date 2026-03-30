@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
-import type { ThemeMode, FontSize, ThemePrimitives } from '@/lib/theme';
+import type { ThemePrimitives } from '@/lib/theme';
 import { THEME_MODES, FONT_SIZES, hexToHsl } from './ThemeSettingsPage.helpers';
 
 const ICON_MAP: Record<string, React.ElementType> = { Sun, Moon, Monitor };
