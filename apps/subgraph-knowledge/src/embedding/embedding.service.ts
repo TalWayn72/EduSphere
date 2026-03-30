@@ -1,11 +1,5 @@
-import { Injectable, Logger, OnModuleDestroy, Optional, InternalServerErrorException, BadRequestException } from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  schema,
-  eq,
-  sql,
-  closeAllPools,
-} from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy, Optional } from '@nestjs/common';
+import { closeAllPools } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import type {
   EmbeddingRecord,
@@ -14,24 +8,21 @@ import type {
 } from './embedding.types.js';
 import { EmbeddingStoreService } from './embedding-store.service.js';
 import { EmbeddingProviderService } from './embedding-provider.service.js';
+import { EmbeddingFallbackService } from './embedding-fallback.service.js';
 
 export type { EmbeddingRecord, SearchResult, SegmentInput };
 
 const BATCH_SIZE = 20;
 
-const safeDate = (v: unknown): string =>
-  v ? new Date(v as string | number).toISOString() : new Date().toISOString();
-
 /**
  * Facade -- delegates to EmbeddingStoreService + EmbeddingProviderService.
- * Falls back to direct DB/HTTP when sub-services are not injected (unit-test
- * path: spec mocks @edusphere/db and constructs with new EmbeddingService()).
+ * Falls back to EmbeddingFallbackService when sub-services are not injected
+ * (unit-test path: spec mocks @edusphere/db and constructs with new EmbeddingService()).
  */
 @Injectable()
 export class EmbeddingService implements OnModuleDestroy {
   private readonly logger = new Logger(EmbeddingService.name);
-  /** Used only in the no-sub-services fallback path (unit tests). */
-  private readonly db = createDatabaseConnection();
+  private readonly fallback = new EmbeddingFallbackService();
 
   constructor(
     @Optional() private readonly store?: EmbeddingStoreService,
@@ -46,23 +37,20 @@ export class EmbeddingService implements OnModuleDestroy {
 
   async findById(id: string): Promise<EmbeddingRecord> {
     if (this.store) return this.store.findById(id);
-    return this.fallbackFindById(id);
+    return this.fallback.findById(id);
   }
 
   async findBySegment(segmentId: string): Promise<EmbeddingRecord[]> {
     if (this.store) return this.store.findBySegment(segmentId);
-    return this.fallbackFindBySegment(segmentId);
+    return this.fallback.findBySegment(segmentId);
   }
 
   // -- Generation ------------------------------------------------------------
 
-  async generateEmbedding(
-    text: string,
-    segmentId: string
-  ): Promise<EmbeddingRecord> {
+  async generateEmbedding(text: string, segmentId: string): Promise<EmbeddingRecord> {
     const vector = await this.callEmbeddingProvider(text);
     if (this.store) return this.store.upsertContentEmbedding(segmentId, vector);
-    return this.fallbackUpsertContent(segmentId, vector);
+    return this.fallback.upsertContent(segmentId, vector);
   }
 
   async generateBatchEmbeddings(segments: SegmentInput[]): Promise<number> {
@@ -76,25 +64,17 @@ export class EmbeddingService implements OnModuleDestroy {
             await this.generateEmbedding(seg.text, seg.id);
             count++;
           } catch (err) {
-            this.logger.error(
-              `Failed to embed segment ${seg.id}: ${String(err)}`
-            );
+            this.logger.error(`Failed to embed segment ${seg.id}: ${String(err)}`);
           }
         })
       );
     }
-    this.logger.log(
-      `Batch embed complete: ${count}/${segments.length} segments`
-    );
+    this.logger.log(`Batch embed complete: ${count}/${segments.length} segments`);
     return count;
   }
 
   // -- Semantic Search -------------------------------------------------------
 
-  /**
-   * OWASP LLM06 / SI-9: tenantCtx is now required so that all pgvector
-   * similarity queries are executed inside withTenantContext() (RLS enforced).
-   */
   async semanticSearch(
     queryText: string,
     tenantCtx: TenantContext,
@@ -105,30 +85,26 @@ export class EmbeddingService implements OnModuleDestroy {
       : !!(process.env.OLLAMA_URL ?? process.env.OPENAI_API_KEY);
 
     if (!hasProvider) {
-      this.logger.warn(
-        'No embedding provider -- semantic search falling back to ILIKE'
-      );
+      this.logger.warn('No embedding provider -- semantic search falling back to ILIKE');
       return this.store
         ? this.store.ilikeFallback(queryText, limit, tenantCtx)
-        : this.fallbackIlike(queryText, limit);
+        : this.fallback.ilikeFallback(queryText, limit);
     }
 
     let vector: number[];
     try {
       vector = await this.callEmbeddingProvider(queryText);
     } catch (err) {
-      this.logger.warn(
-        `Embedding provider error (${String(err)}) -- using ILIKE fallback`
-      );
+      this.logger.warn(`Embedding provider error (${String(err)}) -- using ILIKE fallback`);
       return this.store
         ? this.store.ilikeFallback(queryText, limit, tenantCtx)
-        : this.fallbackIlike(queryText, limit);
+        : this.fallback.ilikeFallback(queryText, limit);
     }
 
     const vecStr = `[${vector.join(',')}]`;
     return this.store
       ? this.store.searchByVector(vecStr, limit, tenantCtx)
-      : this.fallbackVectorSearch(vecStr, limit);
+      : this.fallback.vectorSearch(vecStr, limit);
   }
 
   async semanticSearchByVector(
@@ -140,30 +116,26 @@ export class EmbeddingService implements OnModuleDestroy {
     const vecStr = `[${queryVector.join(',')}]`;
     return this.store
       ? this.store.searchByVector(vecStr, limit, tenantCtx, minSimilarity)
-      : this.fallbackVectorSearch(vecStr, limit, minSimilarity);
+      : this.fallback.vectorSearch(vecStr, limit, minSimilarity);
   }
 
   // -- Delete ----------------------------------------------------------------
 
-  /**
-   * Cascade-delete all embedding rows for a concept vertex.
-   * Delegates to EmbeddingStoreService; fallback uses direct DB query.
-   */
   async deleteByConceptId(conceptId: string): Promise<number> {
     if (this.store) return this.store.deleteByConceptId(conceptId);
-    return this.fallbackDeleteByConceptId(conceptId);
+    return this.fallback.deleteByConceptId(conceptId);
   }
 
   async delete(id: string): Promise<boolean> {
     if (this.store) return this.store.delete(id);
-    return this.fallbackDelete(id);
+    return this.fallback.deleteById(id);
   }
 
   // -- Public helper (used by tests + semanticSearch internally) -------------
 
   async callEmbeddingProvider(text: string): Promise<number[]> {
     if (this.provider) return this.provider.generateEmbedding(text);
-    return this.directProviderCall(text);
+    return this.fallback.directProviderCall(text);
   }
 
   // -- Legacy shims ----------------------------------------------------------
@@ -176,287 +148,5 @@ export class EmbeddingService implements OnModuleDestroy {
   async deleteByContentItem(_contentItemId: string): Promise<number> {
     this.logger.warn('deleteByContentItem is deprecated');
     return 0;
-  }
-
-  // -- Fallback implementations (no-sub-services / unit-test path) -----------
-
-  private async fallbackFindById(id: string): Promise<EmbeddingRecord> {
-    const { NotFoundException } = await import('@nestjs/common');
-
-    const [ce] = await this.db
-      .select()
-      .from(schema.content_embeddings)
-      .where(eq(schema.content_embeddings.id, id))
-      .limit(1);
-    if (ce)
-      return this.mapContent(
-        ce as {
-          id: string;
-          segment_id: string;
-          embedding: number[];
-          created_at: Date;
-        }
-      );
-
-    const [ae] = await this.db
-      .select()
-      .from(schema.annotation_embeddings)
-      .where(eq(schema.annotation_embeddings.id, id))
-      .limit(1);
-    if (ae)
-      return this.mapAnnotation(
-        ae as {
-          id: string;
-          annotation_id: string;
-          embedding: number[];
-          created_at: Date;
-        }
-      );
-
-    const [conc] = await this.db
-      .select()
-      .from(schema.concept_embeddings)
-      .where(eq(schema.concept_embeddings.id, id))
-      .limit(1);
-    if (conc)
-      return this.mapConcept(
-        conc as {
-          id: string;
-          concept_id: string;
-          embedding: number[];
-          created_at: Date;
-        }
-      );
-
-    throw new NotFoundException(`Embedding with ID ${id} not found`);
-  }
-
-  private async fallbackFindBySegment(
-    segmentId: string
-  ): Promise<EmbeddingRecord[]> {
-    const rows = await this.db
-      .select()
-      .from(schema.content_embeddings)
-      .where(eq(schema.content_embeddings.segment_id, segmentId));
-    return rows.map((r) =>
-      this.mapContent(
-        r as {
-          id: string;
-          segment_id: string;
-          embedding: number[];
-          created_at: Date;
-        }
-      )
-    );
-  }
-
-  private async fallbackUpsertContent(
-    segmentId: string,
-    vector: number[]
-  ): Promise<EmbeddingRecord> {
-    const vecStr = `[${vector.join(',')}]`;
-    type R = {
-      id: string;
-      segment_id: string;
-      embedding: number[];
-      created_at: Date;
-    };
-    const [row] = (await this.db.execute<R>(sql`
-      INSERT INTO content_embeddings (segment_id, embedding)
-      VALUES (${segmentId}, ${vecStr}::vector)
-      ON CONFLICT (segment_id)
-      DO UPDATE SET embedding = EXCLUDED.embedding
-      RETURNING id, segment_id, embedding, created_at
-    `)) as unknown as R[];
-    if (!row) throw new InternalServerErrorException('Failed to upsert content embedding');
-    this.logger.log(
-      `Generated embedding: segmentId=${segmentId} dim=${vector.length}`
-    );
-    return this.mapContent(row);
-  }
-
-  private async fallbackIlike(
-    query: string,
-    limit: number
-  ): Promise<SearchResult[]> {
-    const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
-    const term = '%' + escaped + '%';
-    const rows = await this.db
-      .select({
-        id: schema.transcript_segments.id,
-        text: schema.transcript_segments.text,
-      })
-      .from(schema.transcript_segments)
-      .where(sql`${schema.transcript_segments.text} ILIKE ${term}`)
-      .limit(limit);
-    return rows.map((r) => ({
-      id: r.id,
-      refId: r.id,
-      type: 'transcript_segment',
-      similarity: 0.75,
-    }));
-  }
-
-  private async fallbackVectorSearch(
-    vecStr: string,
-    limit: number,
-    minSimilarity = 0
-  ): Promise<SearchResult[]> {
-    type R = {
-      id: string;
-      segment_id: string;
-      type: string;
-      similarity: string;
-    };
-    if (minSimilarity > 0) {
-      const rows = (await this.db.execute<R>(sql`
-        SELECT 'content' AS type, ce.id, ce.segment_id,
-          1 - (ce.embedding <=> ${vecStr}::vector) AS similarity
-        FROM content_embeddings ce
-        WHERE 1 - (ce.embedding <=> ${vecStr}::vector) >= ${minSimilarity}
-        ORDER BY ce.embedding <=> ${vecStr}::vector ASC
-        LIMIT ${limit}
-      `)) as unknown as R[];
-      return rows.map((r) => ({
-        id: r.id,
-        refId: r.segment_id,
-        type: r.type,
-        similarity: parseFloat(r.similarity),
-      }));
-    }
-    const rows = (await this.db.execute<R>(sql`
-      SELECT ce.id, ce.segment_id,
-        1 - (ce.embedding <=> ${vecStr}::vector) AS similarity
-      FROM content_embeddings ce
-      JOIN transcript_segments ts ON ts.id = ce.segment_id
-      ORDER BY ce.embedding <=> ${vecStr}::vector ASC
-      LIMIT ${limit}
-    `)) as unknown as R[];
-    return rows.map((r) => ({
-      id: r.id,
-      refId: r.segment_id,
-      type: 'transcript_segment',
-      similarity: parseFloat(r.similarity),
-    }));
-  }
-
-  private async fallbackDeleteByConceptId(conceptId: string): Promise<number> {
-    const rows = await this.db
-      .delete(schema.concept_embeddings)
-      .where(eq(schema.concept_embeddings.concept_id, conceptId))
-      .returning({ id: schema.concept_embeddings.id });
-    if (rows.length > 0) {
-      this.logger.log(
-        `Cascade-deleted ${rows.length} orphaned concept embedding(s) for concept ${conceptId}`
-      );
-    }
-    return rows.length;
-  }
-
-  private async fallbackDelete(id: string): Promise<boolean> {
-    const [c] = await this.db
-      .delete(schema.content_embeddings)
-      .where(eq(schema.content_embeddings.id, id))
-      .returning({ id: schema.content_embeddings.id });
-    if (c) return true;
-
-    const [a] = await this.db
-      .delete(schema.annotation_embeddings)
-      .where(eq(schema.annotation_embeddings.id, id))
-      .returning({ id: schema.annotation_embeddings.id });
-    if (a) return true;
-
-    const [conc] = await this.db
-      .delete(schema.concept_embeddings)
-      .where(eq(schema.concept_embeddings.id, id))
-      .returning({ id: schema.concept_embeddings.id });
-    return !!conc;
-  }
-
-  private async directProviderCall(text: string): Promise<number[]> {
-    const ollamaUrl = process.env.OLLAMA_URL;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    const model = process.env.EMBEDDING_MODEL ?? 'nomic-embed-text';
-
-    if (ollamaUrl) {
-      const resp = await fetch(
-        `${ollamaUrl.replace(/\/$/g, '')}/api/embeddings`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, prompt: text }),
-        }
-      );
-      if (!resp.ok) throw new BadRequestException(`Ollama error ${resp.status}`);
-      const json = (await resp.json()) as { embedding: number[] };
-      return json.embedding;
-    }
-
-    if (openaiKey) {
-      const resp = await fetch('https://api.openai.com/v1/embeddings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${openaiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'text-embedding-3-small',
-          input: text,
-          dimensions: 768,
-        }),
-      });
-      if (!resp.ok) throw new BadRequestException(`OpenAI error ${resp.status}`);
-      const json = (await resp.json()) as {
-        data: Array<{ embedding: number[] }>;
-      };
-      return json.data[0]!.embedding;
-    }
-
-    throw new BadRequestException('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
-  }
-
-  private mapContent(r: {
-    id: string;
-    segment_id: string;
-    embedding: number[];
-    created_at: Date | null;
-  }): EmbeddingRecord {
-    return {
-      id: r.id,
-      type: 'content',
-      refId: r.segment_id,
-      embedding: r.embedding,
-      createdAt: safeDate(r.created_at),
-    };
-  }
-
-  private mapAnnotation(r: {
-    id: string;
-    annotation_id: string;
-    embedding: number[];
-    created_at: Date | null;
-  }): EmbeddingRecord {
-    return {
-      id: r.id,
-      type: 'annotation',
-      refId: r.annotation_id,
-      embedding: r.embedding,
-      createdAt: safeDate(r.created_at),
-    };
-  }
-
-  private mapConcept(r: {
-    id: string;
-    concept_id: string;
-    embedding: number[];
-    created_at: Date | null;
-  }): EmbeddingRecord {
-    return {
-      id: r.id,
-      type: 'concept',
-      refId: r.concept_id,
-      embedding: r.embedding,
-      createdAt: safeDate(r.created_at),
-    };
   }
 }

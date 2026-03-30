@@ -3,11 +3,13 @@ import { EmbeddingResolver } from './embedding.resolver';
 import { EmbeddingService } from './embedding.service';
 import { EmbeddingStoreService } from './embedding-store.service';
 import { EmbeddingProviderService } from './embedding-provider.service';
+import { EmbeddingFallbackService } from './embedding-fallback.service';
 
 @Module({
   providers: [
     EmbeddingResolver,
     EmbeddingService,
+    EmbeddingFallbackService,
     EmbeddingStoreService,
     EmbeddingProviderService,
   ],

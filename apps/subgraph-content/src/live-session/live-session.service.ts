@@ -8,13 +8,6 @@ import {
 } from '@nestjs/common';
 import { randomUUID, randomBytes } from 'crypto';
 import {
-  connect,
-  StringCodec,
-  type NatsConnection,
-  type Subscription,
-} from 'nats';
-import { buildNatsOptions } from '@edusphere/nats-client';
-import {
   createDatabaseConnection,
   closeAllPools,
   schema,
@@ -25,11 +18,7 @@ import {
   deriveTenantKey,
 } from '@edusphere/db';
 import { createBbbClient, BBB_DEMO_JOIN_URL } from './bbb.client';
-
-const NATS_SUBJECT = 'EDUSPHERE.live.session.ended';
-const NATS_SESSION_CREATED = 'EDUSPHERE.sessions.created';
-const NATS_SESSION_ENDED = 'EDUSPHERE.sessions.ended';
-const NATS_PARTICIPANT_JOINED = 'EDUSPHERE.sessions.participant.joined';
+import { LiveSessionRecordingService } from './live-session-recording.service';
 
 const MODERATOR_ROLES = ['INSTRUCTOR', 'ADMIN', 'ORG_ADMIN', 'SUPER_ADMIN'];
 
@@ -66,20 +55,12 @@ interface DbLiveSession {
 export class LiveSessionService implements OnModuleDestroy {
   private readonly logger = new Logger(LiveSessionService.name);
   private readonly db = createDatabaseConnection();
-  private readonly sc = StringCodec();
-  private natsConn: NatsConnection | null = null;
-  private natsSub: Subscription | null = null;
 
-  constructor() {
-    void this.subscribeToSessionEnded();
-  }
+  constructor(
+    private readonly recordingService: LiveSessionRecordingService
+  ) {}
 
   async onModuleDestroy(): Promise<void> {
-    this.natsSub?.unsubscribe();
-    if (this.natsConn) {
-      await this.natsConn.drain().catch(() => undefined);
-      this.natsConn = null;
-    }
     await closeAllPools();
   }
 
@@ -102,19 +83,6 @@ export class LiveSessionService implements OnModuleDestroy {
     return randomBytes(16).toString('hex');
   }
 
-  private async publishNatsEvent(subject: string, payload: object): Promise<void> {
-    try {
-      // SI-7: Uses buildNatsOptions() for TLS/NKey authentication support.
-      if (!this.natsConn) {
-        this.natsConn = await connect(buildNatsOptions());
-      }
-      this.natsConn.publish(subject, this.sc.encode(JSON.stringify(payload)));
-      this.logger.debug(`[LiveSessionService] Published ${subject}`);
-    } catch (err) {
-      this.logger.warn(`[LiveSessionService] NATS publish failed (non-fatal): ${err}`);
-    }
-  }
-
   async createLiveSession(
     contentItemId: string,
     tenantId: string,
@@ -125,7 +93,6 @@ export class LiveSessionService implements OnModuleDestroy {
     const attendeePassword = this.generatePassword();
     const moderatorPassword = this.generatePassword();
 
-    // SI-3: Encrypt passwords with tenant-derived AES-256-GCM key before INSERT.
     const tenantKey = deriveTenantKey(tenantId);
     const attendeePasswordEnc = encryptField(attendeePassword, tenantKey);
     const moderatorPasswordEnc = encryptField(moderatorPassword, tenantKey);
@@ -133,40 +100,25 @@ export class LiveSessionService implements OnModuleDestroy {
     const [session] = await this.db
       .insert(schema.liveSessions)
       .values({
-        contentItemId,
-        tenantId,
-        bbbMeetingId,
-        meetingName,
-        scheduledAt,
-        attendeePasswordEnc,
-        moderatorPasswordEnc,
-        status: 'SCHEDULED',
+        contentItemId, tenantId, bbbMeetingId, meetingName, scheduledAt,
+        attendeePasswordEnc, moderatorPasswordEnc, status: 'SCHEDULED',
       })
       .returning();
 
     if (!session) throw new InternalServerErrorException('Failed to insert live session');
 
-    await this.publishNatsEvent(NATS_SESSION_CREATED, {
-      sessionId: session.id,
-      tenantId,
-      scheduledAt: scheduledAt.toISOString(),
-    });
+    await this.recordingService.publishSessionCreated(session.id, tenantId, scheduledAt);
 
     const bbb = createBbbClient();
     if (bbb) {
       try {
-        await bbb.createMeeting(
-          bbbMeetingId,
-          meetingName,
-          attendeePassword,
-          moderatorPassword
-        );
+        await bbb.createMeeting(bbbMeetingId, meetingName, attendeePassword, moderatorPassword);
         this.logger.log(`BBB meeting created: ${bbbMeetingId}`);
       } catch (err) {
         this.logger.warn(`BBB createMeeting failed (non-fatal): ${err}`);
       }
     } else {
-      this.logger.debug('BBB not configured — using demo mode');
+      this.logger.debug('BBB not configured - using demo mode');
     }
 
     return this.map(session as DbLiveSession);
@@ -177,16 +129,12 @@ export class LiveSessionService implements OnModuleDestroy {
     tenantId: string
   ): Promise<LiveSessionResult | null> {
     const [row] = await this.db
-      .select()
-      .from(schema.liveSessions)
-      .where(
-        and(
-          eq(schema.liveSessions.contentItemId, contentItemId),
-          eq(schema.liveSessions.tenantId, tenantId)
-        )
-      )
+      .select().from(schema.liveSessions)
+      .where(and(
+        eq(schema.liveSessions.contentItemId, contentItemId),
+        eq(schema.liveSessions.tenantId, tenantId)
+      ))
       .limit(1);
-
     return row ? this.map(row as DbLiveSession) : null;
   }
 
@@ -197,46 +145,32 @@ export class LiveSessionService implements OnModuleDestroy {
     userRole: string
   ): Promise<string> {
     const [session] = await this.db
-      .select()
-      .from(schema.liveSessions)
-      .where(
-        and(
-          eq(schema.liveSessions.id, sessionId),
-          eq(schema.liveSessions.tenantId, tenantId)
-        )
-      )
+      .select().from(schema.liveSessions)
+      .where(and(
+        eq(schema.liveSessions.id, sessionId),
+        eq(schema.liveSessions.tenantId, tenantId)
+      ))
       .limit(1);
 
-    if (!session)
-      throw new NotFoundException(`LiveSession ${sessionId} not found`);
+    if (!session) throw new NotFoundException(`LiveSession ${sessionId} not found`);
 
     const typedSession = session as DbLiveSession;
-    if (typedSession.status === 'ENDED') {
-      throw new ForbiddenException('Session has ended');
-    }
+    if (typedSession.status === 'ENDED') throw new ForbiddenException('Session has ended');
 
     const isModerator = MODERATOR_ROLES.includes(userRole);
-    // SI-3: Decrypt the stored ciphertext before passing to the BBB client.
     const tenantKey = deriveTenantKey(tenantId);
     const encryptedPassword = isModerator
       ? typedSession.moderatorPasswordEnc
       : typedSession.attendeePasswordEnc;
     const password = decryptField(encryptedPassword, tenantKey);
 
-    await this.publishNatsEvent(NATS_PARTICIPANT_JOINED, {
-      sessionId,
-      tenantId,
-      userId: userName,
-    });
+    await this.recordingService.publishParticipantJoined(sessionId, tenantId, userName);
 
     const bbb = createBbbClient();
     if (!bbb) {
-      this.logger.debug(
-        `BBB not configured — returning demo join URL for session=${sessionId}`
-      );
+      this.logger.debug(`BBB not configured - returning demo join URL for session=${sessionId}`);
       return BBB_DEMO_JOIN_URL;
     }
-
     return bbb.buildJoinUrl(typedSession.bbbMeetingId, userName, password);
   }
 
@@ -247,16 +181,13 @@ export class LiveSessionService implements OnModuleDestroy {
     const [updated] = await this.db
       .update(schema.liveSessions)
       .set({ status: 'ENDED', endedAt: new Date() })
-      .where(
-        and(
-          eq(schema.liveSessions.id, sessionId),
-          eq(schema.liveSessions.tenantId, tenantId)
-        )
-      )
+      .where(and(
+        eq(schema.liveSessions.id, sessionId),
+        eq(schema.liveSessions.tenantId, tenantId)
+      ))
       .returning();
 
-    if (!updated)
-      throw new NotFoundException(`LiveSession ${sessionId} not found`);
+    if (!updated) throw new NotFoundException(`LiveSession ${sessionId} not found`);
 
     const typedUpdated = updated as DbLiveSession;
     const endedAt = typedUpdated.endedAt ?? new Date();
@@ -266,54 +197,12 @@ export class LiveSessionService implements OnModuleDestroy {
 
     this.logger.log(`[LiveSessionService] Session ended: ${sessionId}`);
 
-    await this.publishNatsEvent(NATS_SESSION_ENDED, {
-      sessionId,
-      tenantId,
-      endedAt: endedAt.toISOString(),
-      durationSeconds,
-    });
-
-    // Also signal legacy NATS subject for recording pipeline
-    this.natsConn?.publish(
-      NATS_SUBJECT,
-      this.sc.encode(JSON.stringify({ sessionId, tenantId }))
+    await this.recordingService.publishSessionEnded(
+      sessionId, tenantId, endedAt, typedUpdated.startedAt ?? null, durationSeconds
     );
+    this.recordingService.publishLegacySessionEnded(sessionId, tenantId);
 
     return this.map(typedUpdated);
-  }
-
-  async processRecording(sessionId: string, tenantId: string): Promise<void> {
-    const [session] = await this.db
-      .select()
-      .from(schema.liveSessions)
-      .where(
-        and(
-          eq(schema.liveSessions.id, sessionId),
-          eq(schema.liveSessions.tenantId, tenantId)
-        )
-      )
-      .limit(1);
-
-    if (!session) return;
-
-    const typedSession = session as DbLiveSession;
-
-    await this.db
-      .update(schema.liveSessions)
-      .set({ status: 'RECORDING' })
-      .where(eq(schema.liveSessions.id, sessionId));
-
-    const bbb = createBbbClient();
-    if (!bbb) return;
-
-    const recordingUrl = await bbb.getRecordingUrl(typedSession.bbbMeetingId);
-    if (recordingUrl) {
-      await this.db
-        .update(schema.liveSessions)
-        .set({ recordingUrl, status: 'ENDED' })
-        .where(eq(schema.liveSessions.id, sessionId));
-      this.logger.log(`Recording saved for session=${sessionId}`);
-    }
   }
 
   async listSessions(
@@ -323,8 +212,7 @@ export class LiveSessionService implements OnModuleDestroy {
     offset = 0
   ): Promise<LiveSessionResult[]> {
     const rows = await this.db
-      .select()
-      .from(schema.liveSessions)
+      .select().from(schema.liveSessions)
       .where(
         status
           ? and(
@@ -336,7 +224,6 @@ export class LiveSessionService implements OnModuleDestroy {
       .orderBy(schema.liveSessions.scheduledAt)
       .limit(limit)
       .offset(offset);
-
     return (rows as DbLiveSession[]).map((r) => this.map(r));
   }
 
@@ -345,46 +232,12 @@ export class LiveSessionService implements OnModuleDestroy {
     tenantId: string
   ): Promise<LiveSessionResult | null> {
     const [row] = await this.db
-      .select()
-      .from(schema.liveSessions)
-      .where(
-        and(
-          eq(schema.liveSessions.id, sessionId),
-          eq(schema.liveSessions.tenantId, tenantId)
-        )
-      )
+      .select().from(schema.liveSessions)
+      .where(and(
+        eq(schema.liveSessions.id, sessionId),
+        eq(schema.liveSessions.tenantId, tenantId)
+      ))
       .limit(1);
-
     return row ? this.map(row as DbLiveSession) : null;
-  }
-
-  private async subscribeToSessionEnded(): Promise<void> {
-    const natsUrl = process.env.NATS_URL ?? 'nats://localhost:4222';
-    try {
-      this.natsConn = await connect({ servers: natsUrl });
-      this.natsSub = this.natsConn.subscribe(NATS_SUBJECT);
-
-      void (async () => {
-        if (!this.natsSub) return;
-        for await (const msg of this.natsSub) {
-          try {
-            const payload = JSON.parse(this.sc.decode(msg.data)) as {
-              sessionId: string;
-              tenantId: string;
-            };
-            this.logger.log(
-              `NATS: session ended — sessionId=${payload.sessionId}`
-            );
-            await this.processRecording(payload.sessionId, payload.tenantId);
-          } catch (err) {
-            this.logger.error('Error processing session.ended event', err);
-          }
-        }
-      })();
-
-      this.logger.log(`Subscribed to ${NATS_SUBJECT}`);
-    } catch (err) {
-      this.logger.warn(`NATS subscription failed (non-fatal): ${err}`);
-    }
   }
 }

@@ -3,6 +3,7 @@ import { LessonResolver } from './lesson.resolver';
 import { LessonService } from './lesson.service';
 import { LessonAssetService } from './lesson-asset.service';
 import { LessonPipelineService } from './lesson-pipeline.service';
+import { LessonPipelineQueryService } from './lesson-pipeline-query.service';
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service';
 import { PipelineModuleExecutorService } from './pipeline-module-executor.service';
 import { PipelineNatsService } from './pipeline-nats.service';
@@ -25,6 +26,7 @@ import { LessonPipelineTemplateResolver } from './lesson-pipeline-template.resol
     LessonService,
     LessonAssetService,
     LessonPipelineService,
+    LessonPipelineQueryService,
     LessonPipelineOrchestratorService,
     PipelineModuleExecutorService,
     PipelineNatsService,

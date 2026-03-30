@@ -11,6 +11,7 @@ import { DomainProvisioningService } from './domain-provisioning.service';
 import { OrgDomainService } from './org-domain.service';
 import { TenantPlanService } from './tenant-plan.service';
 import { OrgOnboardingResolver } from './org-onboarding.resolver';
+import { OrgOnboardingApiResolver } from './org-onboarding-api.resolver';
 import { OrgAnalyticsService } from '../analytics/org-analytics.service';
 import { AtRiskLearnerService } from '../analytics/at-risk-learner.service';
 import { OrgGamificationService } from '../gamification/org-gamification.service';
@@ -33,6 +34,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     OrgDomainService,
     TenantPlanService,
     OrgOnboardingResolver,
+    OrgOnboardingApiResolver,
     OrgAnalyticsService,
     AtRiskLearnerService,
     OrgGamificationService,

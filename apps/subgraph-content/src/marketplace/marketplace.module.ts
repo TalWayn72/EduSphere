@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { StripeClient } from './stripe.client.js';
 import { MarketplaceEarningsService } from './marketplace.earnings.service.js';
+import { MarketplaceListingService } from './marketplace-listing.service.js';
+import { MarketplacePurchaseService } from './marketplace-purchase.service.js';
+import { MarketplaceSearchService } from './marketplace-search.service.js';
 import { MarketplaceService } from './marketplace.service.js';
 import { MarketplaceController } from './marketplace.controller.js';
 import { MarketplaceResolver } from './marketplace.resolver.js';
@@ -16,6 +19,9 @@ import { CourseCopyService } from './course-copy.service.js';
   providers: [
     StripeClient,
     MarketplaceEarningsService,
+    MarketplaceListingService,
+    MarketplacePurchaseService,
+    MarketplaceSearchService,
     MarketplaceService,
     MarketplaceResolver,
     InstructorPayoutService,

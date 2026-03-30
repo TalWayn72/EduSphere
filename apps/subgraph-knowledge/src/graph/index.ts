@@ -4,6 +4,7 @@
  */
 export { GraphService } from './graph.service';
 export { GraphResolver } from './graph.resolver';
+export { GraphQueryResolver } from './graph-query.resolver';
 export { GraphConceptService } from './graph-concept.service';
 export { GraphConceptLinkService } from './graph-concept-link.service';
 export { GraphSearchService } from './graph-search.service';
@@ -21,6 +22,8 @@ export {
   type ConceptNode,
   type LearningPathResult,
 } from './cypher-learning-path.service';
+export { KMeansAlgorithmService } from './kmeans-algorithm.service';
+export type { ConceptWithEmbedding, KMeansCluster } from './kmeans-algorithm.service';
 export { KMeansDataService } from './kmeans-data.service';
 export { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 export { SocialRecommendationsService } from './social-recommendations.service';

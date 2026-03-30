@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GraphResolver } from './graph.resolver';
+import { GraphQueryResolver } from './graph-query.resolver';
 import { GraphService } from './graph.service';
 import { GraphConceptService } from './graph-concept.service';
 import { GraphConceptLinkService } from './graph-concept-link.service';
@@ -15,6 +16,7 @@ import { CypherSourceService } from './cypher-source.service';
 import { CypherTopicClusterService } from './cypher-topic-cluster.service';
 import { CypherLearningPathService } from './cypher-learning-path.service';
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
+import { KMeansAlgorithmService } from './kmeans-algorithm.service';
 import { KMeansDataService } from './kmeans-data.service';
 import { EmbeddingModule } from '../embedding/embedding.module';
 import { EmbeddingDataLoader } from '../embedding/embedding.dataloader';
@@ -43,9 +45,10 @@ import { MergeConceptsService } from './merge-concepts.service';
     CypherSourceService,
     CypherTopicClusterService,
     CypherLearningPathService,
-    // ── K-means topic clustering data + orchestrator
+    // ── K-means topic clustering data + algorithm + orchestrator
+    KMeansAlgorithmService,
     KMeansDataService,
-    TopicClusterKMeansService, // depends on CypherTopicClusterService + KMeansDataService
+    TopicClusterKMeansService, // depends on CypherTopicClusterService + KMeansAlgorithmService
     // ── Layer 2: CypherService facade (depends on all domain Cypher services above)
     CypherService,
     // ── Layer 3: Application sub-services (depend on domain Cypher services)
@@ -58,6 +61,7 @@ import { MergeConceptsService } from './merge-concepts.service';
     GraphService,
     // ── Resolvers & supporting services
     GraphResolver,
+    GraphQueryResolver,
     AutoPathResolver,
     AutoPathService,
     AdaptivePathResolver,

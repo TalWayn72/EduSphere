@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LiveSessionResolver } from './live-session.resolver';
 import { LiveSessionService } from './live-session.service';
+import { LiveSessionRecordingService } from './live-session-recording.service';
 import { BreakoutService } from './breakout.service';
 import { PollService } from './poll.service';
 import { LiveSessionExtensionsResolver } from './live-session-extensions.resolver';
@@ -8,11 +9,12 @@ import { LiveSessionExtensionsResolver } from './live-session-extensions.resolve
 @Module({
   providers: [
     LiveSessionResolver,
+    LiveSessionRecordingService,
     LiveSessionService,
     BreakoutService,
     PollService,
     LiveSessionExtensionsResolver,
   ],
-  exports: [LiveSessionService, BreakoutService, PollService],
+  exports: [LiveSessionService, LiveSessionRecordingService, BreakoutService, PollService],
 })
 export class LiveSessionModule {}

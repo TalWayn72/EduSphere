@@ -1,22 +1,19 @@
-import React, { lazy, Suspense, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation } from 'urql';
+import React, { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { toast } from 'sonner';
 import { ArrowLeft, ArrowRight, Check, Download } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 import { AiCourseCreatorModal } from '@/components/AiCourseCreatorModal';
-// Step 1 is shown immediately — keep eager
 import { CourseWizardStep1 } from './CourseWizardStep1';
-// Steps 2–4 are lazy: avoids pulling TipTap+KaTeX (~450 KB) on initial page load.
-// RichEditor (TipTap StarterKit + 8 extensions + lowlight + KaTeX) lives in
-// CourseWizardMediaStep and must NOT be downloaded until the user reaches step 2.
+import { PageShell } from '@/components/PageShell';
+import { DRAFT_COURSE_ID } from './CourseCreatePage.types';
+import { useCourseCreate } from './useCourseCreate';
+
+// Re-export for backward compatibility
+export { courseSchema, type CourseSchemaValues } from './CourseCreatePage.types';
+
 const CourseWizardStep2 = lazy(() =>
   import('./CourseWizardStep2').then((m) => ({ default: m.CourseWizardStep2 }))
 );
@@ -28,239 +25,40 @@ const CourseWizardMediaStep = lazy(() =>
 const CourseWizardStep3 = lazy(() =>
   import('./CourseWizardStep3').then((m) => ({ default: m.CourseWizardStep3 }))
 );
-import {
-  DEFAULT_FORM,
-  type CourseFormData,
-  type Difficulty,
-} from './course-create.types';
-import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
-import { getCurrentUser } from '@/lib/auth';
-import { PageShell } from '@/components/PageShell';
 
-// ── Zod schema for Step 1 fields ─────────────────────────────────────────────
-export const courseSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z
-    .string()
-    .min(10, 'Description must be at least 10 characters')
-    .or(z.literal('')),
-  difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
-  duration: z.string().optional(),
-  thumbnail: z.string().min(1, 'Thumbnail required'),
-});
-
-export type CourseSchemaValues = z.infer<typeof courseSchema>;
-
-// ── GraphQL: SCORM export mutation ────────────────────────────────────────────
-const EXPORT_SCORM_MUTATION = `
-  mutation ExportScorm($courseId: ID!) {
-    exportCourseAsScorm2004(courseId: $courseId) {
-      downloadUrl
-      expiresAt
-      fileSizeBytes
-    }
-  }
-`;
-
-interface ExportScormResult {
-  exportCourseAsScorm2004: {
-    downloadUrl: string;
-    expiresAt: string;
-    fileSizeBytes: number;
-  };
-}
-
-interface ExportScormVariables {
-  courseId: string;
-}
-
-// ── GraphQL types ─────────────────────────────────────────────────────────────
-interface CreateCourseResult {
-  createCourse: {
-    id: string;
-    title: string;
-    slug: string;
-    description: string | null;
-    isPublished: boolean;
-    estimatedHours: number | null;
-    createdAt: string;
-  };
-}
-
-interface CreateCourseVariables {
-  input: {
-    title: string;
-    slug: string;
-    description?: string;
-    instructorId: string;
-    isPublished: boolean;
-    estimatedHours?: number;
-  };
-}
-
-const DRAFT_COURSE_ID = 'draft';
+const LazyFallback = (
+  <div className="flex items-center justify-center py-12">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+  </div>
+);
 
 export function CourseCreatePage() {
   const { t } = useTranslation('courses');
-  const navigate = useNavigate();
-  const user = getCurrentUser();
+  const {
+    step,
+    setStep,
+    form,
+    wizardData,
+    currentData,
+    updateWizard,
+    showAiModal,
+    setShowAiModal,
+    isSubmitting,
+    isExporting,
+    handleExportScorm,
+    handleNextFromStep1,
+    handlePublish,
+    canAdvanceStep1,
+    navigate,
+  } = useCourseCreate();
 
   const STEPS = [
-    {
-      label: t('wizard.step1Label'),
-      description: t('wizard.step1Description'),
-    },
-    {
-      label: t('wizard.step2Label'),
-      description: t('wizard.step2Description'),
-    },
-    {
-      label: t('wizard.mediaLabel'),
-      description: t('wizard.mediaDescription'),
-    },
-    {
-      label: t('wizard.publishLabel'),
-      description: t('wizard.publishDescription'),
-    },
+    { label: t('wizard.step1Label'), description: t('wizard.step1Description') },
+    { label: t('wizard.step2Label'), description: t('wizard.step2Description') },
+    { label: t('wizard.mediaLabel'), description: t('wizard.mediaDescription') },
+    { label: t('wizard.publishLabel'), description: t('wizard.publishDescription') },
   ];
-  const [step, setStep] = useState(0);
-  const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
-  const [showAiModal, setShowAiModal] = useState(false);
 
-  const form = useForm<CourseSchemaValues>({
-    resolver: zodResolver(courseSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      difficulty: 'BEGINNER',
-      duration: '',
-      thumbnail: '📚',
-    },
-    mode: 'onTouched',
-  });
-
-  const [createResult, executeMutation] = useMutation<
-    CreateCourseResult,
-    CreateCourseVariables
-  >(CREATE_COURSE_MUTATION);
-
-  const [exportScormResult, executeExportScorm] = useMutation<
-    ExportScormResult,
-    ExportScormVariables
-  >(EXPORT_SCORM_MUTATION);
-
-  const isSubmitting = createResult.fetching;
-  const isExporting = exportScormResult.fetching;
-
-  const handleExportScorm = async () => {
-    const courseId = form.getValues('title')
-      ? DRAFT_COURSE_ID
-      : DRAFT_COURSE_ID;
-    const { data, error } = await executeExportScorm({ courseId });
-    if (error) {
-      console.error('[CourseCreatePage] SCORM export failed:', error.message);
-      toast.error('Failed to export SCORM package. Please try again.');
-      return;
-    }
-    if (data?.exportCourseAsScorm2004) {
-      const { downloadUrl, expiresAt } = data.exportCourseAsScorm2004;
-      const expiry = new Date(expiresAt).toLocaleTimeString();
-      toast.success(
-        `SCORM 2004 package ready — link expires at ${expiry}`,
-        {
-          description: (
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline text-indigo-400 dark:text-indigo-300"
-            >
-              Download SCORM package
-            </a>
-          ),
-          duration: 15000,
-        }
-      );
-    }
-  };
-
-  // Sync RHF values into wizard state for non-RHF steps to read
-  const syncWizardData = () => {
-    const vals = form.getValues();
-    setWizardData((prev) => ({
-      ...prev,
-      title: vals.title,
-      description: vals.description ?? '',
-      difficulty: vals.difficulty as Difficulty,
-      duration: vals.duration ?? '',
-      thumbnail: vals.thumbnail,
-    }));
-  };
-
-  const handleNextFromStep1 = async () => {
-    const valid = await form.trigger(['title', 'description', 'difficulty']);
-    if (!valid) return;
-    syncWizardData();
-    setStep(1);
-  };
-
-  const handlePublish = async (publish: boolean) => {
-    const vals = form.getValues();
-    const rawSlug = vals.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    const slug = rawSlug || `course-${Date.now().toString(36)}`;
-    const instructorId = user?.id ?? '';
-
-    const { data, error } = await executeMutation({
-      input: {
-        title: vals.title,
-        slug,
-        description: vals.description || undefined,
-        instructorId,
-        isPublished: publish,
-      },
-    });
-
-    if (error) {
-      // Always show a user-friendly message — never raw GraphQL error strings
-      // (e.g. database constraint violations, field-level resolver messages).
-      toast.error('Failed to create course. Please try again.');
-      return;
-    }
-
-    if (data?.createCourse) {
-      const label = publish
-        ? `"${data.createCourse.title}" has been published!`
-        : `"${data.createCourse.title}" saved as draft.`;
-      toast.success(label);
-      navigate(`/courses/${data.createCourse.id}`);
-    }
-  };
-
-  // Single subscription for all watched fields — avoids 5 separate re-render cycles per keystroke.
-  const [
-    watchedTitle,
-    watchedDescription,
-    watchedDifficulty,
-    watchedThumbnail,
-  ] = form.watch(['title', 'description', 'difficulty', 'thumbnail']);
-
-  // Merged view of form data for steps 2–4 that display wizard state
-  const currentData: CourseFormData = {
-    ...wizardData,
-    title: watchedTitle || wizardData.title,
-    description: watchedDescription || wizardData.description,
-    difficulty: (watchedDifficulty as Difficulty) || wizardData.difficulty,
-    thumbnail: watchedThumbnail || wizardData.thumbnail,
-  };
-
-  const updateWizard = (updates: Partial<CourseFormData>) => {
-    setWizardData((prev) => ({ ...prev, ...updates }));
-  };
-
-  const canAdvanceStep1 = watchedTitle?.trim().length >= 3;
   const lastContentStep = STEPS.length - 2;
 
   return (
@@ -268,11 +66,7 @@ export function CourseCreatePage() {
       <PageShell size="sm">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/courses')}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('title')}
           </Button>
@@ -280,75 +74,18 @@ export function CourseCreatePage() {
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-0">
-          {STEPS.map((s, i) => (
-            <React.Fragment key={s.label}>
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
-                    i < step
-                      ? 'bg-primary border-primary text-primary-foreground'
-                      : i === step
-                        ? 'border-primary text-primary'
-                        : 'border-muted-foreground/30 text-muted-foreground'
-                  }`}
-                >
-                  {i < step ? <Check className="h-4 w-4" /> : i + 1}
-                </div>
-                <div className="text-center hidden sm:block">
-                  <p
-                    className={`text-xs font-medium ${i === step ? 'text-foreground' : 'text-muted-foreground'}`}
-                  >
-                    {s.label}
-                  </p>
-                </div>
-              </div>
-              {i < STEPS.length - 1 && (
-                <div
-                  className={`flex-1 h-0.5 mx-2 transition-colors ${
-                    i < step ? 'bg-primary' : 'bg-muted-foreground/20'
-                  }`}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+        <StepIndicator steps={STEPS} currentStep={step} />
 
         {/* Step content */}
         <Card className="p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold">{STEPS[step]?.label}</h2>
-            <p className="text-sm text-muted-foreground">
-              {STEPS[step]?.description}
-            </p>
+            <p className="text-sm text-muted-foreground">{STEPS[step]?.description}</p>
           </div>
 
           {step === 0 && (
             <>
-              {/* AI Course Builder CTA */}
-              <div
-                data-testid="ai-builder-cta"
-                className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5 dark:border-indigo-400/30 dark:bg-indigo-400/10"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">✨</span>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-indigo-300 dark:text-indigo-400">
-                      {t('aiCreator.builderTitle')}
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
-                      {t('aiCreator.builderDescription')}
-                    </p>
-                  </div>
-                  <Button
-                    data-testid="launch-ai-builder-btn"
-                    onClick={() => setShowAiModal(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500"
-                  >
-                    {t('aiCreator.launchAiBuilder')}
-                  </Button>
-                </div>
-              </div>
+              <AiBuilderCta t={t} onLaunch={() => setShowAiModal(true)} />
               <AiCourseCreatorModal open={showAiModal} onClose={() => setShowAiModal(false)} />
             </>
           )}
@@ -356,18 +93,9 @@ export function CourseCreatePage() {
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}
           </Form>
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-              </div>
-            }
-          >
+          <Suspense fallback={LazyFallback}>
             {step === 1 && (
-              <CourseWizardStep2
-                modules={wizardData.modules}
-                onChange={updateWizard}
-              />
+              <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />
             )}
             {step === 2 && (
               <CourseWizardMediaStep
@@ -389,18 +117,12 @@ export function CourseCreatePage() {
         {/* Navigation */}
         {step < STEPS.length - 1 && (
           <div className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setStep((s) => s - 1)}
-              disabled={step === 0}
-            >
+            <Button variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('wizard.back')}
             </Button>
             <Button
-              onClick={
-                step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)
-              }
+              onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
               disabled={step === 0 && !canAdvanceStep1}
             >
               {t('wizard.next')}
@@ -432,5 +154,72 @@ export function CourseCreatePage() {
         )}
       </PageShell>
     </Layout>
+  );
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+interface StepIndicatorProps {
+  steps: { label: string; description: string }[];
+  currentStep: number;
+}
+
+function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
+  return (
+    <div className="flex items-center gap-0">
+      {steps.map((s, i) => (
+        <React.Fragment key={s.label}>
+          <div className="flex flex-col items-center gap-1">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
+                i < currentStep
+                  ? 'bg-primary border-primary text-primary-foreground'
+                  : i === currentStep
+                    ? 'border-primary text-primary'
+                    : 'border-muted-foreground/30 text-muted-foreground'
+              }`}
+            >
+              {i < currentStep ? <Check className="h-4 w-4" /> : i + 1}
+            </div>
+            <div className="text-center hidden sm:block">
+              <p className={`text-xs font-medium ${i === currentStep ? 'text-foreground' : 'text-muted-foreground'}`}>
+                {s.label}
+              </p>
+            </div>
+          </div>
+          {i < steps.length - 1 && (
+            <div className={`flex-1 h-0.5 mx-2 transition-colors ${i < currentStep ? 'bg-primary' : 'bg-muted-foreground/20'}`} />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+function AiBuilderCta({ t, onLaunch }: { t: (key: string) => string; onLaunch: () => void }) {
+  return (
+    <div
+      data-testid="ai-builder-cta"
+      className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5 dark:border-indigo-400/30 dark:bg-indigo-400/10"
+    >
+      <div className="flex items-start gap-3">
+        <span className="text-2xl">{'\u2728'}</span>
+        <div className="flex-1">
+          <h3 className="font-semibold text-indigo-300 dark:text-indigo-400">
+            {t('aiCreator.builderTitle')}
+          </h3>
+          <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
+            {t('aiCreator.builderDescription')}
+          </p>
+        </div>
+        <Button
+          data-testid="launch-ai-builder-btn"
+          onClick={onLaunch}
+          className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500"
+        >
+          {t('aiCreator.launchAiBuilder')}
+        </Button>
+      </div>
+    </div>
   );
 }
