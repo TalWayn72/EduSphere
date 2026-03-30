@@ -2,9 +2,13 @@
  * CanvasDropZone — droppable canvas for the portal builder.
  * Accepts dropped block types from BlockPalette, renders existing blocks
  * in sortable order with remove and drag-to-reorder support.
+ *
+ * IS-5568 / WCAG 2.5.7: keyboard Up/Down buttons for reordering blocks
+ * so users who cannot drag can still reorganise the canvas.
  */
 import { useRef } from 'react';
-import { GripVertical, X } from 'lucide-react';
+import { ChevronUp, ChevronDown, GripVertical, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { PortalBlock, BlockType } from './types';
 import { BlockRenderer } from './blocks/BlockRenderer';
 
@@ -17,7 +21,6 @@ interface Props {
 
 export function CanvasDropZone({ blocks, onDrop, onRemove, onReorder }: Props) {
   const dragIdx = useRef<number | null>(null);
-  const isDraggingPalette = useRef<boolean>(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -29,15 +32,12 @@ export function CanvasDropZone({ blocks, onDrop, onRemove, onReorder }: Props) {
     const paletteType = e.dataTransfer.getData('blockType') as BlockType | '';
     if (paletteType) {
       onDrop(paletteType);
-      isDraggingPalette.current = false;
       return;
     }
-    // Reorder drop on canvas (no target index = append, handled via block-level drop)
   };
 
   const handleBlockDragStart = (idx: number) => {
     dragIdx.current = idx;
-    isDraggingPalette.current = false;
   };
 
   const handleBlockDrop = (e: React.DragEvent, toIdx: number) => {
@@ -52,6 +52,13 @@ export function CanvasDropZone({ blocks, onDrop, onRemove, onReorder }: Props) {
       onReorder(dragIdx.current, toIdx);
     }
     dragIdx.current = null;
+  };
+
+  /** Keyboard reorder: move block at idx up or down by one position */
+  const handleMove = (idx: number, direction: 'up' | 'down') => {
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= blocks.length) return;
+    onReorder(idx, targetIdx);
   };
 
   if (blocks.length === 0) {
@@ -74,19 +81,24 @@ export function CanvasDropZone({ blocks, onDrop, onRemove, onReorder }: Props) {
       className="flex-1 flex flex-col gap-3 overflow-y-auto"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      role="region"
+      role="list"
       aria-label="Portal canvas"
     >
+      {/* WCAG 2.5.7 — screen-reader instruction for keyboard users */}
+      <span className="sr-only">
+        Keyboard users: use the up and down buttons on each block to reorder
+      </span>
       {blocks.map((block, idx) => (
         <div
           key={block.id}
+          role="listitem"
           draggable
           onDragStart={() => handleBlockDragStart(idx)}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleBlockDrop(e, idx)}
           className="relative group border rounded-xl bg-background overflow-hidden
             cursor-grab active:cursor-grabbing hover:border-primary/50 transition-colors"
-          aria-label={`${block.type} block`}
+          aria-label={`${block.type} block, position ${idx + 1} of ${blocks.length}`}
         >
           <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
             <GripVertical
@@ -94,11 +106,36 @@ export function CanvasDropZone({ blocks, onDrop, onRemove, onReorder }: Props) {
               aria-hidden
             />
           </div>
+
+          {/* Keyboard-accessible reorder controls (IS-5568 / WCAG 2.5.7) */}
+          <div className="absolute top-2 left-8 z-10 flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              disabled={idx === 0}
+              aria-label={`Move ${block.type} block up`}
+              onClick={() => handleMove(idx, 'up')}
+            >
+              <ChevronUp className="h-3 w-3" aria-hidden />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              disabled={idx === blocks.length - 1}
+              aria-label={`Move ${block.type} block down`}
+              onClick={() => handleMove(idx, 'down')}
+            >
+              <ChevronDown className="h-3 w-3" aria-hidden />
+            </Button>
+          </div>
+
           <button
             onClick={() => onRemove(block.id)}
             className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100
-              transition-opacity p-1 rounded-md bg-destructive/80 text-destructive-foreground
-              hover:bg-destructive"
+              focus:opacity-100 transition-opacity p-1 rounded-md bg-destructive/80
+              text-destructive-foreground hover:bg-destructive"
             aria-label={`Remove ${block.type} block`}
           >
             <X className="h-3 w-3" />

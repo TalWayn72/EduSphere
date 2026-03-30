@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import i18n from 'i18next';
 import { RTL_LOCALES, type SupportedLocale } from '@edusphere/i18n';
+import { applyDocumentDirection } from '@/lib/i18n';
 
 interface DirectionContextValue {
   direction: 'ltr' | 'rtl';
@@ -24,6 +25,9 @@ export function DirectionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleLanguageChanged = (lng: string) => {
       setDirection(getDirection(lng));
+      // IS-5568 / WCAG 3.1.1: keep <html lang> and dir in sync on every
+      // language change, regardless of which code path triggered it.
+      applyDocumentDirection(lng);
     };
     i18n.on('languageChanged', handleLanguageChanged);
     return () => {

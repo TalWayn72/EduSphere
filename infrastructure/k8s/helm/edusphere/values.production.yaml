@@ -159,6 +159,10 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.tls: 'true'
 
+# ── mTLS — SI-6: inter-service mTLS enforced via Linkerd ────────────────────
+mtls:
+  enabled: true
+
 # ── Pod Disruption Budget (cluster-level availability guarantee) ──────────────
 podDisruptionBudget:
   minAvailable: 1

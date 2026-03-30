@@ -126,6 +126,10 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-staging
     traefik.ingress.kubernetes.io/router.tls: 'true'
 
+# ── mTLS — SI-6: inter-service mTLS enforced via Linkerd ────────────────────
+mtls:
+  enabled: true
+
 # ── External services — shared staging cluster ────────────────────────────────
 # Staging uses a shared PostgreSQL and Redis instance (not bundled via Helm).
 # Connection strings are pulled from the 'edusphere-staging-secrets' Secret

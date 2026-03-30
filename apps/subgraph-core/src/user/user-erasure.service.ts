@@ -7,6 +7,8 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
+import { ErasureProofService } from './erasure-proof.service.js';
+import type { ErasureProof, ManifestEntry } from './erasure-proof.service.js';
 
 /**
  * GDPR Art.17 — Right to Erasure (Right to be Forgotten).
@@ -18,9 +20,11 @@ import type { Database } from '@edusphere/db';
 export class UserErasureService implements OnModuleDestroy {
   private readonly logger = new Logger(UserErasureService.name);
   private readonly db: Database;
+  private readonly proofService: ErasureProofService;
 
   constructor() {
     this.db = createDatabaseConnection();
+    this.proofService = new ErasureProofService();
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -118,6 +122,21 @@ export class UserErasureService implements OnModuleDestroy {
       report.status = 'COMPLETED';
       report.completedAt = new Date();
 
+      // Generate cryptographic erasure proof
+      const manifestEntries: ManifestEntry[] = report.deletedEntities.map(
+        (e) => ({ table: e.type, rowsDeleted: e.count })
+      );
+      try {
+        report.proof = await this.proofService.generateAndStore(
+          userId, tenantId, requestedBy, manifestEntries
+        );
+      } catch (proofError) {
+        this.logger.error(
+          { userId, tenantId, proofError },
+          'Failed to generate erasure proof — erasure itself succeeded'
+        );
+      }
+
       // Write audit log (append-only — outside erasure transaction so it survives)
       await this.writeAuditLog(
         tenantId,
@@ -184,4 +203,5 @@ export interface ErasureReport {
   deletedEntities: { type: string; count: number }[];
   status: 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
   error?: string;
+  proof?: ErasureProof;
 }

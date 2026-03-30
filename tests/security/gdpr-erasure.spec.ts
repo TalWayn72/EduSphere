@@ -1,10 +1,7 @@
 /**
- * Static security tests for GDPR Art.17 (Right to Erasure) and Art.20 (Data Portability).
- * G-03 and G-11 implementation verification.
- *
- * Phase: Static analysis — no database required.
- * These tests verify that the committed service files contain the structural
- * and behavioral prerequisites for GDPR compliance.
+ * Static security tests for GDPR Art.17 (Right to Erasure).
+ * G-03 and G-03b (cryptographic proof) implementation verification.
+ * G-11 (Data Portability) moved to gdpr-portability.spec.ts.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
@@ -115,72 +112,137 @@ describe('G-03: Right to Erasure (GDPR Art.17)', () => {
   });
 });
 
-// ── G-11: Data Portability (GDPR Art.20) ─────────────────────────────────────
+// ── G-03b: Cryptographic Proof of Erasure ────────────────────────────────────
 
-describe('G-11: Data Portability (GDPR Art.20)', () => {
-  const EXPORT_SERVICE = 'apps/subgraph-core/src/user/user-export.service.ts';
+describe('G-03b: Cryptographic Proof of Erasure', () => {
+  const PROOF_SERVICE =
+    'apps/subgraph-core/src/user/erasure-proof.service.ts';
+  const ERASURE_LOG_SCHEMA =
+    'packages/db/src/schema/gdpr-erasure-log.ts';
+  const MIGRATION =
+    'packages/db/src/migrations/0043_gdpr_erasure_log.sql';
 
-  it('user-export.service.ts exists', () => {
-    expect(fileExists(EXPORT_SERVICE)).toBe(true);
+  it('erasure-proof.service.ts exists', () => {
+    expect(fileExists(PROOF_SERVICE)).toBe(true);
   });
 
-  it('export includes user profile data', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/profile/);
-    expect(content).toMatch(/schema\.users/);
+  it('gdpr-erasure-log schema exists', () => {
+    expect(fileExists(ERASURE_LOG_SCHEMA)).toBe(true);
   });
 
-  it('export includes annotations (personal notes)', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/annotations/);
-    expect(content).toMatch(/schema\.annotations/);
+  it('migration 0043 exists for gdpr_erasure_log', () => {
+    expect(fileExists(MIGRATION)).toBe(true);
   });
 
-  it('export includes agentSessions (AI conversation history)', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/agentSessions/);
-    expect(content).toMatch(/schema\.agentSessions/);
+  it('proof service uses SHA-256 for hashing', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain("createHash('sha256')");
   });
 
-  it('export includes learningProgress', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/learningProgress|userProgress/);
-    expect(content).toMatch(/schema\.userProgress/);
+  it('proof service uses HMAC-SHA256 for signing', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain("createHmac('sha256'");
   });
 
-  it('export writes audit log with EXPORT action', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toContain("'GDPR_EXPORT'");
-    expect(content).toContain("gdprArticle: '20'");
+  it('proof service hashes userId (no PII in log)', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain('hashUserId');
+    expect(content).toContain("createHash('sha256')");
   });
 
-  it('export returns structured UserDataExport (not void)', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/Promise<UserDataExport>/);
+  it('proof service generates a verification token', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain('createVerificationToken');
+    expect(content).toContain('verificationToken');
   });
 
-  it('export interface includes exportedAt timestamp', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/exportedAt/);
+  it('proof service stores proof in gdprErasureLog', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain('schema.gdprErasureLog');
+    expect(content).toContain('.insert(');
   });
 
-  it('export interface includes gdprArticle field set to 20', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/gdprArticle.*'20'/s);
+  it('proof service has verifyErasure method', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain('async verifyErasure');
   });
 
-  it('export interface exported for external use', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toMatch(/export interface UserDataExport/);
+  it('proof service has verifyToken method', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain('verifyToken');
   });
 
-  it('export uses withTenantContext for RLS enforcement', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toContain('withTenantContext');
+  it('erasure log schema has RLS enabled', () => {
+    const content = readFile(ERASURE_LOG_SCHEMA);
+    expect(content).toContain('enableRLS()');
+    expect(content).toContain('pgPolicy');
   });
 
-  it('export uses parallel Promise.all for efficiency', () => {
-    const content = readFile(EXPORT_SERVICE);
-    expect(content).toContain('Promise.all');
+  it('erasure log stores user_id as hash not plaintext', () => {
+    const content = readFile(ERASURE_LOG_SCHEMA);
+    expect(content).toContain('user_id_hash');
+    expect(content).not.toMatch(/user_id['"]?\)\.notNull/);
+  });
+
+  it('migration creates RLS policy', () => {
+    const content = readFile(MIGRATION);
+    expect(content).toContain('ENABLE ROW LEVEL SECURITY');
+    expect(content).toContain('CREATE POLICY');
+  });
+
+  it('erasure service integrates proof generation', () => {
+    const content = readFile(
+      'apps/subgraph-core/src/user/user-erasure.service.ts'
+    );
+    expect(content).toContain('ErasureProofService');
+    expect(content).toContain('generateAndStore');
+  });
+
+  it('proof service has unit tests', () => {
+    expect(
+      fileExists(
+        'apps/subgraph-core/src/user/erasure-proof.service.spec.ts'
+      )
+    ).toBe(true);
+  });
+
+  it('GraphQL schema includes verifyErasure query', () => {
+    const content = readFile(
+      'apps/subgraph-core/src/admin/audit.graphql'
+    );
+    expect(content).toContain('verifyErasure');
+    expect(content).toContain('ErasureVerification');
+  });
+
+  it('verifyErasure requires ORG_ADMIN or SUPER_ADMIN', () => {
+    const content = readFile(
+      'apps/subgraph-core/src/admin/audit.graphql'
+    );
+    const verifyBlock = content.slice(
+      content.indexOf('verifyErasure')
+    );
+    expect(verifyBlock).toContain('@authenticated');
+    expect(verifyBlock).toContain('ORG_ADMIN');
+    expect(verifyBlock).toContain('SUPER_ADMIN');
+  });
+
+  it('resolver wires verifyErasure to proof service', () => {
+    const content = readFile(
+      'apps/subgraph-core/src/admin/audit-log.resolver.ts'
+    );
+    expect(content).toContain('verifyErasure');
+    expect(content).toContain('ErasureProofService');
+  });
+
+  it('uses GDPR_SIGNING_KEY env var', () => {
+    const content = readFile(PROOF_SERVICE);
+    expect(content).toContain('GDPR_SIGNING_KEY');
+  });
+
+  it('schema exports gdprErasureLog from index', () => {
+    const content = readFile('packages/db/src/schema/index.ts');
+    expect(content).toContain('gdpr-erasure-log');
   });
 });
+
+// G-11 (Data Portability) tests moved to gdpr-portability.spec.ts

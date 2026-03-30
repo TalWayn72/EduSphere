@@ -159,7 +159,7 @@ export function PortalBuilderPage() {
 
       {/* Two-panel body */}
       <div className="flex flex-1 overflow-hidden">
-        <BlockPalette />
+        <BlockPalette onAdd={handleDrop} />
         <main className="flex-1 p-6 overflow-y-auto bg-muted/10">
           <CanvasDropZone
             blocks={blocks}

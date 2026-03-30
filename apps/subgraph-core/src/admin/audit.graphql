@@ -57,3 +57,22 @@ extend type Mutation {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
+
+type ErasureVerification {
+  userIdHash: String!
+  tenantId: ID!
+  requestedAt: String!
+  completedAt: String
+  tablesAffected: [String!]!
+  rowsDeletedCount: Int!
+  erasureHash: String!
+  verificationToken: String!
+  isValid: Boolean!
+  status: String!
+}
+
+extend type Query {
+  verifyErasure(userId: ID!): ErasureVerification
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

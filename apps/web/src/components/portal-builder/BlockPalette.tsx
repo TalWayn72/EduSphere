@@ -53,9 +53,11 @@ const PALETTE_ITEMS: PaletteItem[] = [
 
 interface Props {
   onDragStart?: (type: BlockType) => void;
+  /** IS-5568 / WCAG 2.5.7: click-to-add alternative for keyboard users */
+  onAdd?: (type: BlockType) => void;
 }
 
-export function BlockPalette({ onDragStart }: Props) {
+export function BlockPalette({ onDragStart, onAdd }: Props) {
   const handleDragStart = (e: React.DragEvent, type: BlockType) => {
     e.dataTransfer.setData('blockType', type);
     e.dataTransfer.effectAllowed = 'copy';
@@ -68,13 +70,16 @@ export function BlockPalette({ onDragStart }: Props) {
         Block Types
       </h2>
       {PALETTE_ITEMS.map((item) => (
-        <div
+        <button
           key={item.type}
+          type="button"
           draggable
           onDragStart={(e) => handleDragStart(e, item.type)}
+          onClick={() => onAdd?.(item.type)}
           className="flex items-start gap-3 p-3 rounded-lg border bg-background cursor-grab
-            hover:border-primary/50 hover:shadow-sm active:cursor-grabbing transition-all select-none"
-          aria-label={`Drag to add ${item.label}`}
+            hover:border-primary/50 hover:shadow-sm active:cursor-grabbing transition-all
+            select-none text-start focus-visible:ring-2 focus-visible:ring-primary"
+          aria-label={`Add ${item.label} block`}
         >
           <GripVertical
             className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0"
@@ -89,7 +94,7 @@ export function BlockPalette({ onDragStart }: Props) {
               {item.description}
             </span>
           </div>
-        </div>
+        </button>
       ))}
     </aside>
   );

@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import { AuditLogService } from './audit-log.service.js';
+import { ErasureProofService } from '../user/erasure-proof.service.js';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -10,7 +11,11 @@ interface GraphQLContext {
 
 @Resolver()
 export class AuditLogResolver {
-  constructor(private readonly auditLogService: AuditLogService) {}
+  private readonly erasureProofService: ErasureProofService;
+
+  constructor(private readonly auditLogService: AuditLogService) {
+    this.erasureProofService = new ErasureProofService();
+  }
 
   @Query('adminAuditLog')
   async getAdminAuditLog(
@@ -60,5 +65,14 @@ export class AuditLogResolver {
       ctx.authContext.tenantId ?? ''
     );
     return true;
+  }
+
+  @Query('verifyErasure')
+  async verifyErasure(
+    @Args('userId') userId: string,
+    @Context() ctx: GraphQLContext
+  ) {
+    if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
+    return this.erasureProofService.verifyErasure(userId);
   }
 }

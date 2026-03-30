@@ -18,29 +18,29 @@ describe('BlockPalette', () => {
     expect(screen.getByText('CTA Button')).toBeInTheDocument();
   });
 
-  it('renders 6 draggable items', () => {
+  it('renders 6 draggable button items', () => {
     render(<BlockPalette />);
     const items = screen
-      .getAllByRole('generic')
+      .getAllByRole('button')
       .filter((el) => el.getAttribute('draggable') === 'true');
     expect(items).toHaveLength(6);
   });
 
-  it('each item has an aria-label following "Drag to add X" pattern', () => {
+  it('each item has an aria-label following "Add X block" pattern', () => {
     render(<BlockPalette />);
     expect(
-      screen.getByLabelText('Drag to add Hero Banner')
+      screen.getByLabelText('Add Hero Banner block')
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText('Drag to add Featured Courses')
+      screen.getByLabelText('Add Featured Courses block')
     ).toBeInTheDocument();
-    expect(screen.getByLabelText('Drag to add CTA Button')).toBeInTheDocument();
+    expect(screen.getByLabelText('Add CTA Button block')).toBeInTheDocument();
   });
 
   it('calls onDragStart with correct block type on dragstart', () => {
     const onDragStart = vi.fn();
     render(<BlockPalette onDragStart={onDragStart} />);
-    const heroBanner = screen.getByLabelText('Drag to add Hero Banner');
+    const heroBanner = screen.getByLabelText('Add Hero Banner block');
     fireEvent.dragStart(heroBanner, {
       dataTransfer: { setData: vi.fn(), effectAllowed: '' },
     });
@@ -49,7 +49,7 @@ describe('BlockPalette', () => {
 
   it('does not throw when onDragStart is not provided', () => {
     render(<BlockPalette />);
-    const textBlock = screen.getByLabelText('Drag to add Text Block');
+    const textBlock = screen.getByLabelText('Add Text Block block');
     expect(() =>
       fireEvent.dragStart(textBlock, {
         dataTransfer: { setData: vi.fn(), effectAllowed: '' },
@@ -61,5 +61,21 @@ describe('BlockPalette', () => {
     render(<BlockPalette />);
     expect(screen.getByText('Full-width header with CTA')).toBeInTheDocument();
     expect(screen.getByText('Rich text content')).toBeInTheDocument();
+  });
+
+  // ── IS-5568 / WCAG 2.5.7 — click-to-add keyboard alternative ──────────
+
+  it('calls onAdd with block type when button is clicked', () => {
+    const onAdd = vi.fn();
+    render(<BlockPalette onAdd={onAdd} />);
+    fireEvent.click(screen.getByLabelText('Add Hero Banner block'));
+    expect(onAdd).toHaveBeenCalledWith('HeroBanner');
+  });
+
+  it('does not throw when onAdd is not provided and button clicked', () => {
+    render(<BlockPalette />);
+    expect(() =>
+      fireEvent.click(screen.getByLabelText('Add Stat Widget block'))
+    ).not.toThrow();
   });
 });

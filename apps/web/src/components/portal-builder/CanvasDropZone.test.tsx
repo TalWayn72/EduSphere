@@ -88,17 +88,78 @@ describe('CanvasDropZone', () => {
     render(
       <CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} onDrop={onDrop} />
     );
-    const canvas = screen.getByRole('region', { name: /portal canvas$/i });
+    const canvas = screen.getByRole('list', { name: /portal canvas$/i });
     fireEvent.drop(canvas, {
       dataTransfer: { getData: vi.fn(() => 'CTAButton') },
     });
     expect(onDrop).toHaveBeenCalledWith('CTAButton');
   });
 
-  it('canvas region has accessible label when blocks exist', () => {
+  it('canvas list has accessible label when blocks exist', () => {
     render(<CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} />);
     expect(
-      screen.getByRole('region', { name: /^Portal canvas$/i })
+      screen.getByRole('list', { name: /^Portal canvas$/i })
+    ).toBeInTheDocument();
+  });
+
+  // ── IS-5568 / WCAG 2.5.7 — Keyboard reorder buttons ────────────────────
+
+  it('renders Move up and Move down buttons for each block', () => {
+    render(<CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} />);
+    expect(
+      screen.getByRole('button', { name: /move HeroBanner block up/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /move HeroBanner block down/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /move TextBlock block up/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /move TextBlock block down/i })
+    ).toBeInTheDocument();
+  });
+
+  it('Move up is disabled on the first block', () => {
+    render(<CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} />);
+    expect(
+      screen.getByRole('button', { name: /move HeroBanner block up/i })
+    ).toBeDisabled();
+  });
+
+  it('Move down is disabled on the last block', () => {
+    render(<CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} />);
+    expect(
+      screen.getByRole('button', { name: /move TextBlock block down/i })
+    ).toBeDisabled();
+  });
+
+  it('clicking Move down calls onReorder with correct indices', () => {
+    const onReorder = vi.fn();
+    render(
+      <CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} onReorder={onReorder} />
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: /move HeroBanner block down/i })
+    );
+    expect(onReorder).toHaveBeenCalledWith(0, 1);
+  });
+
+  it('clicking Move up calls onReorder with correct indices', () => {
+    const onReorder = vi.fn();
+    render(
+      <CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} onReorder={onReorder} />
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: /move TextBlock block up/i })
+    );
+    expect(onReorder).toHaveBeenCalledWith(1, 0);
+  });
+
+  it('renders sr-only keyboard instruction', () => {
+    render(<CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} />);
+    expect(
+      screen.getByText(/keyboard users: use the up and down buttons/i)
     ).toBeInTheDocument();
   });
 });

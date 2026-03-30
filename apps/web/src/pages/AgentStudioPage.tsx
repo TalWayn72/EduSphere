@@ -77,22 +77,26 @@ export interface WorkflowEdge {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function PaletteItem({ type }: { type: NodeType }) {
+function PaletteItem({ type, onAdd }: { type: NodeType; onAdd: (t: NodeType) => void }) {
   const meta = NODE_META[type];
   return (
-    <div
+    <button
+      type="button"
       draggable
       onDragStart={(e) => e.dataTransfer.setData('nodeType', type)}
+      onClick={() => onAdd(type)}
       className={cn(
         'flex flex-col items-center gap-1 p-2 rounded-lg border cursor-grab select-none text-center',
+        'focus-visible:ring-2 focus-visible:ring-primary',
         meta.bg,
         meta.color
       )}
       data-testid={`palette-${type.toLowerCase()}`}
+      aria-label={`Add ${meta.label} node`}
     >
       {meta.icon}
       <span className="text-[10px] font-semibold">{meta.label}</span>
-    </div>
+    </button>
   );
 }
 
@@ -125,6 +129,17 @@ export function AgentStudioPage() {
       { id, type, label: NODE_META[type].label, x: Math.max(0, x), y: Math.max(0, y) },
     ]);
   }, []);
+
+  /** IS-5568 / WCAG 2.5.7: keyboard click-to-add alternative for palette items */
+  const handlePaletteAdd = useCallback((type: NodeType) => {
+    const id = `node-${Date.now()}`;
+    // Place new nodes in a stacked layout when added via keyboard
+    const yOffset = nodes.length * 60;
+    setNodes((prev) => [
+      ...prev,
+      { id, type, label: NODE_META[type].label, x: 40, y: 40 + yOffset },
+    ]);
+  }, [nodes.length]);
 
   // ── Edge connection ───────────────────────────────────────────────────────
 
@@ -259,7 +274,7 @@ export function AgentStudioPage() {
           </p>
           <div className="flex flex-col gap-2">
             {(Object.keys(NODE_META) as NodeType[]).map((type) => (
-              <PaletteItem key={type} type={type} />
+              <PaletteItem key={type} type={type} onAdd={handlePaletteAdd} />
             ))}
           </div>
         </Card>

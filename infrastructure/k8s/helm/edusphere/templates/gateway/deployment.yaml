@@ -41,9 +41,15 @@ spec:
               value: {{ .Values.gateway.port | quote }}
             - name: NODE_ENV
               value: production
+            {{- $protocol := "http" }}
+            {{- if $.Values.mtls }}
+            {{- if $.Values.mtls.enabled }}
+            {{- $protocol = "https" }}
+            {{- end }}
+            {{- end }}
             {{- range winget,  := .Values.subgraphs }}
             - name: SUBGRAPH_{{ winget | upper }}_URL
-              value: "http://{{ include "edusphere.fullname" $ }}-subgraph-{{ winget }}:{{ .port }}/graphql"
+              value: "{{ $protocol }}://{{ include "edusphere.fullname" $ }}-subgraph-{{ winget }}:{{ .port }}/graphql"
             {{- end }}
             - name: KEYCLOAK_JWKS_URL
               valueFrom:

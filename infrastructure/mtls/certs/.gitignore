@@ -1,0 +1,4 @@
+# Never commit TLS private keys or certificates to Git.
+# Regenerate with: ./infrastructure/mtls/generate-certs.sh
+*
+!.gitignore

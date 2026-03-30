@@ -225,3 +225,6 @@ export * from './tenant-audit-log';
 
 // F-03: Custom Domains (subdomain provisioning + custom domain verification)
 export * from './custom-domains';
+
+// GDPR Erasure Log — cryptographic proof of Art.17 erasure
+export * from './gdpr-erasure-log';

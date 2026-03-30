@@ -1,0 +1,92 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# EduSphere — mTLS Overlay for Docker Compose (SI-6 Compliance)
+#
+# Usage: docker-compose -f docker-compose.dev.yml -f docker-compose.mtls.yml up -d
+#
+# Prerequisites: Run ./infrastructure/mtls/generate-certs.sh first.
+#
+# This overlay:
+#   1. Mounts CA + per-service TLS certs into each container
+#   2. Sets MTLS_ENABLED=true so subgraphs start HTTPS listeners
+#   3. Configures NODE_EXTRA_CA_CERTS so Node.js trusts the self-signed CA
+#   4. Switches gateway SUBGRAPH_*_URL from http:// to https://
+# ═══════════════════════════════════════════════════════════════════════════════
+version: "3.9"
+
+x-mtls-env: &mtls-env
+  MTLS_ENABLED: "true"
+  MTLS_CA_PATH: /etc/edusphere/tls/ca.crt
+  MTLS_CERT_PATH: /etc/edusphere/tls/tls.crt
+  MTLS_KEY_PATH: /etc/edusphere/tls/tls.key
+  NODE_EXTRA_CA_CERTS: /etc/edusphere/tls/ca.crt
+
+services:
+  # ── Gateway ─────────────────────────────────────────────────────────────────
+  gateway:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/gateway/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/gateway/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env
+      # SI-6: Gateway connects to subgraphs via HTTPS (not plain HTTP)
+      SUBGRAPH_CORE_URL: https://subgraph-core:4001/graphql
+      SUBGRAPH_CONTENT_URL: https://subgraph-content:4002/graphql
+      SUBGRAPH_ANNOTATION_URL: https://subgraph-annotation:4003/graphql
+      SUBGRAPH_COLLABORATION_URL: https://subgraph-collaboration:4004/graphql
+      SUBGRAPH_AGENT_URL: https://subgraph-agent:4005/graphql
+      SUBGRAPH_KNOWLEDGE_URL: https://subgraph-knowledge:4006/graphql
+
+  # ── Core Subgraph ──────────────────────────────────────────────────────────
+  subgraph-core:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-core/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-core/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env
+
+  # ── Content Subgraph ───────────────────────────────────────────────────────
+  subgraph-content:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-content/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-content/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env
+
+  # ── Annotation Subgraph ────────────────────────────────────────────────────
+  subgraph-annotation:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-annotation/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-annotation/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env
+
+  # ── Collaboration Subgraph ─────────────────────────────────────────────────
+  subgraph-collaboration:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-collaboration/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-collaboration/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env
+
+  # ── Agent Subgraph ─────────────────────────────────────────────────────────
+  subgraph-agent:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-agent/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-agent/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env
+
+  # ── Knowledge Subgraph ─────────────────────────────────────────────────────
+  subgraph-knowledge:
+    volumes:
+      - ./infrastructure/mtls/certs/ca.crt:/etc/edusphere/tls/ca.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-knowledge/tls.crt:/etc/edusphere/tls/tls.crt:ro
+      - ./infrastructure/mtls/certs/subgraph-knowledge/tls.key:/etc/edusphere/tls/tls.key:ro
+    environment:
+      <<: *mtls-env

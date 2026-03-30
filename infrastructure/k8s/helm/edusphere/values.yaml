@@ -129,6 +129,13 @@ pgbouncer:
       cpu: 500m
       memory: 256Mi
 
+# ── mTLS — Inter-service mutual TLS (SI-6) ─────────────────────────────────
+# When enabled, gateway connects to subgraphs via https:// instead of http://.
+# In Kubernetes, Linkerd provides automatic mTLS (no cert management needed).
+# For Docker Compose staging, use docker-compose.mtls.yml overlay with self-signed CA.
+mtls:
+  enabled: false # Override in staging/production values
+
 serviceAccount:
   create: true
   name: ''

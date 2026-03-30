@@ -35,7 +35,12 @@ vi.mock('@edusphere/i18n', () => ({
   RTL_LOCALES: new Set(['he', 'ar']),
 }));
 
+vi.mock('@/lib/i18n', () => ({
+  applyDocumentDirection: vi.fn(),
+}));
+
 import { DirectionProvider, useDirection } from './DirectionContext';
+import { applyDocumentDirection } from '@/lib/i18n';
 
 function wrapper({ children }: { children: React.ReactNode }) {
   return React.createElement(DirectionProvider, null, children);
@@ -95,6 +100,18 @@ describe('DirectionContext', () => {
     const { result } = renderHook(() => useDirection());
     expect(result.current.direction).toBe('ltr');
     expect(result.current.isRtl).toBe(false);
+  });
+
+  it('IS-5568: calls applyDocumentDirection on language change', () => {
+    renderHook(() => useDirection(), { wrapper });
+
+    act(() => {
+      for (const cb of listeners['languageChanged'] ?? []) {
+        cb('he');
+      }
+    });
+
+    expect(applyDocumentDirection).toHaveBeenCalledWith('he');
   });
 
   it('cleans up i18n listener on unmount', async () => {

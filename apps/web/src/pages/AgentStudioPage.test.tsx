@@ -239,6 +239,28 @@ describe('AgentStudioPage', () => {
     expect(paths.length).toBeGreaterThan(0);
   });
 
+  // ── IS-5568 / WCAG 2.5.7 — Keyboard click-to-add ────────────────────────
+
+  it('palette items are buttons (keyboard accessible)', () => {
+    renderPage();
+    const startBtn = screen.getByTestId('palette-start');
+    expect(startBtn.tagName.toLowerCase()).toBe('button');
+  });
+
+  it('clicking a palette item adds a node (keyboard alternative to drag)', () => {
+    renderPage();
+    const assessBtn = screen.getByTestId('palette-assess');
+    fireEvent.click(assessBtn);
+    const nodes = document.querySelectorAll('[data-testid^="workflow-node-"]');
+    expect(nodes.length).toBe(1);
+  });
+
+  it('palette items have aria-labels', () => {
+    renderPage();
+    const startBtn = screen.getByTestId('palette-start');
+    expect(startBtn).toHaveAttribute('aria-label', 'Add Start node');
+  });
+
   // ── Properties panel stats ────────────────────────────────────────────────
 
   it('shows node and connection count in properties panel', () => {

@@ -6,8 +6,14 @@ metadata:
   labels:
     {{- include "edusphere.labels" . | nindent 4 }}
 data:
+  {{- $protocol := "http" }}
+  {{- if .Values.mtls }}
+  {{- if .Values.mtls.enabled }}
+  {{- $protocol = "https" }}
+  {{- end }}
+  {{- end }}
   {{- range winget,  := .Values.subgraphs }}
   {{- if .enabled }}
-  SUBGRAPH_{{ winget | upper }}_URL: "http://{{ include "edusphere.fullname" $ }}-subgraph-{{ winget }}:{{ .port }}/graphql"
+  SUBGRAPH_{{ winget | upper }}_URL: "{{ $protocol }}://{{ include "edusphere.fullname" $ }}-subgraph-{{ winget }}:{{ .port }}/graphql"
   {{- end }}
   {{- end }}
