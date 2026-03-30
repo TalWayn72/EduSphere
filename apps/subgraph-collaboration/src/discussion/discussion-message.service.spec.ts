@@ -162,7 +162,7 @@ describe('DiscussionMessageService', () => {
         ...sampleMessage,
         content: 'alert',
       }]);
-      const mockValues = vi.fn((...args: unknown[]) => {
+      const mockValues = vi.fn((..._args: unknown[]) => {
         return { returning: mockReturning };
       });
       mockTx.insert.mockReturnValue({ values: mockValues });
