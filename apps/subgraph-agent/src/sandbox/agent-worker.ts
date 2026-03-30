@@ -57,12 +57,12 @@ async function executeAgent(config: SandboxConfig): Promise<void> {
 
     let result: Record<string, unknown>;
     if (agent.template === 'SUMMARIZE') {
-      result = (await runner.runSummarizer(model, input)) as Record<
+      result = (await runner.runSummarizer(model, input)) as unknown as Record<
         string,
         unknown
       >;
     } else {
-      result = (await runner.runGeneric(model, agent, input)) as Record<
+      result = (await runner.runGeneric(model, agent, input)) as unknown as Record<
         string,
         unknown
       >;
