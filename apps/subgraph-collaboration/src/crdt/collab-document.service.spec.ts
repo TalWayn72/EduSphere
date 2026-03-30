@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const {
   mockCloseAllPools,
   mockSelect,
-  mockFrom,
+  mockFrom: _mockFrom,
   mockWhere,
   mockLimit,
 } = vi.hoisted(() => {
