@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-header -- sub-component embedded in CourseWizardMediaStep, not a standalone page */
 import { FileVideo, FileAudio, FileText, X, AlertCircle, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

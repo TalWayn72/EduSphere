@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-header -- sub-component embedded in ScimSettingsPage, not a standalone page */
 /**
  * ScimSyncLog — displays recent SCIM provisioning operations.
  */

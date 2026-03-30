@@ -69,6 +69,7 @@ const KEYCLOAK_INIT_TIMEOUT_MS = 10_000;
 export function initKeycloak(): Promise<boolean> {
   // Development mode - skip Keycloak
   if (DEV_MODE) {
+    // eslint-disable-next-line no-console -- DEV-only auth mode indicator
     if (import.meta.env.DEV) console.debug('[Auth] DEV MODE: Running without Keycloak authentication');
     // Require an explicit login() call — do NOT auto-authenticate on cold
     // start. sessionStorage is empty in incognito / fresh sessions, so using

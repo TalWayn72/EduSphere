@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-header -- sub-component embedded in HrisConfigPage, not a standalone page */
 /**
  * HrisSyncHistory — Sync history table for HRIS configuration page.
  */

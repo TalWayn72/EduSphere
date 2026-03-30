@@ -59,6 +59,7 @@ export function RiskThresholdConfig() {
     return () => {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
+        // eslint-disable-next-line no-console -- DEV-only cleanup trace
         if (import.meta.env.DEV) console.debug('[RiskThresholdConfig] cleanup: save timer cleared on unmount');
       }
     };

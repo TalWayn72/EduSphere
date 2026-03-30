@@ -130,6 +130,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
           reportProgress(10);
 
           const { uploadUrl, fileKey } = await presign(file);
+          // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
           if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} presign OK — fileKey=${fileKey}`);
 
           if (!mountedRef.current) return null;
@@ -149,6 +150,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
             throw new Error(`PUT failed: ${putResponse.status} ${putResponse.statusText}`);
           }
 
+          // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
           if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} PUT OK — status=${putResponse.status}`);
           if (!mountedRef.current) return null;
 
@@ -157,6 +159,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
           reportProgress(80);
 
           const result = await confirm(fileKey, file);
+          // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
           if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} confirm OK — id=${result.id}`);
 
           if (!mountedRef.current) return null;
@@ -167,6 +170,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
         } catch (err: unknown) {
           // Abort errors are not retryable
           if (err instanceof DOMException && err.name === 'AbortError') {
+            // eslint-disable-next-line no-console -- DEV-only abort trace
             if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} aborted`);
             return null;
           }
@@ -188,6 +192,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
 
           const backoffMs = BASE_DELAY_MS * Math.pow(2, attempt - 1);
           if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console -- DEV-only retry trace
             console.debug(
               `${LOG_PREFIX} attempt ${attempt}/${maxRetries} failed (${message}) — retrying in ${backoffMs}ms`,
             );
@@ -210,6 +215,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
   const retry = useCallback(async (): Promise<ConfirmResult | null> => {
     const file = lastFileRef.current;
     if (!file) {
+      // eslint-disable-next-line no-console -- DEV-only retry trace
       if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} retry called with no previous file`);
       return null;
     }

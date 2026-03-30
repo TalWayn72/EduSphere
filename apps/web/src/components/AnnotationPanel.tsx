@@ -103,6 +103,7 @@ export function AnnotationPanel({
   const handleMergeRequestSubmit = (description: string) => {
     if (!proposingId) return;
     if (import.meta.env.DEV) {
+// eslint-disable-next-line no-console -- DEV-only debug trace for merge-request lifecycle
       console.debug('[AnnotationPanel] Merge request submitted:', {
         annotationId: proposingId,
         description,

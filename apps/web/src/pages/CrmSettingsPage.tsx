@@ -63,6 +63,7 @@ export function CrmSettingsPage() {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
+        // eslint-disable-next-line no-console -- DEV-only cleanup trace
         if (import.meta.env.DEV) console.debug('[CrmSettingsPage] cleanup: copy timer cleared on unmount');
       }
     };

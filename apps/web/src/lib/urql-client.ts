@@ -58,6 +58,7 @@ const authErrorExchange = errorExchange({
       ) as { name?: { value: string } } | undefined;
       const opName = opDef?.name?.value ?? 'unknown';
       if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console -- DEV-only GraphQL network error trace
         console.debug(
           `[GraphQL][Network] ${operation.kind} "${opName}": ${error.networkError.message}`
         );
@@ -73,6 +74,7 @@ const authErrorExchange = errorExchange({
         if (!_warnedSubscriptionOps.has(opName)) {
           _warnedSubscriptionOps.add(opName);
           if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console -- DEV-only subscription auth degradation trace
             console.debug(
               '[Auth] Subscription auth error — degrading gracefully (real-time updates paused).',
               error.message

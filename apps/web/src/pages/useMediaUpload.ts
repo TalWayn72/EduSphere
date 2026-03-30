@@ -46,6 +46,7 @@ export function useMediaUpload(
     return () => {
       if (richDocSavedTimerRef.current) {
         clearTimeout(richDocSavedTimerRef.current);
+        // eslint-disable-next-line no-console -- DEV-only cleanup trace
         if (import.meta.env.DEV) console.debug('[CourseWizardMediaStep] cleanup: richDocSaved timer cleared on unmount');
       }
     };

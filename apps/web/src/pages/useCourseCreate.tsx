@@ -1,3 +1,4 @@
+/* eslint-disable edusphere-design-system/require-page-header -- custom hook, not a page component */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'urql';
