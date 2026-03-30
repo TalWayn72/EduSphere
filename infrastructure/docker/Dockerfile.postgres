@@ -3,7 +3,7 @@
 # NOTE: Existing data volumes require pg_upgrade before switching from PG16.
 #       Fresh development environments can switch immediately.
 # Pinned 2026-03-17 — was postgres:18-alpine
-FROM postgres:18.3-alpine3.21
+FROM postgres:16-alpine
 
 LABEL maintainer="EduSphere Team"
 LABEL description="PostgreSQL 18 with Apache AGE 1.7.0 graph database (with RLS) and pgvector 0.8.1 for embeddings"
@@ -16,17 +16,18 @@ RUN cat /usr/local/share/ca-certificates/corporate-root-ca.crt >> /etc/ssl/certs
 # Install build dependencies
 RUN apk add --no-cache \
     build-base \
-    clang \
-    llvm \
+    clang19 \
+    llvm19 \
     git \
     curl \
     flex \
-    bison
+    bison \
+    perl
 
 # Install Apache AGE 1.7.0 (supports PG18 — RLS + multi-tenancy index)
 # Branch: release/PG18/1.7.0 (stable); tag PG18/v1.7.0-rc0 is RC only
 RUN cd /tmp && \
-    git clone --branch release/PG18/1.7.0 --depth 1 https://github.com/apache/age.git && \
+    git clone --branch release/PG16/1.5.0 --depth 1 https://github.com/apache/age.git && \
     cd age && \
     make USE_PGXS=1 && \
     make USE_PGXS=1 install && \

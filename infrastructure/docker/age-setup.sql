@@ -26,50 +26,48 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA ag_catalog TO edusphere;
 -- from the properties agtype value.
 
 -- Helper: extract tenant_id string from agtype properties
--- AGE stores properties as agtype; we cast to jsonb for filtering.
+-- AGE stores properties as agtype; use agtype accessor to extract tenant_id.
 CREATE OR REPLACE FUNCTION ag_catalog.get_tenant_id_from_props(props agtype)
 RETURNS text
 LANGUAGE sql STABLE AS $$
-  SELECT (props::jsonb ->> 'tenant_id')
+  SELECT ag_catalog.agtype_access_operator(props, '"tenant_id"'::agtype)::text
 $$;
 
--- Enable RLS on vertex label tables
+-- Enable RLS on vertex label tables (skip if tables don't exist yet)
 DO $$
 DECLARE
   label_name text;
   vertex_labels text[] := ARRAY['Concept', 'Person', 'Term', 'Source', 'TopicCluster'];
+  table_exists boolean;
 BEGIN
   FOREACH label_name IN ARRAY vertex_labels LOOP
-    -- Enable RLS
-    EXECUTE format(
-      'ALTER TABLE edusphere_graph.%I ENABLE ROW LEVEL SECURITY',
-      label_name
-    );
-    -- Drop existing policy if any (idempotent)
-    EXECUTE format(
-      'DROP POLICY IF EXISTS tenant_isolation ON edusphere_graph.%I',
-      label_name
-    );
-    -- Create tenant isolation policy
-    EXECUTE format(
-      $policy$
-      CREATE POLICY tenant_isolation ON edusphere_graph.%I
-        AS PERMISSIVE
-        FOR ALL
-        TO PUBLIC
-        USING (
-          ag_catalog.get_tenant_id_from_props(properties) = current_setting('app.current_tenant', TRUE)
-          OR current_setting('app.current_tenant', TRUE) IS NULL
-        )
-      $policy$,
-      label_name
-    );
-    RAISE NOTICE 'RLS enabled on vertex label: %', label_name;
+    SELECT EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'edusphere_graph' AND table_name = label_name
+    ) INTO table_exists;
+
+    IF table_exists THEN
+      EXECUTE format('ALTER TABLE edusphere_graph.%I ENABLE ROW LEVEL SECURITY', label_name);
+      EXECUTE format('DROP POLICY IF EXISTS tenant_isolation ON edusphere_graph.%I', label_name);
+      EXECUTE format(
+        $policy$
+        CREATE POLICY tenant_isolation ON edusphere_graph.%I
+          AS PERMISSIVE FOR ALL TO PUBLIC
+          USING (
+            ag_catalog.get_tenant_id_from_props(properties) = current_setting('app.current_tenant', TRUE)
+            OR current_setting('app.current_tenant', TRUE) IS NULL
+          )
+        $policy$, label_name
+      );
+      RAISE NOTICE 'RLS enabled on vertex label: %', label_name;
+    ELSE
+      RAISE NOTICE 'Skipping vertex label % (table not yet created)', label_name;
+    END IF;
   END LOOP;
 END;
 $$;
 
--- Enable RLS on edge label tables (edges also carry tenant_id for cross-tenant safety)
+-- Enable RLS on edge label tables (skip if tables don't exist yet)
 DO $$
 DECLARE
   label_name text;
@@ -77,37 +75,47 @@ DECLARE
     'RELATED_TO', 'CONTRADICTS', 'PREREQUISITE_OF', 'MENTIONS', 'CITES',
     'AUTHORED_BY', 'INFERRED_RELATED', 'REFERS_TO', 'DERIVED_FROM', 'BELONGS_TO'
   ];
+  table_exists boolean;
 BEGIN
   FOREACH label_name IN ARRAY edge_labels LOOP
-    EXECUTE format(
-      'ALTER TABLE edusphere_graph.%I ENABLE ROW LEVEL SECURITY',
-      label_name
-    );
-    EXECUTE format(
-      'DROP POLICY IF EXISTS tenant_isolation ON edusphere_graph.%I',
-      label_name
-    );
-    EXECUTE format(
-      $policy$
-      CREATE POLICY tenant_isolation ON edusphere_graph.%I
-        AS PERMISSIVE
-        FOR ALL
-        TO PUBLIC
-        USING (
-          ag_catalog.get_tenant_id_from_props(properties) = current_setting('app.current_tenant', TRUE)
-          OR current_setting('app.current_tenant', TRUE) IS NULL
-        )
-      $policy$,
-      label_name
-    );
-    RAISE NOTICE 'RLS enabled on edge label: %', label_name;
+    SELECT EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'edusphere_graph' AND table_name = label_name
+    ) INTO table_exists;
+
+    IF table_exists THEN
+      EXECUTE format('ALTER TABLE edusphere_graph.%I ENABLE ROW LEVEL SECURITY', label_name);
+      EXECUTE format('DROP POLICY IF EXISTS tenant_isolation ON edusphere_graph.%I', label_name);
+      EXECUTE format(
+        $policy$
+        CREATE POLICY tenant_isolation ON edusphere_graph.%I
+          AS PERMISSIVE FOR ALL TO PUBLIC
+          USING (
+            ag_catalog.get_tenant_id_from_props(properties) = current_setting('app.current_tenant', TRUE)
+            OR current_setting('app.current_tenant', TRUE) IS NULL
+          )
+        $policy$, label_name
+      );
+      RAISE NOTICE 'RLS enabled on edge label: %', label_name;
+    ELSE
+      RAISE NOTICE 'Skipping edge label % (table not yet created)', label_name;
+    END IF;
   END LOOP;
 END;
 $$;
 
--- Grant permission to app role
-GRANT USAGE ON SCHEMA edusphere_graph TO edusphere_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA edusphere_graph TO edusphere_app;
+-- Grant permission to app role (if it exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'edusphere_app') THEN
+    EXECUTE 'GRANT USAGE ON SCHEMA edusphere_graph TO edusphere_app';
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA edusphere_graph TO edusphere_app';
+    RAISE NOTICE 'Granted edusphere_graph permissions to edusphere_app';
+  ELSE
+    RAISE NOTICE 'Role edusphere_app does not exist yet, skipping grants';
+  END IF;
+END;
+$$;
 
 -- Log completion
 \echo 'AGE 1.7.0 RLS policies applied to all vertex and edge label tables'

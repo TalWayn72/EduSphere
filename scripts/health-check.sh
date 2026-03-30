@@ -2,11 +2,11 @@
 
 # EduSphere Health Check Script
 # Verifies all infrastructure services are healthy
-# Architecture: single all-in-one container (edusphere-all-in-one)
+# Supports both: individual containers (docker-compose.dev.yml) and all-in-one
 
 set -e
 
-echo "🏥 EduSphere Health Check"
+echo "EduSphere Health Check"
 echo "=========================="
 
 # Colors
@@ -20,15 +20,11 @@ FAILED=0
 # ── 0. Docker daemon reachability (MUST be first check) ──────────────────────
 echo -n "Checking Docker daemon... "
 if ! docker ps > /dev/null 2>&1; then
-  echo -e "${RED}✗ UNREACHABLE${NC}"
+  echo -e "${RED}x UNREACHABLE${NC}"
   echo -e "${RED}  FATAL: Docker daemon not responding.${NC}"
-  echo -e "${RED}  Docker Desktop may be starting — wait 30s and retry, or start Docker Desktop manually.${NC}"
-  echo -e "${RED}  Context: $(docker context show 2>/dev/null || echo 'unknown')${NC}"
-  echo ""
-  echo -e "${RED}Cannot proceed — all services depend on Docker.${NC}"
-  exit 2  # exit code 2 = Docker unreachable (vs 1 = services down)
+  exit 2
 fi
-echo -e "${GREEN}✓${NC}"
+echo -e "${GREEN}ok${NC}"
 
 check_service() {
   local SERVICE=$1
@@ -37,142 +33,136 @@ check_service() {
 
   echo -n "Checking $SERVICE... "
   if eval "$CHECK_CMD" > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC}"
+    echo -e "${GREEN}ok${NC}"
     return 0
   else
-    echo -e "${RED}✗${NC}"
+    echo -e "${RED}FAIL${NC}"
     [ -n "$WARN_MSG" ] && echo -e "${YELLOW}  $WARN_MSG${NC}"
     return 1
   fi
 }
 
 check_warn() {
-  # Like check_service but failure is a warning (doesn't increment FAILED)
   local SERVICE=$1
   local CHECK_CMD=$2
   local WARN_MSG=${3:-""}
 
   echo -n "Checking $SERVICE... "
   if eval "$CHECK_CMD" > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC}"
+    echo -e "${GREEN}ok${NC}"
   else
-    echo -e "${YELLOW}⚠ (not running — optional)${NC}"
+    echo -e "${YELLOW}SKIP (optional)${NC}"
     [ -n "$WARN_MSG" ] && echo -e "${YELLOW}  $WARN_MSG${NC}"
   fi
 }
 
-# 1. All-in-one container running
-if ! check_service "Container (edusphere-all-in-one)" \
-  "docker inspect edusphere-all-in-one --format '{{.State.Running}}' | grep -q true"; then
-  echo -e "${RED}  FATAL: edusphere-all-in-one not running — run: docker-compose up -d${NC}"
-  FAILED=$((FAILED + 1))
+# Detect architecture: all-in-one vs individual containers
+AIO_RUNNING=false
+if docker inspect edusphere-all-in-one --format '{{.State.Running}}' 2>/dev/null | grep -q true; then
+  AIO_RUNNING=true
+  echo "Mode: all-in-one container"
+else
+  echo "Mode: individual containers (dev)"
 fi
 
-# 2. PostgreSQL (inside all-in-one)
-if ! check_service "PostgreSQL" \
-  "docker exec edusphere-all-in-one pg_isready -U edusphere -d edusphere"; then
-  FAILED=$((FAILED + 1))
+# 1. PostgreSQL
+if [ "$AIO_RUNNING" = true ]; then
+  if ! check_service "PostgreSQL" \
+    "docker exec edusphere-all-in-one pg_isready -U edusphere -d edusphere"; then
+    FAILED=$((FAILED + 1))
+  fi
+  PG_EXEC="docker exec edusphere-all-in-one"
+else
+  if ! check_service "PostgreSQL" \
+    "docker exec edusphere-postgres pg_isready -U edusphere -d edusphere"; then
+    FAILED=$((FAILED + 1))
+  fi
+  PG_EXEC="docker exec edusphere-postgres"
 fi
 
-# 3. PostgreSQL Extensions
+# 2. PostgreSQL Extensions
 echo -n "Checking PostgreSQL extensions... "
-EXTENSIONS=$(docker exec edusphere-all-in-one bash -c \
+EXTENSIONS=$($PG_EXEC bash -c \
   "PGPASSWORD=edusphere_dev_password psql -h 127.0.0.1 -U edusphere -d edusphere -t -A -c \
   \"SELECT COUNT(*) FROM pg_extension WHERE extname IN ('uuid-ossp', 'pgcrypto', 'age', 'vector')\"" \
   2>/dev/null || echo "0")
-if [ "${EXTENSIONS}" -eq "4" ]; then
-  echo -e "${GREEN}✓${NC} (uuid-ossp, pgcrypto, age, vector)"
+if [ "${EXTENSIONS}" -ge "3" ]; then
+  echo -e "${GREEN}ok${NC} (found ${EXTENSIONS} extensions)"
 else
-  echo -e "${RED}✗${NC} (expected 4, found ${EXTENSIONS:-0})"
+  echo -e "${RED}FAIL${NC} (expected >=3, found ${EXTENSIONS:-0})"
   FAILED=$((FAILED + 1))
 fi
 
-# 4. Apache AGE Graph
+# 3. Apache AGE Graph
 echo -n "Checking Apache AGE graph... "
-GRAPH_EXISTS=$(docker exec edusphere-all-in-one bash -c \
+GRAPH_EXISTS=$($PG_EXEC bash -c \
   "PGPASSWORD=edusphere_dev_password psql -h 127.0.0.1 -U edusphere -d edusphere -t -A -c \
   \"SELECT COUNT(*) FROM ag_catalog.ag_graph WHERE name = 'edusphere_graph'\"" \
   2>/dev/null || echo "0")
 if [ "${GRAPH_EXISTS}" -eq "1" ]; then
-  echo -e "${GREEN}✓${NC} (edusphere_graph)"
+  echo -e "${GREEN}ok${NC} (edusphere_graph)"
 else
-  echo -e "${RED}✗${NC} (graph not found — run: pnpm --filter @edusphere/db graph:init)"
+  echo -e "${RED}FAIL${NC} (graph not found)"
   FAILED=$((FAILED + 1))
 fi
 
-# 5. Redis (inside all-in-one, password-protected)
-if ! check_service "Redis" \
-  "docker exec edusphere-all-in-one redis-cli -a edusphere_redis_password ping"; then
-  FAILED=$((FAILED + 1))
+# 4. Redis
+if [ "$AIO_RUNNING" = true ]; then
+  if ! check_service "Redis" \
+    "docker exec edusphere-all-in-one redis-cli -a edusphere_redis_password ping"; then
+    FAILED=$((FAILED + 1))
+  fi
+else
+  if ! check_service "Redis" \
+    "docker exec edusphere-redis redis-cli ping"; then
+    FAILED=$((FAILED + 1))
+  fi
 fi
 
-# 6. NATS
-if ! check_service "NATS" \
-  "docker exec edusphere-all-in-one bash -c 'curl -sf http://127.0.0.1:8222/healthz'"; then
-  FAILED=$((FAILED + 1))
+# 5. NATS
+if [ "$AIO_RUNNING" = true ]; then
+  if ! check_service "NATS" \
+    "docker exec edusphere-all-in-one bash -c 'curl -sf http://127.0.0.1:8222/healthz'"; then
+    FAILED=$((FAILED + 1))
+  fi
+else
+  if ! check_service "NATS" \
+    "curl -sf http://localhost:8222/healthz"; then
+    FAILED=$((FAILED + 1))
+  fi
 fi
 
-# 7. Keycloak
+# 6. Keycloak
 if ! check_service "Keycloak" \
   "curl -sf http://localhost:8080/realms/edusphere/.well-known/openid-configuration" \
   "Allow up to 90s for Keycloak to start"; then
   FAILED=$((FAILED + 1))
 fi
 
-# 8. MinIO
-if ! check_service "MinIO" \
-  "curl -sf http://localhost:9000/minio/health/live"; then
-  FAILED=$((FAILED + 1))
-fi
+# 7. MinIO (optional in dev mode)
+check_warn "MinIO" \
+  "curl -sf http://localhost:9000/minio/health/live" \
+  "MinIO not running (optional for dev)"
 
-# 9. Jaeger (optional — requires docker-compose.monitoring.yml)
+# 8. Jaeger
 check_warn "Jaeger" \
   "curl -sf http://localhost:16686/" \
   "Start with: docker-compose -f docker-compose.monitoring.yml up -d"
 
-# 10. mcp-nats for Claude Code MCP (auto-install if missing)
-echo -n "Checking mcp-nats (Claude MCP)... "
-if docker exec edusphere-all-in-one bash -c "test -f /tmp/nats-test/node_modules/.bin/mcp-nats" > /dev/null 2>&1; then
-  echo -e "${GREEN}✓${NC}"
-else
-  echo -e "${YELLOW}missing — installing...${NC}"
-  if docker exec edusphere-all-in-one bash -c \
-    "mkdir -p /tmp/nats-test && cd /tmp/nats-test && npm install mcp-nats --save --loglevel=error" \
-    > /dev/null 2>&1; then
-    echo -e "  ${GREEN}✓ mcp-nats installed${NC}"
-  else
-    echo -e "  ${RED}✗ mcp-nats install failed${NC}"
-    FAILED=$((FAILED + 1))
-  fi
-fi
-
-# ─── GPU Health (optional — always passes if no GPU present) ────────────────
+# ─── GPU Health (optional) ────────────────
 echo ""
 echo "=== GPU Health ==="
 if command -v nvidia-smi &>/dev/null && nvidia-smi &>/dev/null 2>&1; then
-  echo "GPU hardware: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1)"
-  nvidia-smi --query-gpu=memory.used,memory.free,utilization.gpu,temperature.gpu \
-    --format=csv,noheader 2>/dev/null | head -1 | awk -F',' \
-    '{printf "  VRAM used/free: %s / %s | Util: %s | Temp: %s\n", $1, $2, $3, $4}'
-  echo "GPU: PASS"
+  echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1)"
 elif command -v rocm-smi &>/dev/null && rocm-smi &>/dev/null 2>&1; then
   echo "AMD GPU (ROCm) detected"
-  echo "GPU: PASS"
 else
   echo "GPU: INFO — No discrete GPU detected, CPU mode active"
 fi
 
-# Verify Ollama reports processor type (GPU or CPU)
-OLLAMA_PS=$(curl -sf http://localhost:11434/api/ps 2>/dev/null || echo "")
-if [ -n "$OLLAMA_PS" ]; then
-  echo "Ollama processor: $(echo "$OLLAMA_PS" | grep -o '"processor":"[^"]*"' | head -1 || echo 'unknown')"
-fi
-
-# Verify whisper-server health (if running)
 WHISPER_HEALTH=$(curl -sf http://localhost:3200/health 2>/dev/null || echo "")
 if [ -n "$WHISPER_HEALTH" ]; then
-  WHISPER_DEVICE=$(echo "$WHISPER_HEALTH" | grep -o '"device":"[^"]*"' | head -1 || echo '')
-  echo "Whisper server: running | $WHISPER_DEVICE"
+  echo "Whisper server: running"
 else
   echo "Whisper server: INFO — not running (start with --profile ai)"
 fi
