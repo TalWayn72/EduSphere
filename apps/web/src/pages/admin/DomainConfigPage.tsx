@@ -5,11 +5,10 @@
  * Shows current subdomain, allows adding custom domains,
  * displays verification status and SSL provisioning state.
  */
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -17,90 +16,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
-// ── GraphQL ─────────────────────────────────────────────────
-
-const CUSTOM_DOMAINS_QUERY = `
-  query CustomDomains {
-    customDomains {
-      id domain verificationToken verificationRecordType
-      verifiedAt sslStatus createdAt
-    }
-    myOrganization { slug }
-  }
-`;
-
-const REQUEST_VERIFICATION_MUTATION = `
-  mutation RequestDomainVerification($domain: String!) {
-    requestDomainVerification(domain: $domain) {
-      token recordType recordValue instructions
-    }
-  }
-`;
-
-const CHECK_VERIFICATION_MUTATION = `
-  mutation CheckDomainVerification($domain: String!) {
-    checkDomainVerification(domain: $domain) {
-      id domain verifiedAt sslStatus
-    }
-  }
-`;
-
-const REMOVE_DOMAIN_MUTATION = `
-  mutation RemoveCustomDomain($domainId: ID!) {
-    removeCustomDomain(domainId: $domainId)
-  }
-`;
-
-// ── Validation ──────────────────────────────────────────────
-
-const domainSchema = z.object({
-  domain: z
-    .string()
-    .min(4, 'Domain is too short')
-    .max(255)
-    .regex(
-      /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/,
-      'Enter a valid domain (e.g., learn.example.com)'
-    ),
-});
-
-type DomainForm = z.infer<typeof domainSchema>;
-
-// ── SSL Status Badge ────────────────────────────────────────
-
-function SslBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    provisioning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    pending: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  };
-  return (
-    <Badge className={colors[status] ?? colors.pending} data-testid={`ssl-${status}`}>
-      SSL: {status}
-    </Badge>
-  );
-}
-
-// ── Component ───────────────────────────────────────────────
-
-interface CustomDomainRow {
-  id: string;
-  domain: string;
-  verificationToken: string | null;
-  verificationRecordType: string | null;
-  verifiedAt: string | null;
-  sslStatus: string;
-  createdAt: string;
-}
-
-interface VerificationInfo {
-  token: string;
-  recordType: string;
-  recordValue: string;
-  instructions: string;
-}
+import {
+  CUSTOM_DOMAINS_QUERY,
+  REQUEST_VERIFICATION_MUTATION,
+  CHECK_VERIFICATION_MUTATION,
+  REMOVE_DOMAIN_MUTATION,
+  domainSchema,
+} from './DomainConfigPage.queries';
+import type {
+  DomainForm,
+  CustomDomainRow,
+  VerificationInfo,
+} from './DomainConfigPage.queries';
+import { SslBadge } from './DomainConfigPage.SslBadge';
+import { DomainList } from './DomainConfigPage.DomainList';
 
 export function DomainConfigPage() {
   const { t } = useTranslation('orgAdmin');
@@ -250,57 +179,11 @@ export function DomainConfigPage() {
         )}
 
         {/* Domain List */}
-        {domains.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                {t('domains.customDomains', 'Custom Domains')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="divide-y" data-testid="domains-list">
-                {domains.map((d) => (
-                  <div
-                    key={d.id}
-                    className="flex items-center justify-between py-3"
-                    data-testid={`domain-row-${d.domain}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <code className="text-sm font-mono">{d.domain}</code>
-                      {d.verifiedAt ? (
-                        <Badge className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                          Verified
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">Pending</Badge>
-                      )}
-                      <SslBadge status={d.sslStatus} />
-                    </div>
-                    <div className="flex gap-2">
-                      {!d.verifiedAt && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onCheckVerification(d.domain)}
-                        >
-                          {t('domains.checkVerification', 'Check')}
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive"
-                        onClick={() => onRemoveDomain(d.id)}
-                      >
-                        {t('common.remove', 'Remove')}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <DomainList
+          domains={domains}
+          onCheck={onCheckVerification}
+          onRemove={onRemoveDomain}
+        />
       </div>
     </AdminLayout>
   );

@@ -7,23 +7,9 @@ import { Sun, Moon, Monitor } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
 import type { ThemeMode, FontSize, ThemePrimitives } from '@/lib/theme';
+import { THEME_MODES, FONT_SIZES, hexToHsl } from './ThemeSettingsPage.helpers';
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const THEME_MODES: { value: ThemeMode; label: string; Icon: React.ElementType }[] = [
-  { value: 'light', label: 'Light', Icon: Sun },
-  { value: 'dark', label: 'Dark', Icon: Moon },
-  { value: 'system', label: 'System', Icon: Monitor },
-];
-
-const FONT_SIZES: { value: FontSize; label: string }[] = [
-  { value: 'sm', label: 'Small' },
-  { value: 'md', label: 'Medium' },
-  { value: 'lg', label: 'Large' },
-  { value: 'xl', label: 'Extra Large' },
-];
-
-// ── ThemeSettingsPage ─────────────────────────────────────────────────────────
+const ICON_MAP: Record<string, React.ElementType> = { Sun, Moon, Monitor };
 
 export function ThemeSettingsPage() {
   const {
@@ -38,7 +24,6 @@ export function ThemeSettingsPage() {
   const [primaryColor, setPrimaryColor] = React.useState('#6366f1');
   const [previewCleanup, setPreviewCleanup] = React.useState<(() => void) | null>(null);
 
-  // Cleanup preview on unmount
   React.useEffect(() => {
     return () => {
       previewCleanup?.();
@@ -53,8 +38,6 @@ export function ThemeSettingsPage() {
   }
 
   function handleSaveBrandColor() {
-    // In production this would call a GraphQL mutation.
-    // For now: persist to theme context via previewThemeChanges (no-op save).
     const primitives: ThemePrimitives = { primary: hexToHsl(primaryColor) };
     previewThemeChanges(primitives);
   }
@@ -85,12 +68,11 @@ export function ThemeSettingsPage() {
       />
       <h1 className="text-2xl font-bold text-foreground">Theme &amp; Appearance Settings</h1>
 
-      {/* ── Appearance ─────────────────────────────────────────────────────── */}
+      {/* Appearance */}
       <section aria-labelledby="appearance-heading" className="space-y-4">
         <h2 id="appearance-heading" className="text-lg font-semibold text-foreground">
           Appearance
         </h2>
-
         <div>
           <p className="text-sm text-muted-foreground mb-3">Theme mode</p>
           <div
@@ -99,39 +81,41 @@ export function ThemeSettingsPage() {
             className="flex gap-3"
             data-testid="theme-mode-selector"
           >
-            {THEME_MODES.map(({ value, label, Icon }) => (
-              <label
-                key={value}
-                className={[
-                  'flex flex-col items-center gap-1.5 px-4 py-3 rounded-lg border-2 cursor-pointer transition-colors',
-                  userPreferences.mode === value
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border hover:border-muted-foreground',
-                ].join(' ')}
-              >
-                <input
-                  type="radio"
-                  name="theme-mode"
-                  value={value}
-                  checked={userPreferences.mode === value}
-                  onChange={() => setThemeMode(value)}
-                  className="sr-only"
-                  aria-label={label}
-                />
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                <span className="text-sm font-medium">{label}</span>
-              </label>
-            ))}
+            {THEME_MODES.map(({ value, label, iconName }) => {
+              const Icon = ICON_MAP[iconName] ?? Sun;
+              return (
+                <label
+                  key={value}
+                  className={[
+                    'flex flex-col items-center gap-1.5 px-4 py-3 rounded-lg border-2 cursor-pointer transition-colors',
+                    userPreferences.mode === value
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-muted-foreground',
+                  ].join(' ')}
+                >
+                  <input
+                    type="radio"
+                    name="theme-mode"
+                    value={value}
+                    checked={userPreferences.mode === value}
+                    onChange={() => setThemeMode(value)}
+                    className="sr-only"
+                    aria-label={label}
+                  />
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  <span className="text-sm font-medium">{label}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ── Typography ─────────────────────────────────────────────────────── */}
+      {/* Typography */}
       <section aria-labelledby="typography-heading" className="space-y-4">
         <h2 id="typography-heading" className="text-lg font-semibold text-foreground">
           Typography
         </h2>
-
         <div>
           <p className="text-sm text-muted-foreground mb-3">Font size</p>
           <div
@@ -169,12 +153,11 @@ export function ThemeSettingsPage() {
         </div>
       </section>
 
-      {/* ── Motion & Accessibility ──────────────────────────────────────────── */}
+      {/* Motion & Accessibility */}
       <section aria-labelledby="motion-heading" className="space-y-4">
         <h2 id="motion-heading" className="text-lg font-semibold text-foreground">
           Motion &amp; Accessibility
         </h2>
-
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -192,7 +175,6 @@ export function ThemeSettingsPage() {
               data-testid="motion-toggle"
             />
           </div>
-
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-foreground">High contrast</p>
@@ -202,14 +184,11 @@ export function ThemeSettingsPage() {
             </div>
             <Switch
               checked={isHighContrast}
-              onCheckedChange={() => {
-                /* contrast is read-only derived from contrastMode; no setter in context — placeholder */
-              }}
+              onCheckedChange={() => {}}
               aria-label="High contrast"
               data-testid="contrast-toggle"
             />
           </div>
-
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-foreground">Reading mode</p>
@@ -227,7 +206,7 @@ export function ThemeSettingsPage() {
         </div>
       </section>
 
-      {/* ── Brand Colors (ORG_ADMIN) ────────────────────────────────────────── */}
+      {/* Brand Colors */}
       <section aria-labelledby="brand-heading" className="space-y-4">
         <h2 id="brand-heading" className="text-lg font-semibold text-foreground">
           Brand Colors
@@ -235,7 +214,6 @@ export function ThemeSettingsPage() {
         <p className="text-xs text-muted-foreground">
           Available to Organisation Administrators only.
         </p>
-
         <div className="flex items-end gap-4">
           <div>
             <label
@@ -263,7 +241,7 @@ export function ThemeSettingsPage() {
         </div>
       </section>
 
-      {/* ── Reset ──────────────────────────────────────────────────────────── */}
+      {/* Reset */}
       <section aria-labelledby="reset-heading" className="border-t pt-6">
         <h2 id="reset-heading" className="text-lg font-semibold text-foreground mb-3">
           Reset
@@ -280,32 +258,6 @@ export function ThemeSettingsPage() {
     </PageShell>
     </Layout>
   );
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-/**
- * Convert a CSS hex colour string (e.g. "#6366f1") to HSL component string
- * for use as a CSS variable value (e.g. "239 84% 67%").
- * Uses a best-effort approximation — production would use a proper colour lib.
- */
-function hexToHsl(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return `0 0% ${Math.round(l * 100)}%`;
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  const h =
-    max === r
-      ? ((g - b) / d + (g < b ? 6 : 0)) / 6
-      : max === g
-        ? ((b - r) / d + 2) / 6
-        : ((r - g) / d + 4) / 6;
-  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
 }
 
 export default ThemeSettingsPage;

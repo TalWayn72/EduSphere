@@ -3,7 +3,7 @@
  * Route: /admin/languages
  * Access: ORG_ADMIN, SUPER_ADMIN only
  */
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
@@ -25,47 +25,13 @@ import {
   TENANT_LANGUAGE_SETTINGS_QUERY,
   UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION,
 } from '@/lib/graphql/admin-language.queries';
-
-const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
-
-interface Locale {
-  code: string;
-  name: string;
-  nativeName: string;
-  rtl: boolean;
-}
-
-const AVAILABLE_LOCALES: Locale[] = [
-  { code: 'en', name: 'English', nativeName: 'English', rtl: false },
-  { code: 'he', name: 'Hebrew', nativeName: 'עברית', rtl: true },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', rtl: true },
-  {
-    code: 'zh-CN',
-    name: 'Chinese (Simplified)',
-    nativeName: '中文（简体）',
-    rtl: false,
-  },
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', rtl: false },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', rtl: false },
-  { code: 'fr', name: 'French', nativeName: 'Français', rtl: false },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português', rtl: false },
-  { code: 'ru', name: 'Russian', nativeName: 'Русский', rtl: false },
-  {
-    code: 'id',
-    name: 'Indonesian',
-    nativeName: 'Bahasa Indonesia',
-    rtl: false,
-  },
-];
-
-interface LanguageSettings {
-  supportedLanguages: string[];
-  defaultLanguage: string;
-}
-
-interface QueryResult {
-  myTenantLanguageSettings: LanguageSettings | null;
-}
+import {
+  ADMIN_ROLES,
+  AVAILABLE_LOCALES,
+} from './LanguageSettingsPage.locales';
+import type { QueryResult } from './LanguageSettingsPage.locales';
+import { LanguageListCard } from './LanguageListCard';
+import { LanguagePreviewCard } from './LanguagePreviewCard';
 
 function RtlBadge() {
   return (
@@ -74,6 +40,8 @@ function RtlBadge() {
     </span>
   );
 }
+
+export { RtlBadge };
 
 export function LanguageSettingsPage() {
   const { t } = useTranslation('settings');
@@ -208,92 +176,18 @@ export function LanguageSettingsPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('languageAdmin.enabledLanguages')}</CardTitle>
-                <CardDescription>
-                  {t('languageAdmin.enabledLanguagesDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {supported.size === 0 && (
-                  <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-                    <AlertCircle className="h-4 w-4" />
-                    {t('languageAdmin.atLeastOne')}
-                  </div>
-                )}
-                {AVAILABLE_LOCALES.map((l) => {
-                  const isDefault = l.code === defaultLanguage;
-                  const isChecked = supported.has(l.code);
-                  return (
-                    <label
-                      key={l.code}
-                      className={
-                        'flex items-center gap-3 p-2 rounded-md hover:bg-muted cursor-pointer' +
-                        (isDefault ? ' opacity-70' : '')
-                      }
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        disabled={isDefault}
-                        onChange={() => handleToggleSupported(l.code)}
-                        className="h-4 w-4 rounded border"
-                      />
-                      <span className="text-sm font-medium flex-1">
-                        {l.name}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {l.nativeName}
-                      </span>
-                      {l.rtl && <RtlBadge />}
-                      {isDefault && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                          {t('languageAdmin.default')}
-                        </span>
-                      )}
-                    </label>
-                  );
-                })}
-              </CardContent>
-            </Card>
+            <LanguageListCard
+              supported={supported}
+              defaultLanguage={defaultLanguage}
+              onToggle={handleToggleSupported}
+              RtlBadge={RtlBadge}
+            />
 
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('languageAdmin.preview')}</CardTitle>
-                <CardDescription>
-                  {t('languageAdmin.previewDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-3 text-sm">
-                  {AVAILABLE_LOCALES.filter((l) => supported.has(l.code)).map(
-                    (l) => (
-                      <span
-                        key={l.code}
-                        dir={l.rtl ? 'rtl' : 'ltr'}
-                        className={
-                          'px-3 py-1.5 rounded-full border text-sm' +
-                          (l.code === defaultLanguage
-                            ? ' bg-primary text-primary-foreground border-primary font-medium'
-                            : ' bg-muted border-transparent')
-                        }
-                      >
-                        {l.nativeName}
-                      </span>
-                    )
-                  )}
-                </div>
-                {defaultLocale && (
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    {t('languageAdmin.default')}: <strong>{defaultLocale.name}</strong>
-                    {defaultLocale.rtl
-                      ? ` - ${t('languageAdmin.rtlApplied')}`
-                      : ''}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            <LanguagePreviewCard
+              supported={supported}
+              defaultLanguage={defaultLanguage}
+              defaultLocale={defaultLocale}
+            />
 
             <div className="flex items-center gap-4 pb-8">
               <Button

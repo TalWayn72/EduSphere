@@ -3,7 +3,7 @@
  * Route: /admin/at-risk
  * Phase 36: replaced mock data with real listAtRiskLearners GraphQL query.
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from 'urql';
@@ -35,101 +35,20 @@ import {
 } from '@/components/AtRiskLearnersTable';
 import { RiskThresholdConfig } from './AtRiskDashboardPage.config';
 import { LIST_AT_RISK_LEARNERS_QUERY } from '@/lib/graphql/at-risk.queries';
-
-const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
+import type { RiskFilter, SortKey } from './AtRiskDashboardPage.helpers';
+import {
+  ADMIN_ROLES,
+  applyFilter,
+  applySort,
+  exportCsv,
+  toTableRow,
+} from './AtRiskDashboardPage.helpers';
 
 const RESOLVE_AT_RISK = gql`
   mutation ResolveAtRiskFlag($flagId: ID!) {
     resolveAtRiskFlag(flagId: $flagId)
   }
 `;
-
-type RiskFilter = 'all' | 'high' | 'medium' | 'low';
-type SortKey = 'risk' | 'inactive' | 'progress';
-
-function applyFilter(
-  rows: AtRiskLearnerRow[],
-  filter: RiskFilter
-): AtRiskLearnerRow[] {
-  if (filter === 'high') return rows.filter((r) => r.riskScore > 0.7);
-  if (filter === 'medium')
-    return rows.filter((r) => r.riskScore >= 0.5 && r.riskScore <= 0.7);
-  if (filter === 'low') return rows.filter((r) => r.riskScore < 0.5);
-  return rows;
-}
-
-function applySort(
-  rows: AtRiskLearnerRow[],
-  sort: SortKey
-): AtRiskLearnerRow[] {
-  const copy = [...rows];
-  if (sort === 'risk') copy.sort((a, b) => b.riskScore - a.riskScore);
-  if (sort === 'inactive')
-    copy.sort((a, b) => b.daysSinceLastActivity - a.daysSinceLastActivity);
-  if (sort === 'progress')
-    copy.sort((a, b) => a.progressPercent - b.progressPercent);
-  return copy;
-}
-
-function exportCsv(rows: AtRiskLearnerRow[]) {
-  const header =
-    'learnerId,courseId,riskScore,daysSinceLastActivity,progressPercent,flaggedAt';
-  const body = rows
-    .map((r) =>
-      [
-        r.learnerId,
-        r.courseId,
-        r.riskScore,
-        r.daysSinceLastActivity,
-        r.progressPercent,
-        r.flaggedAt,
-      ].join(',')
-    )
-    .join(String.fromCharCode(10));
-  const blob = new Blob([header + String.fromCharCode(10) + body], {
-    type: 'text/csv',
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'at-risk-learners.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-/** Map real GraphQL AtRiskLearner to the table's AtRiskLearnerRow shape */
-function toTableRow(r: {
-  userId: string;
-  displayName: string;
-  courseId: string;
-  courseTitle: string;
-  daysSinceActive: number;
-  progressPct: number;
-}): AtRiskLearnerRow {
-  const riskScore = Math.max(0, Math.min(1, (100 - r.progressPct) / 100));
-  const riskFactors: AtRiskLearnerRow['riskFactors'] = [];
-  if (r.daysSinceActive >= 7) {
-    riskFactors.push({
-      key: 'inactivity',
-      description: `No activity for ${r.daysSinceActive} days`,
-    });
-  }
-  if (r.progressPct < 30) {
-    riskFactors.push({
-      key: 'low_progress',
-      description: 'Below 30% completion',
-    });
-  }
-  return {
-    learnerId: r.userId,
-    courseId: r.courseId,
-    riskScore,
-    daysSinceLastActivity: r.daysSinceActive,
-    progressPercent: r.progressPct,
-    flaggedAt: new Date().toISOString(),
-    riskFactors,
-  };
-}
 
 export function AtRiskDashboardPage() {
   const { t } = useTranslation('admin');
@@ -193,25 +112,25 @@ export function AtRiskDashboardPage() {
     {
       icon: AlertTriangle,
       label: t('atRisk.totalAtRisk'),
-      value: fetching ? '…' : stats.total,
+      value: fetching ? '\u2026' : stats.total,
       color: 'text-orange-500',
     },
     {
       icon: TrendingDown,
       label: t('atRisk.highRisk'),
-      value: fetching ? '…' : stats.high,
+      value: fetching ? '\u2026' : stats.high,
       color: 'text-red-500',
     },
     {
       icon: Clock,
       label: t('atRisk.avgDaysInactive'),
-      value: fetching ? '…' : stats.avgInactive + 'd',
+      value: fetching ? '\u2026' : stats.avgInactive + 'd',
       color: 'text-yellow-500',
     },
     {
       icon: BookOpen,
       label: t('atRisk.coursesAffected'),
-      value: fetching ? '…' : stats.courses,
+      value: fetching ? '\u2026' : stats.courses,
       color: 'text-blue-500',
     },
   ] as const;

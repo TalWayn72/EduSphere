@@ -14,113 +14,30 @@ import {
   KnowledgeSkillTree,
   SAMPLE_SKILL_TREE_DATA,
 } from '@/components/KnowledgeSkillTree';
-import type { SkillNode, MasteryLevel } from '@/components/KnowledgeSkillTree';
+import type { MasteryLevel } from '@/components/KnowledgeSkillTree';
 import { GET_SKILL_TREE_QUERY, UPDATE_MASTERY_LEVEL_MUTATION } from '@/lib/graphql/knowledge.queries';
 import { Loader2, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-// ─── GraphQL response types ────────────────────────────────────────────────
-
-interface ApiSkillTreeNode {
-  id: string;
-  label: string;
-  type: string;
-  masteryLevel: string;
-  connections: string[];
-}
-
-interface ApiSkillTree {
-  skillTree: {
-    nodes: ApiSkillTreeNode[];
-    edges: { source: string; target: string }[];
-  };
-}
-
-// ─── Mastery level mapping (backend enum → frontend literal) ──────────────
-
-const MASTERY_MAP: Record<string, MasteryLevel> = {
-  NONE: 'none',
-  ATTEMPTED: 'attempted',
-  FAMILIAR: 'familiar',
-  PROFICIENT: 'proficient',
-  MASTERED: 'mastered',
-};
-
-const REVERSE_MASTERY_MAP: Record<MasteryLevel, string> = {
-  none: 'NONE',
-  attempted: 'ATTEMPTED',
-  familiar: 'FAMILIAR',
-  proficient: 'PROFICIENT',
-  mastered: 'MASTERED',
-};
-
-const MASTERY_ORDER: MasteryLevel[] = [
-  'none',
-  'attempted',
-  'familiar',
-  'proficient',
-  'mastered',
-];
-
-function nextMastery(current: MasteryLevel): MasteryLevel {
-  const idx = MASTERY_ORDER.indexOf(current);
-  return MASTERY_ORDER[Math.min(idx + 1, MASTERY_ORDER.length - 1)] ?? current;
-}
-
-function mapApiNodes(
-  apiNodes: ApiSkillTreeNode[],
-  localOverrides: Map<string, MasteryLevel>
-): SkillNode[] {
-  const allIds = new Set(apiNodes.map((n) => n.id));
-  return apiNodes.map((n) => ({
-    id: n.id,
-    label: n.label,
-    mastery: localOverrides.get(n.id) ?? (MASTERY_MAP[n.masteryLevel] ?? 'none'),
-    progress: masteryToProgress(
-      localOverrides.get(n.id) ?? (MASTERY_MAP[n.masteryLevel] ?? 'none')
-    ),
-    children: n.connections.filter((id) => allIds.has(id)),
-    // Unlock first node + any node whose parent has mastery >= 'familiar'
-    unlocked: true,
-  }));
-}
-
-function masteryToProgress(level: MasteryLevel): number {
-  const map: Record<MasteryLevel, number> = {
-    none: 0,
-    attempted: 20,
-    familiar: 60,
-    proficient: 80,
-    mastered: 100,
-  };
-  return map[level] ?? 0;
-}
-
-// ─── UUID validation helper ────────────────────────────────────────────────
-
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isValidCourseId(id: string): boolean {
-  // 'all' is the global/unfiltered sentinel — always valid
-  return id === 'all' || UUID_REGEX.test(id);
-}
-
-// ─── Component ─────────────────────────────────────────────────────────────
+import type { ApiSkillTree } from './SkillTreePage.helpers';
+import {
+  MASTERY_MAP,
+  REVERSE_MASTERY_MAP,
+  nextMastery,
+  mapApiNodes,
+  isValidCourseId,
+} from './SkillTreePage.helpers';
 
 export function SkillTreePage() {
   const { t } = useTranslation('knowledge');
   const { courseId = 'all' } = useParams<{ courseId?: string }>();
   const [mounted, setMounted] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  // Local overrides applied optimistically before server confirmation
   const [masteryOverrides, setMasteryOverrides] = useState<
     Map<string, MasteryLevel>
   >(new Map());
 
   const validId = isValidCourseId(courseId);
 
-  // Mounted guard — prevents urql graphcache dispatch during sibling render
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -128,7 +45,6 @@ export function SkillTreePage() {
   const [skillTreeResult] = useQuery<ApiSkillTree>({
     query: GET_SKILL_TREE_QUERY,
     variables: { courseId },
-    // Pause when not mounted OR when courseId is invalid (no point querying)
     pause: !mounted || !validId,
   });
 
@@ -138,8 +54,7 @@ export function SkillTreePage() {
   const hasData = apiNodes.length > 0;
   const isError = !!skillTreeResult.error;
 
-  // Map API nodes → SkillNode[] or fall back to sample data
-  const nodes: SkillNode[] = hasData
+  const nodes = hasData
     ? mapApiNodes(apiNodes, masteryOverrides)
     : SAMPLE_SKILL_TREE_DATA;
 
@@ -157,7 +72,6 @@ export function SkillTreePage() {
         ] ?? 'none');
     const next = nextMastery(current as MasteryLevel);
 
-    // Optimistic update
     setMasteryOverrides((prev) => {
       const updated = new Map(prev);
       updated.set(selectedNodeId, next);
@@ -170,7 +84,6 @@ export function SkillTreePage() {
     });
 
     if (result.error) {
-      // Revert on failure
       console.error(
         '[SkillTreePage] updateMasteryLevel failed:',
         result.error.message
@@ -185,7 +98,6 @@ export function SkillTreePage() {
 
   const isSampleData = !hasData;
 
-  // UUID validation — render invalid state after all hooks have been called
   if (!validId) {
     return (
       <Layout>
@@ -206,7 +118,6 @@ export function SkillTreePage() {
   return (
     <Layout>
       <div className="space-y-4">
-        {/* Header */}
         <div className="flex items-start justify-between">
           <div>
             <h1
@@ -223,7 +134,6 @@ export function SkillTreePage() {
             </p>
           </div>
 
-          {/* Selected node actions */}
           {selectedNode && hasData && (
             <div
               className="flex items-center gap-3 p-3 rounded-lg border bg-card shadow-sm"
@@ -255,7 +165,6 @@ export function SkillTreePage() {
           )}
         </div>
 
-        {/* Loading state */}
         {skillTreeResult.fetching && (
           <div
             className="flex items-center gap-2 text-xs text-muted-foreground"
@@ -266,7 +175,6 @@ export function SkillTreePage() {
           </div>
         )}
 
-        {/* Error banner */}
         {isError && (
           <div
             role="alert"
@@ -278,7 +186,6 @@ export function SkillTreePage() {
           </div>
         )}
 
-        {/* Mutation error */}
         {updateResult.error && (
           <div
             role="alert"
@@ -290,7 +197,6 @@ export function SkillTreePage() {
           </div>
         )}
 
-        {/* Sample data notice */}
         {isSampleData && !skillTreeResult.fetching && (
           <div
             className="text-xs text-muted-foreground bg-muted/40 border border-muted rounded px-3 py-2"
@@ -300,7 +206,6 @@ export function SkillTreePage() {
           </div>
         )}
 
-        {/* Skill tree */}
         <div className="min-h-[500px]">
           <KnowledgeSkillTree
             nodes={nodes}

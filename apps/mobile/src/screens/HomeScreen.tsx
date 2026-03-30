@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  StyleSheet,
   ActivityIndicator,
 } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
@@ -18,10 +17,11 @@ import {
   MOCK_STATS,
   MOCK_RECENT_COURSES,
 } from '../lib/mock-mobile-data';
-import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../lib/theme';
+import { COLORS } from '../lib/theme';
 import { resolveStats } from '../lib/stats-utils';
 import { WeeklyActivityBar } from '../components/WeeklyActivityBar';
 import type { DayData } from '../components/WeeklyActivityBar';
+import { styles, formatRelativeTime } from './HomeScreen.styles';
 
 const MOCK_WEEKLY_ACTIVITY: DayData[] = [
   { label: 'Sun', count: 2 },
@@ -53,10 +53,6 @@ const HOME_QUERY = gql`
   }
 `;
 
-/**
- * MY_STATS_QUERY — fetches real learning stats (SI-9 fix: replaces always-MOCK_STATS usage).
- * Schema: myStats: UserStats! @authenticated (subgraph-core user.graphql)
- */
 const MY_STATS_QUERY = gql`
   query MyStats {
     myStats {
@@ -133,7 +129,7 @@ export default function HomeScreen() {
             </Text>
           )}
           <View style={styles.streakRow}>
-            <Text style={styles.streakFlame}>🔥</Text>
+            <Text style={styles.streakFlame}>{'\uD83D\uDD25'}</Text>
             <Text
               style={styles.streakCount}
               testID="streak-value"
@@ -210,102 +206,3 @@ export default function HomeScreen() {
     </ScrollView>
   );
 }
-
-function formatRelativeTime(isoString: string): string {
-  if (!isoString) return '';
-  const diff = Date.now() - new Date(isoString).getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 1) return 'Just now';
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
-  content: { padding: SPACING.lg },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.xxl,
-    backgroundColor: COLORS.bgCard,
-    padding: SPACING.xl,
-    borderRadius: RADIUS.lg,
-    ...SHADOW.md,
-  },
-  headerLeft: { flex: 1 },
-  greeting: { fontSize: FONT.sm, color: COLORS.textSecondary },
-  userName: { fontSize: FONT.xxl, fontWeight: FONT.bold, color: COLORS.textPrimary },
-  streakRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.sm,
-  },
-  streakFlame: { fontSize: FONT.lg },
-  streakCount: {
-    fontSize: FONT.base,
-    fontWeight: FONT.semibold,
-    color: COLORS.warning,
-    marginLeft: 4,
-  },
-  streakLabel: { fontSize: FONT.sm, color: COLORS.textSecondary },
-  devBadge: {
-    backgroundColor: COLORS.warning,
-    borderRadius: RADIUS.sm,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 3,
-  },
-  devBadgeText: { color: 'white', fontSize: FONT.xs, fontWeight: FONT.bold },
-  sectionTitle: {
-    fontSize: FONT.lg,
-    fontWeight: FONT.semibold,
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-    marginTop: SPACING.sm,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.md,
-    marginBottom: SPACING.xxl,
-  },
-  statCard: {
-    backgroundColor: COLORS.bgCard,
-    borderRadius: RADIUS.md,
-    padding: SPACING.lg,
-    width: '47%',
-    borderTopWidth: 3,
-    ...SHADOW.sm,
-  },
-  statValue: { fontSize: 28, fontWeight: FONT.bold, marginBottom: 4 },
-  statUnit: { fontSize: FONT.md, fontWeight: FONT.regular },
-  statLabel: { fontSize: 13, color: COLORS.textSecondary },
-  courseCard: {
-    backgroundColor: COLORS.bgCard,
-    borderRadius: RADIUS.md,
-    padding: SPACING.lg,
-    marginBottom: SPACING.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
-    ...SHADOW.sm,
-  },
-  courseInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  courseTitle: { fontSize: FONT.base, fontWeight: FONT.semibold, flex: 1, marginRight: SPACING.sm },
-  courseAccessed: { fontSize: FONT.sm, color: COLORS.textMuted },
-  progressContainer: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  progressBar: {
-    flex: 1,
-    height: 6,
-    backgroundColor: COLORS.border,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressFill: { height: '100%', backgroundColor: COLORS.primary, borderRadius: 3 },
-  progressText: { fontSize: FONT.sm, color: COLORS.textSecondary, width: 35, textAlign: 'right' },
-});

@@ -4,6 +4,7 @@ import { TenantService } from './tenant.service';
 import { TenantLanguageService } from './tenant-language.service';
 import { TenantBrandingService } from './tenant-branding.service';
 import { OrgProvisioningService } from './org-provisioning.service';
+import { OrgProvisioningHelpersService } from './org-provisioning-helpers.service';
 import { OrgInvitationService } from './org-invitation.service';
 import { TrialService } from './trial.service';
 import { OrgLicensingService } from './org-licensing.service';
@@ -19,6 +20,7 @@ import { OrgBadgeService } from '../gamification/org-badge.service';
 import { ApiKeyService } from '../api-keys/api-key.service';
 import { WebhookService } from '../webhooks/webhook.service';
 import { KeycloakAdminService } from '../auth/keycloak-admin.service';
+import { KeycloakAdminHttpService } from '../auth/keycloak-admin-http.service';
 
 @Module({
   providers: [
@@ -27,6 +29,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     TenantLanguageService,
     TenantBrandingService,
     OrgProvisioningService,
+    OrgProvisioningHelpersService,
     OrgInvitationService,
     TrialService,
     OrgLicensingService,
@@ -41,6 +44,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     OrgBadgeService,
     ApiKeyService,
     WebhookService,
+    KeycloakAdminHttpService,
     KeycloakAdminService,
   ],
   exports: [
@@ -48,6 +52,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     TenantLanguageService,
     TenantBrandingService,
     OrgProvisioningService,
+    OrgProvisioningHelpersService,
     OrgInvitationService,
     TrialService,
     OrgLicensingService,
@@ -60,6 +65,7 @@ import { KeycloakAdminService } from '../auth/keycloak-admin.service';
     OrgBadgeService,
     ApiKeyService,
     WebhookService,
+    KeycloakAdminHttpService,
     KeycloakAdminService,
   ],
 })

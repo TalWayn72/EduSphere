@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { GraphResolver } from './graph.resolver';
 import { GraphQueryResolver } from './graph-query.resolver';
 import { GraphService } from './graph.service';
+import { GraphQueryFacadeService } from './graph-query-facade.service';
+import { GraphMutationFacadeService } from './graph-mutation-facade.service';
 import { GraphConceptService } from './graph-concept.service';
 import { GraphConceptLinkService } from './graph-concept-link.service';
 import { GraphSearchService } from './graph-search.service';
@@ -58,6 +60,8 @@ import { MergeConceptsService } from './merge-concepts.service';
     GraphPersonTermService,    // → CypherPersonService, CypherTermService
     GraphSourceClusterService, // → CypherSourceService, CypherTopicClusterService, CypherLearningPathService
     // ── Layer 4: Facade (depends on all Layer 3 services)
+    GraphQueryFacadeService,
+    GraphMutationFacadeService,
     GraphService,
     // ── Resolvers & supporting services
     GraphResolver,

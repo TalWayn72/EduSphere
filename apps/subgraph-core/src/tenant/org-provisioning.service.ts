@@ -1,104 +1,43 @@
 /**
  * OrgProvisioningService — Orchestrates organization creation pipeline.
- *
- * Pipeline steps:
- *   1. Validate slug uniqueness
- *   2. Insert tenant record (plan: FREE, trial: 90 days)
- *   3. Create Keycloak group via KeycloakAdminService
- *   4. Create admin user in Keycloak
- *   5. Create MinIO bucket (placeholder — emits event for infra)
- *   6. Initialize onboarding checklist
- *   7. Emit NATS org.provisioned event
- *   8. Emit welcome email notification event
- *
- * Compensating saga on failure: steps are rolled back in reverse order.
+ * NATS events, saga compensation, and step tracking extracted to
+ * OrgProvisioningHelpersService.
  */
 import {
   Injectable,
   Logger,
   ConflictException,
   InternalServerErrorException,
-  OnModuleDestroy,
 } from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  closeAllPools,
-  schema,
-  eq,
-} from '@edusphere/db';
-import type { Database } from '@edusphere/db';
-import { connect, StringCodec, type NatsConnection } from 'nats';
-import { buildNatsOptions } from '@edusphere/nats-client';
-import { sql } from 'drizzle-orm';
+import { schema, eq } from '@edusphere/db';
 import { DomainProvisioningService } from './domain-provisioning.service';
+import { OrgProvisioningHelpersService } from './org-provisioning-helpers.service';
+import type {
+  CreateOrgInput,
+  ProvisioningResult,
+  ProvisioningSteps,
+} from './org-provisioning.types';
 
-export interface CreateOrgInput {
-  name: string;
-  slug: string;
-  adminEmail: string;
-  adminFirstName: string;
-  adminLastName: string;
-  idempotencyKey: string;
-}
+export type { CreateOrgInput, ProvisioningResult };
 
-export interface ProvisioningResult {
-  id: string;
-  name: string;
-  slug: string;
-  plan: string;
-  provisioningStatus: string;
-  trialEndsAt: Date | null;
-  createdAt: Date;
-}
-
-interface ProvisioningSteps {
-  step1_slug_validated?: boolean;
-  step2_tenant_created?: boolean;
-  step3_keycloak_group?: { groupId: string; completed: boolean };
-  step4_admin_user?: { userId: string; completed: boolean };
-  step5_minio_bucket?: { completed: boolean };
-  step5b_subdomain?: { url: string; completed: boolean };
-  step6_checklist?: { completed: boolean };
-  step7_nats_event?: { completed: boolean };
-  step8_welcome_email?: { completed: boolean };
-}
-
-const ORG_PROVISIONED_SUBJECT = 'EDUSPHERE.org.provisioned';
-const NOTIFICATION_SUBJECT = 'EDUSPHERE.notification.dispatch';
 const TRIAL_DAYS = 90;
 
 @Injectable()
-export class OrgProvisioningService implements OnModuleDestroy {
+export class OrgProvisioningService {
   private readonly logger = new Logger(OrgProvisioningService.name);
-  private readonly db: Database;
-  private readonly sc = StringCodec();
-  private nc: NatsConnection | null = null;
   private readonly domainService: DomainProvisioningService;
 
-  constructor() {
-    this.db = createDatabaseConnection();
+  constructor(
+    private readonly helpers: OrgProvisioningHelpersService
+  ) {
     this.domainService = new DomainProvisioningService();
   }
 
-  async onModuleDestroy(): Promise<void> {
-    if (this.nc) {
-      await this.nc.drain().catch(() => undefined);
-      this.nc = null;
-    }
-    await closeAllPools();
-    this.logger.log('[OrgProvisioningService] onModuleDestroy: cleaned up');
-  }
-
-  private async getNats(): Promise<NatsConnection> {
-    if (!this.nc) {
-      this.nc = await connect(buildNatsOptions());
-    }
-    return this.nc;
-  }
-
   async createOrganization(input: CreateOrgInput): Promise<ProvisioningResult> {
+    const db = this.helpers.db;
+
     // Step 1: Validate slug uniqueness
-    const existing = await this.db
+    const existing = await db
       .select({ id: schema.tenants.id })
       .from(schema.tenants)
       .where(eq(schema.tenants.slug, input.slug))
@@ -112,7 +51,7 @@ export class OrgProvisioningService implements OnModuleDestroy {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DAYS);
 
-    const [tenant] = await this.db
+    const [tenant] = await db
       .insert(schema.tenants)
       .values({
         name: input.name,
@@ -138,34 +77,34 @@ export class OrgProvisioningService implements OnModuleDestroy {
     };
 
     try {
-      // Steps 3-4: Keycloak (placeholder — KeycloakAdminService handles)
+      // Steps 3-4: Keycloak (placeholder)
       steps.step3_keycloak_group = { groupId: 'pending', completed: true };
       steps.step4_admin_user = { userId: 'pending', completed: true };
 
       // Step 5: MinIO bucket (emit event for infra layer)
       steps.step5_minio_bucket = { completed: true };
 
-      // Step 5b: Create subdomain via DnsProvider
+      // Step 5b: Create subdomain
       const subdomainResult = await this.domainService.createSubdomain(
         input.slug,
         { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' }
       );
       steps.step5b_subdomain = { url: subdomainResult.url, completed: true };
 
-      // Step 6: Init onboarding checklist (store in settings)
-      await this.updateProvisioningSteps(tenantId, steps);
+      // Step 6: Init onboarding checklist
+      await this.helpers.updateProvisioningSteps(tenantId, steps);
       steps.step6_checklist = { completed: true };
 
       // Step 7: Emit NATS org.provisioned
-      await this.emitProvisionedEvent(tenantId, input);
+      await this.helpers.emitProvisionedEvent(tenantId, input);
       steps.step7_nats_event = { completed: true };
 
       // Step 8: Emit welcome email
-      await this.emitWelcomeEmail(tenantId, input);
+      await this.helpers.emitWelcomeEmail(tenantId, input);
       steps.step8_welcome_email = { completed: true };
 
       // Mark as ACTIVE
-      await this.db
+      await db
         .update(schema.tenants)
         .set({
           settings: {
@@ -195,109 +134,8 @@ export class OrgProvisioningService implements OnModuleDestroy {
         { tenantId, err },
         '[OrgProvisioningService] Provisioning failed — running compensating saga'
       );
-      await this.compensatingSaga(tenantId, steps);
+      await this.helpers.compensatingSaga(tenantId, steps);
       throw new InternalServerErrorException('Organization provisioning failed');
-    }
-  }
-
-  private async updateProvisioningSteps(
-    tenantId: string,
-    steps: ProvisioningSteps
-  ): Promise<void> {
-    await this.db
-      .update(schema.tenants)
-      .set({
-        settings: sql`jsonb_set(
-          COALESCE(settings, '{}'::jsonb),
-          '{provisioningSteps}',
-          ${JSON.stringify(steps)}::jsonb
-        )`,
-      })
-      .where(eq(schema.tenants.id, tenantId));
-  }
-
-  private async emitProvisionedEvent(
-    tenantId: string,
-    input: CreateOrgInput
-  ): Promise<void> {
-    try {
-      const nc = await this.getNats();
-      nc.publish(
-        ORG_PROVISIONED_SUBJECT,
-        this.sc.encode(
-          JSON.stringify({
-            tenantId,
-            slug: input.slug,
-            adminEmail: input.adminEmail,
-            plan: 'FREE',
-            timestamp: new Date().toISOString(),
-          })
-        )
-      );
-    } catch (err) {
-      this.logger.warn(
-        { tenantId, err },
-        '[OrgProvisioningService] Failed to emit provisioned event'
-      );
-    }
-  }
-
-  private async emitWelcomeEmail(
-    tenantId: string,
-    input: CreateOrgInput
-  ): Promise<void> {
-    try {
-      const nc = await this.getNats();
-      nc.publish(
-        NOTIFICATION_SUBJECT,
-        this.sc.encode(
-          JSON.stringify({
-            template: 'ORG_WELCOME',
-            recipientEmail: input.adminEmail,
-            data: {
-              orgName: input.name,
-              slug: input.slug,
-              loginUrl: `https://${input.slug}.edusphere.com`,
-            },
-            tenantId,
-            timestamp: new Date().toISOString(),
-          })
-        )
-      );
-    } catch (err) {
-      this.logger.warn(
-        { tenantId, err },
-        '[OrgProvisioningService] Failed to emit welcome email event'
-      );
-    }
-  }
-
-  private async compensatingSaga(
-    tenantId: string,
-    steps: ProvisioningSteps
-  ): Promise<void> {
-    try {
-      if (steps.step2_tenant_created) {
-        await this.db
-          .update(schema.tenants)
-          .set({
-            settings: sql`jsonb_set(
-              COALESCE(settings, '{}'::jsonb),
-              '{provisioningStatus}',
-              '"FAILED"'::jsonb
-            )`,
-          })
-          .where(eq(schema.tenants.id, tenantId));
-      }
-      this.logger.log(
-        { tenantId },
-        '[OrgProvisioningService] Compensating saga completed'
-      );
-    } catch (err) {
-      this.logger.error(
-        { tenantId, err },
-        '[OrgProvisioningService] Compensating saga failed'
-      );
     }
   }
 }

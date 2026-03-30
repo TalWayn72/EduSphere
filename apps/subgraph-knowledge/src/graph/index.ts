@@ -3,6 +3,8 @@
  * Import from this file to get all graph services and shared types.
  */
 export { GraphService } from './graph.service';
+export { GraphQueryFacadeService } from './graph-query-facade.service';
+export { GraphMutationFacadeService } from './graph-mutation-facade.service';
 export { GraphResolver } from './graph.resolver';
 export { GraphQueryResolver } from './graph-query.resolver';
 export { GraphConceptService } from './graph-concept.service';

@@ -24,6 +24,7 @@ import {
   useAddYoutubeMutation,
   useAddFileMutation,
 } from './useAddSourceMutations';
+import { UrlPanel, TextPanel, YoutubePanel, FilePanel } from './AddSourceTabPanels';
 
 export function AddSourceModal({
   courseId,
@@ -53,14 +54,12 @@ export function AddSourceModal({
     undefined,
   );
 
-  // BUG-098: Pre-flight auth check — show error immediately if not logged in
   useEffect(() => {
     if (!hasValidAuth()) {
       setError(t('sources.errorUnauthorized'));
     }
   }, [t]);
 
-  // Auto-close 1.5 s after success is shown
   useEffect(() => {
     if (success) {
       closeTimerRef.current = setTimeout(onClose, 1500);
@@ -119,6 +118,11 @@ export function AddSourceModal({
     }
   };
 
+  const handleFileSelect = (name: string) => {
+    setSelectedFileName(name);
+    if (!fileTitle) setFileTitle(name);
+  };
+
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent
@@ -127,7 +131,6 @@ export function AddSourceModal({
         data-testid="add-source-modal"
         onInteractOutside={(e) => { if (success) e.preventDefault(); }}
       >
-        {/* Header */}
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-lg font-semibold">
             {t('sources.addSourceTitle')}
@@ -137,7 +140,6 @@ export function AddSourceModal({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Tabs -- hidden when success */}
         {!success && (
           <div className="flex border-b px-6" role="tablist">
             {TAB_KEYS.map((tabKey) => (
@@ -155,7 +157,6 @@ export function AddSourceModal({
           </div>
         )}
 
-        {/* Body */}
         <div className="p-6 flex flex-col gap-4" role="tabpanel">
           {success && (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
@@ -172,112 +173,16 @@ export function AddSourceModal({
           )}
 
           {!success && tab === 'url' && (
-            <>
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-200">
-                {t('sources.urlLabel')}
-              </label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder={t('sources.urlPlaceholder')}
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                dir="ltr"
-              />
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder={t('sources.titleOptional')}
-                value={urlTitle}
-                onChange={(e) => setUrlTitle(e.target.value)}
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400">{t('sources.urlHint')}</p>
-            </>
+            <UrlPanel url={url} urlTitle={urlTitle} onUrlChange={setUrl} onTitleChange={setUrlTitle} />
           )}
-
           {!success && tab === 'text' && (
-            <>
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                placeholder={t('sources.titleOptional')}
-                value={textTitle}
-                onChange={(e) => setTextTitle(e.target.value)}
-              />
-              <textarea
-                className="w-full border rounded-lg px-3 py-2 text-sm h-40 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder={t('sources.textPlaceholder')}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-              />
-            </>
+            <TextPanel text={text} textTitle={textTitle} onTextChange={setText} onTitleChange={setTextTitle} />
           )}
-
           {!success && tab === 'youtube' && (
-            <>
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder={t('sources.youtubePlaceholder')}
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                dir="ltr"
-              />
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                placeholder={t('sources.titleOptional')}
-                value={youtubeTitle}
-                onChange={(e) => setYoutubeTitle(e.target.value)}
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t('sources.youtubeHint')}
-              </p>
-            </>
+            <YoutubePanel youtubeUrl={youtubeUrl} youtubeTitle={youtubeTitle} onUrlChange={setYoutubeUrl} onTitleChange={setYoutubeTitle} />
           )}
-
           {!success && tab === 'file' && (
-            <>
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                placeholder={t('sources.titleOptional')}
-                value={fileTitle}
-                onChange={(e) => setFileTitle(e.target.value)}
-                disabled={busy}
-              />
-              {busy ? (
-                <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50 dark:border-blue-700 dark:bg-blue-950">
-                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2 dark:border-blue-400" />
-                  <span className="text-sm text-blue-700 font-medium dark:text-blue-300">
-                    {t('sources.uploading')}
-                  </span>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors dark:border-gray-600">
-                  <span className="text-3xl mb-1">
-                    {selectedFileName ? '\u{1F4C4}' : '\u{1F4C2}'}
-                  </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    {selectedFileName
-                      ? t('sources.fileChanged', { name: selectedFileName })
-                      : t('sources.dropOrClick')}
-                  </span>
-                  {!selectedFileName && (
-                    <span className="text-xs text-gray-400 mt-1 dark:text-gray-500">
-                      {t('sources.fileHint')}
-                    </span>
-                  )}
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept=".docx,.pdf,.txt"
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) {
-                        setSelectedFileName(f.name);
-                        if (!fileTitle) setFileTitle(f.name);
-                      }
-                    }}
-                  />
-                </label>
-              )}
-            </>
+            <FilePanel fileTitle={fileTitle} selectedFileName={selectedFileName} busy={busy} fileRef={fileRef} onTitleChange={setFileTitle} onFileSelect={handleFileSelect} />
           )}
 
           {!success && error && (
@@ -291,7 +196,6 @@ export function AddSourceModal({
           )}
         </div>
 
-        {/* Footer -- hidden when success */}
         {!success && (
           <div className="flex gap-3 justify-end px-6 py-4 border-t">
             <button

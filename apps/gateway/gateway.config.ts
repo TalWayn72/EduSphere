@@ -1,65 +1,26 @@
+/**
+ * Hive Gateway v2 configuration.
+ * Plugins (response cache, auth propagation) extracted to gateway-plugins.ts.
+ */
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import { defineConfig } from '@graphql-hive/gateway';
-import { useResponseCache } from '@graphql-yoga/plugin-response-cache';
-import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { buildGatewayPlugins } from './gateway-plugins';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// ─── JWT Validation at Gateway Level ─────────────────────────────────────────
-// Validates the JWT and extracts identity claims (userId, tenantId, role) before
-// forwarding to subgraphs. This ensures subgraphs receive both the raw
-// Authorization header AND pre-extracted identity headers as a fallback when
-// local Keycloak JWKS validation fails (e.g. Keycloak startup race condition).
-const KEYCLOAK_URL =
-  process.env.KEYCLOAK_URL || 'http://localhost:8080';
-const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'edusphere';
-const JWKS_URL = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`;
-const KEYCLOAK_ISSUER = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
-// SEC-3: JWT audience validation
-const KEYCLOAK_AUDIENCE = process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web';
-const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
-const DEV_TOKEN = 'dev-token-mock-jwt';
-
 // Load the persisted query manifest if it exists.
-// In development the manifest is optional — arbitrary queries are allowed.
-// In production, only queries in the manifest are accepted.
 const manifestPath = join(__dirname, 'persisted-queries', 'manifest.json');
 const persistedQueryManifest: Record<string, string> | undefined = existsSync(
   manifestPath
 )
   ? (JSON.parse(readFileSync(manifestPath, 'utf-8')) as Record<string, string>)
   : undefined;
-
-// ─── Response Cache TTL Configuration ────────────────────────────────────────
-// Per-operation TTL differentiation based on query root field name:
-//   - content/* queries → 60 s (content items change less frequently)
-//   - course/* queries  → 30 s (courses refresh more often due to enrollment)
-//   - all other reads   → 60 s (conservative safe default)
-//
-// stale-while-revalidate is emulated by keeping the item in cache until TTL
-// expires and simultaneously serving the stale value. True SWR (serve stale
-// while fetching fresh in the background) requires a custom cache store; the
-// built-in in-memory store uses TTL eviction only.
-const CONTENT_TTL_MS = 60_000; // 60 s — content items, knowledge nodes
-const COURSE_TTL_MS = 30_000; // 30 s — course data (enrollment counts change)
-const DEFAULT_TTL_MS = 60_000; // 60 s — safe default for all other reads
-
-// Regex that matches operation documents whose first root selection is a
-// course-related field (courses, course, courseById, myCourses, …).
-const COURSE_QUERY_RE = /^\s*(?:query\s+\w*\s*[({]?\s*)?{?\s*\bcourses?\b/i;
-
-function resolveTtlMs(documentString: string): number {
-  if (COURSE_QUERY_RE.test(documentString)) {
-    return COURSE_TTL_MS;
-  }
-  return DEFAULT_TTL_MS;
-}
 
 export const gatewayConfig = defineConfig({
   supergraph: './supergraph.graphql',
@@ -85,7 +46,6 @@ export const gatewayConfig = defineConfig({
   },
 
   graphiql: {
-    // Disable GraphiQL in production — forces use of persisted queries
     enabled: !isProduction,
   },
 
@@ -94,212 +54,13 @@ export const gatewayConfig = defineConfig({
   logging:
     (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
 
-  // ─── Response Cache ──────────────────────────────────────────────────────
-  // Response caching for read-heavy queries (courses, content items).
-  //   - TTL: 60 s for content queries, 30 s for course queries
-  //   - Cache-Control: stale-while-revalidate added on all cached responses
-  //   - Cache keys are namespaced per tenant (multi-tenant isolation)
-  //   - Mutations and error responses are never cached
-  //
-  // Hive Gateway v2: plugins as factory function (ctx no longer carries plugins array)
-  plugins: () => [
-    useResponseCache({
-      // Default TTL — overridden per-operation via ttlPerSchemaCoordinate or
-      // the custom buildResponseCacheKey below. Content items use CONTENT_TTL_MS,
-      // course queries use COURSE_TTL_MS.
-      ttl: DEFAULT_TTL_MS,
-
-      // Per-type TTL: schema coordinate overrides take priority over the
-      // default. Content type fields are cached longer; Course fields shorter.
-      ttlPerSchemaCoordinate: {
-        // Content subgraph root fields → 60 s
-        'Query.contentItem': CONTENT_TTL_MS,
-        'Query.contentItems': CONTENT_TTL_MS,
-        'Query.myContentItems': CONTENT_TTL_MS,
-        // Course root fields → 30 s
-        'Query.course': COURSE_TTL_MS,
-        'Query.courses': COURSE_TTL_MS,
-        'Query.myCourses': COURSE_TTL_MS,
-        'Query.enrolledCourses': COURSE_TTL_MS,
-      },
-
-      // session must be provided — return null to treat all as anonymous
-      // (we use buildResponseCacheKey for tenant isolation instead)
-      session: () => null,
-
-      // Only cache safe read-only requests (GET or explicit GraphQL content-type)
-      enabled: (request) =>
-        request.method === 'GET' ||
-        (request.headers.get('content-type')?.includes('application/graphql') ??
-          false),
-
-      // Tenant-scoped cache key prevents cross-tenant data leakage.
-      // Key format: <tenantId>:<ttlBucket>:<document>:<variables>
-      // The ttlBucket segment makes course and content keys distinct so
-      // per-operation TTL differences are applied correctly.
-      buildResponseCacheKey: async ({
-        documentString,
-        variableValues,
-        request,
-      }) => {
-        const tenantId = request.headers.get('x-tenant-id') ?? 'anonymous';
-        const ttlBucket = resolveTtlMs(documentString);
-        return `${tenantId}:ttl${ttlBucket}:${documentString}:${JSON.stringify(variableValues ?? {})}`;
-      },
-
-      // Do not cache responses that contain errors
-      shouldCacheResult: ({ result }) => !result.errors?.length,
-    }),
-
-    // ─── Cache-Control: stale-while-revalidate ──────────────────────────────
-    // Instructs CDN/proxy layers (Cloudflare, Nginx, Varnish) to serve the
-    // cached copy for up to half the TTL period while revalidating in the
-    // background. This minimises perceived latency on cache misses.
-    //
-    // Header is only added to GET responses so that POST (mutation) responses
-    // are never mistakenly cached at the CDN layer.
-    {
-      onResponse({ request, response, serverContext: _ctx }) {
-        if (request.method !== 'GET') return;
-        const maxAge = Math.floor(DEFAULT_TTL_MS / 1000);
-        const swr = Math.floor(maxAge / 2);
-        response.headers.set(
-          'Cache-Control',
-          `public, max-age=${maxAge}, stale-while-revalidate=${swr}`
-        );
-      },
-    },
-
-    // ─── Authorization Header Propagation ──────────────────────────────────
-    // hive-gateway CLI does not forward the Authorization header to upstream
-    // subgraphs by default. Each subgraph independently validates the JWT, so
-    // it must receive the original Bearer token from the client request.
-    //
-    // Two auth paths:
-    //   HTTP (query/mutation): token in Authorization request header
-    //   WebSocket (subscription): token in graphql-ws connectionParams
-    //     → `context.connectionParams.authorization` (set by urql-client.ts)
-    //
-    // Phase 1: onContextBuilding captures auth header from the original request
-    // and stores it in the context under `_authHeader`. This is more reliable
-    // than reading from `context.request` in onFetch, which may not be
-    // available in all Hive Gateway v2 execution paths.
-    {
-      async onContextBuilding({ context, extendContext }) {
-        const req = (context as Record<string, unknown>)['request'] as
-          | Request
-          | undefined;
-        const connParams = (context as Record<string, unknown>)[
-          'connectionParams'
-        ] as Record<string, string> | undefined;
-
-        const auth =
-          req?.headers?.get('authorization') ??
-          connParams?.['authorization'] ??
-          null;
-
-        const tenantId =
-          req?.headers?.get('x-tenant-id') ??
-          connParams?.['x-tenant-id'] ??
-          null;
-
-        // Extract identity from JWT for header forwarding to subgraphs
-        let userId: string | null = null;
-        let role: string | null = null;
-        let resolvedTenantId = tenantId;
-
-        if (auth?.startsWith('Bearer ')) {
-          const token = auth.slice(7);
-          // SEC-1: Dev bypass requires ALLOW_DEV_TOKEN=true. Grants STUDENT by default.
-          if (token === DEV_TOKEN && !isProduction && process.env['ALLOW_DEV_TOKEN'] === 'true') {
-            const APP_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER']);
-            const devRole = process.env['DEV_TOKEN_ROLE'] ?? 'STUDENT';
-            userId = '00000000-0000-0000-0000-000000000001';
-            resolvedTenantId = '00000000-0000-0000-0000-000000000000';
-            role = APP_ROLES.has(devRole) ? devRole : 'STUDENT';
-          } else {
-            try {
-              // SEC-3: JWT audience validation
-              const { payload } = await jwtVerify(token, JWKS, {
-                issuer: KEYCLOAK_ISSUER,
-                audience: KEYCLOAK_AUDIENCE,
-              });
-              userId = (payload.sub as string) ?? null;
-              resolvedTenantId =
-                (payload.tenant_id as string) ?? tenantId;
-              const roles =
-                (payload.realm_access as { roles?: string[] })?.roles ?? [];
-              const knownRoles = [
-                'SUPER_ADMIN',
-                'ORG_ADMIN',
-                'INSTRUCTOR',
-                'STUDENT',
-                'RESEARCHER',
-              ];
-              role = roles.find((r) => knownRoles.includes(r)) ?? null;
-            } catch {
-              // JWT validation failure at gateway — subgraph will re-validate.
-              // Auth header is still forwarded so subgraph can attempt validation.
-            }
-          }
-        }
-
-        extendContext({
-          _authHeader: auth,
-          _tenantId: resolvedTenantId,
-          userId,
-          role,
-        } as Record<string, unknown>);
-      },
-    },
-    // Phase 2: onFetch reads the captured auth header from context and forwards
-    // it to every subgraph HTTP fetch request.
-    {
-      onFetch({ options, setOptions, context }) {
-        const ctx = context as Record<string, unknown> | null | undefined;
-
-        // Primary: read from context built by onContextBuilding above
-        // Fallback: read directly from request headers (original pattern)
-        const auth =
-          (ctx?.['_authHeader'] as string | null) ??
-          (ctx?.['request'] as Request | undefined)?.headers?.get(
-            'authorization'
-          ) ??
-          (ctx?.['connectionParams'] as Record<string, string> | undefined)?.[
-            'authorization'
-          ] ??
-          null;
-
-        if (!auth) return;
-
-        const prev = options.headers as Record<string, string> | undefined;
-        const forwarded: Record<string, string> = {
-          ...(prev ?? {}),
-          authorization: auth,
-        };
-
-        // Forward tenant/identity headers for subgraph resolvers
-        const tenantId = ctx?.['_tenantId'] as string | null;
-        if (tenantId) forwarded['x-tenant-id'] = tenantId;
-        if (ctx?.['userId']) forwarded['x-user-id'] = ctx['userId'] as string;
-        if (ctx?.['role']) forwarded['x-user-role'] = ctx['role'] as string;
-
-        setOptions({ ...options, headers: forwarded });
-      },
-    },
-  ],
+  plugins: () => buildGatewayPlugins(),
 
   // ─── Persisted Queries ──────────────────────────────────────────────────
-  // When manifest is present:
-  //   - production:   allowArbitraryDocuments = false (strict mode)
-  //   - development:  allowArbitraryDocuments = true  (dev convenience)
-  //
-  // See apps/gateway/persisted-queries/README.md for manifest generation.
   ...(persistedQueryManifest
     ? {
         persistedDocuments: {
           documents: persistedQueryManifest,
-          // Reject any query not in the manifest when running in production
           allowArbitraryDocuments: !isProduction,
         },
       }
@@ -307,29 +68,13 @@ export const gatewayConfig = defineConfig({
 
   // ─── NATS Distributed Subscriptions ─────────────────────────────────────
   // Multi-replica subscription support is implemented in src/nats-subscriptions.ts.
-  //
-  // The NatsPubSub bridge is wired into the GraphQL context in src/index.ts
-  // so that subscription resolvers can call ctx.pubSub.publish() / .subscribe().
+  // The NatsPubSub bridge is wired into the GraphQL context in src/index.ts.
   //
   // Runtime behaviour:
-  //   NATS_URL set   → NatsPubSub (multi-replica, events fan-out via gw.sub.* subjects)
-  //   NATS_URL unset → InProcessPubSub (single-replica, in-memory EventEmitter)
+  //   NATS_URL set   -> NatsPubSub (multi-replica)
+  //   NATS_URL unset -> InProcessPubSub (single-replica)
   //
   // NATS subject convention: gw.sub.<topic>
-  //
-  // To add a new subscription topic in a subgraph resolver:
-  //   async *myField(_root, _args, ctx) {
-  //     const unsubscribe = await ctx.pubSub.subscribe('my-topic', (payload) => {
-  //       // push payload to the AsyncGenerator
-  //     });
-  //     try { yield* asyncGenerator; } finally { unsubscribe(); }
-  //   }
-  //
-  // To emit events from a mutation resolver:
-  //   await ctx.pubSub.publish('my-topic', { data: ... });
-  //
-  // Environment variables:
-  //   NATS_URL=nats://nats:4222   (required for multi-replica mode)
 });
 
 export default gatewayConfig;

@@ -32,33 +32,15 @@ import type {
   MessageStreamSubscriptionVariables,
 } from '@edusphere/graphql-types';
 import { MessageRole } from '@edusphere/graphql-types';
+import type { ChatMessage } from './useAgentChat.helpers';
+import {
+  INITIAL_MESSAGE,
+  MOCK_RESPONSES,
+  optimisticReducer,
+  withStreamingCursor,
+} from './useAgentChat.helpers';
 
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'agent';
-  content: string;
-}
-
-const INITIAL_MESSAGE: ChatMessage = {
-  id: 'init',
-  role: 'agent',
-  content: `שלום! I'm your Chavruta learning partner. I can help you debate, understand, and explore the concepts in this lesson. Ask me anything!`,
-};
-
-const MOCK_RESPONSES = [
-  `That's an interesting point. Let me challenge you: if free will truly exists, how do you explain the deterministic nature of neural processes?`,
-  `A strong argument! But consider the opposite view: Rambam himself in the Mishneh Torah writes that man has absolute free choice. How do you reconcile this?`,
-  `Excellent! Can you find a source in the Talmud that supports or contradicts this position?`,
-  `Let's explore this deeper. What would the implications be if you are correct? How would that affect the concept of reward and punishment?`,
-];
-
-// Reducer for useOptimistic: appends a new message to the displayed list.
-function optimisticReducer(
-  state: ChatMessage[],
-  newMessage: ChatMessage
-): ChatMessage[] {
-  return [...state, newMessage];
-}
+export type { ChatMessage } from './useAgentChat.helpers';
 
 export interface UseAgentChatReturn {
   messages: ChatMessage[];
@@ -79,19 +61,13 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
-  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
+  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (mockTimeoutRef.current) clearTimeout(mockTimeoutRef.current);
-      if (streamingTimeoutRef.current)
-        clearTimeout(streamingTimeoutRef.current);
+      if (streamingTimeoutRef.current) clearTimeout(streamingTimeoutRef.current);
     };
   }, []);
 
@@ -104,8 +80,6 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     SendAgentMessageMutationVariables
   >(SEND_AGENT_MESSAGE_MUTATION);
 
-  // useOptimistic exposes the live message list; the reducer merges streaming
-  // updates on top of confirmedMessages without extra state.
   const [messages] = useOptimistic<ChatMessage[], ChatMessage>(
     confirmedMessages,
     optimisticReducer
@@ -113,9 +87,6 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
 
   const [isSending, startTransition] = useTransition();
 
-  // Subscribe to streaming agent responses when a session is active.
-  // useSubscription<Data, Result, Variables>: Variables is the 3rd param.
-  // Pass only Data here; use `satisfies` on variables for compile-time safety.
   const [streamResult] = useSubscription<
     MessageStreamSubscription,
     MessageStreamSubscription,
@@ -126,33 +97,21 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     pause: !sessionId,
   });
 
-  // Handle incoming stream events: upsert by id so partial updates work.
   useEffect(() => {
     const msg = streamResult.data?.messageStream;
     if (!msg) return;
-
     const incomingRole: ChatMessage['role'] =
       msg.role === MessageRole.User ? 'user' : 'agent';
-
     setConfirmedMessages((prev) => {
       const existingIdx = prev.findIndex((m) => m.id === msg.id);
       if (existingIdx !== -1) {
         const updated = [...prev];
-        updated[existingIdx] = {
-          ...updated[existingIdx]!,
-          content: msg.content,
-        };
+        updated[existingIdx] = { ...updated[existingIdx]!, content: msg.content };
         return updated;
       }
-      return [
-        ...prev,
-        { id: msg.id, role: incomingRole, content: msg.content },
-      ];
+      return [...prev, { id: msg.id, role: incomingRole, content: msg.content }];
     });
-
-    if (incomingRole === 'agent') {
-      setIsStreaming(false);
-    }
+    if (incomingRole === 'agent') setIsStreaming(false);
   }, [streamResult.data]);
 
   const scrollToBottom = useCallback(() => {
@@ -166,8 +125,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const appendMockResponse = useCallback(() => {
     setIsStreaming(true);
     mockTimeoutRef.current = setTimeout(() => {
-      const reply =
-        MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)] ?? '';
+      const reply = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)] ?? '';
       setConfirmedMessages((prev) => [
         ...prev,
         { id: Date.now().toString(), role: 'agent', content: reply },
@@ -180,7 +138,6 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     const trimmed = chatInput.trim();
     if (!trimmed) return;
 
-    // SI-10: Frontend consent gate — check localStorage before calling backend.
     if (localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true') {
       setChatInput('');
       setConfirmedMessages((prev) => [
@@ -191,26 +148,16 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       return;
     }
 
-    const userMsg: ChatMessage = {
-      id: `temp-${Date.now()}`,
-      role: 'user',
-      content: trimmed,
-    };
-
-    // Clear input and add user message to confirmed list immediately —
-    // avoids the useOptimistic duplicate-key bug that occurs when both
-    // addOptimisticMessage() and setConfirmedMessages() add the same id.
+    const userMsg: ChatMessage = { id: `temp-${Date.now()}`, role: 'user', content: trimmed };
     setChatInput('');
     setIsStreaming(true);
     setConfirmedMessages((prev) => [...prev, userMsg]);
 
     startTransition(async () => {
-      // Ensure we have an active session
       let sid = sessionId;
       if (!sid) {
         const res = await startSession({
-          templateType:
-            'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
+          templateType: 'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
           context: { contentId },
         });
         if (res.error) {
@@ -220,11 +167,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           if (consentErr) {
             setConfirmedMessages((prev) => [
               ...prev,
-              {
-                id: `consent-${Date.now()}`,
-                role: 'agent' as const,
-                content: 'consent-required',
-              },
+              { id: `consent-${Date.now()}`, role: 'agent' as const, content: 'consent-required' },
             ]);
             setIsStreaming(false);
             return;
@@ -235,10 +178,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       }
 
       if (sid) {
-        const res = await sendAgentMessage({
-          sessionId: sid,
-          content: trimmed,
-        });
+        const res = await sendAgentMessage({ sessionId: sid, content: trimmed });
         if (res.error) {
           const consentErr = res.error.graphQLErrors?.find(
             (e) => e.extensions?.code === 'CONSENT_REQUIRED'
@@ -246,11 +186,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           if (consentErr) {
             setConfirmedMessages((prev) => [
               ...prev,
-              {
-                id: `consent-${Date.now()}`,
-                role: 'agent' as const,
-                content: 'consent-required',
-              },
+              { id: `consent-${Date.now()}`, role: 'agent' as const, content: 'consent-required' },
             ]);
             setIsStreaming(false);
             return;
@@ -261,50 +197,27 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           setConfirmedMessages((prev) => {
             const alreadyPresent = prev.some((m) => m.id === reply.id);
             if (alreadyPresent) return prev;
-            return [
-              ...prev,
-              {
-                id: reply.id,
-                role: 'agent' as const,
-                content: reply.content,
-              },
-            ];
+            return [...prev, { id: reply.id, role: 'agent' as const, content: reply.content }];
           });
           setIsStreaming(false);
           return;
         }
-        // Streaming response will arrive via subscription
-        streamingTimeoutRef.current = setTimeout(
-          () => setIsStreaming(false),
-          30_000
-        );
+        streamingTimeoutRef.current = setTimeout(() => setIsStreaming(false), 30_000);
         return;
       }
 
-      // Backend unavailable — fall back to mock response
       appendMockResponse();
     });
-  }, [
-    chatInput,
-    contentId,
-    sessionId,
-    startSession,
-    sendAgentMessage,
-    appendMockResponse,
-  ]);
+  }, [chatInput, contentId, sessionId, startSession, sendAgentMessage, appendMockResponse]);
 
   const stopGeneration = useCallback(() => {
     setIsStreaming(false);
   }, []);
 
-  // Derived display messages: append blinking cursor to the last agent message
-  // while a response is being streamed in.
-  const displayMessages = useMemo(() => {
-    if (!isStreaming || messages.length === 0) return messages;
-    const last = messages[messages.length - 1];
-    if (!last || last.role !== 'agent') return messages;
-    return [...messages.slice(0, -1), { ...last, content: last.content + '▌' }];
-  }, [messages, isStreaming]);
+  const displayMessages = useMemo(
+    () => withStreamingCursor(messages, isStreaming),
+    [messages, isStreaming]
+  );
 
   return {
     messages: displayMessages,

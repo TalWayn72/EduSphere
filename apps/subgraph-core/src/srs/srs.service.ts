@@ -1,8 +1,11 @@
+/**
+ * SrsService — SRS card CRUD, queries, and SM-2 review submission.
+ * Scheduling/NATS digest logic extracted to SrsSchedulingService.
+ */
 import {
   Injectable,
   Logger,
   OnModuleDestroy,
-  OnModuleInit,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,8 +20,6 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
-import { connect, type NatsConnection } from 'nats';
-import { buildNatsOptions } from '@edusphere/nats-client';
 import { computeNextReview } from './sm2';
 
 export interface SRSCard {
@@ -31,42 +32,16 @@ export interface SRSCard {
   lastReviewedAt: string | null;
 }
 
-const DAILY_DIGEST_INTERVAL_MS = 24 * 60 * 60 * 1000;
-const SRS_REVIEW_DUE_SUBJECT = 'EDUSPHERE.srs.review.due';
-
 @Injectable()
-export class SrsService implements OnModuleInit, OnModuleDestroy {
+export class SrsService implements OnModuleDestroy {
   private readonly logger = new Logger(SrsService.name);
   private db: Database;
-  private nats: NatsConnection | null = null;
-  private digestIntervalHandle: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.db = createDatabaseConnection();
   }
 
-  async onModuleInit(): Promise<void> {
-    try {
-      this.nats = await connect(buildNatsOptions());
-      this.logger.log('SrsService: NATS connected');
-    } catch (err) {
-      this.logger.warn(
-        { err },
-        'SrsService: NATS connection failed — digest disabled'
-      );
-    }
-    this.scheduleDailyDigest();
-  }
-
   async onModuleDestroy(): Promise<void> {
-    if (this.digestIntervalHandle !== null) {
-      clearInterval(this.digestIntervalHandle);
-      this.digestIntervalHandle = null;
-    }
-    if (this.nats) {
-      await this.nats.drain();
-      this.nats = null;
-    }
     await closeAllPools();
   }
 
@@ -219,23 +194,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  private scheduleDailyDigest(): void {
-    const runDigest = () => void this.publishDailyDigest();
-    this.digestIntervalHandle = setInterval(
-      runDigest,
-      DAILY_DIGEST_INTERVAL_MS
-    );
-    this.logger.log('SrsService: daily digest scheduled (every 24h)');
-  }
-
-  // ---------------------------------------------------------------------------
-  // API alias methods — thin delegation, no duplicated business logic.
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Alias for getDueReviews.
-   * getDueCards(tenantId, userId, limit?) → delegates to getDueReviews
-   */
+  /** Alias for getDueReviews. */
   async getDueCards(
     tenantId: string,
     userId: string,
@@ -244,14 +203,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
     return this.getDueReviews(userId, tenantId, limit ?? 20);
   }
 
-  /**
-   * Alias for createCard with optional initialDueDate override.
-   * scheduleReview(tenantId, userId, conceptName, initialDueDate?, algorithm?)
-   * → delegates to createCard, then patches dueDate if initialDueDate provided.
-   * The `algorithm` parameter is stored for future use; scheduling itself
-   * always uses SM-2 via the existing createCard path (FSRS integration
-   * requires schema column additions tracked separately).
-   */
+  /** Alias for createCard with optional initialDueDate override. */
   async scheduleReview(
     tenantId: string,
     userId: string,
@@ -280,10 +232,7 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  /**
-   * Alias for submitReview.
-   * recordReview(tenantId, userId, cardId, quality) → delegates to submitReview
-   */
+  /** Alias for submitReview. */
   async recordReview(
     tenantId: string,
     userId: string,
@@ -291,25 +240,5 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
     quality: number
   ): Promise<SRSCard> {
     return this.submitReview(cardId, userId, tenantId, quality);
-  }
-
-  private async publishDailyDigest(): Promise<void> {
-    if (!this.nats) return;
-    try {
-      const payload = JSON.stringify({
-        event: 'srs.review.due',
-        timestamp: new Date().toISOString(),
-      });
-      this.nats.publish(
-        SRS_REVIEW_DUE_SUBJECT,
-        new TextEncoder().encode(payload)
-      );
-      this.logger.log(
-        { subject: SRS_REVIEW_DUE_SUBJECT },
-        'SRS daily digest published'
-      );
-    } catch (err) {
-      this.logger.error({ err }, 'SRS daily digest publish failed');
-    }
   }
 }

@@ -4,7 +4,7 @@
  * Access: SUPER_ADMIN or ORG_ADMIN only
  * Allows configuring HRIS system connections (SCIM, Workday, SAP, Banner).
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,51 +25,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuthRole } from '@/hooks/useAuthRole';
-import { Building2, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
+import { Building2, Clock, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import type { HrisType } from './HrisConfigPage.types';
+import {
+  ADMIN_ROLES,
+  SYSTEM_CARDS,
+  STATUS_STYLES,
+  STATUS_ICONS,
+  MOCK_SYNC_HISTORY,
+} from './HrisConfigPage.types';
+import { HrisSyncHistory } from './HrisSyncHistory';
 
-const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
-
-type HrisType = 'SCIM' | 'WORKDAY' | 'SAP' | 'BANNER';
-
-type SystemStatus = 'CONNECTED' | 'NOT_CONFIGURED' | 'ERROR';
-
-interface SystemCard {
-  type: HrisType;
-  label: string;
-  status: SystemStatus;
-  lastSync?: string;
-}
-
-const SYSTEM_CARDS: SystemCard[] = [
-  { type: 'SCIM', label: 'SCIM 2.0 (Generic)', status: 'NOT_CONFIGURED' },
-  { type: 'WORKDAY', label: 'Workday', status: 'NOT_CONFIGURED' },
-  { type: 'SAP', label: 'SAP SuccessFactors', status: 'NOT_CONFIGURED' },
-  { type: 'BANNER', label: 'Banner (Ellucian)', status: 'NOT_CONFIGURED' },
-];
-
-const STATUS_STYLES: Record<SystemStatus, string> = {
-  CONNECTED: 'text-green-700 bg-green-50 border-green-200',
-  NOT_CONFIGURED: 'text-gray-500 bg-gray-50 border-gray-200',
-  ERROR: 'text-red-700 bg-red-50 border-red-200',
-};
-
-const STATUS_ICONS: Record<SystemStatus, React.ReactNode> = {
-  CONNECTED: <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />,
-  NOT_CONFIGURED: <XCircle className="h-4 w-4 text-gray-400 dark:text-gray-500" />,
-  ERROR: <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />,
-};
-
-interface SyncEntry {
-  id: string;
-  type: string;
-  timestamp: string;
-  usersUpserted: number;
-  errors: number;
-  status: 'SUCCESS' | 'ERROR';
-}
-
-const MOCK_SYNC_HISTORY: SyncEntry[] = [];
 const [fetching] = [false];
 
 export function HrisConfigPage() {
@@ -273,57 +240,7 @@ export function HrisConfigPage() {
         </Card>
 
         {/* Sync history */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Sync History</CardTitle>
-            <CardDescription>
-              Recent synchronization operations from your HRIS system.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {fetching ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <table
-                className="w-full text-sm"
-                data-testid="sync-history-table"
-                aria-label="HRIS synchronization history"
-              >
-                <thead>
-                  <tr className="border-b text-left text-muted-foreground">
-                    <th scope="col" className="pb-2 font-medium">Type</th>
-                    <th scope="col" className="pb-2 font-medium">Timestamp</th>
-                    <th scope="col" className="pb-2 font-medium">Users Synced</th>
-                    <th scope="col" className="pb-2 font-medium">Errors</th>
-                    <th scope="col" className="pb-2 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {MOCK_SYNC_HISTORY.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="py-6 text-center text-muted-foreground"
-                      >
-                        No sync history yet. Configure an HRIS connection and run a sync.
-                      </td>
-                    </tr>
-                  ) : (
-                    MOCK_SYNC_HISTORY.map((entry) => (
-                      <tr key={entry.id} className="border-b last:border-0">
-                        <td className="py-2">{entry.type}</td>
-                        <td className="py-2">{entry.timestamp}</td>
-                        <td className="py-2">{entry.usersUpserted}</td>
-                        <td className="py-2">{entry.errors}</td>
-                        <td className="py-2">{entry.status}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            )}
-          </CardContent>
-        </Card>
+        <HrisSyncHistory entries={MOCK_SYNC_HISTORY} fetching={fetching} />
       </div>
     </Layout>
   );

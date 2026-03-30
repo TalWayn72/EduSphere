@@ -1,6 +1,7 @@
 /**
- * ScimGroupService: SCIM 2.0 group provisioning (RFC 7643 §4.2).
- * Manages scim_groups table — create, read, update, patch, delete.
+ * ScimGroupService: SCIM 2.0 group provisioning (RFC 7643 S4.2).
+ * Manages scim_groups table — create, read, update, delete.
+ * Patch/member management extracted to ScimGroupMemberService.
  * All DB queries via Drizzle with withTenantContext() for RLS enforcement.
  */
 import {
@@ -23,7 +24,7 @@ import {
 import type { Database, TenantContext } from '@edusphere/db';
 import { connect, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
-import type { ScimGroup, ScimPatchOp } from './scim.types.js';
+import type { ScimGroup } from './scim.types.js';
 
 const SCIM_GROUP_SCHEMA =
   'urn:ietf:params:scim:schemas:core:2.0:Group' as const;
@@ -195,73 +196,6 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
     return this.toScimGroup(rows[0]);
   }
 
-  async patchGroup(
-    tenantId: string,
-    groupId: string,
-    operations: ScimPatchOp[]
-  ): Promise<ScimGroup> {
-    // Fetch current group first to apply incremental patch
-    const current = await this.getGroup(tenantId, groupId);
-    const currentMemberIds = (current.members ?? []).map((m) => m.value);
-    const currentCourseIds =
-      current['urn:edusphere:scim:extension']?.courseIds ?? [];
-
-    let memberIds = [...currentMemberIds];
-    let displayName = current.displayName;
-    let courseIds = [...currentCourseIds];
-
-    for (const op of operations) {
-      if (op.op === 'replace' && op.path === 'displayName') {
-        displayName = String(op.value ?? displayName);
-      } else if (op.op === 'replace' && op.path === 'members') {
-        const vals = op.value as Array<{ value: string }> | undefined;
-        memberIds = (vals ?? []).map((m) => m.value);
-      } else if (op.op === 'add' && op.path === 'members') {
-        const vals = op.value as Array<{ value: string }> | undefined;
-        const toAdd = (vals ?? []).map((m) => m.value);
-        memberIds = [...new Set([...memberIds, ...toAdd])];
-        // Emit enrollment event for newly added members
-        if (courseIds.length > 0 && toAdd.length > 0) {
-          this.publishEvent('EDUSPHERE.scim.group.enrollment', {
-            groupId,
-            tenantId,
-            memberIds: toAdd,
-            courseIds,
-          });
-        }
-      } else if (op.op === 'remove' && op.path === 'members') {
-        const vals = op.value as Array<{ value: string }> | undefined;
-        if (vals && vals.length > 0) {
-          const toRemove = new Set(vals.map((m) => m.value));
-          memberIds = memberIds.filter((id) => !toRemove.has(id));
-        } else {
-          memberIds = [];
-        }
-      }
-    }
-
-    const ctx: TenantContext = {
-      tenantId,
-      userId: 'system',
-      userRole: 'ORG_ADMIN',
-    };
-    const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx
-        .update(schema.scimGroups)
-        .set({ displayName, memberIds, courseIds, updatedAt: new Date() })
-        .where(
-          and(
-            eq(schema.scimGroups.id, groupId),
-            eq(schema.scimGroups.tenantId, tenantId)
-          )
-        )
-        .returning()
-    );
-    if (!rows[0]) throw new NotFoundException(`Group ${groupId} not found`);
-    this.logger.log({ tenantId, groupId }, 'SCIM: group patched');
-    return this.toScimGroup(rows[0]);
-  }
-
   async deleteGroup(tenantId: string, groupId: string): Promise<void> {
     const ctx: TenantContext = {
       tenantId,
@@ -284,7 +218,8 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
     this.logger.log({ tenantId, groupId }, 'SCIM: group deleted');
   }
 
-  private toScimGroup(row: typeof schema.scimGroups.$inferSelect): ScimGroup {
+  /** Convert DB row to SCIM group representation. Public for use by ScimGroupMemberService. */
+  toScimGroup(row: typeof schema.scimGroups.$inferSelect): ScimGroup {
     const memberIds = (row.memberIds as string[] | null) ?? [];
     const courseIds = (row.courseIds as string[] | null) ?? [];
     return {
@@ -298,7 +233,8 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private publishEvent(
+  /** Publish NATS event. Public for use by ScimGroupMemberService. */
+  publishEvent(
     subject: string,
     payload: Record<string, unknown>
   ): void {

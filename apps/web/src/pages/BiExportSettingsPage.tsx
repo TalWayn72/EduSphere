@@ -3,7 +3,7 @@
  * Route: /admin/bi-export
  * Access: ORG_ADMIN, SUPER_ADMIN only (F-029)
  */
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,10 @@ import {
   Copy,
   Plus,
   Trash2,
-  AlertCircle,
   Loader2,
 } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
+import { BiExportTokenModal } from './BiExportTokenModal';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 const ODATA_BASE = `${window.location.protocol}//${window.location.hostname}:4002/odata/v1`;
@@ -234,71 +234,16 @@ export function BiExportSettingsPage() {
         </Card>
       </PageShell>
       {showModal && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => {
-            if (!generatedToken) setShowModal(false);
+        <BiExportTokenModal
+          description={description}
+          generatedToken={generatedToken}
+          onDescriptionChange={setDescription}
+          onGenerate={() => void handleGenerate()}
+          onClose={() => {
+            setShowModal(false);
+            setGeneratedToken(null);
           }}
-        >
-          <div
-            className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-lg font-semibold">{t('biExport.generateModalTitle')}</h2>
-            {generatedToken ? (
-              <div className="space-y-3">
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm dark:bg-amber-950 dark:border-amber-700">
-                  <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 dark:text-amber-400" />
-                  <span className="text-amber-800 dark:text-amber-200">
-                    {t('biExport.tokenWarning')}
-                  </span>
-                </div>
-                <div className="p-3 bg-muted rounded-md font-mono text-xs break-all select-all">
-                  {generatedToken}
-                </div>
-                <Button
-                  className="w-full"
-                  onClick={() => {
-                    setShowModal(false);
-                    setGeneratedToken(null);
-                  }}
-                >
-                  {t('biExport.done')}
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium block mb-1">
-                    {t('biExport.description')}
-                  </label>
-                  <input
-                    className="w-full border rounded-md px-3 py-2 text-sm"
-                    placeholder={t('biExport.descriptionPlaceholder')}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setShowModal(false)}
-                  >
-                    {t('biExport.cancel')}
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    disabled={!description.trim()}
-                    onClick={() => void handleGenerate()}
-                  >
-                    {t('biExport.generate')}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        />
       )}
     </Layout>
   );
