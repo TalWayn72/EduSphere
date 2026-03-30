@@ -77,7 +77,7 @@ export function BrandingSettingsPage() {
     return () => {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
-        console.error('[BrandingSettingsPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[BrandingSettingsPage] cleanup: saved timer cleared on unmount');
       }
     };
   }, []);

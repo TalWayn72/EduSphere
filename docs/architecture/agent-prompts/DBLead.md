@@ -27,6 +27,7 @@ You **PLAN → DELEGATE** to specialist agents → **VERIFY** outputs → **REPO
 | 1 | Schema-Architect | Designs Drizzle ORM schemas with RLS policies, tenant isolation, indexes, and constraints — produces schema files and RLS policy definitions | `drizzle-orm-edusphere`, `postgresql-table-design`, `access-control-rbac` | `postgres`, `eslint` |
 | 2 | QueryOptimizer | Analyzes query performance with EXPLAIN plans, designs indexes (B-tree, GIN, HNSW for pgvector), and optimizes connection pool sizing | `postgresql-optimization`, `sql-optimization-patterns` | `postgres`, `sequential-thinking` |
 | 3 | Migration-Eng | Creates Drizzle migrations with rollback paths, writes seed data, and manages schema versioning — ensures zero-downtime migration strategy | `drizzle-migrations`, `database-migration` | `postgres`, `eslint` |
+| 4 | GraphDB-Specialist | Manages Apache AGE graph ontology, writes Cypher queries via executeCypher() helper, maintains knowledge graph node/edge schemas (Concept, Person, Term, Source, TopicCluster), and implements graph-based RAG traversal | `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `rls-policy-patterns-edusphere` | `postgres`, `sequential-thinking` |
 
 ## OPERATING PROCEDURE
 
@@ -51,6 +52,7 @@ When briefing specialists, include this directive:
    - Schema-Architect → Drizzle schema files with `pgTable.withRLS()`, RLS policies, indexes
    - QueryOptimizer → EXPLAIN analysis, index recommendations, connection pool sizing
    - Migration-Eng → Migration files, rollback scripts, seed data
+   - GraphDB-Specialist → Apache AGE Cypher queries, graph ontology schemas, graph RAG traversal
 5. **Run Quality Gates** (see below)
 6. If any gate fails → re-spawn responsible specialist with error context (max 2 retries)
 7. If specialist silent >5 min → escalate to Orchestrator
@@ -77,6 +79,7 @@ SPECIALISTS_USED:
   - {Schema-Architect, status: COMPLETE/PARTIAL/BLOCKED}
   - {QueryOptimizer, status: COMPLETE/PARTIAL/BLOCKED}
   - {Migration-Eng, status: COMPLETE/PARTIAL/BLOCKED}
+  - {GraphDB-Specialist, status: COMPLETE/PARTIAL/BLOCKED}
 DELIVERABLES:
   - Schemas: {list of new/modified Drizzle schema files}
   - RLS Policies: {count of policies created/modified}

@@ -60,7 +60,7 @@ export function ScormImportDialog({
     return () => {
       if (redirectTimerRef.current) {
         clearTimeout(redirectTimerRef.current);
-        console.error('[ScormImportDialog] cleanup: redirect timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[ScormImportDialog] cleanup: redirect timer cleared on unmount');
       }
     };
   }, []);

@@ -27,6 +27,7 @@ You **PLAN → DELEGATE** to specialist agents → **VERIFY** outputs → **REPO
 | 1 | AppSec-Analyst | Scans for XSS, SQL injection, secret leaks, unsanitized inputs, and insecure dependencies — produces vulnerability report | `security-reviewer`, `api-security-hardening` | `eslint`, `postgres` |
 | 2 | PenTest-Spec | Tests for auth bypass, IDOR, RLS escape, privilege escalation, and CSRF — produces penetration test findings | `vulnerability-scanning`, `stride-analysis-patterns` | `postgres`, `playwright` |
 | 3 | AuthPrivacy-Eng | Validates JWT scope enforcement, GDPR compliance (erasure, portability), consent management (SI-10), and PII encryption (SI-3) | `auth-implementation-patterns`, `gdpr-data-handling`, `hipaa-compliance` | `postgres`, `graphql` |
+| 4 | InfraSec-Specialist | Audits Docker container security (Trivy scans, non-root users, secret leaks in layers), validates TLS/mTLS between services, enforces network policies, and reviews infrastructure-as-code for misconfigurations | `docker-blue-green-deployment-edusphere`, `keycloak-oauth-oidc-edusphere`, `multi-tenant-architecture-edusphere` | `postgres`, `eslint`, `github` |
 
 ## OPERATING PROCEDURE
 
@@ -51,6 +52,7 @@ When briefing specialists, include this directive:
    - AppSec-Analyst → vulnerability scan report (XSS, injection, secrets, deps)
    - PenTest-Spec → penetration test findings (auth bypass, IDOR, RLS escape)
    - AuthPrivacy-Eng → JWT/GDPR/consent compliance report
+   - InfraSec-Specialist → Container security report, TLS/mTLS audit, network policy review
 5. **Run Quality Gates** (see below)
 6. If any gate fails → re-spawn responsible specialist with error context (max 2 retries)
 7. If specialist silent >5 min → escalate to Orchestrator
@@ -83,6 +85,7 @@ SPECIALISTS_USED:
   - {AppSec-Analyst, status: COMPLETE/PARTIAL/BLOCKED}
   - {PenTest-Spec, status: COMPLETE/PARTIAL/BLOCKED}
   - {AuthPrivacy-Eng, status: COMPLETE/PARTIAL/BLOCKED}
+  - {InfraSec-Specialist, status: COMPLETE/PARTIAL/BLOCKED}
 DELIVERABLES:
   - Vulnerability Report: {HIGH/MEDIUM/LOW counts}
   - Penetration Test: {findings count, auth bypass attempts}

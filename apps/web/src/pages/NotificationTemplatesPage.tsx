@@ -43,7 +43,7 @@ export function NotificationTemplatesPage() {
     setMounted(true);
     return () => {
       clearTimeout(savedTimerRef.current);
-      console.error('[NotificationTemplatesPage] cleanup: saved timer cleared on unmount');
+      if (import.meta.env.DEV) console.debug('[NotificationTemplatesPage] cleanup: saved timer cleared on unmount');
     };
   }, []);
 

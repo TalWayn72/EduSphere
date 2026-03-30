@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { Logger } from '@nestjs/common';
 
 export interface PubSubMessage<T = any> {
   event: string;
@@ -8,6 +9,7 @@ export interface PubSubMessage<T = any> {
 }
 
 export class RedisPubSub {
+  private readonly logger = new Logger(RedisPubSub.name);
   private publisher: Redis;
   private subscriber: Redis;
   private listeners: Map<string, Set<(message: PubSubMessage) => void>>;
@@ -86,7 +88,7 @@ export class RedisPubSub {
       const parsed: PubSubMessage = JSON.parse(message);
       listeners.forEach((callback) => callback(parsed));
     } catch (error) {
-      console.error('Failed to parse PubSub message:', error);
+      this.logger.error('Failed to parse PubSub message:', error);
     }
   }
 

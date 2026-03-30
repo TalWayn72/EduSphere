@@ -59,7 +59,7 @@ export function RiskThresholdConfig() {
     return () => {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
-        console.error('[RiskThresholdConfig] cleanup: save timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[RiskThresholdConfig] cleanup: save timer cleared on unmount');
       }
     };
   }, []);

@@ -56,7 +56,7 @@ export function CollaborationSessionPage() {
     return () => {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
-        console.error('[CollaborationSessionPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[CollaborationSessionPage] cleanup: saved timer cleared on unmount');
       }
     };
   }, []);

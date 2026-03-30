@@ -69,7 +69,7 @@ const KEYCLOAK_INIT_TIMEOUT_MS = 10_000;
 export function initKeycloak(): Promise<boolean> {
   // Development mode - skip Keycloak
   if (DEV_MODE) {
-    console.warn('🔧 DEV MODE: Running without Keycloak authentication');
+    console.warn('[Auth] DEV MODE: Running without Keycloak authentication');
     // Require an explicit login() call — do NOT auto-authenticate on cold
     // start. sessionStorage is empty in incognito / fresh sessions, so using
     // a "logged-in" flag (opt-in) instead of a "logged-out" flag (opt-out)
@@ -119,7 +119,7 @@ export function initKeycloak(): Promise<boolean> {
     })
     .catch((error) => {
       initPromise = null; // allow retry on genuine errors
-      console.error('Keycloak initialization failed:', error);
+      console.error('[Auth] Keycloak initialization failed:', error);
       throw error;
     });
 

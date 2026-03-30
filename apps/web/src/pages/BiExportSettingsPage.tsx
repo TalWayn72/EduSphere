@@ -76,7 +76,7 @@ export function BiExportSettingsPage() {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
-        console.error('[BiExportSettingsPage] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[BiExportSettingsPage] cleanup: copy timer cleared on unmount');
       }
     };
   }, []);

@@ -63,7 +63,7 @@ export function XapiSettingsPage() {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
-        console.error('[XapiSettingsPage] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[XapiSettingsPage] cleanup: copy timer cleared on unmount');
       }
     };
   }, []);

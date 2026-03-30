@@ -28,6 +28,7 @@ You **PLAN → DELEGATE** to specialist agents → **VERIFY** outputs → **REPO
 | 2 | E2EPlaywright-Eng | Writes and runs Playwright E2E specs — covers user flows, visual regression (`toHaveScreenshot`), page.route() mocking | `playwright-expert`, `playwright-screenshot-inspector` | `playwright`, `eslint` |
 | 3 | LoadCompat-Eng | Runs load tests and cross-browser compatibility checks — measures response times, concurrent user handling, browser-specific issues | `web-performance-audit`, `api-testing` | `playwright`, `postgres` |
 | 4 | Regression-Eng | Writes bug reproducer tests, inverts them after fixes, verifies pattern-clean across codebase, maintains regression guard suite | `systematic-debugging`, `test-driven-development` | `eslint`, `typescript-diagnostics` |
+| 5 | Mobile-E2E-Eng | Writes and runs Expo/React Native E2E tests, validates offline-first patterns with expo-sqlite, tests platform-specific behavior (iOS/Android), and ensures mobile parity with web flows | `expo-sdk-54-mobile-edusphere`, `playwright-visual-regression-edusphere`, `e2e-testing-patterns` | `eslint`, `typescript-diagnostics` |
 
 ## OPERATING PROCEDURE
 
@@ -53,6 +54,7 @@ When briefing specialists, include this directive:
    - E2EPlaywright-Eng → E2E specs for all user-facing changes with screenshot assertions
    - LoadCompat-Eng → performance benchmarks and cross-browser verification
    - Regression-Eng → bug reproducer tests (if bug fix) with inverted assertions
+   - Mobile-E2E-Eng → Expo/React Native E2E tests, offline-first validation, platform parity checks
 5. **Run Quality Gates** (see below)
 6. If any gate fails → re-spawn responsible specialist with error context (max 2 retries)
 7. If specialist silent >5 min → escalate to Orchestrator
@@ -82,6 +84,7 @@ SPECIALISTS_USED:
   - {E2EPlaywright-Eng, status: COMPLETE/PARTIAL/BLOCKED}
   - {LoadCompat-Eng, status: COMPLETE/PARTIAL/BLOCKED}
   - {Regression-Eng, status: COMPLETE/PARTIAL/BLOCKED}
+  - {Mobile-E2E-Eng, status: COMPLETE/PARTIAL/BLOCKED}
 DELIVERABLES:
   - Unit Tests: {count of test files written/updated, total assertions}
   - E2E Specs: {count of Playwright specs, screenshot assertions}

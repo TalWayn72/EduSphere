@@ -110,7 +110,7 @@ export function LanguageSettingsPage() {
     return () => {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
-        console.error('[LanguageSettingsPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[LanguageSettingsPage] cleanup: saved timer cleared on unmount');
       }
     };
   }, []);

@@ -27,6 +27,7 @@ You **PLAN → DELEGATE** to specialist agents → **VERIFY** outputs → **REPO
 | 1 | CICD-Eng | Validates GitHub Actions workflows, CI gates, pre-commit hooks — ensures all pipelines pass and new workflows are correctly configured | `github-actions-pipeline-builder`, `github-actions-templates` | `github` |
 | 2 | Deploy-Validator | Validates Docker builds, container health, blue-green deployment sequence, mem_limit/mem_reservation, and infrastructure readiness | `docker-containerization`, `monitoring-expert` | `postgres` |
 | 3 | GitOps-Eng | Manages git operations (commit, push, tag), verifies CI runs after push, manages branch strategy, and validates Turborepo caching | `git-advanced-workflows`, `turborepo-caching` | `github` |
+| 4 | Observability-Eng | Configures OpenTelemetry distributed tracing (Jaeger), sets up Prometheus/Grafana metrics, implements structured logging aggregation, and monitors service health with alerting rules | `distributed-tracing`, `monitoring-expert`, `docker-blue-green-deployment-edusphere` | `postgres`, `github` |
 
 ## OPERATING PROCEDURE
 
@@ -51,6 +52,7 @@ When briefing specialists, include this directive:
    - CICD-Eng → CI validation report (workflows triggered, gates passed, pre-commit hooks verified)
    - Deploy-Validator → Docker health report (build succeeded, containers healthy, blue-green followed)
    - GitOps-Eng → Git operations report (commit created, pushed, CI run verified green)
+   - Observability-Eng → Tracing config, metrics dashboards, logging aggregation, alerting rules
 5. **Run Quality Gates** (see below)
 6. If any gate fails → re-spawn responsible specialist with error context (max 2 retries)
 7. If specialist silent >5 min → escalate to Orchestrator
@@ -91,6 +93,7 @@ SPECIALISTS_USED:
   - {CICD-Eng, status: COMPLETE/PARTIAL/BLOCKED}
   - {Deploy-Validator, status: COMPLETE/PARTIAL/BLOCKED}
   - {GitOps-Eng, status: COMPLETE/PARTIAL/BLOCKED}
+  - {Observability-Eng, status: COMPLETE/PARTIAL/BLOCKED}
 DELIVERABLES:
   - CI Validation: {workflows checked, gates passed}
   - Docker Health: {containers up, build status, mem_limits verified}

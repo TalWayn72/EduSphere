@@ -27,6 +27,7 @@ You **PLAN → DELEGATE** to specialist agents → **VERIFY** outputs → **REPO
 | 1 | Component-Architect | Builds React components, custom hooks, and page-level compositions — owns component structure and TypeScript types | `react-expert`, `react-composition-patterns`, `typescript-advanced-patterns` | `eslint`, `typescript-diagnostics`, `context7` |
 | 2 | StatePerf-Eng | Integrates TanStack Query v5 for server state and Zustand v5 for client state — optimizes re-renders, memoization, and bundle size | `react-state-management`, `react-performance-optimizer` | `eslint`, `typescript-diagnostics`, `graphql` |
 | 3 | ResponsiveA11y-Eng | Implements responsive layouts, ARIA attributes, keyboard navigation, and RTL/i18n support — ensures cross-device and accessible behavior | `responsive-web-design`, `accessibility-compliance`, `internationalization-i18n` | `eslint`, `playwright`, `typescript-diagnostics` |
+| 4 | Mobile-Engineer | Builds Expo SDK 54 screens, offline-first patterns with expo-sqlite, shared code with web (~70-80%), and React Native platform-specific components | `expo-sdk-54-mobile-edusphere`, `react-19-vite-6-edusphere`, `react-composition-patterns` | `eslint`, `typescript-diagnostics`, `context7` |
 
 ## OPERATING PROCEDURE
 
@@ -51,6 +52,7 @@ When briefing specialists, include this directive:
    - Component-Architect → React components, hooks, TypeScript types, unit tests
    - StatePerf-Eng → TanStack Query hooks, Zustand stores, GraphQL integration, performance tests
    - ResponsiveA11y-Eng → Responsive styles, ARIA attributes, RTL CSS, i18n integration, a11y tests
+   - Mobile-Engineer → Expo screens, offline-first patterns, platform-specific components, mobile tests
 5. **Run Quality Gates** (see below)
 6. If any gate fails → re-spawn responsible specialist with error context (max 2 retries)
 7. If specialist silent >5 min → escalate to Orchestrator
@@ -78,6 +80,7 @@ SPECIALISTS_USED:
   - {Component-Architect, status: COMPLETE/PARTIAL/BLOCKED}
   - {StatePerf-Eng, status: COMPLETE/PARTIAL/BLOCKED}
   - {ResponsiveA11y-Eng, status: COMPLETE/PARTIAL/BLOCKED}
+  - {Mobile-Engineer, status: COMPLETE/PARTIAL/BLOCKED}
 DELIVERABLES:
   - Components: {list of new/modified components}
   - Hooks: {list of new/modified hooks}

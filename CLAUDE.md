@@ -57,6 +57,7 @@
 ## Orchestrator Role — IRON RULE (NEVER VIOLATE)
 
 > **The main Claude agent is the ORCHESTRATOR. It manages, it does NOT execute.**
+> Full protocol: [docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md](docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md)
 
 ### Allowed Tools (Orchestrator ONLY uses these)
 
@@ -78,15 +79,6 @@
 | `Bash` (mutating) | `pnpm test`, `pnpm build`, `docker-compose up`, `git commit`, `git push` — delegate to QA/DevOps agent |
 | `MCP tools` (code-affecting) | `mcp__eslint__*`, `mcp__playwright__*`, `mcp__postgres__*` for fixing — delegate to appropriate agent |
 | `Read` (source code) | Reading `.ts`, `.tsx`, `.graphql`, `.sql` files to solve a problem — delegate to an Explore agent |
-
-### Violation Detection Rules
-
-The Orchestrator is VIOLATING its role if it does ANY of the following:
-1. Uses `Edit` or `Write` tool on any file in `apps/`, `packages/`, `tests/`, `infrastructure/`, or `scripts/`
-2. Uses `Bash` to run `pnpm`, `npm`, `node`, `docker-compose build`, `docker-compose up`, `docker-compose down`, `git add`, `git commit`, `git push`
-3. Uses `Read` on `.ts`, `.tsx`, `.js`, `.jsx`, `.graphql`, `.sql`, `.json` (except `package.json` for scope analysis) files to debug or solve a problem
-4. Writes more than 5 lines of code in a message (even as "example" or "suggestion")
-5. Directly fixes a bug, writes a test, modifies a config, or edits a Dockerfile
 
 ### What the Orchestrator DOES
 
@@ -113,6 +105,13 @@ The Orchestrator is VIOLATING its role if it does ANY of the following:
 | Code exploration/debugging | Architecture (Explore) | `Agent("Investigate why X fails...", subagent_type="Explore")` |
 | Bug investigation (3 waves) | Architecture (Explore) | `Agent("Run discovery waves for bug pattern X...", subagent_type="Explore")` |
 | Planning/design decisions | Architecture (Plan) | `Agent("Design approach for feature X...", subagent_type="Plan")` |
+| Expo/React Native mobile screens | Frontend Engineering | `Agent("Build mobile screen X in apps/mobile/src/...")` |
+| LangGraph AI agent workflows | Backend Engineering | `Agent("Implement AI agent workflow for X in apps/subgraph-agent/...")` |
+| GraphQL federation contract testing | Backend Engineering | `Agent("Validate federation composition for entity X...")` |
+| Apache AGE graph queries/ontology | Database & Data | `Agent("Write Cypher query for knowledge graph traversal X...")` |
+| Container/infra security audit | Security & Compliance | `Agent("Audit Docker security and TLS config for service X...")` |
+| Mobile E2E testing | QA & Validation | `Agent("Write mobile E2E tests for screen X...")` |
+| Observability/tracing/metrics | DevOps & Release | `Agent("Configure distributed tracing for service X...")` |
 
 ### CRITICAL: "Execute directly" means "spawn agents directly"
 
@@ -200,62 +199,6 @@ The existing rule "Don't ask questions — Execute directly" means:
 11. **Security-first** - RLS validation, JWT scopes, input sanitization, no secrets in code
 12. **Parallel agent execution mandatory** - Split every task into sub-tasks and spawn Agents in parallel for maximum efficiency. The Orchestrator's ONLY execution tool is the Agent tool — all other work is done by agents.
 
-## Memory Safety (Mandatory)
-
-**Iron rule:** No commit may introduce a memory leak. Every resource opened must have a corresponding close/cleanup path.
-
-### Backend Rules
-
-| Rule                                                                                                                       | Pattern                      |
-| -------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Every `@Injectable()` service with `createDatabaseConnection()` MUST implement `OnModuleDestroy` calling `closeAllPools()` | `implements OnModuleDestroy` |
-| Every `@Injectable()` service with `new NatsKVClient()` MUST call `this.kv.close()` in `OnModuleDestroy`                   | Lifecycle hook               |
-| Every `setInterval`/`setTimeout` in a NestJS service MUST store the handle and clear it in `OnModuleDestroy`               | Handle in class field        |
-| All async `for await` subscription loops MUST be stoppable via the subscription's `unsubscribe()` — track in service array | Subscription tracking array  |
-| Fire-and-forget async MUST use `Promise.race(task, timeoutPromise)` with DB failure update on timeout                      | 5-min default timeout        |
-| Unbounded `Map`/`Array` MUST have max-size eviction (insertion-order LRU for Map, `slice(-N)` for arrays)                  | Size guard                   |
-| Database pools MUST use `getOrCreatePool()` from `@edusphere/db` — never `new Pool()` directly                             | Import `getOrCreatePool`     |
-
-### Frontend Rules
-
-| Rule                                                                                                | Pattern                                                                                   |
-| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Every `setInterval` in component/hook MUST have `clearInterval` in `useEffect` cleanup return       | `const ref = useRef(); useEffect(() => () => clearInterval(ref.current), [])`             |
-| Every `setTimeout` inside a component MUST be stored in `useRef` and cleared in `useEffect` cleanup | Same pattern                                                                              |
-| NEVER `return () => cleanup()` inside `useCallback` — the return value is **discarded** by React    | Use `useEffect` for cleanup instead                                                       |
-| GraphQL subscriptions (`useSubscription`) MUST use `pause: true` flag tied to component mount state | `const [paused, setPaused] = useState(false); useEffect(() => () => setPaused(true), [])` |
-| `useQuery` in React Router sibling routes sharing a query (e.g. Lesson Detail/Pipeline/Results) MUST use mounted guard to prevent urql cache dispatch during sibling render | `const [mounted, setMounted] = useState(false); useEffect(() => { setMounted(true); }, []); useQuery({ pause: !mounted })` |
-| Module-level WebSocket clients MUST be disposed on `window.beforeunload`                            | `window.addEventListener('beforeunload', () => client.dispose())`                         |
-
-### Infrastructure Rules
-
-| Rule                                                                                                    | Pattern                    |
-| ------------------------------------------------------------------------------------------------------- | -------------------------- |
-| ALL Docker services MUST have `mem_limit` AND `mem_reservation` in docker-compose files                 | Validated in CI            |
-| All Node.js services MUST set `NODE_OPTIONS=--max-old-space-size` ≤ 75% of container `mem_limit`        | Environment block          |
-| ALL NATS JetStream streams MUST declare `max_age` AND `max_bytes` at creation                           | Use stream factory helper  |
-| LangGraph checkpointers MUST be wrapped in NestJS `@Injectable()` with `OnModuleInit`/`OnModuleDestroy` | `LangGraphService` pattern |
-
-### Memory Testing Rules (required for every new service/hook)
-
-| Change Type                                 | Required Test                                                                  |
-| ------------------------------------------- | ------------------------------------------------------------------------------ |
-| New NestJS service with DB/NATS connections | `*.memory.spec.ts` verifying `onModuleDestroy` calls cleanup                   |
-| New React hook with timers or subscriptions | `*.memory.test.ts` verifying `unmount` triggers `clearTimeout`/`clearInterval` |
-| New unbounded Map or growing array          | Test verifying eviction fires at configured max size                           |
-| New async subscription loop                 | Test verifying loop exits cleanly on `unsubscribe()`                           |
-| New `setInterval` anywhere                  | Test verifying `clearInterval` called on service destroy or component unmount  |
-
-### OOM Response Protocol
-
-| Event                            | Action                                                                               |
-| -------------------------------- | ------------------------------------------------------------------------------------ |
-| Container OOM-killed             | Check `docker stats` → identify service → increase `mem_limit` OR fix the leak       |
-| Node.js heap OOM                 | Run with `--expose-gc` + `--heap-prof` → analyze `.heapprofile` in Chrome DevTools   |
-| NATS memory pressure             | Check stream sizes: `nats stream ls` + `nats stream info <name>` → enforce retention |
-| PostgreSQL connection exhaustion | Check `pg_stat_activity` → verify `closeAllPools()` is called on service destroy     |
-| First OOM in CI                  | Reduce parallel agents by 20% (see Parallel Execution section)                       |
-
 ## Environment Setup
 
 ### Required Environment Variables
@@ -334,200 +277,20 @@ The existing rule "Don't ask questions — Execute directly" means:
 - MinIO reachable
 - Jaeger UI responds
 
-## MCP Tools — When to Use (Mandatory)
+## MCP Tools — 14 Active Servers
+
+> **Full configuration, decision matrix, and HIVEMIND protocol:** [docs/operations/MCP_DECISION_MATRIX.md](docs/operations/MCP_DECISION_MATRIX.md)
 
 **CRITICAL RULE:** Prefer MCP tools over Bash commands whenever available.
 MCP tools return **structured, typed data** — Bash commands return unstructured text that must be parsed.
 
-### MCP Iron Rule — node.exe directly, never .cmd files, never npx
-
-**Root cause #1:** `npx -y` downloads from npm on every session start — corporate proxy/TLS kills it silently.
-**Root cause #2:** `.cmd` files on Windows cause 30s MCP timeout — JSON-RPC handshake cannot complete via batch file stdio.
-**Correct approach:** All MCP servers globally installed via `npm install -g`, invoked with **`node.exe` + full absolute JS path**.
-**Node path:** `C:\Program Files\nodejs\node.exe`
-**Global modules:** `C:\Users\P0039217\AppData\Roaming\npm\node_modules\`
-**settings.json:** `C:\Users\P0039217\.claude\settings.json`
-
-### Installed MCP Servers (13 active)
-
-| Server                   | Command file                                            | Package                                            | Version | Status    |
-| ------------------------ | ------------------------------------------------------- | -------------------------------------------------- | ------- | --------- |
-| `memory`                 | `node.exe` + `server-memory\dist\index.js`              | `@modelcontextprotocol/server-memory`              | 0.6.3   | ✅ Global |
-| `sequential-thinking`    | `node.exe` + `server-sequential-thinking\dist\index.js` | `@modelcontextprotocol/server-sequential-thinking` | latest  | ✅ Global |
-| `eslint`                 | `node.exe` + `@eslint\mcp\src\mcp-cli.js`               | `@eslint/mcp`                                      | 0.3.0   | ✅ Global |
-| `github`                 | `github-mcp-server.exe`                                 | `github/github-mcp-server` v0.31.0                 | 0.31.0  | ✅ Binary |
-| `tavily`                 | `node.exe` + `tavily-mcp\build\index.js`                | `tavily-mcp`                                       | 0.2.17  | ✅ Global |
-| `postgres`               | `node.exe` + `postgres-mcp-server\build\index.js`       | `@henkey/postgres-mcp-server`                      | 1.0.5   | ✅ Global |
-| `graphql`                | `node.exe` + `mcp-graphql\dist\index.js`                | `mcp-graphql`                                      | 2.0.4   | ✅ Global |
-| `nats`                   | docker exec                                             | edusphere-all-in-one container                     | -       | ✅ Docker |
-| `typescript-diagnostics` | `node.exe` + `ts-diagnostics-mcp\dist\index.js`         | `ts-diagnostics-mcp`                               | -       | ✅ Global |
-| `playwright`             | `node.exe` + `@playwright\mcp\cli.js`                   | `@playwright/mcp`                                  | 0.0.68  | ✅ Global |
-| `context7`               | `node.exe` + `context7-mcp\dist\index.js`               | `@upstash/context7-mcp`                            | 2.1.2   | ✅ Global |
-| `coordination-bridge`    | `node.exe` + project `tools/mcp-coordination-bridge/dist/index.js` | Local (project)                              | 1.0.0   | ✅ Project |
-| `vector-memory`          | `node.exe` + project `tools/mcp-vector-memory/dist/index.js`       | Local (project)                              | 1.0.0   | ✅ Project |
-
-> **Note:** `@modelcontextprotocol/server-github` is DEPRECATED (Apr 2025). Replaced by official `github/github-mcp-server` binary.
-> **Note:** `@modelcontextprotocol/server-postgres` is ARCHIVED (May 2025) + has SQL injection vulnerability. Replaced by `@henkey/postgres-mcp-server`.
-> **Note:** If Node.js is upgraded, verify path `C:\Program Files\nodejs\node.exe` still exists.
-
-### Decision Matrix
-
-| Task                                                | Use This MCP Tool                                                 | Do NOT Use              |
-| --------------------------------------------------- | ----------------------------------------------------------------- | ----------------------- |
-| PostgreSQL query (RLS, schema, pg_policies)         | `mcp__postgres__*`                                                | `psql -c "..."` or Bash |
-| Search technical docs / APIs / patterns             | `mcp__tavily__tavily_search`                                      | WebSearch built-in      |
-| Fetch live NestJS/Drizzle/GraphQL docs              | `mcp__context7__*`                                                | Hallucinated APIs       |
-| Lint a file after writing it                        | `mcp__eslint__lint-files`                                         | `pnpm turbo lint`       |
-| Store architectural decision across sessions        | `mcp__memory__create_entities`                                    | Editing CLAUDE.md       |
-| Recall previous decisions / bug root causes         | `mcp__memory__search_nodes`                                       | Asking user to repeat   |
-| GitHub CI status / PR reviews / commit history      | `mcp__github__*`                                                  | `gh run list`           |
-| GraphQL schema inspection / query testing           | `mcp__graphql__introspect-schema` / `mcp__graphql__query-graphql` | `pnpm compose`          |
-| Complex multi-step reasoning / planning             | `mcp__sequential-thinking__sequentialthinking`                    | Inline reasoning only   |
-| E2E browser test after UI change                    | `mcp__playwright__*`                                              | `pnpm test:e2e`         |
-| NATS event monitoring / stream inspection           | `mcp__nats__*`                                                    | `nats sub EDUSPHERE.>`  |
-| Per-file TypeScript errors (faster than full build) | `mcp__typescript-diagnostics__*`                                  | `pnpm turbo typecheck`  |
-| Agent coordination (Orchestrator only)              | `mcp__coordination-bridge__cb_health`                             | Manual tracking in docs         |
-| Store/search architectural decisions                | `mcp__vector-memory__vm_store/search_*`                           | Only `mcp__memory__*`           |
-| Search past bug patterns before fix                 | `mcp__vector-memory__vm_search_bugs`                              | Re-investigating from scratch   |
-
-### HIVEMIND — Shared Intelligence Layer (Orchestrator-Only)
-
-HIVEMIND provides persistent semantic memory via 2 MCP servers (27 tools). **Only the Orchestrator uses HIVEMIND directly.** Leads and Specialists work without any HIVEMIND overhead — the Orchestrator injects relevant prior intelligence as plain text in Lead briefs.
-
-#### Why Orchestrator-Only
-
-Requiring all ~50 agents to register, search, lock, and store added ~420 MCP calls per session with minimal value. Under the Orchestrator-Only model, HIVEMIND overhead drops to ~10 calls per session while retaining cross-session memory benefits.
-
-#### Auto-Startup Check (EVERY session start)
-
-Before spawning any agents, the Orchestrator MUST verify:
-1. `docker ps | grep hivemind-chromadb` — must be healthy
-2. If not running: `docker-compose -f tools/docker-compose.hivemind.yml up -d`
-3. `mcp__vector-memory__vm_health` — must return `status: ok`
-
-#### Orchestrator HIVEMIND Protocol
-
-**Before spawning Leads:**
-1. `vm_search({ query: "<task keywords>" })` — gather prior intelligence
-2. `vm_search_decisions({ query: "<domain>" })` — find past architectural decisions
-3. `vm_search_bugs({ query: "<domain>" })` — find past bug patterns
-4. Include findings as "Prior Intelligence" plain text in each Lead brief
-
-**After all Leads complete:**
-1. `vm_store_decision({ title, rationale, alternatives, chosen, tags })` — for each major decision from Lead reports
-2. `vm_store_bug_pattern(...)` — for each bug fix from Lead reports
-3. `vm_get_recent({ n: 10 })` — verify decisions were stored
-
-#### Leads and Specialists — NO HIVEMIND
-
-- Leads receive prior intelligence as plain text in their brief from the Orchestrator
-- Leads do NOT call any `cb_*` or `vm_*` tools
-- Specialists do NOT call any `cb_*` or `vm_*` tools
-- No file locking (`cb_lock_file`) — divisions already separate concerns by file ownership
-- No agent registration (`cb_register_agent`) — the Orchestrator tracks agents via the Agent tool directly
-
-### postgres — Use For
-
-- Validate RLS policies: `SELECT tablename, policyname, cmd, qual FROM pg_policies WHERE schemaname='public'`
-- Check tenant isolation: query with `SET LOCAL app.current_tenant = '<uuid>'`
-- Inspect Apache AGE graph: `SELECT * FROM cypher('edusphere_graph', ...) AS (n agtype)`
-- Debug connection pool: `SELECT pid, state, query FROM pg_stat_activity WHERE datname='edusphere'`
-- Verify migration state: `SELECT * FROM drizzle.__drizzle_migrations`
-- Uses `@henkey/postgres-mcp-server` (18 intelligent tools covering schema, RLS, performance)
-
-### memory — ALWAYS Use
-
-- **Start of every complex task:** `mcp__memory__create_entities` to record the task context
-- **After every bug fix:** Record root cause and solution as entity
-- **After every architectural decision:** Store the decision and rationale
-- **Before starting related tasks:** `mcp__memory__search_nodes` to recall past decisions
-
-### context7 — Use Before Writing Code
-
-- Fetch current NestJS, Drizzle ORM v1, TanStack Query v5, GraphQL Yoga, Expo SDK 54 docs
-- Prevents hallucinated/outdated API usage
-- Use: `mcp__context7__resolve-library-id` then `mcp__context7__get-library-docs`
-
-### tavily — Use For
-
-- Apache AGE Cypher query syntax and examples
-- LangGraph.js agent patterns and state machine docs
-- pgvector HNSW index configuration
-- NestJS Federation v2 patterns and resolver examples
-- `mcp__tavily__tavily_research` for comprehensive multi-source research
-
-### eslint — Use After Every File Write
-
-```
-mcp__eslint__lint-files({ filePaths: ["/absolute/path/to/file.ts"] })
-```
-
-Fix any errors before moving to next file. Do not batch lint at the end.
-
-### github — Use After Every Push
-
-- Official `github/github-mcp-server` v0.31.0 binary (not deprecated npm package)
-- `mcp__github__list_commits` to verify commit landed
-- `mcp__github__get_pull_request` to check CI gates
-- `mcp__github__get_file_contents` for PR diff inspection
-
-### sequential-thinking — Use For
-
-- RLS policy design (multi-tenant edge cases, cross-schema access)
-- LangGraph state machine architecture decisions
-- Federation entity resolution debugging
-- Complex Drizzle migration sequences with rollback strategy
-
-### Infrastructure Status (4 servers need services running)
-
-| Server     | Prerequisite                           | Verify                                          |
-| ---------- | -------------------------------------- | ----------------------------------------------- |
-| `postgres` | `docker-compose up -d postgres`        | `mcp__postgres__*` returns result               |
-| `graphql`  | `pnpm --filter @edusphere/gateway dev` | `mcp__graphql__introspect-schema` returns types |
-| `nats`     | `docker-compose up -d nats`            | `mcp__nats__*` returns stream list              |
-| `vector-memory` | `docker-compose -f docker-compose.hivemind.yml up -d chromadb` | `mcp__vector-memory__vm_health` returns ok |
-
----
-
-## MindHive Shared Intelligence (Orchestrator-Only)
-
-MindHive provides persistent semantic memory for the Orchestrator only. Leads and Specialists work without MindHive overhead.
-
-### MindHive MCP Servers (infrastructure unchanged)
-
-| Server | Tool Prefix | Backend | Tools | Used By |
-|--------|-------------|---------|-------|---------|
-| `coordination-bridge` | `mcp__coordination-bridge__cb_*` | SQLite (WAL mode, `.hivemind/coordination.db`) | 15 | Orchestrator only (health check) |
-| `vector-memory` | `mcp__vector-memory__vm_*` | ChromaDB (Docker, port 8100) | 12 | Orchestrator only (search + store) |
-
-**CRITICAL — Tool Name Format:** Use HYPHENS, not underscores: `mcp__coordination-bridge__cb_*` and `mcp__vector-memory__vm_*`.
-
-### Orchestrator-Only Protocol
-
-| Phase | Actions | Tools |
-|-------|---------|-------|
-| Session Start | Health check, search prior intelligence | `vm_health`, `vm_search`, `vm_search_decisions`, `vm_search_bugs` |
-| Before Leads | Inject findings as plain text in Lead briefs | (text only — no MCP) |
-| After Leads | Store major decisions and bug patterns from Lead reports | `vm_store_decision`, `vm_store_bug_pattern` |
-| Session End | Verify decisions stored | `vm_get_recent` |
-
-### What Leads and Specialists Do NOT Do
-
-- No `cb_register_agent` — Orchestrator tracks agents via Agent tool
-- No `cb_lock_file` / `cb_unlock_file` — divisions separate file ownership
-- No `vm_search_*` — Orchestrator provides prior intelligence in briefs
-- No `vm_store_*` — Orchestrator consolidates and stores from Lead reports
-- No `cb_publish` / `cb_subscribe` — Leads report directly to Orchestrator
-
-**Full protocol reference:** `docs/architecture/MINDHIVE-PROTOCOL.md`
-
----
+**Servers:** memory, sequential-thinking, eslint, github, tavily, postgres, graphql, nats, typescript-diagnostics, playwright, context7, coordination-bridge, vector-memory, exa
 
 ## Skills Integration
 
 ### Overview
 
-Skills are markdown-based expertise guides that auto-load when Claude detects relevant context (file paths, keywords, patterns). 8 custom EduSphere skills + ~200 external skills are installed in `~/.agents/skills/`.
+Skills are markdown-based expertise guides that auto-load when Claude detects relevant context (file paths, keywords, patterns). 20 custom EduSphere skills + ~200 external skills are installed in `~/.agents/skills/`.
 
 ### EduSphere Custom Skills (Auto-Loaded)
 
@@ -541,25 +304,24 @@ Skills are markdown-based expertise guides that auto-load when Claude detects re
 | `nats-jetstream-patterns` | `packages/nats-client/`, NATS imports | 23 event subjects, stream retention, KV stores, SI-7 TLS |
 | `session-completion-gate` | task completion, before git push | 10-check gate, 5-user auth, Docker health, failure protocol |
 | `discovery-wave-automator` | bug fixes, test failures | 3-wave search, 7-dir checklist, Discovery List, pattern-class search |
+| `rls-policy-patterns-edusphere` | `packages/db/src/rls/`, RLS policy files | RLS policy templates, tenant isolation patterns, cross-tenant guards |
+| `memory-safety-resource-lifecycle-edusphere` | `OnModuleDestroy`, cleanup patterns | Resource lifecycle management, connection pool cleanup, timer guards |
+| `keycloak-oauth-oidc-edusphere` | Keycloak config, `packages/auth/`, JWT/OIDC code | OIDC flows, realm config, brute-force protection, JWKS validation |
+| `expo-sdk-54-mobile-edusphere` | `apps/mobile/`, Expo config files | Expo SDK 54 patterns, expo-sqlite offline-first, React Native 0.81 |
+| `multi-tenant-architecture-edusphere` | `withTenantContext`, tenant isolation code | Multi-tenant RLS patterns, tenant context propagation, SI-9 compliance |
+| `react-19-vite-6-edusphere` | `apps/web/`, React 19 components, Vite config | React 19 features, Vite 6 config, mounted-guard patterns |
+| `hive-gateway-v2-patterns` | `apps/gateway/`, supergraph composition | Hive Gateway v2 config, Federation v2.7, subgraph routing |
+| `playwright-visual-regression-edusphere` | `apps/web/e2e/`, visual test files | toHaveScreenshot() patterns, visual baseline management |
+| `docker-blue-green-deployment-edusphere` | `docker-compose.yml`, Dockerfile | Blue-green protocol, mem_limit/mem_reservation, rollback strategy |
+| `turborepo-edusphere-monorepo` | `turbo.json`, monorepo config | Turborepo caching, workspace filtering, pipeline configuration |
+| `graphql-authorization-directives-edusphere` | `@authenticated`, `@requiresScopes` directives | GraphQL authorization directives, scope enforcement |
+| `scorm-edusphere-lms-integration` | SCORM-related code, LMS integration files | SCORM 1.2/2004 compliance, LMS data model, xAPI integration |
 
 ### Skills per Wave (Mandatory Loading)
 
-Skills are loaded per Enterprise Execution Protocol wave:
-
-- **Wave 1 (Product/Arch/UX):** `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere`, `accessibility-compliance`, `wcag-audit-patterns`, `writing-plans`, `brainstorming`
-- **Wave 2 (FE/BE/DB/Security/QA):** `nestjs-best-practices`, `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `langgraph-agent-workflows`, `nats-jetstream-patterns`, `react-state-management`, `e2e-testing-patterns`, `auth-implementation-patterns`, `secrets-management`, `sast-configuration`, `test-driven-development`
-- **Wave 3 (Docs/DevOps):** `changelog-automation`, `deployment-pipeline-design`, `distributed-tracing`, `turborepo-caching`, `github-actions-templates`
-
-### Bug Fix Protocol Skills
-
-Load at the START of every bug investigation:
-1. `systematic-debugging` — root cause investigation framework
-2. `discovery-wave-automator` — 3-wave search automation
-3. Domain skill based on bug location (e.g., `drizzle-orm-edusphere` for DB bugs, `graphql-federation-edusphere` for schema bugs)
-
-### Session Completion Skills
-
-Load `session-completion-gate` skill before declaring ANY task complete. It automates all 10 checks from the Session Completion Gate.
+- **Wave 1 (Product/Arch/UX):** `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere`, `accessibility-compliance`, `wcag-audit-patterns`, `writing-plans`, `brainstorming`, `multi-tenant-architecture-edusphere`, `hive-gateway-v2-patterns`
+- **Wave 2 (FE/BE/DB/Security/QA):** `nestjs-best-practices`, `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `langgraph-agent-workflows`, `nats-jetstream-patterns`, `react-state-management`, `e2e-testing-patterns`, `auth-implementation-patterns`, `secrets-management`, `sast-configuration`, `test-driven-development`, `rls-policy-patterns-edusphere`, `memory-safety-resource-lifecycle-edusphere`, `keycloak-oauth-oidc-edusphere`, `expo-sdk-54-mobile-edusphere`, `react-19-vite-6-edusphere`, `playwright-visual-regression-edusphere`, `graphql-authorization-directives-edusphere`
+- **Wave 3 (Docs/DevOps):** `changelog-automation`, `deployment-pipeline-design`, `distributed-tracing`, `turborepo-caching`, `github-actions-templates`, `docker-blue-green-deployment-edusphere`, `turborepo-edusphere-monorepo`, `scorm-edusphere-lms-integration`
 
 ### Skill Trigger Rules
 
@@ -567,6 +329,8 @@ Load `session-completion-gate` skill before declaring ANY task complete. It auto
 - Custom EduSphere skills (`*-edusphere`) take precedence for overlapping domains
 - Multiple matching skills load additively (not exclusively)
 - Skills location: `~/.agents/skills/<skill-name>/SKILL.md`
+- Load `systematic-debugging` + `discovery-wave-automator` + domain skill at START of every bug investigation
+- Load `session-completion-gate` skill before declaring ANY task complete
 
 ---
 
@@ -660,17 +424,8 @@ Load `session-completion-gate` skill before declaring ANY task complete. It auto
 - Generated code (GraphQL types from codegen)
 - UI component libraries from `packages/ui` (Radix wrappers)
 
-**When to split:**
-
-- Duplicate code patterns → extract to shared utility
-- Multiple responsibilities → separate concerns into focused files
-- Overly long resolver → extract service layer
-- Large test file → split by feature/domain
-
-**How to split:**
-
-- Create barrel files (`index.ts`) to preserve import compatibility
-- Example: `user.resolver.ts` (150+ lines) → `user.resolver.ts` + `user.service.ts` + `user.validation.ts` + `index.ts`
+**When to split:** Duplicate code patterns, multiple responsibilities, overly long resolver, large test file.
+**How to split:** Create barrel files (`index.ts`) to preserve import compatibility.
 
 ### Error Handling
 
@@ -737,86 +492,7 @@ Load `session-completion-gate` skill before declaring ANY task complete. It auto
 - **Frontend:** >80% component coverage
 - **RLS policies:** 100% coverage (critical security)
 
-**No merge/deploy without:**
-
-- All tests passing (`pnpm turbo test`)
-- Supergraph composition succeeds (`pnpm --filter @edusphere/gateway compose`)
-- Health check passes (`./scripts/health-check.sh`)
-
-## Security Invariants — ENFORCED (Iron Rules — never violate)
-
-These are non-negotiable. Any code violating these invariants must be rejected immediately.
-
-| #         | Invariant                  | WRONG                                                     | RIGHT                                                                       |
-| --------- | -------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **SI-1**  | RLS session variable name  | `current_setting('app.current_user', TRUE)`               | `current_setting('app.current_user_id', TRUE)`                              |
-| **SI-2**  | CORS origin in production  | `origin: '*'`                                             | `origin: process.env.CORS_ORIGIN?.split(',') ?? []`                         |
-| **SI-3**  | PII fields in DB           | Store plaintext email/name/annotation text                | `encryptField(value, tenantKey)` before every write                         |
-| **SI-4**  | Keycloak brute-force       | `"bruteForceProtected": false`                            | `"bruteForceProtected": true, "failureFactor": 5`                           |
-| **SI-5**  | SSL verification in Docker | `curl --insecure` / `Acquire::https::Verify-Peer "false"` | `apt-get install -y ca-certificates && update-ca-certificates`              |
-| **SI-6**  | Inter-service HTTP         | Plain `http://` subgraph URLs in production               | mTLS via Linkerd or `https://` with certs                                   |
-| **SI-7**  | NATS without auth/TLS      | `connect({ servers: url })` bare                          | `connect({ servers, tls, authenticator })`                                  |
-| **SI-8**  | DB direct access           | `new Pool()` / raw `pg` client                            | `getOrCreatePool()` from `@edusphere/db` only                               |
-| **SI-9**  | Cross-tenant query         | Query without `withTenantContext()`                       | Always wrap: `withTenantContext(tenantId, userId, role, fn)`                |
-| **SI-10** | LLM call without consent   | Forward user message to OpenAI/Anthropic directly         | Check `THIRD_PARTY_LLM` consent first — throw `CONSENT_REQUIRED` if missing |
-
-**Enforcement:** Pre-commit hook and CI gate must run `pnpm test:rls` + `pnpm audit --audit-level=high`.
-**Iron rule:** No commit may weaken any of SI-1 through SI-10. A failing invariant = a blocked PR.
-
----
-
-## Security
-
-### Pre-commit Gate (every code change)
-
-| Check            | Rule                                                                          |
-| ---------------- | ----------------------------------------------------------------------------- |
-| XSS              | No unsanitized user input in GraphQL responses                                |
-| SQL Injection    | All queries via Drizzle ORM (except Cypher via graph helpers)                 |
-| NoSQL Injection  | All Cypher queries use parameterized prepared statements                      |
-| RLS              | All tenant-scoped tables have `USING (tenant_id = current_setting(...))`      |
-| JWT              | All mutations validate scopes (`@requiresScopes`) and roles (`@requiresRole`) |
-| Input Validation | All mutations have Zod schemas                                                |
-| Secrets          | No API keys, passwords, tokens in code (use env vars)                         |
-
-### RLS Validation Checklist
-
-- [ ] All 16 tables have RLS enabled (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY`)
-- [ ] All tenant-scoped tables have tenant isolation policy
-- [ ] All queries use `withTenantContext()` wrapper
-- [ ] Cross-tenant tests verify isolation (Tenant A cannot read Tenant B data)
-- [ ] Personal annotations only visible to owner or instructors
-
-### GraphQL Security
-
-- [ ] All mutations use `@authenticated` directive
-- [ ] Sensitive mutations use `@requiresScopes` (e.g., `course:write`, `agent:execute`)
-- [ ] Admin-only mutations use `@requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])`
-- [ ] Query depth limited to 10 (prevent DoS)
-- [ ] Query complexity limited to 1000 (prevent expensive queries)
-- [ ] Rate limiting at gateway level (per tenant, per IP)
-
-**Iron rule:** No commit may weaken existing security (RLS, JWT validation, scopes, directives).
-
-### Security Test Files
-
-| Test File                                      | Coverage                           |
-| ---------------------------------------------- | ---------------------------------- |
-| `tests/security/rls-variables.spec.ts`         | SI-1: RLS session variable names   |
-| `tests/security/cors-config.spec.ts`           | SI-2: CORS fail-closed             |
-| `tests/security/pii-encryption.spec.ts`        | SI-3: AES-256-GCM encryption       |
-| `tests/security/keycloak-config.spec.ts`       | G-12: Brute force protection       |
-| `tests/security/dockerfile-security.spec.ts`   | G-05: SSL bypass patterns          |
-| `tests/security/nats-security.spec.ts`         | SI-7: NATS TLS                     |
-| `tests/security/audit-log.spec.ts`             | G-08: Audit trail                  |
-| `tests/security/minio-config.spec.ts`          | G-17: MinIO encryption             |
-| `tests/security/consent-management.spec.ts`    | G-04: Consent                      |
-| `tests/security/data-retention.spec.ts`        | G-13: Retention TTLs               |
-| `tests/security/gdpr-erasure.spec.ts`          | G-03+G-11: Erasure+Portability     |
-| `tests/security/api-security.spec.ts`          | G-09+G-10: Rate limit + complexity |
-| `tests/security/graphql-authorization.spec.ts` | G-15: @requiresScopes              |
-| `tests/security/ai-compliance.spec.ts`         | SI-10: LLM consent                 |
-| `tests/security/eu-ai-act.spec.ts`             | EU AI Act: transparency            |
+**No merge/deploy without:** All tests passing (`pnpm turbo test`), supergraph composition succeeds, health check passes.
 
 ## CI/CD (GitHub Actions)
 
@@ -878,471 +554,6 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 - `fix(db): RLS policy for annotations layer filtering`
 - `refactor(knowledge): optimize HybridRAG fusion algorithm`
 
-## Bug Fix Protocol
-
-### Delegation Model (IRON RULE)
-
-> **The Orchestrator does NOT execute any part of the Bug Fix Protocol.**
-> When a bug is reported, the Orchestrator spawns a **QA & Validation Lead Agent** who owns the entire protocol (Stages 0–11).
-> The QA Lead spawns sub-agents (FE, BE, DB, Security, Playwright, DevOps) as needed within each stage.
-> The Orchestrator only monitors progress and relays the QA Lead's reports to the user.
->
-> **Orchestrator's allowed actions during a bug fix:**
-> - `Agent` — spawn the QA Lead Agent (with full bug context)
-> - `Read` — check OPEN_ISSUES.md status only
-> - Text output — relay progress to user in Hebrew
->
-> **Orchestrator MUST NOT:** read source code, search patterns, run tests, edit files, make root cause decisions, or run any build/deploy commands during a bug fix.
-
-### Interactive Debugger — `dap` CLI (MANDATORY tool for all debugging)
-
-**NEVER use `console.log` / `this.logger.debug` for debugging runtime state. Use the `dap` interactive debugger instead.**
-
-The `debugging-code` skill + `dap` CLI are globally installed. `dap` wraps the Debug Adapter Protocol and lets you pause execution, inspect live variables, step through code, and evaluate expressions — without restarting the process.
-
-**Supported languages:** Python · Go · Node.js/TypeScript · Rust/C/C++ (backend auto-detected from file extension)
-
-**Quick reference:**
-```bash
-# Stop at a specific line and inspect
-dap debug apps/subgraph-core/src/main.ts --break user.service.ts:55
-
-# Evaluate a live expression at the stopped line
-dap eval "this.tenantId"
-dap eval "result"
-
-# Navigate
-dap step          # step over
-dap step in       # step into a function
-dap continue      # jump to next breakpoint
-dap output        # drain stdout/stderr since last stop
-
-# End session
-dap stop
-```
-
-**Debugging mindset (mandatory):**
-1. Form a hypothesis: "I believe X fails because Y"
-2. Set breakpoint *where the problem begins*, not where it manifests
-3. Stop → read locals + call stack → confirm or disprove hypothesis
-4. Repeat until root cause confirmed
-
-**When `dap` is unavailable** (e.g. remote container, CI): fall back to structured Pino logging with `tenantId`+`userId` context — never raw `console.log`.
-
----
-
-### Phase 0 — Reproduce First (TEST-FIRST — before any other investigation)
-
-> **Iron principle:** Never investigate a bug you can't prove exists. Write the test FIRST.
-
-1. **Read logs** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console — understand the symptom
-2. **Write a reproducer test** that demonstrates the bug **as it exists right now**. The test must **PASS** (GREEN) because it asserts the broken behavior:
-   - UI bug → Playwright E2E: `expect(locator).toContainText(badString)` — must PASS
-   - Logic bug → unit test: `expect(result).toBe(wrongValue)` — must PASS
-   - RLS/security leak → integration test proving the leak exists
-   - API bug → GraphQL integration test returning wrong data
-   - Crash → unit test: `expect(() => fn()).toThrow(specificError)`
-3. **Run the test** — it MUST be **GREEN** (proving the bug is real). If RED → the test doesn't reproduce, investigate further.
-4. **Mark the test:** `// BUG-NNN: reproducer — asserts BROKEN state, will be INVERTED after fix`
-
-### Phase 1 — Discovery (3 Waves — MANDATORY before any fix code)
-
-5. **Wide pattern search — DISCOVERY WAVES (MANDATORY, never skip):**
-
-   After confirming the bug with the reproducer test, execute **3 search waves** before writing a single line of fix code:
-
-   **Wave 1 — Exact match:** Grep for the exact code pattern (string, function name, API call, class structure) across the entire codebase.
-
-   **Wave 2 — MANDATORY SIMILARITY SEARCH (NEVER SKIP — "שוני מסויים"):**
-
-   MANDATORY CHECKLIST (mark each ✓ as you complete it):
-   □ Every file in `apps/web/src/pages/` — checked for same anti-pattern
-   □ Every file in `apps/web/src/hooks/` — checked for same anti-pattern
-   □ Every file in `apps/web/src/components/` — checked for same anti-pattern
-   □ Every screen in `apps/mobile/src/` — checked for same anti-pattern
-   □ Every service in ALL 6 backend subgraphs — checked if bug is server-side
-   □ All resolver files across all subgraphs — checked for same pattern
-   □ Mobile equivalent of affected web component — explicitly checked
-
-   This includes ALL variation types:
-   - Same hook/function with **different variable names**
-   - Same pattern with **different prop signatures**
-   - Same anti-pattern in **parallel/sibling pages**
-   - Same bug in **mobile screens**
-   - Same logic in **different subgraphs** if cross-cutting
-
-   Build a numbered **DISCOVERY LIST** before writing a single line of fix code.
-   Wave 2 is NOT complete until every checkbox above is ✓.
-
-   **Wave 3 — Class of bug:** Search for all usages of the same API or pattern class. Examples:
-   - If bug is "no cleanup on unmount" → grep ALL `setInterval`/`setTimeout`/`useSubscription` usages
-   - If bug is "raw error.message in UI" → grep ALL places where `.message` or `error.message` is rendered
-   - If bug is "stale urql cache" → grep ALL `useQuery`/`useFragment` reads after mutations
-   - If bug is "missing try/catch" → grep ALL async service methods
-
-   **Build a Discovery List** — a numbered list of every affected file + the exact issue in that file.
-
-### Phase 2 — Root Cause Analysis
-
-6. **Use `dap` debugger** — set breakpoint at the location indicated by the reproducer test
-7. **Inspect live state** — locals, call stack, variable values at the point of failure
-8. **Document root cause** — file:line where the bug originates + why it happens
-
-### Phase 3 — Fix Rounds (one round per Wave group)
-
-Execute one fix round per logical grouping of similar issues.
-
-**Round structure:**
-- **Round 1**: Fix the original bug + add Pino logging + **INVERT the reproducer test from Phase 0**
-  - `expect(locator).toContainText(badString)` → `expect(locator).not.toContainText(badString)`
-  - `expect(result).toBe(wrongValue)` → `expect(result).toBe(correctValue)`
-  - Remove `// BUG-NNN: reproducer` comment → replace with `// BUG-NNN: regression guard`
-- **Round 2**: Fix all similar issues found in Wave 2 (other pages/components with variations)
-- **Round 3**: Fix all class-of-bug issues found in Wave 3 (if different from Round 2 items)
-- **Round N**: Continue until the Discovery List is 100% empty and grep returns zero matches for the bug pattern outside of test files
-
-**Round Completion Gate (MANDATORY after EVERY fix round):**
-A round is NOT done until ALL of the following pass:
-0. Docker infrastructure UP — `docker ps` shows postgres, keycloak, nats, minio, jaeger healthy. If not: `docker-compose up -d` first. **Never skip — E2E + visual tests fail silently without Docker.**
-1. `pnpm turbo test` passes 100% for ALL affected packages (not just the one you changed)
-2. `pnpm turbo typecheck` — zero TypeScript errors
-3. **Reproducer test INVERTED and GREEN** — proves the fix actually works
-4. Additional regression test: asserts the BAD string/state is GONE
-5. Console.error/Pino log added so bug is observable if it recurs in production
-6. `./scripts/health-check.sh` — all services PASS
-7. All 5 test users can authenticate successfully:
-   | User | Role | Password |
-   |------|------|----------|
-   | super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
-   | instructor@example.com | INSTRUCTOR | Instructor123! |
-   | org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
-   | researcher@example.com | RESEARCHER | Researcher123! |
-   | student@example.com | STUDENT | Student123! |
-
-**Required output per round (non-negotiable):**
-- Inverted reproducer test (from Phase 0) now GREEN
-- Unit test asserting the BAD behavior is GONE (regression guard)
-- **Playwright E2E test** with `page.route()` interception or mock + `expect(element).not.toContainText(badString)` assertion
-- Screenshot assertion (`expect(page).toHaveScreenshot(...)`) for visual regressions
-- Console.error/Pino log call so the bug is observable if it recurs in production
-
-A round is **not complete** until health-check passes AND all 5 users can authenticate.
-
-### Phase 4 — Verification
-
-9. **Full test suite** - `pnpm turbo test -- --coverage` must pass 100%
-10. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino/console.error with structured prefix `[ServiceName]` or `[ComponentName]`)
-11. **Visual check (MANDATORY for UI bugs)** - Open browser, reproduce the original scenario, confirm the correct fallback UI is shown without raw technical strings. Take a screenshot and compare.
-12. **Health check** - `./scripts/health-check.sh` passes
-13. **Pattern clean** - grep for the bug pattern returns zero matches outside of test files
-14. **E2E visual regression test** - A Playwright test that simulates the failure condition and asserts the UI is clean
-
-### Phase 5 — Documentation
-
-15. **Document** in `OPEN_ISSUES.md`:
-    - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
-    - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
-    - **Reproducer test path** from Phase 0 (now inverted as regression guard)
-    - Files affected per round (all 3 waves), problem, root cause chain, solution per round, tests added
-    - **Anti-recurrence note**: what prevents this from happening again (the inverted reproducer test file:line)
-    - **Discovery List**: the complete list of affected files found in each wave
-
-**IRON RULES (never violate):**
-- **Never write fix code before a reproducer test proves the bug exists** — Phase 0 reproducer must be GREEN first.
-- **Every reproducer test must be GREEN before fixing and GREEN (inverted) after fixing** — the test lifecycle proves the bug existed and is now gone.
-- Never declare a bug fixed until the entire Discovery List is empty (all 3 waves exhausted).
-- Never close a bug without a regression test that would catch it if it returns (the inverted reproducer IS the regression guard).
-- Never leave logging gaps — the bug must be observable in logs if it recurs (Pino error + structured context).
-- **UI bugs must have a Playwright E2E test that simulates the failure and asserts the UI is clean.**
-- **Never report completion after fixing only the original file.** Always complete all 3 discovery waves and all fix rounds first.
-- **Every Pino/console.error logging MUST include structured context:** `[ServiceName]` or `[ComponentName]` prefix + `tenantId` + `userId` where applicable.
-- **Round Completion Gate is mandatory after EVERY round** — never skip health-check.sh or 5-user verification.
-- **ALWAYS restore services after ANY disruption** — Run `./scripts/health-check.sh` after every disruptive action. The user must NEVER encounter ERR_CONNECTION_REFUSED.
-
-## Parallel Execution (Agents)
-
-**MANDATORY RULE:** Split every task into sub-tasks and run Agents/Workers in parallel whenever possible.
-
-### Task Decomposition Protocol
-
-Before starting any task:
-
-1. **Analyze dependencies** - Identify which sub-tasks can run independently
-2. **Create execution plan** - Map out parallel vs sequential sub-tasks
-3. **Launch agents** - Spawn multiple agents using Task tool with clear responsibilities
-4. **Track progress** - Use Agent Tracking Table to monitor all parallel workers
-5. **Synchronize results** - Merge outputs only after all agents complete
-
-### Parallelization Opportunities
-
-- **Multiple subgraphs** - Each subgraph can be built/tested by separate agent
-- **Multiple tables** - Database schema creation can be split across agents
-- **Multiple test suites** - Backend, Frontend, E2E, RLS tests run in parallel
-- **Multiple files** - Code generation, linting, type checking across agents
-- **Multiple GraphQL types** - Resolver implementation split by domain
-
-### When Executing Phases
-
-- **Check for parallelization opportunities** - Phase 3 + Phase 4 can run in parallel
-- **Always prefer parallel over sequential** when no dependencies exist
-- **Use Agent Orchestration Protocol** - Report progress every 3 minutes
-- **Never run full test suite in parallel** - Use `pnpm turbo test --filter=<package>` per subgraph
-- **Launch agents with Task tool** - One agent per independent sub-task
-
-### Example: Phase 2 Parallelization
-
-```
-Task: Implement Core + Content Subgraphs
-├─ Agent-1: Core subgraph (Types + Resolvers + Tests) — parallel
-├─ Agent-2: Content subgraph (Types + Resolvers + Tests) — parallel
-├─ Agent-3: Auth infrastructure (JWT validation + Guards) — parallel
-└─ Agent-4: Documentation (API-CONTRACTS updates) — parallel
-```
-
-### Agent Tracking Table (required when running parallel)
-
-**Format:** `Agent-N` = per-task sequence index (temporary). `Division` = one of the 11 Enterprise Divisions (mandatory). `Mission` = specific deliverable for this run (mandatory).
-
-| ID      | Division          | Mission                       | Status     |
-| ------- | ----------------- | ----------------------------- | ---------- |
-| Agent-1 | Architecture      | Building docker-compose.yml   | 🟡 Running |
-| Agent-2 | Database & Data   | Generating Drizzle migrations | ⏳ Waiting |
-| Agent-3 | QA & Validation   | Writing health-check tests    | ✅ Done    |
-
-### OOM Protection
-
-| Event              | Action                                   |
-| ------------------ | ---------------------------------------- |
-| First OOM          | Reduce agents by 20%                     |
-| Repeated OOM       | Continue reducing until 1 agent          |
-| Single agent + OOM | `NODE_OPTIONS=--max-old-space-size=8192` |
-
-## Enterprise Execution Protocol (Mandatory)
-
-> **This section defines HOW Claude operates on every task. These are development workflow rules, not EduSphere app features.**
-> Full reference: `C:\Users\P0039217\.claude\projects\c--Users-P0039217--claude-projects-EduSphere\memory\enterprise-execution.md`
-
-### A. Autonomous Mode (Iron Rules)
-
-- No confirmation requests, no execution pauses, no clarifying questions unless logically impossible
-- **Logically impossible** = conflicting requirements / unavailable credentials / legal-security violation / undefined external resource
-- When ambiguity is resolvable → make best engineering assumption and proceed
-- CORRECT: Detect what needs to be done → execute → report results
-
-### B. Enterprise Division Structure (11 Divisions)
-
-Each task is decomposed and routed to the relevant division(s). Each division must internally approve before passing control.
-
-| # | Division | Responsibility |
-|---|----------|----------------|
-| 1 | **Orchestrator** | Sole external communicator. Coordinates all divisions, tracks % completion, enforces quality gates, reports progress every 3 min |
-| 2 | **Product & Requirements** | PRD delta, functional/non-functional reqs, risk matrix, acceptance criteria |
-| 3 | **Software Architecture** | System impact, scalability, service boundaries, domain modeling, performance budgets |
-| 4 | **UX/UI Design** | User flows, WCAG accessibility, design system compliance, mobile/desktop parity |
-| 5 | **Frontend Engineering** | Component architecture, state management, rendering performance, responsive behavior |
-| 6 | **Backend Engineering** | Business logic, API consistency, validation rules, error resilience |
-| 7 | **Database & Data Eng.** | Schema changes, query optimization, migrations, rollback strategy |
-| 8 | **Security & Compliance** | Threat modeling, vulnerability scan, auth validation, GDPR/privacy (SI-1 through SI-10) |
-| 9 | **QA & Validation** | Unit + Integration + E2E + Load + Playwright visual regression. 100% pass required. No partial approval. |
-| 10 | **Documentation** | Update all affected docs (README, API, runbooks, release notes) after QA approval |
-| 11 | **DevOps & Release** | CI/CD validation, build, staging, prod readiness, rollback plan, post-deploy monitoring |
-
-### C. Mandatory Execution Order — Wave-Based Parallel Model
-
-**The sequential order defines APPROVAL dependency, NOT launch timing.**
-Stages are grouped into parallel waves. Within each wave, all stages launch simultaneously.
-
-```
-Wave 1 (parallel):  Stage 1 (Product) + Stage 2 (Architecture) + Stage 3 (UX/UI)
-Wave 2 (parallel):  Stage 4 (FE+BE+DB dev) + Stage 5 (Security prep) + Stage 6 (QA test writing)
-Wave 3 (parallel):  Stage 7 (Documentation) + Stage 8 (DevOps validation)
-Wave 4 (sequential): Stage 9 (Deploy to production)
-Wave 5 (sequential): Stage 10 (Post-release verification)
-```
-
-**Wave launch rules:**
-- Wave 1 launches ALL 3 stages in a single message (3 parallel agents)
-- Wave 2 launches AFTER Wave 1 approvals — but ALL 5+ agents launch together (dev×3 + security + QA prep)
-- Wave 3 launches AFTER Wave 2 approvals — both agents in parallel
-- Waves 4-5 are sequential (deploy then verify)
-
-**Platform constraint:** Claude Code SDK supports max ~5 concurrent agents. Waves with >5 agents execute as **sub-waves** (5 agents → wait for first to finish → launch next batch). This is transparent to the user.
-
-**If any stage fails:** fix → re-run all downstream stages from that wave onward.
-
-### D. Agent Orchestration
-
-- All division work performed by specialized sub-agents via the `Agent` tool
-- **Wave-based execution:** max ~5 concurrent agents per sub-wave (SDK limit)
-- Large waves (e.g., Wave 2 with 6 agents) split into sub-waves automatically: first 5 launch → as agents complete, remaining launch
-- FE + BE + DB always run concurrently within Wave 2
-- Security + QA prep launch WITH dev agents, not after them
-- Progress reported every 3 minutes: `[Progress: XX%] Active: <Division>`
-- **Never wait for a full wave to finish before preparing the next wave's inputs**
-
-### E. Completion Gate (All required before declaring done)
-
-- `pnpm turbo test` — 100% pass rate
-- `pnpm turbo typecheck` — 0 TypeScript errors
-- `pnpm turbo lint` — 0 lint errors
-- All Playwright E2E tests pass
-- `./scripts/health-check.sh` — all services healthy
-
-### F. Final Output Format (after 100% completion only)
-
-```
-✅ Change fully implemented.
-✅ Architecture validated.
-✅ UX/UI approved.
-✅ Security cleared.
-✅ QA fully passed.
-✅ Documentation fully updated.
-✅ Production deployed safely.
-✅ Post-release validation successful.
-```
-
----
-
-## Phase Execution Protocol
-
-**CRITICAL:** This project follows IMPLEMENTATION_ROADMAP.md strictly.
-
-### Phase Rules
-
-1. **Never skip phases** - Each phase builds on the previous one
-2. **Run acceptance criteria before proceeding** - Green output = permission to advance
-3. **Reference API-CONTRACTS and DATABASE_SCHEMA** - Single source of truth
-4. **Report progress every 3 minutes** - Use Agent Orchestration Protocol format
-5. **No deviation from locked tech stack** - Update IMPLEMENTATION_ROADMAP.md if changes needed
-
-### Quality Gates (Enforced at every phase boundary)
-
-```bash
-# 1. TypeScript compilation (zero errors)
-pnpm turbo build --filter='./apps/*' --filter='./packages/*'
-
-# 2. Linting (zero warnings in CI mode)
-pnpm turbo lint
-
-# 3. Unit tests (100% pass, coverage thresholds met)
-pnpm turbo test -- --coverage
-
-# 4. Schema validation (supergraph composes without errors)
-pnpm --filter @edusphere/gateway compose
-
-# 5. Docker health (all containers healthy)
-./scripts/health-check.sh
-
-# 6. Security scan
-pnpm audit --audit-level=high
-```
-
-### Phase Progress Reporting Format
-
-```
-═══════════════════════════════════════════════════
-📊 PROGRESS REPORT — Phase X.Y — [timestamp]
-═══════════════════════════════════════════════════
-🔵 Active Agents:
-   Agent-1 [Database & Data | Migrations]: Generating Drizzle migrations — 80% complete
-   Agent-2 [QA & Validation | RLS Tests]: Writing RLS validation tests — running
-
-✅ Completed this cycle:
-   - All 16 tables created with RLS enabled
-   - Apache AGE graph ontology initialized
-
-⏳ Next actions:
-   - Apply migrations to database
-   - Run health-check.sh
-
-📈 Phase progress: 65% → estimated 8 min remaining
-═══════════════════════════════════════════════════
-```
-
-## Autonomous Execution Rules (IRON RULES)
-
-### 1. Phase Completion Announcement (MANDATORY)
-After EVERY phase or major milestone completes, Claude MUST proactively announce:
-```
-═══════════════════════════════════════════════════
-✅ PHASE [X] COMPLETE — [Phase Name]
-═══════════════════════════════════════════════════
-תוצרים: [list what was built]
-בדיקות: [test counts]
-📋 הבא בתור (Phase [X+1]):
-  • [next item 1]
-  • [next item 2]
-  • [next item 3]
-▶ ממשיך אוטומטית ב-[X] שניות אלא אם כן תעצור אותי.
-═══════════════════════════════════════════════════
-```
-Then proceed autonomously without waiting for user approval.
-
-### 2. No Inter-Phase Pauses
-- NEVER ask "האם להמשיך לשלב הבא?" between phases
-- NEVER wait for user confirmation between phases
-- Proceed directly from phase to phase
-- Only stop for: logical contradiction, security violation, missing credentials
-
-### 3. Maximum Parallelism — Wave Execution Model
-- Always spawn the MAXIMUM number of parallel agents the task allows
-- Frontend + Backend + DB agents ALWAYS run in parallel
-- Never run sequentially what can run in parallel
-- **Platform limit:** max ~5 concurrent agents (Claude Code SDK constraint)
-- **Wave model:** stages grouped into waves; within each wave all agents launch together
-- **Sub-waves:** if a wave has >5 agents, split into batches of 5; as agents complete, launch remaining
-- **Cross-wave preparation:** downstream stages begin prep work while upstream stages execute
-- The total agent count per task may reach 10-15+, but they execute in waves of 5, not all at once
-
-### 4. Protocol Compliance
-- Run Session Completion Gate after EVERY phase (not just at session end)
-- Every new feature = E2E Playwright spec (no exceptions)
-- Every UI change = visual regression screenshot
-
----
-
-## Session Completion Gate (IRON RULE — NEVER VIOLATE)
-
-**MANDATORY:** Claude may NEVER declare a session, feature, or task "complete" without producing and verifying the following table in full. Every row must show ✅ before completion is announced.
-
-> **Trigger phrase:** When the user asks "הצג Session Completion Report" — produce this table immediately with real results.
-
-| # | Check | Command | Required Result |
-|---|-------|---------|----------------|
-| -1 | Orchestrator Compliance | Self-audit: Did Orchestrator use Edit/Write/mutating Bash directly? | 0 violations — all work done via agents |
-| 0 | Docker Up | `docker ps \| grep -c healthy` | ≥5 containers healthy |
-| 1 | Unit Tests | `pnpm turbo test` | 100% pass, 0 failures |
-| 2 | TypeScript | `pnpm turbo typecheck` | 0 errors |
-| 3 | Lint | `pnpm turbo lint` | 0 warnings/errors |
-| 4 | Security Tests | `pnpm test:security` | 0 failures |
-| 5 | E2E Playwright | `pnpm --filter @edusphere/web test:e2e` | all pass |
-| 6 | Health Check | `./scripts/health-check.sh` | all services UP |
-| 7 | 5-User Auth | Keycloak login × 5 roles | all login OK |
-| 8 | GitHub CI | `gh run list --limit 3` | all green |
-| 9 | Git Push | `git log --oneline -1` | commit pushed |
-| 10 | OPEN_ISSUES.md | updated with E2E files listed | status ✅ |
-| 11 | Memory Audit | `vm_get_recent({ n: 10 })` | ≥1 decision stored this session |
-
-### Iron Rules for Completion
-
-- **NEVER** say "complete" or "done" without running every check above
-- **NEVER** mark OPEN_ISSUES.md ✅ without listing the actual E2E spec files written
-- **EVERY** new feature/fix requires a Playwright E2E spec — unit tests alone are NOT sufficient
-- **EVERY** visual UI change requires `toHaveScreenshot()` visual regression test
-- **Agent work is not done** until the Orchestrator has reviewed all agent outputs and confirmed the table above
-- If any row fails: fix → re-run ALL downstream checks — never partial sign-off
-- **ALWAYS restore services after ANY disruption** — If Docker/services went down during the session, bring them ALL back before running the gate. The user must NEVER open their browser and see ERR_CONNECTION_REFUSED.
-
-### Parallel Agents — Completion Protocol
-
-When running parallel agents:
-1. Wait for ALL agents to complete before declaring session done
-2. Review each agent's output for errors, gaps, or missed tests
-3. Spawn fix agents for any gaps found
-4. Only after all agents report clean — run the Completion Gate table
-
----
-
 ## Documentation Sync
 
 | File                                  | When to Update                          | What to Sync                                    |
@@ -1357,69 +568,18 @@ When running parallel agents:
 
 Every new or updated `.md` file describing architecture, flows, relationships, state machines, or timelines **MUST** include Mermaid diagrams following [docs/reference/MERMAID_STYLE_GUIDE.md](docs/reference/MERMAID_STYLE_GUIDE.md).
 
-| Content Pattern | Required Diagram Type |
-|-----------------|----------------------|
-| Service/component dependencies | `graph TD` |
-| Request/response flows | `sequenceDiagram` |
-| State transitions | `stateDiagram-v2` |
-| Timeline/roadmap | `gantt` |
-| Process/pipeline steps | `flowchart TD/LR` |
-| Data relationships | `erDiagram` |
-| Git workflow | `gitGraph` |
-
-**Skills:** Use `mermaid-graph-writer` for creating diagrams, `mermaid-graph-renderer` for export.
-
 ## VS Code Extensions
 
 **Recommended extensions** are defined in `.vscode/extensions.json` and will be suggested automatically when opening the project in VS Code.
 
-### Essential Extensions (Must Install)
+**Essential:** GraphQL Language Feature Support, GraphQL Syntax Highlighting, Prisma, PostgreSQL (Chris Kolkman), ESLint, Prettier, Docker
 
-| Extension                             | Purpose                                            | Why Critical                                    |
-| ------------------------------------- | -------------------------------------------------- | ----------------------------------------------- |
-| **GraphQL: Language Feature Support** | GraphQL autocomplete, validation, schema viewing   | Federation development requires GraphQL tooling |
-| **GraphQL: Syntax Highlighting**      | Syntax highlighting for .graphql files             | SDL schema files across 6 subgraphs             |
-| **Prisma**                            | Database schema visualization (works with Drizzle) | Database schema exploration                     |
-| **PostgreSQL** (Chris Kolkman)        | Database client for PostgreSQL queries             | RLS policy testing, manual queries              |
-| **ESLint**                            | Code quality and linting                           | Already configured in project                   |
-| **Prettier**                          | Auto-formatting                                    | Matches project code conventions                |
-| **Docker**                            | Manage containers directly from VS Code            | Infrastructure management                       |
-
-### Highly Recommended
-
-| Extension           | Purpose                                         |
-| ------------------- | ----------------------------------------------- |
-| **GitLens**         | Advanced Git features (blame, history, compare) |
-| **Thunder Client**  | API testing for GraphQL endpoints               |
-| **REST Client**     | HTTP/GraphQL requests in .http files            |
-| **Error Lens**      | Inline error highlighting                       |
-| **Import Cost**     | Shows bundle impact of imports                  |
-| **Todo Tree**       | Highlights TODO/FIXME comments                  |
-| **Better Comments** | Color-coded comment categories                  |
-| **YAML**            | Docker Compose and Kubernetes files             |
-| **EditorConfig**    | Consistent formatting across team               |
-
-### Nice to Have
-
-| Extension               | Purpose                          |
-| ----------------------- | -------------------------------- |
-| **Turbo Console Log**   | Quick console.log insertion      |
-| **Path Intellisense**   | Autocomplete file paths          |
-| **Markdown All in One** | Better markdown editing for docs |
-
-### Installation
-
-VS Code will prompt to install recommended extensions on first open. Alternatively:
-
-```bash
-# Install all at once via Extensions panel "Install All Recommended Extensions"
-# Or manually: Ctrl+Shift+X → Search extension name → Install
-```
+**Highly Recommended:** GitLens, Thunder Client, REST Client, Error Lens, Import Cost, Todo Tree, Better Comments, YAML, EditorConfig
 
 ## Troubleshooting
 
 | Problem                      | Solution                                                                                              |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------- | ---------- |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Docker not running           | `docker-compose up -d`                                                                                |
 | PostgreSQL down (5432)       | Check `docker ps`, restart postgres container                                                         |
 | Apache AGE not loaded        | Run `LOAD 'age';` in psql, verify `shared_preload_libraries` in postgresql.conf                       |
@@ -1431,7 +591,7 @@ VS Code will prompt to install recommended extensions on first open. Alternative
 | Supergraph composition fails | Check subgraph SDL files for Federation v2 compliance, run `pnpm --filter @edusphere/gateway compose` |
 | RLS policy fails             | Verify `withTenantContext()` wrapper used, check `SET LOCAL` commands in logs                         |
 | JWT validation fails         | Check Keycloak JWKS URL, verify `KEYCLOAK_JWKS_URL` in gateway .env                                   |
-| NATS connection fails        | Verify `NATS_URL` in .env, check `docker ps                                                           | grep nats` |
+| NATS connection fails        | Verify `NATS_URL` in .env, check `docker ps` for nats container                                       |
 | Embeddings not generated     | Run `pnpm --filter @edusphere/subgraph-knowledge embed`, check Ollama running                         |
 | Transcription stuck          | Check `apps/transcription-worker` logs, verify MinIO access, check faster-whisper GPU config          |
 
@@ -1451,4 +611,18 @@ VS Code will prompt to install recommended extensions on first open. Alternative
 
 ---
 
-**Last Updated:** February 2026 | **Version:** 1.0.0 | **Target Scale:** 100,000+ concurrent users
+## Extracted Operations Documents
+
+The following sections have been extracted to keep CLAUDE.md focused. Each document contains the full content and links back here.
+
+| Document | Content |
+|----------|---------|
+| [docs/operations/IRON_RULES.md](docs/operations/IRON_RULES.md) | Security Invariants (SI-1 to SI-10), Memory Safety rules (backend/frontend/infrastructure), OOM Response Protocol |
+| [docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md](docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md) | Enterprise Division Structure, Wave-Based Parallel Model, Agent Orchestration, Phase Execution, Autonomous Execution Rules |
+| [docs/operations/SESSION_COMPLETION_GATE.md](docs/operations/SESSION_COMPLETION_GATE.md) | 12-check completion table, Iron Rules for Completion, Parallel Agents Completion Protocol |
+| [docs/operations/MCP_DECISION_MATRIX.md](docs/operations/MCP_DECISION_MATRIX.md) | 14 MCP servers config, Decision Matrix, Tool Usage Guidelines, HIVEMIND/MindHive protocol |
+| [docs/operations/BUG_FIX_PROTOCOL_QUICK_REF.md](docs/operations/BUG_FIX_PROTOCOL_QUICK_REF.md) | Bug Fix Protocol phases 0-5, Discovery Waves, Round Completion Gate, `dap` debugger reference. Full protocol: [docs/reference/BUG_FIX_PROTOCOL.md](docs/reference/BUG_FIX_PROTOCOL.md) |
+
+---
+
+**Last Updated:** March 2026 | **Version:** 1.1.0 | **Target Scale:** 100,000+ concurrent users

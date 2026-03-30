@@ -63,7 +63,7 @@ export function CrmSettingsPage() {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
-        console.error('[CrmSettingsPage] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[CrmSettingsPage] cleanup: copy timer cleared on unmount');
       }
     };
   }, []);

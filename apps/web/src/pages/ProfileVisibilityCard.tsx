@@ -39,7 +39,7 @@ export function ProfileVisibilityCard({
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
-        console.error('[ProfileVisibilityCard] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV) console.debug('[ProfileVisibilityCard] cleanup: copy timer cleared on unmount');
       }
     };
   }, []);
