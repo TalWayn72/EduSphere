@@ -8,19 +8,19 @@
 
 ### MCP Tool Assignment (by Division)
 
-| MCP Server | Product | Arch | UX | FE | BE | DB | Security | QA | Docs | DevOps |
-|------------|---------|------|----|----|----|----|----------|----|----|--------|
-| `memory` | Y | Y | — | — | — | — | Y | — | Y | — |
-| `sequential-thinking` | Y | Y | — | — | — | Y | Y | — | — | — |
-| `eslint` | — | — | — | Y | Y | Y | Y | Y | — | — |
-| `github` | — | — | — | — | — | — | Y | — | Y | Y |
-| `tavily` | Y | Y | Y | — | — | — | — | — | — | — |
-| `postgres` | — | Y | — | — | Y | Y | Y | Y | — | Y |
-| `graphql` | — | Y | — | Y | Y | — | Y | Y | Y | — |
-| `nats` | — | — | — | — | Y | — | — | — | — | — |
-| `typescript-diagnostics` | — | — | — | Y | Y | — | — | Y | — | — |
-| `playwright` | — | — | Y | Y | — | — | Y | Y | — | — |
-| `context7` | — | — | Y | Y | Y | — | — | — | — | Y |
+| MCP Server | Product | Arch | UX | PMO | FE | BE | DB | Security | QA | Docs | DevOps |
+|------------|---------|------|----|----|----|----|----|----|----------|----|----|
+| `memory` | Y | Y | — | — | — | — | — | Y | — | Y | — |
+| `sequential-thinking` | Y | Y | — | — | — | — | Y | Y | — | — | — |
+| `eslint` | — | — | — | — | Y | Y | Y | Y | Y | — | — |
+| `github` | — | — | — | — | — | — | — | Y | — | Y | Y |
+| `tavily` | Y | Y | Y | — | — | — | — | — | — | — | — |
+| `postgres` | — | Y | — | — | — | Y | Y | Y | Y | — | Y |
+| `graphql` | — | Y | — | — | Y | Y | — | Y | Y | Y | — |
+| `nats` | — | — | — | — | — | Y | — | — | — | — | — |
+| `typescript-diagnostics` | — | — | — | — | Y | Y | — | — | Y | — | — |
+| `playwright` | — | — | Y | — | Y | — | — | Y | Y | — | — |
+| `context7` | — | — | Y | — | Y | Y | — | — | — | — | Y |
 
 ### Core Skills (per Specialist)
 
@@ -53,6 +53,10 @@
 | Deploy-Validator | `docker-containerization` | `monitoring-expert` | — | — |
 | GitOps-Eng | `git-advanced-workflows` | `turborepo-caching` | — | — |
 | Observability-Eng | `distributed-tracing` | `monitoring-observability` | `grafana-dashboards` | — |
+| Wave-Planner | `executing-plans` | `task-decomposer` | `dispatching-parallel-agents` | — |
+| Risk-Dependency-Tracker | `task-coordination-strategies` | `checklist-discipline` | — | — |
+| Progress-Reporter | `project-management-guru-adhd` | `checklist-discipline` | — | — |
+| Resource-Monitor | `dispatching-parallel-agents` | `task-coordination-strategies` | — | — |
 
 ---
 
@@ -61,30 +65,31 @@
 ### Concurrency Math
 
 ```
-Wave 1 (3 Leads -> ~14 total agents):
-  ProductLead + ArchLead + UXLead
+Wave 1 (4 Leads -> ~18 total agents):
+  ProductLead + ArchLead + UXLead + PMOLead
   Each spawns 3-4 specialists internally
-  Concurrency: 3 leads + ~11 specialists = 14
+  Concurrency: 4 leads + ~15 specialists = 19
+  PMOLead plans execution for Waves 2+
 
-Wave 2 (5 Leads -> ~27 total agents):
-  FELead (4 specs) + BELead (5 specs) + DBLead (4 specs) + SecurityLead (4 specs) + QALead (5 specs)
-  Each spawns 4-5 specialists internally
-  Concurrency: 5 leads + ~22 specialists = 27
+Wave 2 (6 Leads -> ~28 total agents):
+  FELead (4) + API-Lead (2) + ServicesLead (3) + DBLead (4) + SecurityLead (4) + QALead (5)
+  Each spawns 2-5 specialists internally
+  Concurrency: 6 leads + ~22 specialists = 28
 
 Wave 3 (2 Leads -> ~9 total agents):
   DocLead (3 specs) + DevOpsLead (4 specs)
   Each spawns 3-4 specialists internally
   Concurrency: 2 leads + 7 specialists = 9
 
-TOTAL PEAK: ~27 concurrent agents (vs. 5 in flat model — 5.4x improvement)
-Specialist density ratio: 4.0:1 (40 specialists / 10 leads)
+TOTAL PEAK: ~28 concurrent agents (vs. 5 in flat model — 5.6x improvement)
+Specialist density ratio: 3.8:1 (46 specialists / 12 leads)
 ```
 
 ### Wave Dependencies
 
 ```mermaid
 graph LR
-    W1["Wave 1<br/>Planning<br/>3 Leads, ~14 agents"] --> W2["Wave 2<br/>Implementation<br/>5 Leads, ~27 agents"]
+    W1["Wave 1<br/>Planning + PMO<br/>4 Leads, ~19 agents"] --> W2["Wave 2<br/>Implementation<br/>6 Leads, ~28 agents"]
     W2 --> W3["Wave 3<br/>Finalization<br/>2 Leads, ~9 agents"]
     W3 --> W4["Wave 4<br/>Deploy<br/>Sequential"]
     W4 --> W5["Wave 5<br/>Post-Release<br/>Sequential"]
@@ -98,8 +103,8 @@ graph LR
 
 ### Wave Launch Rules
 
-- **Wave 1** launches ALL 3 Leads in a single message (3 parallel agents). Each Lead internally spawns its 3-4 specialists.
-- **Wave 2** launches AFTER Wave 1 approvals — all 5 Leads launch together. Each Lead internally spawns its specialists.
+- **Wave 1** launches ALL 4 Leads in a single message (4 parallel agents: Product + Arch + UX + PMO). PMOLead plans execution for Waves 2+. Each Lead internally spawns its 3-4 specialists.
+- **Wave 2** launches AFTER Wave 1 approvals — all 6 Leads launch together. Each Lead internally spawns its specialists.
 - **Wave 3** launches AFTER Wave 2 approvals — both Leads launch in parallel.
 - **Waves 4-5** are sequential (deploy then verify).
 - **Platform constraint:** Claude Code SDK supports max ~5 concurrent agents at the Orchestrator level. Since each Lead is one agent from the Orchestrator's perspective, and Leads spawn their own specialists internally, the hierarchy bypasses the 5-agent limit.
@@ -270,11 +275,11 @@ All agents in the 3-level hierarchy share access to 3 new MCP servers that provi
 
 ### MCP Tool Assignment Matrix (Updated)
 
-| MCP Server | Product | Arch | UX | FE | BE | DB | Security | QA | Docs | DevOps |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `hivemind` | Y | Y | — | Y | Y | Y | Y | Y | Y | Y |
-| `vector-memory` | — | Y | — | Y | Y | Y | Y | Y | Y | — |
-| `coordination-bridge` | — | — | — | Y | Y | Y | — | Y | — | Y |
+| MCP Server | Product | Arch | UX | PMO | FE | BE | DB | Security | QA | Docs | DevOps |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `hivemind` | Y | Y | — | — | Y | Y | Y | Y | Y | Y | Y |
+| `vector-memory` | — | Y | — | — | Y | Y | Y | Y | Y | Y | — |
+| `coordination-bridge` | — | — | — | — | Y | Y | Y | — | Y | — | Y |
 
 ### Configuration
 

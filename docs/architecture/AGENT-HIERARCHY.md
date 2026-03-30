@@ -2,23 +2,19 @@
 
 ## Context
 
-**Problem:** EduSphere currently uses a **flat orchestration model** — the Orchestrator spawns one agent per division directly, managing all 10+ agents itself. This creates a bottleneck: no division-internal quality gates, no specialist delegation, and the 5-agent concurrency limit caps total parallelism at 5.
+**3-level hierarchical agent model:** 12 divisions (excluding Orchestrator), each with a **Division Lead** + **2-5 Specialists**. Orchestrator communicates ONLY with Leads. Leads manage, delegate, verify, and report. ~5.6x parallelism improvement over flat model.
 
-**Goal:** Implement a **3-level hierarchical agent model** where each division (11 divisions, excluding Orchestrator) has a **Division Lead** + **2-5 Specialist agents**. The Orchestrator communicates ONLY with Division Leads. Leads manage, delegate, verify, and report. Each agent has pre-loaded Skills and MCP tools for its domain.
-
-**Outcome:** 5.8x parallelism improvement (5 to ~29 concurrent agents), division-level quality ownership, skills-equipped specialists, and cleaner Orchestrator focus.
-
-> **Note (2026-03-30):** The former BELead has been split into **API-Lead** (SDL/federation/contracts, 2 specialists) and **ServicesLead** (business logic/NATS/AI, 3 specialists). See [APILead.md](agent-prompts/APILead.md) and [ServicesLead.md](agent-prompts/ServicesLead.md). Cross-Lead sync windows are mandatory before Wave 2 specialists spawn — see [CROSS_LEAD_SYNC_PROTOCOL.md](../operations/CROSS_LEAD_SYNC_PROTOCOL.md).
+> **Notes:** BELead split into **API-Lead** (2 specs) + **ServicesLead** (3 specs) — see [APILead.md](agent-prompts/APILead.md), [ServicesLead.md](agent-prompts/ServicesLead.md), [CROSS_LEAD_SYNC_PROTOCOL.md](../operations/CROSS_LEAD_SYNC_PROTOCOL.md). **PMOLead** (Division 12) added for wave planning and execution coordination.
 
 ### 3-Level Hierarchy
 
 | Level | Role | Count | Responsibility |
 |-------|------|-------|----------------|
 | **Level 0** | Orchestrator | 1 | Coordinates Leads, tracks progress, communicates with user |
-| **Level 1** | Division Leads | 11 | Plans, delegates to specialists, verifies quality gates, reports |
-| **Level 2** | Specialists | 42+ | Implements code, tests, docs, security audits, deployments |
+| **Level 1** | Division Leads | 12 | Plans, delegates to specialists, verifies quality gates, reports |
+| **Level 2** | Specialists | 46+ | Implements code, tests, docs, security audits, deployments |
 
-**Specialist density ratio:** 3.8:1 (42 specialists / 11 leads)
+**Specialist density ratio:** 3.8:1 (46 specialists / 12 leads)
 
 **Related:** [Lead Protocols & Iron Rules](./AGENT-HIERARCHY-PROTOCOLS.md) | [Operations & Reference](./AGENT-HIERARCHY-OPERATIONS.md)
 
@@ -28,10 +24,11 @@
 graph TD
     O["ORCHESTRATOR<br/>Level 0 — Coordinator Only"]
 
-    subgraph W1["Wave 1 — Planning (3 Leads)"]
+    subgraph W1["Wave 1 — Planning (4 Leads)"]
         PL["ProductLead"]
         AL["ArchLead"]
         UL["UXLead"]
+        PMOL["PMOLead"]
     end
 
     subgraph W2["Wave 2 — Implementation (6 Leads)"]
@@ -51,6 +48,7 @@ graph TD
     O -->|"Brief"| PL
     O -->|"Brief"| AL
     O -->|"Brief"| UL
+    O -->|"Brief"| PMOL
     O -->|"Brief + W1 outputs"| FL
     O -->|"Brief + W1 outputs"| APIL
     O -->|"Brief + W1 outputs"| SVCL
@@ -69,6 +67,7 @@ graph TD
     DL --> DS1["Schema-Architect"] & DS2["QueryOptimizer"] & DS3["Migration-Eng"] & DS4["GraphDB-Specialist"]
     SL --> SS1["AppSec-Analyst"] & SS2["PenTest-Spec"] & SS3["AuthPrivacy-Eng"] & SS4["InfraSec-Specialist"]
     QL --> QS1["UnitInteg-Eng"] & QS2["E2EPlaywright-Eng"] & QS3["LoadCompat-Eng"] & QS4["Regression-Eng"] & QS5["Mobile-E2E-Eng"]
+    PMOL --> PMO1["Wave-Planner"] & PMO2["Risk-Dependency-Tracker"] & PMO3["Progress-Reporter"] & PMO4["Resource-Monitor"]
     DocL --> DoS1["APIDocs-Writer"] & DoS2["UserGuide-Writer"] & DoS3["ArchDocs-Writer"]
     DevL --> DeS1["CICD-Eng"] & DeS2["Deploy-Validator"] & DeS3["GitOps-Eng"] & DeS4["Observability-Eng"]
 
@@ -82,6 +81,7 @@ graph TD
     style DL fill:#45b7d1,color:#fff
     style SL fill:#45b7d1,color:#fff
     style QL fill:#45b7d1,color:#fff
+    style PMOL fill:#4ecdc4,color:#fff
     style DocL fill:#96ceb4,color:#fff
     style DevL fill:#96ceb4,color:#fff
 ```
@@ -131,31 +131,9 @@ sequenceDiagram
     deactivate L
 ```
 
-## Failure Handling State Machine
+## Failure Handling
 
-```mermaid
-stateDiagram-v2
-    [*] --> SpecialistRunning: Lead spawns specialist
-
-    SpecialistRunning --> SpecDone: Success
-    SpecialistRunning --> SpecFailed: Error/timeout
-
-    SpecFailed --> Retry1: attempt <= 2
-    Retry1 --> SpecialistRunning: Re-spawn with error context
-
-    SpecFailed --> LeadInvestigates: attempt > 2
-    LeadInvestigates --> SpecialistRunning: Root cause found, re-brief
-    LeadInvestigates --> EscalateToOrchestrator: Cross-division blocker
-
-    EscalateToOrchestrator --> OrchestratorFix: Spawn fix in blocking division
-    OrchestratorFix --> SpecialistRunning: Unblocked, re-run
-
-    SpecDone --> QualityGate
-    QualityGate --> DivisionComplete: All gates pass
-    QualityGate --> SpecialistRunning: Gate fails, re-assign
-
-    DivisionComplete --> [*]: Report to Orchestrator
-```
+**Retry flow:** Specialist fails -> Lead retries (max 2x with error context) -> if still failing, Lead investigates -> if cross-division blocker, escalate to Orchestrator -> Orchestrator spawns fix in blocking division -> re-run. Quality gate failure -> re-assign specialist.
 
 ## Per-Division Breakdown
 
@@ -294,3 +272,15 @@ stateDiagram-v2
 | Spec 4 | Observability-Eng | OpenTelemetry tracing, Jaeger architecture, Prometheus metrics, alert rules, SLA correlation | `distributed-tracing`, `monitoring-observability`, `grafana-dashboards` | `sequential-thinking`, `context7` |
 
 **Quality Gate:** `docker-compose build` succeeds. Health-check passes. 5 containers healthy. CI green. Blue-green followed. Traces flowing to Jaeger.
+
+### Division 12: PMO & Wave Management
+
+| Role | Agent | Produces | Skills | MCP Tools |
+|------|-------|----------|--------|-----------|
+| **Lead** | PMOLead | Wave execution plan, risk register, progress dashboards | `executing-plans`, `project-management-guru-adhd` | — (pure coordination) |
+| Spec 1 | Wave-Planner | Wave decomposition, agent assignment matrix, dependency graph | `executing-plans`, `task-decomposer`, `dispatching-parallel-agents` | — |
+| Spec 2 | Risk-Dependency-Tracker | Risk register, cross-division dependency map, blocker alerts | `task-coordination-strategies`, `checklist-discipline` | — |
+| Spec 3 | Progress-Reporter | Real-time progress dashboards, ETA projections, status summaries | `project-management-guru-adhd`, `checklist-discipline` | — |
+| Spec 4 | Resource-Monitor | Agent concurrency tracking, memory/OOM checks, sub-wave sizing | `dispatching-parallel-agents`, `task-coordination-strategies` | — |
+
+**Quality Gate:** Wave plan covers all divisions. Dependencies mapped. No circular blockers. Progress reported every 3 min. Resource limits respected (max 5 concurrent Leads).
