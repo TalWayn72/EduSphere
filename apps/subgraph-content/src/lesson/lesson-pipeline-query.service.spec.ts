@@ -36,8 +36,8 @@ function makeChain(rows: unknown[]) {
   return { from, where, orderBy, limit };
 }
 
-function makeChainNoLimit(rows: unknown[]) {
-  const orderBy = vi.fn().mockResolvedValue(rows);
+function _makeChainNoLimit(rows: unknown[]) {
+  const _orderBy = vi.fn().mockResolvedValue(rows);
   const limit = vi.fn().mockResolvedValue(rows);
   const where = vi.fn().mockReturnValue({ orderBy: vi.fn().mockReturnValue({ limit }) });
   const from = vi.fn().mockReturnValue({ where });

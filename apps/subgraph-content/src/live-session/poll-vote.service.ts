@@ -16,7 +16,7 @@ import {
 } from '@edusphere/db';
 import type { PollVotePayload } from '@edusphere/nats-client';
 
-import type { PollResults, PollOptionResult } from './poll.service.js';
+import type { PollResults } from './poll.service.js';
 
 const NATS_POLL_VOTED = 'EDUSPHERE.poll.voted';
 
