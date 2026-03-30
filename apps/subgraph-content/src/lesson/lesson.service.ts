@@ -20,26 +20,11 @@ import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions, NatsSubjects } from '@edusphere/nats-client';
 import type { LessonPayload } from '@edusphere/nats-client';
 
-export interface CreateLessonInput {
-  courseId: string;
-  moduleId?: string;
-  title: string;
-  type: 'THEMATIC' | 'SEQUENTIAL';
-  series?: string;
-  lessonDate?: string;
-  instructorId: string;
-}
+export type { CreateLessonInput, UpdateLessonInput, MappedLesson } from './lesson.helpers.js';
+export { mapLesson, UUID_REGEX } from './lesson.helpers.js';
 
-export interface UpdateLessonInput {
-  title?: string;
-  type?: 'THEMATIC' | 'SEQUENTIAL';
-  series?: string;
-  lessonDate?: string;
-  status?: 'DRAFT' | 'PROCESSING' | 'READY' | 'PUBLISHED';
-}
-
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { mapLesson, UUID_REGEX } from './lesson.helpers.js';
+import type { CreateLessonInput, UpdateLessonInput } from './lesson.helpers.js';
 
 @Injectable()
 export class LessonService implements OnModuleDestroy {
@@ -71,23 +56,6 @@ export class LessonService implements OnModuleDestroy {
       });
   }
 
-  private mapLesson(row: Record<string, unknown> | null | undefined) {
-    if (!row) return null;
-    return {
-      id: row['id'],
-      courseId: row['course_id'] ?? row['courseId'],
-      moduleId: row['module_id'] ?? row['moduleId'] ?? null,
-      title: row['title'],
-      type: row['type'],
-      series: row['series'] ?? null,
-      lessonDate: row['lesson_date'] ? String(row['lesson_date']) : null,
-      instructorId: row['instructor_id'] ?? row['instructorId'],
-      status: row['status'],
-      createdAt: row['created_at'] ? String(row['created_at']) : null,
-      updatedAt: row['updated_at'] ? String(row['updated_at']) : null,
-    };
-  }
-
   async findById(id: string, tenantCtx: TenantContext) {
     return withTenantContext(this.db, tenantCtx, async (db) => {
       const [row] = await db
@@ -101,7 +69,7 @@ export class LessonService implements OnModuleDestroy {
           )
         )
         .limit(1);
-      return this.mapLesson(row as Record<string, unknown>);
+      return mapLesson(row as Record<string, unknown>);
     });
   }
 
@@ -125,77 +93,14 @@ export class LessonService implements OnModuleDestroy {
         .orderBy(desc(schema.lessons.created_at))
         .limit(limit)
         .offset(offset);
-      return rows.map((r) => this.mapLesson(r as Record<string, unknown>));
+      return rows.map((r) => mapLesson(r as Record<string, unknown>));
     });
   }
 
   async create(input: CreateLessonInput, tenantCtx: TenantContext) {
-    if (!UUID_REGEX.test(input.courseId)) {
-      this.logger.warn(
-        `[LessonService] createLesson rejected: courseId "${input.courseId}" is not a valid UUID`
-      );
-      throw new BadRequestException(
-        'מזהה הקורס אינו תקין. ודא שהקורס קיים במערכת.'
-      );
-    }
-
-    if (!tenantCtx.tenantId) {
-      this.logger.error(
-        '[LessonService] createLesson rejected: tenantId is missing from auth context'
-      );
-      throw new BadRequestException(
-        'שגיאת אימות: חסר מזהה ארגון. נסה להתחבר מחדש.'
-      );
-    }
-
-    // Pre-validate: course exists and belongs to this tenant
-    const [course] = await this.db
-      .select({ id: schema.courses.id, tenant_id: schema.courses.tenant_id })
-      .from(schema.courses)
-      .where(
-        and(
-          eq(schema.courses.id, input.courseId),
-          isNull(schema.courses.deleted_at)
-        )
-      )
-      .limit(1);
-
-    if (!course) {
-      this.logger.warn(
-        `[LessonService] createLesson rejected: course "${input.courseId}" not found in DB`
-      );
-      throw new NotFoundException(
-        'הקורס לא נמצא. ייתכן שנמחק או שהמזהה שגוי.'
-      );
-    }
-
-    if (course.tenant_id !== tenantCtx.tenantId) {
-      this.logger.warn(
-        `[LessonService] createLesson rejected: course "${input.courseId}" belongs to tenant ` +
-          `"${course.tenant_id}" but request is from tenant "${tenantCtx.tenantId}"`
-      );
-      throw new BadRequestException(
-        'אין לך הרשאה ליצור שיעור בקורס זה.'
-      );
-    }
-
-    // Pre-validate: instructor (user) exists in users table
-    const [instructor] = await this.db
-      .select({ id: schema.users.id })
-      .from(schema.users)
-      .where(eq(schema.users.id, input.instructorId))
-      .limit(1);
-
-    if (!instructor) {
-      this.logger.warn(
-        `[LessonService] createLesson rejected: instructorId "${input.instructorId}" not found in users table. ` +
-          `This often happens when the Keycloak user ID (JWT sub) does not match any row in the users table. ` +
-          `Ensure user provisioning syncs Keycloak users to the DB.`
-      );
-      throw new BadRequestException(
-        'המשתמש לא נמצא במערכת. ייתכן שיש בעיית סנכרון עם מערכת ההזדהות.'
-      );
-    }
+    this.validateCreateInput(input, tenantCtx);
+    await this.validateCourseExists(input.courseId, tenantCtx);
+    await this.validateInstructorExists(input.instructorId);
 
     return withTenantContext(this.db, tenantCtx, async (db) => {
       let row: Record<string, unknown> | undefined;
@@ -215,34 +120,10 @@ export class LessonService implements OnModuleDestroy {
           })
           .returning()) as unknown as [Record<string, unknown>];
       } catch (err) {
-        const errMsg = String(err);
-        this.logger.error(
-          `[LessonService] Failed to create lesson for course "${input.courseId}" ` +
-            `(tenant: ${tenantCtx.tenantId}, instructor: ${input.instructorId}): ${errMsg}`
-        );
-
-        // Parse specific DB constraint violations for actionable messages
-        if (errMsg.includes('foreign key') && errMsg.includes('course_id')) {
-          throw new BadRequestException(
-            'הקורס לא נמצא במסד הנתונים.'
-          );
-        }
-        if (errMsg.includes('foreign key') && errMsg.includes('instructor_id')) {
-          throw new BadRequestException(
-            'המרצה לא נמצא במערכת. בדוק את סנכרון המשתמשים.'
-          );
-        }
-        if (errMsg.includes('foreign key') && errMsg.includes('tenant_id')) {
-          throw new BadRequestException(
-            'הארגון לא נמצא. נסה להתחבר מחדש.'
-          );
-        }
-        throw new BadRequestException(
-          'שגיאה ביצירת שיעור. נסה שוב או פנה לתמיכה.'
-        );
+        this.handleCreateError(err, input, tenantCtx);
       }
 
-      const lesson = this.mapLesson(row);
+      const lesson = mapLesson(row);
       this.logger.log(
         `[LessonService] Lesson created: ${String(row?.['id'])} - "${input.title}" ` +
           `(course: ${input.courseId}, tenant: ${tenantCtx.tenantId})`
@@ -256,7 +137,6 @@ export class LessonService implements OnModuleDestroy {
         timestamp: new Date().toISOString(),
       };
       this.publishEvent(NatsSubjects.LESSON_CREATED, payload);
-
       return lesson;
     });
   }
@@ -284,7 +164,7 @@ export class LessonService implements OnModuleDestroy {
             )
           )
           .returning();
-        return this.mapLesson(row as Record<string, unknown>);
+        return mapLesson(row as Record<string, unknown>);
       } catch (err) {
         this.logger.error(
           `[LessonService] Failed to update lesson "${id}": ${String(err)}`
@@ -333,7 +213,7 @@ export class LessonService implements OnModuleDestroy {
           )
           .returning();
 
-        const published = this.mapLesson(row as Record<string, unknown>);
+        const published = mapLesson(row as Record<string, unknown>);
         const payload: LessonPayload = {
           type: 'lesson.published',
           lessonId: id,
@@ -342,7 +222,6 @@ export class LessonService implements OnModuleDestroy {
           timestamp: new Date().toISOString(),
         };
         this.publishEvent(NatsSubjects.LESSON_PUBLISHED, payload);
-
         return published;
       } catch (err) {
         this.logger.error(
@@ -351,5 +230,71 @@ export class LessonService implements OnModuleDestroy {
         throw new BadRequestException('שגיאה בפרסום השיעור.');
       }
     });
+  }
+
+  // ─── Private validation helpers ───────────────────────────────────────────
+
+  private validateCreateInput(input: CreateLessonInput, tenantCtx: TenantContext): void {
+    if (!UUID_REGEX.test(input.courseId)) {
+      this.logger.warn(`[LessonService] createLesson rejected: invalid courseId "${input.courseId}"`);
+      throw new BadRequestException('מזהה הקורס אינו תקין. ודא שהקורס קיים במערכת.');
+    }
+    if (!tenantCtx.tenantId) {
+      this.logger.error('[LessonService] createLesson rejected: tenantId missing');
+      throw new BadRequestException('שגיאת אימות: חסר מזהה ארגון. נסה להתחבר מחדש.');
+    }
+  }
+
+  private async validateCourseExists(courseId: string, tenantCtx: TenantContext): Promise<void> {
+    const [course] = await this.db
+      .select({ id: schema.courses.id, tenant_id: schema.courses.tenant_id })
+      .from(schema.courses)
+      .where(and(eq(schema.courses.id, courseId), isNull(schema.courses.deleted_at)))
+      .limit(1);
+
+    if (!course) {
+      this.logger.warn(`[LessonService] createLesson rejected: course "${courseId}" not found in DB`);
+      throw new NotFoundException('הקורס לא נמצא. ייתכן שנמחק או שהמזהה שגוי.');
+    }
+    if (course.tenant_id !== tenantCtx.tenantId) {
+      this.logger.warn(
+        `[LessonService] createLesson rejected: course "${courseId}" belongs to tenant ` +
+          `"${course.tenant_id}" but request is from tenant "${tenantCtx.tenantId}"`
+      );
+      throw new BadRequestException('אין לך הרשאה ליצור שיעור בקורס זה.');
+    }
+  }
+
+  private async validateInstructorExists(instructorId: string): Promise<void> {
+    const [instructor] = await this.db
+      .select({ id: schema.users.id })
+      .from(schema.users)
+      .where(eq(schema.users.id, instructorId))
+      .limit(1);
+
+    if (!instructor) {
+      this.logger.warn(
+        `[LessonService] createLesson rejected: instructorId "${instructorId}" not found in users table.`
+      );
+      throw new BadRequestException('המשתמש לא נמצא במערכת. ייתכן שיש בעיית סנכרון עם מערכת ההזדהות.');
+    }
+  }
+
+  private handleCreateError(err: unknown, input: CreateLessonInput, tenantCtx: TenantContext): never {
+    const errMsg = String(err);
+    this.logger.error(
+      `[LessonService] Failed to create lesson for course "${input.courseId}" ` +
+        `(tenant: ${tenantCtx.tenantId}, instructor: ${input.instructorId}): ${errMsg}`
+    );
+    if (errMsg.includes('foreign key') && errMsg.includes('course_id')) {
+      throw new BadRequestException('הקורס לא נמצא במסד הנתונים.');
+    }
+    if (errMsg.includes('foreign key') && errMsg.includes('instructor_id')) {
+      throw new BadRequestException('המרצה לא נמצא במערכת. בדוק את סנכרון המשתמשים.');
+    }
+    if (errMsg.includes('foreign key') && errMsg.includes('tenant_id')) {
+      throw new BadRequestException('הארגון לא נמצא. נסה להתחבר מחדש.');
+    }
+    throw new BadRequestException('שגיאה ביצירת שיעור. נסה שוב או פנה לתמיכה.');
   }
 }

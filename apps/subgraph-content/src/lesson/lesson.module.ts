@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LessonResolver } from './lesson.resolver';
 import { LessonService } from './lesson.service';
+import { LessonQueryService } from './lesson-query.service';
 import { LessonAssetService } from './lesson-asset.service';
 import { LessonPipelineService } from './lesson-pipeline.service';
 import { LessonPipelineQueryService } from './lesson-pipeline-query.service';
@@ -24,6 +25,7 @@ import { LessonPipelineTemplateResolver } from './lesson-pipeline-template.resol
     LessonPipelineFieldResolver,
     LessonPipelineRunFieldResolver,
     LessonService,
+    LessonQueryService,
     LessonAssetService,
     LessonPipelineService,
     LessonPipelineQueryService,
@@ -41,6 +43,6 @@ import { LessonPipelineTemplateResolver } from './lesson-pipeline-template.resol
     LessonPipelineTemplateService,
     LessonPipelineTemplateResolver,
   ],
-  exports: [LessonService, LessonAssetService, LessonPipelineService, LessonPlanService, LessonPipelineTemplateService],
+  exports: [LessonService, LessonQueryService, LessonAssetService, LessonPipelineService, LessonPlanService, LessonPipelineTemplateService],
 })
 export class LessonModule {}

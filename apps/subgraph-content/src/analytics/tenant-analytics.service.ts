@@ -1,3 +1,8 @@
+/**
+ * TenantAnalyticsService — Orchestrates analytics queries and report generation.
+ * Delegates aggregation to TenantAnalyticsAggregationService.
+ * File-size compliance: <300 lines.
+ */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -14,8 +19,8 @@ import type {
   CohortMetricsDto,
   AnalyticsPeriod,
   DailyMetric,
-  TopCourse,
 } from './tenant-analytics.types.js';
+import { TenantAnalyticsAggregationService } from './tenant-analytics-aggregation.service.js';
 
 function periodToDays(period: AnalyticsPeriod): number {
   switch (period) {
@@ -32,6 +37,10 @@ function periodToDays(period: AnalyticsPeriod): number {
 export class TenantAnalyticsService implements OnModuleDestroy {
   private readonly logger = new Logger(TenantAnalyticsService.name);
   private readonly db = createDatabaseConnection();
+
+  constructor(
+    private readonly aggregation: TenantAnalyticsAggregationService,
+  ) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
@@ -51,7 +60,6 @@ export class TenantAnalyticsService implements OnModuleDestroy {
 
     const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
 
-    // For NINETY_DAYS, try snapshot cache first
     if (period === 'NINETY_DAYS') {
       try {
         const snapshots = await withTenantContext(
@@ -71,7 +79,7 @@ export class TenantAnalyticsService implements OnModuleDestroy {
           }
         );
         if (snapshots.length > 0) {
-          return this.buildDtoFromSnapshots(tenantId, period, snapshots, cutoff);
+          return this.buildDtoFromSnapshots(tenantId, period, snapshots);
         }
       } catch (err) {
         this.logger.warn(
@@ -82,11 +90,11 @@ export class TenantAnalyticsService implements OnModuleDestroy {
 
     const [totalEnrollments, activeLearnersTrend, completionRateTrend, avgLearningVelocity, topCourses] =
       await Promise.all([
-        this.getTotalEnrollments(tenantId, userId, cutoff),
-        this.getActiveLearnersTrend(tenantId, userId, cutoff),
-        this.getCompletionRateTrend(tenantId, userId, cutoff),
-        this.getAvgLearningVelocity(tenantId, userId, cutoff),
-        this.getTopCourses(tenantId, userId, cutoff),
+        this.aggregation.getTotalEnrollments(this.db, tenantId, userId, cutoff),
+        this.aggregation.getActiveLearnersTrend(this.db, tenantId, userId, cutoff),
+        this.aggregation.getCompletionRateTrend(this.db, tenantId, userId, cutoff),
+        this.aggregation.getAvgLearningVelocity(this.db, tenantId, userId, cutoff),
+        this.aggregation.getTopCourses(this.db, tenantId, userId, cutoff),
       ]);
 
     return {
@@ -104,7 +112,6 @@ export class TenantAnalyticsService implements OnModuleDestroy {
     tenantId: string,
     period: AnalyticsPeriod,
     snapshots: typeof schema.tenantAnalyticsSnapshots.$inferSelect[],
-    _cutoff: Date
   ): TenantAnalyticsDto {
     const activeLearnersTrend: DailyMetric[] = snapshots.map((s) => ({
       date: String(s.snapshotDate),
@@ -125,152 +132,6 @@ export class TenantAnalyticsService implements OnModuleDestroy {
       completionRateTrend,
       topCourses: [],
     };
-  }
-
-  private async getTotalEnrollments(
-    tenantId: string,
-    userId: string,
-    cutoff: Date
-  ): Promise<number> {
-    const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
-    return withTenantContext(this.db, ctx, async (tx) => {
-      const [row] = await tx
-        .select({ total: count() })
-        .from(schema.userCourses)
-        .where(
-          and(
-            sql`EXISTS (SELECT 1 FROM courses WHERE courses.id = ${schema.userCourses.courseId} AND courses.tenant_id = ${tenantId}::uuid)`,
-            sql`${schema.userCourses.enrolledAt} >= ${cutoff}`
-          )
-        );
-      return Number(row?.total ?? 0);
-    });
-  }
-
-  private async getActiveLearnersTrend(
-    tenantId: string,
-    userId: string,
-    cutoff: Date
-  ): Promise<DailyMetric[]> {
-    const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
-    return withTenantContext(this.db, ctx, async (tx) => {
-      const rows = await tx
-        .select({
-          date: sql<string>`DATE(${schema.userProgress.lastAccessedAt})`,
-          value: sql<number>`COUNT(DISTINCT ${schema.userProgress.userId})`,
-        })
-        .from(schema.userProgress)
-        .where(sql`${schema.userProgress.lastAccessedAt} >= ${cutoff}`)
-        .groupBy(sql`DATE(${schema.userProgress.lastAccessedAt})`);
-
-      return rows.map((r) => ({
-        date: String(r.date),
-        value: Number(r.value),
-      }));
-    });
-  }
-
-  private async getCompletionRateTrend(
-    tenantId: string,
-    userId: string,
-    cutoff: Date
-  ): Promise<DailyMetric[]> {
-    const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
-    return withTenantContext(this.db, ctx, async (tx) => {
-      const rows = await tx
-        .select({
-          date: sql<string>`DATE(${schema.userCourses.enrolledAt})`,
-          enrollments: sql<number>`COUNT(*)`,
-          completions: sql<number>`COUNT(${schema.userCourses.completedAt})`,
-        })
-        .from(schema.userCourses)
-        .where(
-          and(
-            sql`EXISTS (SELECT 1 FROM courses WHERE courses.id = ${schema.userCourses.courseId} AND courses.tenant_id = ${tenantId}::uuid)`,
-            sql`${schema.userCourses.enrolledAt} >= ${cutoff}`
-          )
-        )
-        .groupBy(sql`DATE(${schema.userCourses.enrolledAt})`);
-
-      return rows.map((r) => {
-        const enrollments = Number(r.enrollments);
-        const completions = Number(r.completions);
-        return {
-          date: String(r.date),
-          value: enrollments > 0 ? Math.round((completions / enrollments) * 1000) / 10 : 0,
-        };
-      });
-    });
-  }
-
-  private async getAvgLearningVelocity(
-    tenantId: string,
-    userId: string,
-    cutoff: Date
-  ): Promise<number> {
-    const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
-    try {
-      return await withTenantContext(this.db, ctx, async (tx) => {
-        const [row] = await tx
-          .select({
-            avgVelocity: avg(schema.userLearningVelocity.lessonsCompleted),
-          })
-          .from(schema.userLearningVelocity)
-          .where(
-            and(
-              sql`${schema.userLearningVelocity.tenantId} = ${tenantId}::uuid`,
-              sql`${schema.userLearningVelocity.weekStart} >= ${cutoff.toISOString().split('T')[0]}`
-            )
-          );
-        return Math.round(Number(row?.avgVelocity ?? 0) * 10) / 10;
-      });
-    } catch (err) {
-      this.logger.warn(
-        `[TenantAnalyticsService] userLearningVelocity not available: ${String(err)}`
-      );
-      return 0.0;
-    }
-  }
-
-  private async getTopCourses(
-    tenantId: string,
-    userId: string,
-    cutoff: Date
-  ): Promise<TopCourse[]> {
-    const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
-    return withTenantContext(this.db, ctx, async (tx) => {
-      const rows = await tx
-        .select({
-          courseId: schema.userCourses.courseId,
-          enrollmentCount: count(),
-          completions: sql<number>`COUNT(${schema.userCourses.completedAt})`,
-        })
-        .from(schema.userCourses)
-        .where(
-          and(
-            sql`EXISTS (SELECT 1 FROM courses WHERE courses.id = ${schema.userCourses.courseId} AND courses.tenant_id = ${tenantId}::uuid)`,
-            sql`${schema.userCourses.enrolledAt} >= ${cutoff}`
-          )
-        )
-        .groupBy(schema.userCourses.courseId);
-
-      return rows
-        .sort((a, b) => Number(b.enrollmentCount) - Number(a.enrollmentCount))
-        .slice(0, 10)
-        .map((r) => {
-          const enrollmentCount = Number(r.enrollmentCount);
-          const completions = Number(r.completions);
-          return {
-            courseId: r.courseId,
-            title: r.courseId, // title resolved via DataLoader in resolver layer
-            enrollmentCount,
-            completionRate:
-              enrollmentCount > 0
-                ? Math.round((completions / enrollmentCount) * 1000) / 10
-                : 0,
-          };
-        });
-    });
   }
 
   async getLearnerVelocity(
@@ -301,7 +162,7 @@ export class TenantAnalyticsService implements OnModuleDestroy {
 
         return sorted.map((r) => ({
           userId: r.userId,
-          displayName: `User ${r.userId.slice(0, 8)}`, // GDPR: no raw email, use displayName from users table
+          displayName: `User ${r.userId.slice(0, 8)}`,
           avgLessonsPerWeek: Math.round(Number(r.avgLessons ?? 0) * 10) / 10,
           totalWeeks: Number(r.totalWeeks),
         }));
@@ -326,7 +187,6 @@ export class TenantAnalyticsService implements OnModuleDestroy {
     const ctx = { tenantId, userId, userRole: 'ORG_ADMIN' as const };
 
     return withTenantContext(this.db, ctx, async (tx) => {
-      // Group enrollments by ISO week
       const cohortRows = await tx
         .select({
           cohortWeek: sql<string>`TO_CHAR(DATE_TRUNC('week', ${schema.userCourses.enrolledAt}), 'IYYY-"W"IW')`,

@@ -12,9 +12,13 @@ import {
 import { AnnotationItem } from './AnnotationItem';
 import { AnnotationForm } from './AnnotationForm';
 import { AnnotationMergeRequestModal } from './AnnotationMergeRequestModal';
+import { AnnotationFilterControls } from './AnnotationFilterControls';
+import {
+  buildAnnotationTree,
+  formatTimestamp,
+  createAnnotation,
+} from './annotation-helpers';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 
 interface AnnotationPanelProps {
   contentId: string;
@@ -43,92 +47,44 @@ export function AnnotationPanel({
   const [proposingId, setProposingId] = useState<string | null>(null);
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
 
-  // Filter annotations by enabled layers
   const filteredAnnotations = useMemo(() => {
     return filterAnnotationsByLayers(annotations, enabledLayers);
   }, [annotations, enabledLayers]);
 
-  // Sort annotations
   const sortedAnnotations = useMemo(() => {
     const sorted = [...filteredAnnotations];
     if (sortBy === 'timestamp') {
-      sorted.sort(
-        (a, b) => (a.contentTimestamp || 0) - (b.contentTimestamp || 0)
-      );
+      sorted.sort((a, b) => (a.contentTimestamp || 0) - (b.contentTimestamp || 0));
     } else {
-      sorted.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
     return sorted;
   }, [filteredAnnotations, sortBy]);
 
-  // Get annotation counts
   const annotationCounts = useMemo(() => {
     return getAnnotationCountByLayer(annotations);
   }, [annotations]);
 
-  // Toggle layer visibility
   const toggleLayer = (layer: AnnotationLayer) => {
     setEnabledLayers((prev) =>
       prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]
     );
   };
 
-  // Add new annotation
-  const handleAddAnnotation = (
-    content: string,
-    layer: AnnotationLayer,
-    timestamp?: number
-  ) => {
-    const newAnnotation: Annotation = {
-      id: `ann-${Date.now()}`,
-      content,
-      layer,
-      userId: currentUserId,
-      userName: 'You',
-      userRole: currentUserRole,
-      timestamp: timestamp ? formatTimestamp(timestamp) : '',
-      contentId,
-      contentTimestamp: timestamp,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      replies: [],
-    };
-
+  const handleAddAnnotation = (content: string, layer: AnnotationLayer, timestamp?: number) => {
+    const newAnnotation = createAnnotation(
+      content, layer, currentUserId, currentUserRole, contentId,
+      timestamp ? formatTimestamp(timestamp) : '', timestamp
+    );
     setAnnotations((prev) => [...prev, newAnnotation]);
     setIsAddingNew(false);
   };
 
-  // Add reply
-  const handleReply = (
-    parentId: string,
-    content: string,
-    layer: AnnotationLayer
-  ) => {
-    const reply: Annotation = {
-      id: `ann-${Date.now()}`,
-      content,
-      layer,
-      userId: currentUserId,
-      userName: 'You',
-      userRole: currentUserRole,
-      timestamp: '',
-      contentId,
-      parentId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      replies: [],
-    };
-
-    setAnnotations((prev) => {
-      const updated = [...prev, reply];
-      return buildAnnotationTree(updated);
-    });
+  const handleReply = (parentId: string, content: string, layer: AnnotationLayer) => {
+    const reply = createAnnotation(content, layer, currentUserId, currentUserRole, contentId, '', undefined, parentId);
+    setAnnotations((prev) => buildAnnotationTree([...prev, reply]));
   };
 
-  // Edit annotation
   const handleEdit = (annotationId: string, newContent: string) => {
     setAnnotations((prev) =>
       prev.map((ann) =>
@@ -139,20 +95,14 @@ export function AnnotationPanel({
     );
   };
 
-  // Delete annotation
   const handleDelete = (annotationId: string) => {
     setAnnotations((prev) =>
-      prev.filter(
-        (ann) => ann.id !== annotationId && ann.parentId !== annotationId
-      )
+      prev.filter((ann) => ann.id !== annotationId && ann.parentId !== annotationId)
     );
   };
 
-  // Submit merge request
   const handleMergeRequestSubmit = (description: string) => {
     if (!proposingId) return;
-    // In production this would call a GraphQL mutation.
-    // For now we mark it as submitted locally.
     if (import.meta.env.DEV) {
       console.debug('[AnnotationPanel] Merge request submitted:', {
         annotationId: proposingId,
@@ -173,56 +123,15 @@ export function AnnotationPanel({
             {isAddingNew ? 'Cancel' : '+ New Annotation'}
           </Button>
         </div>
-
-        {/* Layer Filters */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Layers</Label>
-          <div className="grid grid-cols-2 gap-2">
-            {Object.values(AnnotationLayer).map((layer) => {
-              const config = ANNOTATION_LAYER_CONFIGS[layer];
-              const count = annotationCounts[layer] || 0;
-              return (
-                <div key={layer} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`layer-${layer}`}
-                    checked={enabledLayers.includes(layer)}
-                    onCheckedChange={() => toggleLayer(layer)}
-                  />
-                  <Label
-                    htmlFor={`layer-${layer}`}
-                    className="text-sm cursor-pointer flex items-center gap-1"
-                  >
-                    <span>{config.icon}</span>
-                    <span className={config.color}>{config.label}</span>
-                    <span className="text-gray-400 dark:text-slate-400">({count})</span>
-                  </Label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Sort Options */}
-        <div className="flex gap-2 text-sm">
-          <Label className="self-center">Sort by:</Label>
-          <Button
-            variant={sortBy === 'timestamp' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setSortBy('timestamp')}
-          >
-            Timestamp
-          </Button>
-          <Button
-            variant={sortBy === 'recent' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setSortBy('recent')}
-          >
-            Most Recent
-          </Button>
-        </div>
+        <AnnotationFilterControls
+          enabledLayers={enabledLayers}
+          annotationCounts={annotationCounts}
+          sortBy={sortBy}
+          onToggleLayer={toggleLayer}
+          onSortChange={setSortBy}
+        />
       </div>
 
-      {/* Add New Annotation Form */}
       {isAddingNew && (
         <div className="p-4 bg-white border-b dark:bg-gray-900">
           <AnnotationForm
@@ -234,12 +143,9 @@ export function AnnotationPanel({
         </div>
       )}
 
-      {/* Merge Request Modal */}
       {proposingId && (
         <AnnotationMergeRequestModal
-          annotationContent={
-            annotations.find((a) => a.id === proposingId)?.content ?? ''
-          }
+          annotationContent={annotations.find((a) => a.id === proposingId)?.content ?? ''}
           onSubmit={handleMergeRequestSubmit}
           onCancel={() => setProposingId(null)}
         />
@@ -256,10 +162,7 @@ export function AnnotationPanel({
           sortedAnnotations.map((annotation) => (
             <div key={annotation.id}>
               {submittedIds.has(annotation.id) && (
-                <p
-                  className="text-xs text-indigo-600 mb-1 ml-1 dark:text-indigo-400"
-                  data-testid={`merge-submitted-${annotation.id}`}
-                >
+                <p className="text-xs text-indigo-600 mb-1 ml-1 dark:text-indigo-400" data-testid={`merge-submitted-${annotation.id}`}>
                   Proposal submitted — pending instructor review.
                 </p>
               )}
@@ -270,65 +173,17 @@ export function AnnotationPanel({
                 onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onPropose={
-                  submittedIds.has(annotation.id)
-                    ? undefined
-                    : (id) => setProposingId(id)
-                }
+                onPropose={submittedIds.has(annotation.id) ? undefined : (id) => setProposingId(id)}
               />
             </div>
           ))
         )}
       </div>
 
-      {/* Footer Stats */}
       <div className="p-3 bg-white dark:bg-slate-800 border-t text-xs text-gray-500 dark:text-slate-400 flex justify-between">
-        <span>
-          {sortedAnnotations.length} of {annotations.length} annotations visible
-        </span>
-        <span>
-          {enabledLayers.length} of {Object.keys(AnnotationLayer).length} layers
-          enabled
-        </span>
+        <span>{sortedAnnotations.length} of {annotations.length} annotations visible</span>
+        <span>{enabledLayers.length} of {Object.keys(AnnotationLayer).length} layers enabled</span>
       </div>
     </div>
   );
-}
-
-// Utility function to rebuild annotation tree
-function buildAnnotationTree(annotations: Annotation[]): Annotation[] {
-  const annotationMap = new Map<string, Annotation>();
-  const result: Annotation[] = [];
-
-  // First pass: create map
-  annotations.forEach((ann) => {
-    annotationMap.set(ann.id, { ...ann, replies: [] });
-  });
-
-  // Second pass: build relationships
-  annotations.forEach((ann) => {
-    const annotation = annotationMap.get(ann.id)!;
-    if (ann.parentId) {
-      const parent = annotationMap.get(ann.parentId);
-      if (parent) {
-        parent.replies = parent.replies || [];
-        parent.replies.push(annotation);
-      }
-    } else {
-      result.push(annotation);
-    }
-  });
-
-  return result;
-}
-
-function formatTimestamp(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-
-  if (hours > 0) {
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  }
-  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }

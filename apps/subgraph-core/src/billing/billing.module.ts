@@ -6,6 +6,7 @@ import { YauCounterService } from './yau-counter.service.js';
 import { YauEnforcementService } from './yau-enforcement.service.js';
 import { SubscriptionService } from './subscription.service.js';
 import { PilotService } from './pilot.service.js';
+import { PilotApprovalService } from './pilot-approval.service.js';
 import { TenantUsageService } from './tenant-usage.service.js';
 import { PlatformStatsService } from './platform-stats.service.js';
 import { StripeInvoiceService } from './stripe-invoice.service.js';
@@ -17,6 +18,7 @@ import { BillingQueryResolver, BillingMutationResolver } from './billing.resolve
     YauEnforcementService,
     SubscriptionService,
     PilotService,
+    PilotApprovalService,
     TenantUsageService,
     PlatformStatsService,
     StripeInvoiceService,

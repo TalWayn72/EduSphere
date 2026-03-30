@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
+import { UserAdminService } from './user-admin.service';
 import { UserStatsService } from './user-stats.service';
 import { UserPreferencesService } from './user-preferences.service';
 import { PublicProfileService } from './public-profile.service';
@@ -14,6 +15,7 @@ import { CompetencyGoalService } from './competency-goal.service';
   providers: [
     UserResolver,
     UserService,
+    UserAdminService,
     UserStatsService,
     UserPreferencesService,
     PublicProfileService,
@@ -25,6 +27,7 @@ import { CompetencyGoalService } from './competency-goal.service';
   ],
   exports: [
     UserService,
+    UserAdminService,
     UserStatsService,
     UserPreferencesService,
     PublicProfileService,

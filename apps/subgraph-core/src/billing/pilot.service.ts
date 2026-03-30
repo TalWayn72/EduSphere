@@ -1,13 +1,10 @@
 /**
- * pilot.service.ts — B2B pilot request workflow.
+ * pilot.service.ts — B2B pilot request submission.
  *
  * submitPilotRequest: public endpoint — validates input, inserts pilot_requests,
  *   emits 'pilot.request_submitted' NATS event.
- * approvePilotRequest: SUPER_ADMIN — creates tenant + pilot subscription,
- *   updates pilot_request status, emits 'pilot.approved'.
- * rejectPilotRequest: SUPER_ADMIN — marks request rejected.
- * listPilotRequests: SUPER_ADMIN — paginated list by status.
  *
+ * Approval/rejection/listing delegated to PilotApprovalService.
  * Memory safety: OnModuleDestroy drains NATS + closes DB pools.
  */
 import {
@@ -15,8 +12,6 @@ import {
   Logger,
   OnModuleDestroy,
   BadRequestException,
-  NotFoundException,
-  UnauthorizedException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import {
@@ -30,14 +25,10 @@ import type { Database, PilotRequest, TenantContext } from '@edusphere/db';
 import { connect } from 'nats';
 import type { NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
-import { PilotRequestSchema, RejectPilotSchema } from './billing.schemas.js';
-import { SubscriptionService } from './subscription.service.js';
+import { PilotRequestSchema } from './billing.schemas.js';
+import { PilotApprovalService } from './pilot-approval.service.js';
 
 const SUBJ_SUBMITTED = 'EDUSPHERE.pilot.request_submitted';
-const SUBJ_APPROVED = 'EDUSPHERE.pilot.approved';
-const SUBJ_REJECTED = 'EDUSPHERE.pilot.rejected';
-
-const PILOT_DURATION_DAYS = 90;
 
 @Injectable()
 export class PilotService implements OnModuleDestroy {
@@ -45,7 +36,7 @@ export class PilotService implements OnModuleDestroy {
   private readonly db: Database;
   private nats: NatsConnection | null = null;
 
-  constructor(private readonly subscriptionService: SubscriptionService) {
+  constructor(private readonly approvalService: PilotApprovalService) {
     this.db = createDatabaseConnection();
     this.initNats().catch((err) =>
       this.logger.warn({ err }, '[PilotService] NATS init skipped (non-fatal)')
@@ -92,14 +83,10 @@ export class PilotService implements OnModuleDestroy {
       .limit(1);
 
     if (existing) {
-      // SC-07 (T-12): Prevent email enumeration — return the same success path
-      // regardless of whether the email already has a pending request.
-      // Log server-side only; never expose "already exists" to the caller.
       this.logger.log(
         { contactEmail: data.contactEmail },
         '[PilotService] Duplicate pilot request suppressed (email enumeration prevention)'
       );
-      // Return a stable PENDING_APPROVAL response without exposing the duplicate
       return {
         id: existing.id,
         orgName: data.orgName,
@@ -146,185 +133,23 @@ export class PilotService implements OnModuleDestroy {
 
     this.logger.log(
       { requestId: created.id, orgName: created.orgName },
-      // SC-07: Always log as PENDING_APPROVAL (generic status for audit trail)
       '[PilotService] Pilot request submitted — status: PENDING_APPROVAL'
     );
 
     return created;
   }
 
-  /**
-   * SUPER_ADMIN: approve a pilot request, provision tenant + subscription.
-   */
-  async approvePilotRequest(
-    requestId: string,
-    approvedByUserId: string,
-    ctx: TenantContext
-  ): Promise<void> {
-    if (ctx.userRole !== 'SUPER_ADMIN') {
-      throw new UnauthorizedException('Only SUPER_ADMIN can approve pilot requests');
-    }
-
-    const [request] = await this.db
-      .select()
-      .from(schema.pilotRequests)
-      .where(eq(schema.pilotRequests.id, requestId))
-      .limit(1);
-
-    if (!request) {
-      throw new NotFoundException(`Pilot request ${requestId} not found`);
-    }
-    if (request.status !== 'pending') {
-      throw new BadRequestException(
-        `Pilot request is already ${request.status}`
-      );
-    }
-
-    // SC-04 (T-04): Self-approval prevention — approver's tenantId must not match
-    // the target tenant. SUPER_ADMIN accounts on the platform have a platform tenantId;
-    // if somehow a SUPER_ADMIN has the same tenantId as the org being approved,
-    // that would be a conflict of interest (self-approval of pilot).
-    if (ctx.tenantId && request.tenantId && ctx.tenantId === request.tenantId) {
-      throw new BadRequestException(
-        'Self-approval of own organization\'s pilot request is not permitted'
-      );
-    }
-
-    // Provision new tenant
-    const tenantSlug = request.orgName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .substring(0, 63);
-
-    const [newTenant] = await this.db
-      .insert(schema.tenants)
-      .values({
-        name: request.orgName,
-        slug: `${tenantSlug}-${Date.now()}`,
-        plan: 'STARTER',
-      })
-      .returning();
-
-    if (!newTenant) {
-      throw new InternalServerErrorException('[PilotService] Failed to provision tenant');
-    }
-
-    // Find or fallback to first active plan for pilot
-    const [pilotPlan] = await this.db
-      .select()
-      .from(schema.subscriptionPlans)
-      .where(eq(schema.subscriptionPlans.isActive, true))
-      .limit(1);
-
-    if (!pilotPlan) {
-      throw new InternalServerErrorException('[PilotService] No active subscription plan found');
-    }
-
-    const pilotEndsAt = new Date();
-    pilotEndsAt.setDate(pilotEndsAt.getDate() + PILOT_DURATION_DAYS);
-
-    const superCtx: TenantContext = {
-      tenantId: newTenant.id,
-      userId: approvedByUserId,
-      userRole: 'SUPER_ADMIN',
-    };
-
-    await this.subscriptionService.createPilotSubscription(
-      newTenant.id,
-      pilotPlan.id,
-      pilotEndsAt,
-      superCtx
-    );
-
-    // Update pilot request status
-    await this.db
-      .update(schema.pilotRequests)
-      .set({
-        status: 'approved',
-        approvedAt: new Date(),
-        tenantId: newTenant.id,
-        pilotEndsAt,
-      })
-      .where(eq(schema.pilotRequests.id, requestId));
-
-    this.publish(SUBJ_APPROVED, {
-      requestId,
-      tenantId: newTenant.id,
-      orgName: request.orgName,
-      contactEmail: request.contactEmail,
-      pilotEndsAt: pilotEndsAt.toISOString(),
-      approvedByUserId,
-      timestamp: new Date().toISOString(),
-    });
-
-    this.logger.log(
-      { requestId, tenantId: newTenant.id },
-      '[PilotService] Pilot request approved and tenant provisioned'
-    );
+  // Delegation methods — forwarded to PilotApprovalService
+  async approvePilotRequest(requestId: string, approvedByUserId: string, ctx: TenantContext) {
+    return this.approvalService.approvePilotRequest(requestId, approvedByUserId, ctx);
   }
 
-  /**
-   * SUPER_ADMIN: reject a pilot request.
-   */
-  async rejectPilotRequest(
-    requestId: string,
-    reason: string | undefined,
-    ctx: TenantContext
-  ): Promise<void> {
-    if (ctx.userRole !== 'SUPER_ADMIN') {
-      throw new UnauthorizedException('Only SUPER_ADMIN can reject pilot requests');
-    }
-
-    const validated = RejectPilotSchema.safeParse({ requestId, reason });
-    if (!validated.success) {
-      throw new BadRequestException(validated.error.message);
-    }
-
-    const [request] = await this.db
-      .select({ id: schema.pilotRequests.id, status: schema.pilotRequests.status })
-      .from(schema.pilotRequests)
-      .where(eq(schema.pilotRequests.id, requestId))
-      .limit(1);
-
-    if (!request) {
-      throw new NotFoundException(`Pilot request ${requestId} not found`);
-    }
-    if (request.status !== 'pending') {
-      throw new BadRequestException(
-        `Pilot request is already ${request.status}`
-      );
-    }
-
-    await this.db
-      .update(schema.pilotRequests)
-      .set({ status: 'rejected', notes: reason })
-      .where(eq(schema.pilotRequests.id, requestId));
-
-    this.publish(SUBJ_REJECTED, {
-      requestId,
-      reason: reason ?? null,
-      timestamp: new Date().toISOString(),
-    });
-
-    this.logger.log({ requestId }, '[PilotService] Pilot request rejected');
+  async rejectPilotRequest(requestId: string, reason: string | undefined, ctx: TenantContext) {
+    return this.approvalService.rejectPilotRequest(requestId, reason, ctx);
   }
 
-  /**
-   * SUPER_ADMIN: list pilot requests optionally filtered by status.
-   */
-  async listPilotRequests(status?: string): Promise<PilotRequest[]> {
-    if (status) {
-      return this.db
-        .select()
-        .from(schema.pilotRequests)
-        .where(eq(schema.pilotRequests.status, status))
-        .orderBy(schema.pilotRequests.created_at);
-    }
-    return this.db
-      .select()
-      .from(schema.pilotRequests)
-      .orderBy(schema.pilotRequests.created_at);
+  async listPilotRequests(status?: string) {
+    return this.approvalService.listPilotRequests(status);
   }
 
   private publish(subject: string, payload: Record<string, unknown>): void {

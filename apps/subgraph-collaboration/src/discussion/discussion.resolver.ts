@@ -1,3 +1,8 @@
+/**
+ * DiscussionResolver — Query, Mutation, Subscription, and Discussion field resolvers.
+ * DiscussionMessage and DiscussionParticipant field resolvers are in discussion-field.resolver.ts.
+ * Re-exports all resolver classes for backward-compatible imports.
+ */
 import type { IncomingMessage } from 'http';
 import {
   Resolver,
@@ -21,6 +26,9 @@ import {
   type AddMessageInput,
 } from './discussion.schemas';
 
+// Re-export field resolvers for backward-compatible imports
+export { DiscussionMessageResolver, DiscussionParticipantResolver } from './discussion-field.resolver';
+
 interface GraphQLContext {
   req: IncomingMessage;
   authContext?: AuthContext;
@@ -30,18 +38,6 @@ interface DiscussionRow {
   id: string;
   course_id: string;
   creator_id: string;
-}
-
-interface MessageRow {
-  id: string;
-  discussion_id: string;
-  user_id: string;
-  parent_message_id: string | null;
-}
-
-interface ParticipantRow {
-  discussion_id: string;
-  user_id: string;
 }
 
 @Resolver('Discussion')
@@ -74,10 +70,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findDiscussionsByCourse(
-      courseId,
-      limit,
-      offset,
-      context.authContext
+      courseId, limit, offset, context.authContext
     );
   }
 
@@ -89,9 +82,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findDiscussionsByUser(
-      limit,
-      offset,
-      context.authContext
+      limit, offset, context.authContext
     );
   }
 
@@ -104,10 +95,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findMessagesByDiscussion(
-      discussionId,
-      limit,
-      offset,
-      context.authContext
+      discussionId, limit, offset, context.authContext
     );
   }
 
@@ -118,10 +106,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     const validated = createDiscussionInputSchema.parse(input);
-    return this.discussionService.createDiscussion(
-      validated,
-      context.authContext
-    );
+    return this.discussionService.createDiscussion(validated, context.authContext);
   }
 
   @Mutation('addMessage')
@@ -133,16 +118,11 @@ export class DiscussionResolver {
     if (!context.authContext) throw new Error('Unauthenticated');
     const validated = addMessageInputSchema.parse(input);
     const message = await this.discussionService.addMessage(
-      discussionId,
-      validated,
-      context.authContext
+      discussionId, validated, context.authContext
     );
-
-    // Publish to subscription
     this.pubSub.publish(`messageAdded_${discussionId}`, {
       messageAdded: message,
     });
-
     return message;
   }
 
@@ -152,10 +132,7 @@ export class DiscussionResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.joinDiscussion(
-      discussionId,
-      context.authContext
-    );
+    return this.discussionService.joinDiscussion(discussionId, context.authContext);
   }
 
   @Mutation('leaveDiscussion')
@@ -164,10 +141,7 @@ export class DiscussionResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.leaveDiscussion(
-      discussionId,
-      context.authContext
-    );
+    return this.discussionService.leaveDiscussion(discussionId, context.authContext);
   }
 
   @Mutation('generateDiscussionSummary')
@@ -176,29 +150,18 @@ export class DiscussionResolver {
     @Context() context: GraphQLContext,
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-
-    // Fetch the discussion to get title
     const discussion = await this.discussionService.findDiscussionById(
-      discussionId,
-      context.authContext,
+      discussionId, context.authContext,
     );
-
-    // Fetch last 50 messages
     const messages = await this.discussionService.findMessagesByDiscussion(
-      discussionId,
-      50,
-      0,
-      context.authContext,
+      discussionId, 50, 0, context.authContext,
     );
-
     const messageDtos = messages.map((m: { content: string; user_id: string }) => ({
       content: m.content,
       userId: m.user_id,
     }));
-
     return this.discussionInsightsService.summarizeThread(
-      messageDtos,
-      (discussion as { title: string }).title,
+      messageDtos, (discussion as { title: string }).title,
     );
   }
 
@@ -207,7 +170,6 @@ export class DiscussionResolver {
     return this.pubSub.subscribe(`messageAdded_${discussionId}`);
   }
 
-  // Field resolvers
   @ResolveField('course')
   resolveCourse(@Parent() discussion: DiscussionRow) {
     return { __typename: 'Course', id: discussion.course_id };
@@ -227,10 +189,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findMessagesByDiscussion(
-      discussion.id,
-      limit,
-      offset,
-      context.authContext
+      discussion.id, limit, offset, context.authContext
     );
   }
 
@@ -241,8 +200,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findParticipantsByDiscussion(
-      discussion.id,
-      context.authContext
+      discussion.id, context.authContext
     );
   }
 
@@ -253,8 +211,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.countParticipants(
-      discussion.id,
-      context.authContext
+      discussion.id, context.authContext
     );
   }
 
@@ -265,94 +222,7 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.countMessages(
-      discussion.id,
-      context.authContext
+      discussion.id, context.authContext
     );
-  }
-}
-
-@Resolver('DiscussionMessage')
-export class DiscussionMessageResolver {
-  private readonly logger = new Logger(DiscussionMessageResolver.name);
-
-  constructor(private readonly discussionService: DiscussionService) {}
-
-  @ResolveField('discussion')
-  async resolveDiscussion(
-    @Parent() message: MessageRow,
-    @Context() context: GraphQLContext
-  ) {
-    if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.findDiscussionById(
-      message.discussion_id,
-      context.authContext
-    );
-  }
-
-  @ResolveField('user')
-  resolveUser(@Parent() message: MessageRow) {
-    return { __typename: 'User', id: message.user_id };
-  }
-
-  @ResolveField('parentMessage')
-  async resolveParentMessage(
-    @Parent() message: MessageRow,
-    @Context() context: GraphQLContext
-  ) {
-    if (!message.parent_message_id) return null;
-    if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.findMessageById(
-      message.parent_message_id,
-      context.authContext
-    );
-  }
-
-  @ResolveField('replies')
-  async resolveReplies(
-    @Parent() message: MessageRow,
-    @Args('limit') limit: number = 20,
-    @Args('offset') offset: number = 0,
-    @Context() context: GraphQLContext
-  ) {
-    if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.findRepliesByParent(
-      message.id,
-      limit,
-      offset,
-      context.authContext
-    );
-  }
-
-  @ResolveField('replyCount')
-  async resolveReplyCount(
-    @Parent() message: MessageRow,
-    @Context() context: GraphQLContext
-  ) {
-    if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.countReplies(message.id, context.authContext);
-  }
-}
-
-@Resolver('DiscussionParticipant')
-export class DiscussionParticipantResolver {
-  private readonly logger = new Logger(DiscussionParticipantResolver.name);
-
-  constructor(private readonly discussionService: DiscussionService) {}
-
-  @ResolveField('discussion')
-  async resolveDiscussion(
-    @Parent() participant: ParticipantRow,
-    @Context() context: GraphQLContext
-  ) {
-    if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.findDiscussionById(
-      participant.discussion_id,
-      context.authContext
-    );
-  }
-
-  @ResolveField('user')
-  resolveUser(@Parent() participant: ParticipantRow) {
-    return { __typename: 'User', id: participant.user_id };
   }
 }

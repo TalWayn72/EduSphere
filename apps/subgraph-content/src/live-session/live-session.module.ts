@@ -4,6 +4,7 @@ import { LiveSessionService } from './live-session.service';
 import { LiveSessionRecordingService } from './live-session-recording.service';
 import { BreakoutService } from './breakout.service';
 import { PollService } from './poll.service';
+import { PollVoteService } from './poll-vote.service';
 import { LiveSessionExtensionsResolver } from './live-session-extensions.resolver';
 
 @Module({
@@ -13,6 +14,7 @@ import { LiveSessionExtensionsResolver } from './live-session-extensions.resolve
     LiveSessionService,
     BreakoutService,
     PollService,
+    PollVoteService,
     LiveSessionExtensionsResolver,
   ],
   exports: [LiveSessionService, LiveSessionRecordingService, BreakoutService, PollService],

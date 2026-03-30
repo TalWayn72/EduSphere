@@ -1,105 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  LayoutDashboard,
-  BookOpen,
-  Compass,
-  Network,
-  Bot,
-  Video,
-  Settings,
-  Sun,
-  Moon,
-  Brain,
-  ChevronLeft,
-  ChevronRight,
-  Trophy,
-  BarChart2,
-  Award,
-  FileQuestion,
-  Target,
-  MessageSquare,
-  Users,
-  Search,
-  Star,
-  ClipboardList,
-  Swords,
-  UserCheck,
-  Lightbulb,
-  HelpCircle,
-} from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
 import { getCurrentUser } from '@/lib/auth';
-
-const SIDEBAR_KEY = 'edusphere-sidebar-collapsed';
-
-interface NavItem {
-  to: string;
-  icon: React.ElementType;
-  labelKey: string;
-}
-
-interface NavGroup {
-  key: string;
-  headingKey: string;
-  items: NavItem[];
-  /** Roles that can see this group. If empty/undefined, visible to all. */
-  allowedRoles?: Set<string>;
-}
-
-/** Learning group — visible to all authenticated users */
-const LEARNING_ITEMS: NavItem[] = [
-  { to: '/dashboard', icon: LayoutDashboard, labelKey: 'home' },
-  { to: '/courses', icon: BookOpen, labelKey: 'myCourses' },
-  { to: '/explore', icon: Compass, labelKey: 'discover' },
-  { to: '/knowledge-graph', icon: Network, labelKey: 'knowledgeGraph' },
-  { to: '/agents', icon: Bot, labelKey: 'aiTutor' },
-  { to: '/sessions', icon: Video, labelKey: 'liveSessions' },
-  { to: '/srs-review', icon: Brain, labelKey: 'srsReview' },
-  { to: '/skills', icon: Target, labelKey: 'skillPaths' },
-  { to: '/gamification', icon: Trophy, labelKey: 'gamification' },
-  { to: '/certificates', icon: Award, labelKey: 'certificates' },
-];
-
-/** Social group — visible to all authenticated users */
-const SOCIAL_ITEMS: NavItem[] = [
-  { to: '/discussions', icon: MessageSquare, labelKey: 'discussions' },
-  { to: '/social', icon: Users, labelKey: 'socialFeed' },
-  { to: '/people', icon: Search, labelKey: 'findPeople' },
-  { to: '/challenges', icon: Swords, labelKey: 'groupChallenges' },
-];
-
-/** Teaching group — INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN */
-const TEACHING_ITEMS: NavItem[] = [
-  { to: '/quiz-builder', icon: FileQuestion, labelKey: 'quizBuilder' },
-  { to: '/assessments', icon: ClipboardList, labelKey: 'assessments' },
-  { to: '/peer-review', icon: Star, labelKey: 'peerReview' },
-  { to: '/peer-matching', icon: UserCheck, labelKey: 'peerMatching' },
-];
-
-/** Analytics group — INSTRUCTOR, RESEARCHER, ORG_ADMIN, SUPER_ADMIN */
-const ANALYTICS_ITEMS: NavItem[] = [
-  { to: '/manager', icon: BarChart2, labelKey: 'managerDashboard' },
-  { to: '/cohort-insights', icon: Lightbulb, labelKey: 'cohortInsights' },
-];
-
-const TEACHING_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
-const ANALYTICS_ROLES = new Set(['INSTRUCTOR', 'RESEARCHER', 'MANAGER', 'ORG_ADMIN', 'SUPER_ADMIN']);
-
-const NAV_GROUPS: NavGroup[] = [
-  { key: 'learning', headingKey: 'groupLearning', items: LEARNING_ITEMS },
-  { key: 'social', headingKey: 'groupSocial', items: SOCIAL_ITEMS },
-  { key: 'teaching', headingKey: 'groupTeaching', items: TEACHING_ITEMS, allowedRoles: TEACHING_ROLES },
-  { key: 'analytics', headingKey: 'groupAnalytics', items: ANALYTICS_ITEMS, allowedRoles: ANALYTICS_ROLES },
-];
-
-function getInitials(firstName?: string, lastName?: string, username?: string): string {
-  const f = firstName?.[0] ?? '';
-  const l = lastName?.[0] ?? '';
-  return (f + l).toUpperCase() || (username?.[0] ?? 'U').toUpperCase();
-}
+import { NAV_GROUPS, SIDEBAR_KEY } from './SidebarNavGroups';
+import { SidebarFooter } from './SidebarFooter';
 
 export function AppSidebar() {
   const { t } = useTranslation('nav');
@@ -117,7 +23,6 @@ export function AppSidebar() {
   const user = getCurrentUser();
   const userRole = user?.role ?? 'STUDENT';
 
-  /** Filter nav groups by the current user's role */
   const visibleGroups = useMemo(
     () =>
       NAV_GROUPS.filter(
@@ -137,12 +42,6 @@ export function AppSidebar() {
   useEffect(() => {
     document.documentElement.style.setProperty('--sidebar-w', collapsed ? '64px' : '240px');
   }, [collapsed]);
-
-  const toggleCollapsed = () => setCollapsed((prev) => !prev);
-
-  const toggleTheme = () => {
-    setThemeMode(resolvedMode === 'dark' ? 'light' : 'dark');
-  };
 
   return (
     <aside
@@ -184,13 +83,11 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Main nav — grouped by role */}
+      {/* Main nav -- grouped by role */}
       <nav id="main-nav" className="flex-1 overflow-y-auto py-2" aria-label="Main navigation">
         {visibleGroups.map((group, groupIdx) => (
           <div key={group.key} data-testid={`nav-group-${group.key}`}>
-            {/* Group separator (not before first group) */}
             {groupIdx > 0 && <hr className="border-border mx-4 my-2" />}
-            {/* Group heading — hidden when collapsed */}
             {!collapsed && (
               <p
                 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider px-5 pt-2 pb-1"
@@ -225,114 +122,16 @@ export function AppSidebar() {
         ))}
       </nav>
 
-      {/* Divider */}
       <hr className="border-border mx-4" />
 
-      {/* Bottom section */}
-      <div className="py-3 flex flex-col gap-1">
-        {/* WCAG 3.2.6 — Consistent Help: Help & Support link appears in the same
-            location (bottom of sidebar) on every page that uses this navigation. */}
-        <NavLink
-          to="/help"
-          title={collapsed ? t('helpAndSupport') : undefined}
-          data-testid="nav-item-help"
-          aria-label={t('helpAndSupport')}
-          className={({ isActive }) =>
-            [
-              'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
-              'transition-colors hover:bg-muted/60',
-              isActive
-                ? 'bg-primary/10 text-primary font-semibold border-s-2 border-primary'
-                : 'text-muted-foreground border-s-2 border-transparent',
-            ].join(' ')
-          }
-        >
-          <HelpCircle className="h-4 w-4 shrink-0" aria-hidden />
-          {!collapsed && <span>{t('helpAndSupport')}</span>}
-        </NavLink>
-
-        {/* Settings */}
-        <NavLink
-          to="/settings"
-          title={collapsed ? t('settings') : undefined}
-          data-testid="nav-item-settings"
-          className={({ isActive }) =>
-            [
-              'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
-              'transition-colors hover:bg-muted/60',
-              isActive
-                ? 'bg-primary/10 text-primary font-semibold border-s-2 border-primary'
-                : 'text-muted-foreground border-s-2 border-transparent',
-            ].join(' ')
-          }
-        >
-          <Settings className="h-4 w-4 shrink-0" aria-hidden />
-          {!collapsed && <span>{t('settings')}</span>}
-        </NavLink>
-
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          title={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
-          data-testid="theme-toggle"
-          className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60 transition-colors border-s-2 border-transparent"
-          aria-label={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
-        >
-          {resolvedMode === 'dark' ? (
-            <Sun className="h-4 w-4 shrink-0" aria-hidden />
-          ) : (
-            <Moon className="h-4 w-4 shrink-0" aria-hidden />
-          )}
-          {!collapsed && (
-            <span>{resolvedMode === 'dark' ? t('lightMode') : t('darkMode')}</span>
-          )}
-        </button>
-
-        {/* User avatar */}
-        {user && (
-          <div
-            className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2"
-            data-testid="sidebar-user"
-            title={collapsed ? `${user.firstName} ${user.lastName}` : undefined}
-          >
-            <div
-              className="h-7 w-7 shrink-0 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold"
-              aria-hidden
-            >
-              {getInitials(user.firstName, user.lastName, user.username)}
-            </div>
-            {!collapsed && (
-              <span className="text-xs font-medium text-foreground truncate" data-testid="sidebar-user-name">
-                {user.firstName || user.username}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Powered-by footer — hidden when white-label branding suppresses it */}
-        {!branding.hideEduSphereBranding && !collapsed && (
-          <div className="mx-2 px-3 py-1" data-testid="powered-by-edusphere">
-            <span className="text-xs text-muted-foreground/60">{t('poweredBy')}</span>
-          </div>
-        )}
-
-        {/* Collapse toggle */}
-        <button
-          onClick={toggleCollapsed}
-          data-testid="sidebar-collapse-toggle"
-          aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
-          className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted/60 transition-colors border-s-2 border-transparent"
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
-              <span>{t('collapse')}</span>
-            </>
-          )}
-        </button>
-      </div>
+      <SidebarFooter
+        collapsed={collapsed}
+        resolvedMode={resolvedMode}
+        user={user}
+        hideEduSphereBranding={!!branding.hideEduSphereBranding}
+        onToggleCollapse={() => setCollapsed((prev) => !prev)}
+        onToggleTheme={() => setThemeMode(resolvedMode === 'dark' ? 'light' : 'dark')}
+      />
     </aside>
   );
 }

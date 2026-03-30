@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AnalyticsResolver } from './analytics.resolver.js';
 import { AnalyticsService } from './analytics.service.js';
 import { AiUsageService } from './ai-usage.service.js';
+import { TenantAnalyticsAggregationService } from './tenant-analytics-aggregation.service.js';
 import { TenantAnalyticsService } from './tenant-analytics.service.js';
 import { TenantAnalyticsExportService } from './tenant-analytics-export.service.js';
 import { TenantAnalyticsResolver } from './tenant-analytics.resolver.js';
@@ -14,6 +15,7 @@ import { AtRiskResolver } from './at-risk.resolver.js';
     AnalyticsResolver,
     AnalyticsService,
     AiUsageService,
+    TenantAnalyticsAggregationService,
     TenantAnalyticsService,
     TenantAnalyticsExportService,
     TenantAnalyticsResolver,

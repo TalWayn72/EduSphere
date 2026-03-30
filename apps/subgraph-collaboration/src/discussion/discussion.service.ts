@@ -1,67 +1,34 @@
+/**
+ * DiscussionService — Facade that delegates to DiscussionThreadService
+ * and DiscussionMessageService. Preserves the original public API
+ * so that all existing imports continue to work unchanged.
+ */
 import {
   Injectable,
-  Logger,
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
   OnModuleDestroy,
 } from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  schema,
-  eq,
-  and,
-  desc,
-  inArray,
-  withTenantContext,
-  sql,
-  closeAllPools,
-  type Database,
-  type TenantContext,
-} from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import type {
   CreateDiscussionInput,
   AddMessageInput,
 } from './discussion.schemas';
+import { DiscussionThreadService } from './discussion-thread.service';
+import { DiscussionMessageService } from './discussion-message.service';
 
 @Injectable()
 export class DiscussionService implements OnModuleDestroy {
-  private readonly logger = new Logger(DiscussionService.name);
-  private db: Database;
-
-  constructor() {
-    this.db = createDatabaseConnection();
-  }
+  constructor(
+    private readonly threads: DiscussionThreadService,
+    private readonly messages: DiscussionMessageService,
+  ) {}
 
   async onModuleDestroy(): Promise<void> {
-    await closeAllPools();
+    await this.threads.onModuleDestroy();
   }
 
-  private toTenantContext(authContext: AuthContext): TenantContext {
-    return {
-      tenantId: authContext.tenantId || '',
-      userId: authContext.userId,
-      userRole: authContext.roles[0] || 'STUDENT',
-    };
-  }
-
-  // Discussions
+  // Thread operations
   async findDiscussionById(id: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const [discussion] = await tx
-        .select()
-        .from(schema.discussions)
-        .where(eq(schema.discussions.id, id))
-        .limit(1);
-
-      if (!discussion) {
-        throw new NotFoundException(`Discussion ${id} not found`);
-      }
-
-      return discussion;
-    });
+    return this.threads.findDiscussionById(id, authContext);
   }
 
   async findDiscussionsByCourse(
@@ -70,90 +37,29 @@ export class DiscussionService implements OnModuleDestroy {
     offset: number,
     authContext: AuthContext
   ) {
-    const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      return tx
-        .select()
-        .from(schema.discussions)
-        .where(eq(schema.discussions.course_id, courseId))
-        .orderBy(desc(schema.discussions.created_at))
-        .limit(limit)
-        .offset(offset);
-    });
+    return this.threads.findDiscussionsByCourse(courseId, limit, offset, authContext);
   }
 
-  async createDiscussion(
-    input: CreateDiscussionInput,
-    authContext: AuthContext
-  ) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const values: Record<string, unknown> = {
-        tenant_id: authContext.tenantId || '',
-        course_id: input.courseId,
-        title: input.title,
-        creator_id: authContext.userId,
-        discussion_type: input.discussionType,
-      };
-
-      if (input.description) {
-        values.description = input.description;
-      }
-
-      const [discussion] = await tx
-        .insert(schema.discussions)
-        .values(values as never)
-        .returning();
-
-      // Auto-join creator as participant
-      await tx.insert(schema.discussion_participants).values({
-        discussion_id: discussion.id,
-        user_id: authContext.userId,
-      });
-
-      this.logger.log(
-        `Discussion created: ${discussion.id} by user ${authContext.userId}`
-      );
-      return discussion;
-    });
+  async createDiscussion(input: CreateDiscussionInput, authContext: AuthContext) {
+    return this.threads.createDiscussion(input, authContext);
   }
 
-  // Messages
+  async findDiscussionsByUser(limit: number, offset: number, authContext: AuthContext) {
+    return this.threads.findDiscussionsByUser(limit, offset, authContext);
+  }
+
+  // Message operations
   async findMessagesByDiscussion(
     discussionId: string,
     limit: number,
     offset: number,
     authContext: AuthContext
   ) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Verify discussion exists and user has access
-      await this.findDiscussionById(discussionId, authContext);
-
-      return tx
-        .select()
-        .from(schema.discussion_messages)
-        .where(eq(schema.discussion_messages.discussion_id, discussionId))
-        .orderBy(desc(schema.discussion_messages.created_at))
-        .limit(limit)
-        .offset(offset);
-    });
+    return this.messages.findMessagesByDiscussion(discussionId, limit, offset, authContext);
   }
 
   async findMessageById(id: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const [message] = await tx
-        .select()
-        .from(schema.discussion_messages)
-        .where(eq(schema.discussion_messages.id, id))
-        .limit(1);
-
-      return message || null;
-    });
+    return this.messages.findMessageById(id, authContext);
   }
 
   async findRepliesByParent(
@@ -162,30 +68,11 @@ export class DiscussionService implements OnModuleDestroy {
     offset: number,
     authContext: AuthContext
   ) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      return tx
-        .select()
-        .from(schema.discussion_messages)
-        .where(eq(schema.discussion_messages.parent_message_id, parentId))
-        .orderBy(desc(schema.discussion_messages.created_at))
-        .limit(limit)
-        .offset(offset);
-    });
+    return this.messages.findRepliesByParent(parentId, limit, offset, authContext);
   }
 
   async countReplies(parentId: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const result = await tx
-        .select({ count: sql<number>`count(*)::int` })
-        .from(schema.discussion_messages)
-        .where(eq(schema.discussion_messages.parent_message_id, parentId));
-
-      return result[0]?.count || 0;
-    });
+    return this.messages.countReplies(parentId, authContext);
   }
 
   async addMessage(
@@ -193,191 +80,27 @@ export class DiscussionService implements OnModuleDestroy {
     input: AddMessageInput,
     authContext: AuthContext
   ) {
-    // SEC-3: maxLength 2000 — enforce content length limit
-    if (input.content.length > 2000) {
-      throw new BadRequestException('Message content exceeds 2000 character limit');
-    }
-    // SEC-3: Sanitize — strip all HTML tags to prevent stored XSS
-    const sanitizedContent = input.content.replace(/<[^>]*>/g, '').trim();
-    const sanitizedInput = { ...input, content: sanitizedContent };
-
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Verify discussion exists
-      await this.findDiscussionById(discussionId, authContext);
-
-      // Verify parent message exists if specified
-      if (input.parentMessageId) {
-        const parent = await this.findMessageById(
-          input.parentMessageId,
-          authContext
-        );
-        if (!parent) {
-          throw new NotFoundException(
-            `Parent message ${input.parentMessageId} not found`
-          );
-        }
-      }
-
-      const messageValues: Record<string, unknown> = {
-        discussion_id: discussionId,
-        user_id: authContext.userId,
-        content: sanitizedInput.content,
-        message_type: sanitizedInput.messageType,
-      };
-
-      if (input.parentMessageId) {
-        messageValues.parent_message_id = input.parentMessageId;
-      }
-
-      const [message] = await tx
-        .insert(schema.discussion_messages)
-        .values(messageValues as never)
-        .returning();
-
-      this.logger.log(
-        `Message added: ${message.id} in discussion ${discussionId}`
-      );
-      return message;
-    });
-  }
-
-  // Participants
-  async findParticipantsByDiscussion(
-    discussionId: string,
-    authContext: AuthContext
-  ) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Verify discussion exists
-      await this.findDiscussionById(discussionId, authContext);
-
-      return tx
-        .select()
-        .from(schema.discussion_participants)
-        .where(eq(schema.discussion_participants.discussion_id, discussionId));
-    });
-  }
-
-  async countParticipants(discussionId: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const result = await tx
-        .select({ count: sql<number>`count(*)::int` })
-        .from(schema.discussion_participants)
-        .where(eq(schema.discussion_participants.discussion_id, discussionId));
-
-      return result[0]?.count || 0;
-    });
-  }
-
-  async findDiscussionsByUser(
-    limit: number,
-    offset: number,
-    authContext: AuthContext
-  ) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Find discussion IDs where user is a participant
-      const participations = await tx
-        .select({ discussion_id: schema.discussion_participants.discussion_id })
-        .from(schema.discussion_participants)
-        .where(eq(schema.discussion_participants.user_id, authContext.userId));
-
-      if (participations.length === 0) return [];
-
-      const ids = participations.map((p) => p.discussion_id);
-
-      return tx
-        .select()
-        .from(schema.discussions)
-        .where(inArray(schema.discussions.id, ids))
-        .orderBy(desc(schema.discussions.created_at))
-        .limit(limit)
-        .offset(offset);
-    });
+    return this.messages.addMessage(discussionId, input, authContext);
   }
 
   async countMessages(discussionId: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
+    return this.messages.countMessages(discussionId, authContext);
+  }
 
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      const result = await tx
-        .select({ count: sql<number>`count(*)::int` })
-        .from(schema.discussion_messages)
-        .where(eq(schema.discussion_messages.discussion_id, discussionId));
+  // Participant operations
+  async findParticipantsByDiscussion(discussionId: string, authContext: AuthContext) {
+    return this.threads.findParticipantsByDiscussion(discussionId, authContext);
+  }
 
-      return result[0]?.count || 0;
-    });
+  async countParticipants(discussionId: string, authContext: AuthContext) {
+    return this.threads.countParticipants(discussionId, authContext);
   }
 
   async joinDiscussion(discussionId: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Verify discussion exists
-      await this.findDiscussionById(discussionId, authContext);
-
-      // Check if already a participant
-      const [existing] = await tx
-        .select()
-        .from(schema.discussion_participants)
-        .where(
-          and(
-            eq(schema.discussion_participants.discussion_id, discussionId),
-            eq(schema.discussion_participants.user_id, authContext.userId)
-          )
-        )
-        .limit(1);
-
-      if (existing) {
-        return true; // Already joined
-      }
-
-      await tx.insert(schema.discussion_participants).values({
-        discussion_id: discussionId,
-        user_id: authContext.userId,
-      });
-
-      this.logger.log(
-        `User ${authContext.userId} joined discussion ${discussionId}`
-      );
-      return true;
-    });
+    return this.threads.joinDiscussion(discussionId, authContext);
   }
 
   async leaveDiscussion(discussionId: string, authContext: AuthContext) {
-    const tenantCtx = this.toTenantContext(authContext);
-
-    return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Verify discussion exists
-      const discussion = await this.findDiscussionById(
-        discussionId,
-        authContext
-      );
-
-      // Prevent creator from leaving
-      if (discussion.creator_id === authContext.userId) {
-        throw new ForbiddenException('Discussion creator cannot leave');
-      }
-
-      await tx
-        .delete(schema.discussion_participants)
-        .where(
-          and(
-            eq(schema.discussion_participants.discussion_id, discussionId),
-            eq(schema.discussion_participants.user_id, authContext.userId)
-          )
-        );
-
-      this.logger.log(
-        `User ${authContext.userId} left discussion ${discussionId}`
-      );
-      return true;
-    });
+    return this.threads.leaveDiscussion(discussionId, authContext);
   }
 }
