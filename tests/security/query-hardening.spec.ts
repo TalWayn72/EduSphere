@@ -83,8 +83,10 @@ describe('GraphQL Query Complexity Middleware (apps/gateway/src/middleware/query
 
 // ─── Gateway: Query Hardening Rules Applied ───────────────────────────────────
 
-describe('Gateway: Query Hardening Rules Applied (apps/gateway/src/index.ts)', () => {
-  const content = readFile('apps/gateway/src/index.ts');
+describe('Gateway: Query Hardening Rules Applied (apps/gateway/src/gateway-plugins.ts)', () => {
+  // Plugins were extracted from src/index.ts to src/gateway-plugins.ts
+  const content = readFile('apps/gateway/src/gateway-plugins.ts');
+  const indexContent = readFile('apps/gateway/src/index.ts');
 
   it('gateway imports depthLimitRule', () => {
     expect(content).toContain('depthLimitRule');
@@ -106,8 +108,8 @@ describe('Gateway: Query Hardening Rules Applied (apps/gateway/src/index.ts)', (
   });
 
   it('gateway passes rules via createGatewayRuntime plugins', () => {
-    expect(content).toContain('createGatewayRuntime');
-    expect(content).toContain('plugins');
+    expect(indexContent).toContain('createGatewayRuntime');
+    expect(indexContent).toContain('plugins');
   });
 
   it('gateway applies depthLimitRule() via addValidationRule', () => {

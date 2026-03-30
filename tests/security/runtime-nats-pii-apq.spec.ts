@@ -56,9 +56,10 @@ describe('SI-7: NATS TLS enforcement — services use buildNatsOptions()', () =>
     expect(content).toContain("@edusphere/nats-client");
   });
 
-  it('subgraph-content LiveSessionService imports buildNatsOptions from @edusphere/nats-client', () => {
+  it('subgraph-content AtRiskFlagService imports buildNatsOptions from @edusphere/nats-client', () => {
+    // NATS usage moved from LiveSessionService to AtRiskFlagService
     const content = readFile(
-      'apps/subgraph-content/src/live-session/live-session.service.ts',
+      'apps/subgraph-content/src/at-risk/at-risk-flag.service.ts',
     );
     expect(content).toBeTruthy();
     expect(content).toContain("buildNatsOptions");
@@ -83,11 +84,11 @@ describe('SI-7: NATS TLS enforcement — services use buildNatsOptions()', () =>
     expect(bareConnectLines).toHaveLength(0);
   });
 
-  it('subgraph-content LiveSessionService uses buildNatsOptions() in publishNatsEvent', () => {
+  it('subgraph-content AtRiskFlagService uses buildNatsOptions() in connect', () => {
     const content = readFile(
-      'apps/subgraph-content/src/live-session/live-session.service.ts',
+      'apps/subgraph-content/src/at-risk/at-risk-flag.service.ts',
     );
-    // The publishNatsEvent method must call buildNatsOptions()
+    // The service must call buildNatsOptions() before connect
     expect(content).toMatch(/connect\(buildNatsOptions\(\)\)/);
   });
 

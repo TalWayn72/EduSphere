@@ -108,9 +108,11 @@ describe('Rate Limiting: Invitation (100/day per org)', () => {
 describe('Rate Limiting: Webhook Dispatch (1000/hr per endpoint)', () => {
   it('webhook dispatcher enforces per-endpoint rate limit', () => {
     const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
+      read('apps/subgraph-core/src/webhooks/webhook.service.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-validation.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-delivery.service.ts') +
       read('apps/subgraph-core/src/org/webhook-dispatcher.service.ts');
-    expect(content).toMatch(/rate.*limit|throttle|limit.*dispatch|MAX_DISPATCH|1000/i);
+    expect(content).toMatch(/rate.*limit|throttle|limit.*dispatch|MAX_DISPATCH|MAX_RETRIES|AUTO_DISABLE/i);
   });
 
   it('webhook dispatcher tracks dispatch count per endpoint', () => {

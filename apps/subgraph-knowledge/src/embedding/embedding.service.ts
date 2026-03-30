@@ -18,6 +18,9 @@ const BATCH_SIZE = 20;
  * Facade -- delegates to EmbeddingStoreService + EmbeddingProviderService.
  * Falls back to EmbeddingFallbackService when sub-services are not injected
  * (unit-test path: spec mocks @edusphere/db and constructs with new EmbeddingService()).
+ *
+ * SI-9 / OWASP LLM06: All vector search operations require TenantContext
+ * to enforce RLS on pgvector queries via withTenantContext in the store layer.
  */
 @Injectable()
 export class EmbeddingService implements OnModuleDestroy {

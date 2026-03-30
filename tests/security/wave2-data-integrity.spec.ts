@@ -129,7 +129,8 @@ describe('BE-2: AgentService Promise.race timeout', () => {
 // BE-3: adminUsers uses COUNT(*) not O(N)
 // ---------------------------------------------------------------------------
 describe('BE-3: adminUsers uses COUNT(*)', () => {
-  const src = read('apps/subgraph-core/src/user/user.service.ts');
+  // Admin logic extracted from user.service.ts to user-admin.service.ts
+  const src = read('apps/subgraph-core/src/user/user-admin.service.ts');
 
   it('adminUsers uses count(*) SQL aggregate', () => {
     expect(src).toMatch(/count\s*\(\s*\*\s*\)/i);

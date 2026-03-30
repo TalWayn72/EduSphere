@@ -180,14 +180,16 @@ describe('Webhook Security: HMAC-SHA256 Signing (OWASP A02)', () => {
 
   it('webhook sends X-EduSphere-Signature header', () => {
     const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
+      read('apps/subgraph-core/src/webhooks/webhook.service.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-delivery.service.ts') +
       read('apps/subgraph-core/src/org/webhook-dispatcher.service.ts');
     expect(content).toMatch(/X-EduSphere-Signature|signature/i);
   });
 
   it('webhook sends X-EduSphere-Delivery header (delivery ID for deduplication)', () => {
     const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
+      read('apps/subgraph-core/src/webhooks/webhook.service.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-delivery.service.ts') +
       read('apps/subgraph-core/src/org/webhook-dispatcher.service.ts');
     expect(content).toMatch(/X-EduSphere-Delivery|deliveryId|delivery_id/);
   });
@@ -251,7 +253,8 @@ describe('Webhook Security: Replay Protection', () => {
 
   it('webhook request has timeout (max 10s per architecture spec)', () => {
     const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
+      read('apps/subgraph-core/src/webhooks/webhook.service.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-delivery.service.ts') +
       read('apps/subgraph-core/src/org/webhook-dispatcher.service.ts');
     expect(content).toMatch(/timeout|10000|signal|AbortController/i);
   });
@@ -284,14 +287,16 @@ describe('Webhook Security: SSRF Protection (OWASP A10)', () => {
 
   it('webhook URL validation blocks localhost', () => {
     const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
+      read('apps/subgraph-core/src/webhooks/webhook.service.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-validation.ts') +
       read('apps/subgraph-core/src/tenant/org-onboarding.schemas.ts');
     expect(content).toMatch(/localhost|127\.0\.0\.1|0\.0\.0\.0|::1/i);
   });
 
   it('webhook URL requires HTTPS in production', () => {
     const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
+      read('apps/subgraph-core/src/webhooks/webhook.service.ts') +
+      read('apps/subgraph-core/src/webhooks/webhook-validation.ts') +
       read('apps/subgraph-core/src/tenant/org-onboarding.schemas.ts');
     expect(content).toMatch(/https|HTTPS|protocol.*https|startsWith.*https/i);
   });

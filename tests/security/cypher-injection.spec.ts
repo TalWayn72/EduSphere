@@ -30,6 +30,9 @@ const GRAPH_DIR = 'apps/subgraph-knowledge/src/graph';
 // ---------------------------------------------------------------------------
 describe('Cypher parameterization — executeCypher', () => {
   const src = read(GRAPH_CLIENT);
+  // Parsing/substitution utilities extracted to cypher-parser.ts
+  const CYPHER_PARSER = 'packages/db/src/graph/cypher-parser.ts';
+  const parserSrc = read(CYPHER_PARSER);
 
   it('executeCypher function exists in graph client', () => {
     expect(src).toContain('export async function executeCypher');
@@ -46,27 +49,27 @@ describe('Cypher parameterization — executeCypher', () => {
   });
 
   it('toCypherLiteral escapes backslashes', () => {
-    expect(src).toMatch(/\.replace\(\/\\\\\/g,\s*'\\\\\\\\'\)/);
+    expect(parserSrc).toMatch(/\.replace\(\/\\\\\/g,\s*'\\\\\\\\'\)/);
   });
 
   it('toCypherLiteral escapes double quotes', () => {
-    expect(src).toMatch(/\.replace\(\/"\//);
+    expect(parserSrc).toMatch(/\.replace\(\/"\//);
   });
 
   it('toCypherLiteral escapes newlines and carriage returns', () => {
-    expect(src).toContain('\\n');
-    expect(src).toContain('\\r');
+    expect(parserSrc).toContain('\\n');
+    expect(parserSrc).toContain('\\r');
   });
 
   it('toCypherLiteral returns Cypher null for null/undefined', () => {
-    expect(src).toMatch(
+    expect(parserSrc).toMatch(
       /if\s*\(\s*value\s*===\s*null\s*\|\|\s*value\s*===\s*undefined\s*\)\s*return\s*'null'/
     );
   });
 
   it('substituteParams only replaces known param keys', () => {
     // Unknown $tokens must be left untouched
-    expect(src).toContain('if (!(key in params)) return match');
+    expect(parserSrc).toContain('if (!(key in params)) return match');
   });
 });
 
@@ -157,6 +160,7 @@ describe('No user-input string concatenation in Cypher queries', () => {
       'followedIds', 'cutoff', 'id', 'name', 'topicName',
       'masteryLevel', 'sorted', 'roleId', 'entityType', 'entityId',
       'err', 'value', 'masteryOrder', 'transcript_segments',
+      'sourceConceptId', 'targetConceptId',
     ]);
 
     for (const file of graphFiles) {

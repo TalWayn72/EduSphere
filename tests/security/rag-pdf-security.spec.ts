@@ -30,7 +30,8 @@ describe('Path Traversal — MinIO file_key sanitization', () => {
   let src: string;
 
   beforeAll(() => {
-    src = read(`${KNOWLEDGE_SRC}/sources/knowledge-source.service.ts`);
+    // Path traversal logic extracted to knowledge-source-processing.service.ts
+    src = read(`${KNOWLEDGE_SRC}/sources/knowledge-source-processing.service.ts`);
   });
 
   it('file exists and is non-empty', () => {

@@ -126,16 +126,15 @@ describe('G-10: Query Depth and Complexity', () => {
   });
 
   it('gateway registers depthLimitRule via addValidationRule plugin', () => {
-    // Since Session 22 the gateway uses createGatewayRuntime + onValidate plugin
-    // instead of createYoga + validationRules array.
-    const idx = read('apps/gateway/src/index.ts');
-    expect(idx).toContain('depthLimitRule');
-    expect(idx).toContain('addValidationRule');
+    // Plugins extracted to gateway-plugins.ts
+    const plugins = read('apps/gateway/src/gateway-plugins.ts');
+    expect(plugins).toContain('depthLimitRule');
+    expect(plugins).toContain('addValidationRule');
   });
 
   it('gateway registers complexityLimitRule in validationRules', () => {
-    const idx = read('apps/gateway/src/index.ts');
-    expect(idx).toContain('complexityLimitRule');
+    const plugins = read('apps/gateway/src/gateway-plugins.ts');
+    expect(plugins).toContain('complexityLimitRule');
   });
 });
 

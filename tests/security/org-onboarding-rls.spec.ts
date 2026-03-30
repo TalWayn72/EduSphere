@@ -483,24 +483,20 @@ describe('SI-8: Org onboarding services use Drizzle ORM (not raw SQL)', () => {
 // ─── SI-9: All resolvers use authContext (JWT) not args for tenant/user ────
 
 describe('SI-9: Org onboarding resolvers use JWT context (not args) for tenant ID', () => {
-  const RESOLVER_PATHS = [
-    'apps/subgraph-core/src/tenant/org-onboarding.resolver.ts',
-  ];
+  const RESOLVER_PATH = 'apps/subgraph-core/src/tenant/org-onboarding.resolver.ts';
+  const HELPER_PATH = 'apps/subgraph-core/src/tenant/org-onboarding.helpers.ts';
+  const resolverContent = read(RESOLVER_PATH);
+  const helperContent = read(HELPER_PATH);
+  // Resolver delegates auth extraction to requireAuth helper
+  const combined = resolverContent + '\n' + helperContent;
 
-  RESOLVER_PATHS.forEach((resolverPath) => {
-    const content = read(resolverPath);
-    if (!content) return;
+  it(`org-onboarding.resolver.ts: extracts tenantId from authContext (JWT), not @Args`, () => {
+    expect(combined).toMatch(/authContext\.tenantId|ctx\.authContext|auth\.tenantId/);
+    // Must NOT accept tenantId as a GraphQL argument (would allow tenant spoofing)
+    expect(resolverContent).not.toMatch(/@Args\([^)]*tenantId/);
+  });
 
-    const fileName = resolverPath.split('/').pop() ?? resolverPath;
-
-    it(`${fileName}: extracts tenantId from authContext (JWT), not @Args`, () => {
-      expect(content).toMatch(/authContext\.tenantId|ctx\.authContext/);
-      // Must NOT accept tenantId as a GraphQL argument (would allow tenant spoofing)
-      expect(content).not.toMatch(/@Args\([^)]*tenantId/);
-    });
-
-    it(`${fileName}: extracts userId from authContext (JWT)`, () => {
-      expect(content).toMatch(/authContext\.userId|ctx\.authContext/);
-    });
+  it(`org-onboarding.resolver.ts: extracts userId from authContext (JWT)`, () => {
+    expect(combined).toMatch(/authContext\.userId|ctx\.authContext|auth\.userId/);
   });
 });
