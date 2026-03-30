@@ -5,7 +5,6 @@
 import {
   Injectable,
   Logger,
-  NotFoundException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {

@@ -3,7 +3,6 @@
  * Split from OrgOnboardingResolver for file-size compliance.
  */
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import type { TenantContext } from '@edusphere/db';
 import { ApiKeyService } from '../api-keys/api-key.service';
 import { WebhookService } from '../webhooks/webhook.service';
 import { OrgLicensingService } from './org-licensing.service';
