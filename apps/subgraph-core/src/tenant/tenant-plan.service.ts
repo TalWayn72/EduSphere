@@ -59,7 +59,7 @@ export class TenantPlanService implements OnModuleDestroy {
       async (db) => {
         return db
           .update(schema.tenants)
-          .set({ plan, updated_at: new Date() })
+          .set({ plan: plan as 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE', updated_at: new Date() })
           .where(eq(schema.tenants.id, tenantId))
           .returning();
       }
@@ -70,6 +70,13 @@ export class TenantPlanService implements OnModuleDestroy {
       throw new NotFoundException(`Tenant ${tenantId} not found`);
     }
 
-    return updated;
+    return {
+      id: updated.id,
+      name: updated.name,
+      slug: updated.slug,
+      plan: updated.plan,
+      createdAt: updated.created_at,
+      updatedAt: updated.updated_at,
+    };
   }
 }

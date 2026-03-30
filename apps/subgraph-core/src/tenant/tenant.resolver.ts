@@ -59,7 +59,7 @@ export class TenantResolver {
     return this.orgDomainService.findByOrgId(orgId, {
       tenantId: auth.tenantId || orgId,
       userId: auth.userId,
-      role: auth.roles[0] || 'STUDENT',
+      userRole: auth.roles[0] || 'STUDENT',
     });
   }
 
@@ -120,7 +120,7 @@ export class TenantResolver {
       {
         tenantId: auth.tenantId || validated.tenantId,
         userId: auth.userId,
-        role: auth.roles[0] || 'SUPER_ADMIN',
+        userRole: auth.roles[0] || 'SUPER_ADMIN',
       }
     );
   }
