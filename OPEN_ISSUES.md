@@ -32,6 +32,7 @@
 | FEAT-SI6-MTLS | mTLS infrastructure for inter-service communication (docker-compose.mtls.yml, cert generation, Helm values, 41 tests) | 30 Mar 2026 |
 | FEAT-IS5568-A11Y | IS 5568 accessibility fixes (dynamic html lang, keyboard drag-drop, 101 tests) | 30 Mar 2026 |
 | FEAT-GDPR-PROOF | Cryptographic proof of GDPR erasure (gdpr_erasure_log table, HMAC-SHA256 signing, verifyErasure query, 20 tests) | 30 Mar 2026 |
+| BUG-109 | Consent save fails — ConsentService missing withTenantContext(), RLS blocks silently (also closes BUG-088, BUG-092) | 30 Mar 2026 |
 
 ### ✅ Fixed (Recent — 27–29 Mar 2026)
 
@@ -62,9 +63,9 @@
 | BUG-096 | Knowledge Graph error banner shows on all errors | `c04ded08` |
 | BUG-095 | AI course creation fails end-to-end | (pending) |
 | BUG-093 | AI Course Creator — no progress text + timeout too short | (pending) |
-| BUG-092 | AI consent save fails (stale turbo cache + @ai-sdk/openai v3 mismatch) | (pending) |
+| BUG-092 | AI consent save fails (stale turbo cache + @ai-sdk/openai v3 mismatch) | Closed by BUG-109 |
 | BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec | (pending) |
-| BUG-088 | Consent toggle saves to localStorage only — backend never synced | (pending) |
+| BUG-088 | Consent toggle saves to localStorage only — backend never synced | Closed by BUG-109 |
 | BUG-087 | Settings page crashes at /settings?highlight=ai-consent | `66a0b79` |
 | BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | `a3995e5` |
 | BUG-081 | PDF source upload fails — pdfParse is not a function | `c4bb7ca` |
@@ -242,6 +243,25 @@
 **Summary:** Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertions across 215 spec files with 4,613 baseline PNGs. QA gate: 46 failures fixed across 5 categories (snapshot mismatches, loading timing, navigation/redirect, content/DOM, DEV_MODE auth).
 
 **Key docs:** `docs/testing/VISUAL_TESTING_COVERAGE.md`
+
+---
+
+## ✅ BUG-109 — Consent Save Fails — ConsentService Missing withTenantContext() (30 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Date:** 30 Mar 2026
+- **Severity:** 🔴 Critical
+- **Also closes:** BUG-088, BUG-092
+
+**Problem:** Consent save operations failed silently. Users could toggle consent in the UI but changes never persisted to the database.
+
+**Root cause:** `ConsentService.updateConsent()`, `getUserConsents()`, `hasConsent()`, and `writeAuditLog()` executed DB queries directly via `this.db` without the `withTenantContext()` wrapper. RLS policy silently blocked all consent writes because PostgreSQL session variables (`app.current_tenant`, `app.current_user_id`) were never set.
+
+**Solution:** Wrapped all 4 methods in `withTenantContext()` to properly set RLS session variables before DB access.
+
+**Tests:** 12 regression tests added (6 unit + 6 static security canary tests).
+
+**Anti-recurrence:** Why not caught previously — unit tests mocked the service so RLS was never exercised; no integration test ran against real DB with RLS enabled; security tests checked schema existence but not code usage of `withTenantContext()`. The new canary tests scan source code to ensure all DB-accessing service methods use `withTenantContext()`.
 
 ---
 

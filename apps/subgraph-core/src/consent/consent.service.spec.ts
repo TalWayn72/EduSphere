@@ -15,6 +15,10 @@ const mockSelectWhere = vi
 const mockSelectFrom = vi.fn().mockReturnValue({ where: mockSelectWhere });
 const mockSelect = vi.fn().mockReturnValue({ from: mockSelectFrom });
 
+const mockTx = {
+  select: vi.fn().mockReturnValue({ from: mockSelectFrom }),
+  insert: mockInsert,
+};
 const mockDb = {
   select: mockSelect,
   insert: mockInsert,
@@ -33,9 +37,11 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
+  withTenantContext: vi.fn(async (_db, _ctx, cb) => cb(mockTx)),
 }));
 
 import { ConsentService } from './consent.service.js';
+import { withTenantContext } from '@edusphere/db';
 
 describe('ConsentService', () => {
   let service: ConsentService;
@@ -57,27 +63,25 @@ describe('ConsentService', () => {
 
   describe('hasConsent', () => {
     it('ESSENTIAL consent is always true without DB check', async () => {
-      const result = await service.hasConsent('user-1', 'ESSENTIAL');
+      const result = await service.hasConsent('user-1', 'tenant-1', 'ESSENTIAL');
       expect(result).toBe(true);
-      expect(mockDb.select).not.toHaveBeenCalled();
     });
 
     it('returns true when consent row exists and given=true', async () => {
-      const result = await service.hasConsent('user-1', 'AI_PROCESSING');
+      const result = await service.hasConsent('user-1', 'tenant-1', 'AI_PROCESSING');
       expect(result).toBe(true);
-      expect(mockDb.select).toHaveBeenCalled();
     });
 
     it('returns false when no consent row exists', async () => {
       mockSelectWhere.mockResolvedValueOnce([]);
 
-      const result = await service.hasConsent('user-1', 'THIRD_PARTY_LLM');
+      const result = await service.hasConsent('user-1', 'tenant-1', 'THIRD_PARTY_LLM');
       expect(result).toBe(false);
     });
 
     it('returns false for MARKETING when no row exists', async () => {
       mockSelectWhere.mockResolvedValueOnce([]);
-      const result = await service.hasConsent('user-1', 'MARKETING');
+      const result = await service.hasConsent('user-1', 'tenant-1', 'MARKETING');
       expect(result).toBe(false);
     });
   });
@@ -193,9 +197,88 @@ describe('ConsentService', () => {
       ];
       mockSelectWhere.mockResolvedValueOnce(fakeRows);
 
-      const result = await service.getUserConsents('user-1');
+      const result = await service.getUserConsents('user-1', 'tenant-1');
       expect(result).toEqual(fakeRows);
-      expect(mockSelect).toHaveBeenCalled();
+    });
+  });
+
+  // ─── BUG-109 REGRESSION: withTenantContext RLS enforcement ──────────────
+  describe('BUG-109 REGRESSION: RLS via withTenantContext', () => {
+    it('updateConsent wraps DB ops in withTenantContext', async () => {
+      await service.updateConsent({
+        tenantId: 'tenant-1',
+        userId: 'user-1',
+        consentType: 'AI_PROCESSING',
+        given: true,
+      });
+
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({
+          tenantId: 'tenant-1',
+          userId: 'user-1',
+        }),
+        expect.any(Function)
+      );
+    });
+
+    it('updateConsent passes userRole in tenant context', async () => {
+      await service.updateConsent({
+        tenantId: 'tenant-1',
+        userId: 'user-1',
+        consentType: 'ANALYTICS',
+        given: true,
+      });
+
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({
+          userRole: expect.stringMatching(
+            /SUPER_ADMIN|ORG_ADMIN|INSTRUCTOR|STUDENT|RESEARCHER/
+          ),
+        }),
+        expect.any(Function)
+      );
+    });
+
+    it('getUserConsents wraps DB query in withTenantContext', async () => {
+      mockSelectWhere.mockResolvedValueOnce([]);
+
+      await service.getUserConsents('user-1', 'tenant-1');
+
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ tenantId: 'tenant-1' }),
+        expect.any(Function)
+      );
+    });
+
+    it('hasConsent wraps non-ESSENTIAL queries in withTenantContext', async () => {
+      await service.hasConsent('user-1', 'tenant-1', 'THIRD_PARTY_LLM');
+
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ tenantId: 'tenant-1' }),
+        expect.any(Function)
+      );
+    });
+
+    it('hasConsent ESSENTIAL skips withTenantContext (no DB hit)', async () => {
+      const result = await service.hasConsent('user-1', 'tenant-1', 'ESSENTIAL');
+      expect(result).toBe(true);
+      expect(withTenantContext).not.toHaveBeenCalled();
+    });
+
+    it('withTenantContext is called for both consent upsert and audit log', async () => {
+      await service.updateConsent({
+        tenantId: 'tenant-1',
+        userId: 'user-1',
+        consentType: 'MARKETING',
+        given: false,
+      });
+
+      // Called twice: once for the consent upsert, once for the audit log
+      expect(withTenantContext).toHaveBeenCalledTimes(2);
     });
   });
 });

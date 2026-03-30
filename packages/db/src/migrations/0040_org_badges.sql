@@ -16,10 +16,19 @@ CREATE TABLE IF NOT EXISTS org_badges (
 -- RLS
 ALTER TABLE org_badges ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY org_badges_tenant_isolation ON org_badges
-  USING (tenant_id::text = current_setting('app.current_tenant', TRUE))
-  WITH CHECK (tenant_id::text = current_setting('app.current_tenant', TRUE));
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'org_badges' AND policyname = 'org_badges_tenant_isolation'
+  ) THEN
+    EXECUTE 'CREATE POLICY org_badges_tenant_isolation ON org_badges
+      USING (tenant_id::text = current_setting(''app.current_tenant'', TRUE))
+      WITH CHECK (tenant_id::text = current_setting(''app.current_tenant'', TRUE))';
+  END IF;
+END
+$$;
 
 -- Indexes
-CREATE INDEX idx_org_badges_tenant ON org_badges (tenant_id);
-CREATE INDEX idx_org_badges_active ON org_badges (tenant_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_org_badges_tenant ON org_badges (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_org_badges_active ON org_badges (tenant_id, is_active);

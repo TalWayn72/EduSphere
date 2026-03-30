@@ -1,4 +1,8 @@
-// MUST be the first import — patches Node.js http, pg, etc. before NestJS loads.
+// Load .env before anything else — process.env.DATABASE_URL must be available
+// for database pool creation in @edusphere/db.
+import 'dotenv/config';
+
+// MUST be imported before NestJS — patches Node.js http, pg, etc.
 import { initTelemetry } from '@edusphere/telemetry';
 initTelemetry('subgraph-knowledge');
 

@@ -162,6 +162,86 @@ describe('G-04: Consent Service Tests', () => {
   });
 });
 
+describe('BUG-109 REGRESSION: Consent service must use withTenantContext for RLS', () => {
+  const serviceContent = readFile(
+    'apps/subgraph-core/src/consent/consent.service.ts'
+  );
+
+  it('consent.service.ts imports withTenantContext from @edusphere/db', () => {
+    expect(serviceContent).toContain('withTenantContext');
+    expect(serviceContent).toMatch(
+      /import\s+\{[^}]*withTenantContext[^}]*\}\s+from\s+['"]@edusphere\/db['"]/
+    );
+  });
+
+  it('updateConsent method wraps DB operations in withTenantContext', () => {
+    // Extract updateConsent method body (from signature to next method or end)
+    const updateMatch = serviceContent.match(
+      /async updateConsent[\s\S]*?(?=async \w+|private async|^\}$)/m
+    );
+    expect(updateMatch).not.toBeNull();
+    const updateBody = updateMatch![0];
+    expect(updateBody).toContain('withTenantContext');
+  });
+
+  it('getUserConsents method wraps DB query in withTenantContext', () => {
+    const getMatch = serviceContent.match(
+      /async getUserConsents[\s\S]*?(?=async \w+|private async|^\}$)/m
+    );
+    expect(getMatch).not.toBeNull();
+    const getBody = getMatch![0];
+    expect(getBody).toContain('withTenantContext');
+  });
+
+  it('hasConsent method wraps non-ESSENTIAL DB query in withTenantContext', () => {
+    const hasMatch = serviceContent.match(
+      /async hasConsent[\s\S]*?(?=async \w+|private async|^\}$)/m
+    );
+    expect(hasMatch).not.toBeNull();
+    const hasBody = hasMatch![0];
+    expect(hasBody).toContain('withTenantContext');
+  });
+
+  it('no direct this.db.select() or this.db.insert() outside withTenantContext', () => {
+    // All DB access should go through withTenantContext callback (tx),
+    // not through this.db directly (except ESSENTIAL early return).
+    // Count direct this.db usages that are NOT in withTenantContext call args.
+    const lines = serviceContent.split('\n');
+    const directDbLines = lines.filter(
+      (line) =>
+        (line.includes('this.db.select') ||
+          line.includes('this.db.insert') ||
+          line.includes('this.db.update') ||
+          line.includes('this.db.delete')) &&
+        !line.includes('withTenantContext')
+    );
+    expect(
+      directDbLines,
+      `Found direct DB access bypassing RLS:\n${directDbLines.join('\n')}`
+    ).toHaveLength(0);
+  });
+
+  it('writeAuditLog uses tx (from withTenantContext) not this.db', () => {
+    // The private writeAuditLog should use the transaction passed from
+    // withTenantContext, not the raw this.db connection
+    const auditMatch = serviceContent.match(
+      /private async writeAuditLog[\s\S]*?(?=async \w+|private async|\n\}$)/m
+    );
+    if (auditMatch) {
+      const auditBody = auditMatch[0];
+      // If writeAuditLog still exists as a separate method, it should
+      // either accept a tx parameter or be called within withTenantContext
+      const usesDirectDb =
+        auditBody.includes('this.db.insert') ||
+        auditBody.includes('this.db.select');
+      expect(
+        usesDirectDb,
+        'writeAuditLog uses this.db directly — must use tx from withTenantContext'
+      ).toBe(false);
+    }
+  });
+});
+
 describe('BUG-092: Consent module included in subgraph-core build', () => {
   it('consent.resolver.ts is imported by app.module.ts', () => {
     const content = readFile('apps/subgraph-core/src/app.module.ts');
