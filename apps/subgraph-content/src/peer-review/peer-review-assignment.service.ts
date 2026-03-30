@@ -17,7 +17,7 @@ import {
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import type { AuthContext } from './peer-review.service';
-import type { PeerReviewCoreService } from './peer-review-core.service';
+import { PeerReviewCoreService } from './peer-review-core.service';
 
 const DEFAULT_MIN_REVIEWERS = 3;
 

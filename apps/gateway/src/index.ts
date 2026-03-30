@@ -4,6 +4,8 @@ initTelemetry('gateway');
 
 import { createGatewayRuntime } from '@graphql-hive/gateway';
 import { createServer } from 'http';
+import { fileURLToPath } from 'url';
+import { resolve, dirname } from 'path';
 import {
   checkRateLimit,
   stopRateLimitCleanup,
@@ -21,7 +23,7 @@ const pubSub = await createNatsPubSub(logger);
 
 const gateway = createGatewayRuntime({
   // Load the composed supergraph SDL (run `pnpm compose` to regenerate).
-  supergraph: new URL('../../supergraph.graphql', import.meta.url).pathname,
+  supergraph: resolve(dirname(fileURLToPath(import.meta.url)), '../supergraph.graphql'),
   additionalResolvers: [],
   cors: {
     origin: process.env.CORS_ORIGIN

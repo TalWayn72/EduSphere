@@ -42,18 +42,25 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const stale = await this.db
-      .update(schema.knowledgeSources)
-      .set({
-        status: 'FAILED',
-        error_message: 'Processing was interrupted (service restarted)',
-      })
-      .where(inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING']))
-      .returning();
+    try {
+      const stale = await this.db
+        .update(schema.knowledgeSources)
+        .set({
+          status: 'FAILED',
+          error_message: 'Processing was interrupted (service restarted)',
+        })
+        .where(inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING']))
+        .returning();
 
-    if (stale.length > 0) {
+      if (stale.length > 0) {
+        this.logger.warn(
+          `Startup cleanup: marked ${stale.length} stale PENDING/PROCESSING source(s) as FAILED`
+        );
+      }
+    } catch (err) {
       this.logger.warn(
-        `Startup cleanup: marked ${stale.length} stale PENDING/PROCESSING source(s) as FAILED`
+        { err: (err as Error).message },
+        'Startup cleanup skipped — knowledge_sources table may not exist yet (run migrations)',
       );
     }
   }

@@ -19,6 +19,7 @@ import { OrgGamificationService } from '../gamification/org-gamification.service
 import { OrgBadgeService } from '../gamification/org-badge.service';
 import { ApiKeyService } from '../api-keys/api-key.service';
 import { WebhookService } from '../webhooks/webhook.service';
+import { WebhookDeliveryService } from '../webhooks/webhook-delivery.service';
 import { KeycloakAdminService } from '../auth/keycloak-admin.service';
 import { KeycloakAdminHttpService } from '../auth/keycloak-admin-http.service';
 
@@ -43,6 +44,7 @@ import { KeycloakAdminHttpService } from '../auth/keycloak-admin-http.service';
     OrgGamificationService,
     OrgBadgeService,
     ApiKeyService,
+    WebhookDeliveryService,
     WebhookService,
     KeycloakAdminHttpService,
     KeycloakAdminService,
@@ -64,6 +66,7 @@ import { KeycloakAdminHttpService } from '../auth/keycloak-admin-http.service';
     OrgGamificationService,
     OrgBadgeService,
     ApiKeyService,
+    WebhookDeliveryService,
     WebhookService,
     KeycloakAdminHttpService,
     KeycloakAdminService,
