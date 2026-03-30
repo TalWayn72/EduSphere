@@ -10,7 +10,7 @@ const mockExecute = vi.fn();
 const mockSelect = vi.fn();
 const mockFrom = vi.fn();
 const mockWhere = vi.fn();
-const mockLimit = vi.fn();
+const _mockLimit = vi.fn();
 const mockWithTenantContext = vi.fn();
 const mockCreateDatabaseConnection = vi.fn();
 

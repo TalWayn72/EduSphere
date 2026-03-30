@@ -5,7 +5,7 @@
  * Tests the IPC message protocol, CPU reporting, cleanup logic,
  * and error handling patterns used by agent-worker.ts.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type {
   SandboxConfig,
   SandboxResponse,

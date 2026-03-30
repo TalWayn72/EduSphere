@@ -130,7 +130,7 @@ describe('CourseSchema', () => {
 describe('createCourseGeneratorWorkflow', () => {
   const originalEnv = { ...process.env };
   // Track whether _resolvedModel is cached across tests
-  let modelCached = false;
+  let _modelCached = false;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -151,7 +151,7 @@ describe('createCourseGeneratorWorkflow', () => {
   it('generates outline via Ollama when no OPENAI_API_KEY', async () => {
     // First test: /api/tags is called to resolve model, then cached
     mockTagsAndChat(['qwen2.5:0.5b'], VALID_COURSE);
-    modelCached = true;
+    _modelCached = true;
 
     const workflow = createCourseGeneratorWorkflow();
     const result = await workflow.invoke({
