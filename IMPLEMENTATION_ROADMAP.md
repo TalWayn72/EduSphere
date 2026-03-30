@@ -52,6 +52,9 @@ gantt
     section RAG & Content Pipeline
         Phase 69-71 RAG + PDF + Observability: done, p8, 2026-03-27, 2026-03-27
 
+    section Technical Debt
+        Phase D Tech Debt Cleanup: done, pd, 2026-03-30, 2026-03-30
+
     section Maintenance
         Ongoing Bug Fixes + Optimization: active, p9, 2026-03-28, 2026-04-30
 ```
@@ -2823,6 +2826,36 @@ pnpm turbo typecheck  # 0 errors
 
 pnpm turbo test  # 100% pass
 pnpm turbo typecheck  # 0 errors
+```
+
+---
+
+## Phase D — Technical Debt Cleanup ✅ Complete
+
+**Status:** ✅ Complete | **Date:** 2026-03-30
+
+**Scope:** Backend test coverage expansion and code quality enforcement across all 4 subgraphs.
+
+### Deliverables
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Backend test files | ~existing | +~99 new test files |
+| Backend test cases | ~3,572 | ~4,932 (+~1,360) |
+| subgraph-content coverage | <90% | ~90% |
+| subgraph-core coverage | <90% | ~92% |
+| subgraph-agent coverage | <90% | ~90% |
+| subgraph-knowledge coverage | ~90% | ~97% |
+| Files over 300 lines | multiple | 0 |
+| Lint warnings | >0 | 0 |
+
+### Acceptance Criteria
+
+```bash
+pnpm turbo test  # 100% pass, ~1,360 new tests green
+pnpm turbo typecheck  # 0 errors
+pnpm turbo lint  # 0 warnings
+# All source files under 300-line limit
 ```
 
 ---

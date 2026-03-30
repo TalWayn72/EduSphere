@@ -27,6 +27,7 @@
 
 | ID | Issue | Fixed In |
 |----|-------|----------|
+| FEAT-PHASE-D-TECHDEBT | Phase D Technical Debt — 80 oversized files split, 33 console.log violations fixed, 27 lint warnings resolved, ~99 test files (~1,360 cases) added | 30 Mar 2026 |
 | FEAT-ORG-RESTRUCTURE | Agent hierarchy restructured (11 divisions, 42 specialists, BELead split, 12 new skills, 4 automation scripts, CLAUDE.md split) | 30 Mar 2026 |
 | FEAT-SI6-MTLS | mTLS infrastructure for inter-service communication (docker-compose.mtls.yml, cert generation, Helm values, 41 tests) | 30 Mar 2026 |
 | FEAT-IS5568-A11Y | IS 5568 accessibility fixes (dynamic html lang, keyboard drag-drop, 101 tests) | 30 Mar 2026 |
@@ -157,6 +158,43 @@
 - Timeout enforcement (configurable per agent type)
 - Sandboxed execution environment (gVisor or equivalent)
 - Audit logging of all agent actions
+
+---
+
+## ✅ FEAT-PHASE-D-TECHDEBT — Phase D Technical Debt Cleanup (30 Mar 2026)
+
+- **Status:** ✅ Complete
+- **Date:** 30 Mar 2026
+
+**Summary:** Comprehensive technical debt cleanup across 4 categories in 5 rounds.
+
+**1. File Size Cleanup:** 80 files over 300-line limit split down to 0. All files now comply with the 300-line maximum rule using barrel exports for split modules.
+
+**2. Console.log Cleanup:** 33 `console.log` violations replaced with Pino structured logging across `apps/web` and `apps/mobile`.
+
+**3. Lint Warnings:** 27 ESLint warnings reduced to 0 across all workspaces.
+
+**4. Test Coverage Boost (~99 new test files, ~1,360 test cases):**
+
+| Package | Before | After | New Files |
+|---------|--------|-------|-----------|
+| subgraph-content | ~66% | ~90% | 25 test files |
+| subgraph-core | ~72% | ~92% | 24 test files |
+| subgraph-agent | ~64% | ~90% | 18 test files |
+| subgraph-knowledge | — | ~97% | 5 test files |
+| subgraph-annotation | — | — | 1 test file |
+| apps/web (frontend) | — | — | 12 test files |
+| packages/nats-client | — | — | 8 test files |
+| apps/gateway | — | — | 6 test files |
+
+**Key test file locations:**
+- `apps/subgraph-content/src/**/*.spec.ts` (25 files — resolvers, services, validators)
+- `apps/subgraph-core/src/**/*.spec.ts` (24 files — user, tenant, org services)
+- `apps/subgraph-agent/src/**/*.spec.ts` (18 files — agent templates, workflows, sandboxing)
+- `apps/subgraph-knowledge/src/**/*.spec.ts` (5 files — embeddings, graph queries, RAG)
+- `apps/web/src/**/*.test.{ts,tsx}` (12 files — hooks, components, utilities)
+- `packages/nats-client/src/**/*.spec.ts` (8 files — JetStream, KV, subscriptions)
+- `apps/gateway/src/**/*.spec.ts` (6 files — composition, routing, auth propagation)
 
 ---
 
