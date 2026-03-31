@@ -95,12 +95,12 @@
 
   
 enum join__Graph {
-  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql") 
-  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql") 
-  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql") 
-  CONTENT @join__graph(name: "content", url: "http://localhost:4002/graphql") 
-  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql") 
-  KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql") 
+  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql")
+  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql")
+  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql")
+  CONTENT @join__graph(name: "content", url: "http://localhost:4002/graphql")
+  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql")
+  KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql")
 }
 
 scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE) 

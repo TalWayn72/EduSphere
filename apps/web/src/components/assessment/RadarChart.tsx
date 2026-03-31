@@ -37,9 +37,10 @@ export function AssessmentRadarChart({ criteria, ariaLabel = 'Assessment radar c
           <PolarGrid />
           <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
           <Tooltip
-            formatter={(value: number | string | undefined) =>
-              [typeof value === 'number' ? value.toFixed(1) : String(value ?? ''), 'Score']
-            }
+            formatter={(value) => {
+              const v = value as number | string | undefined;
+              return [typeof v === 'number' ? v.toFixed(1) : String(v ?? ''), 'Score'] as [string, string];
+            }}
           />
           <Radar
             name="Score"

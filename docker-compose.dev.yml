@@ -466,6 +466,7 @@ services:
       - SUBGRAPH_AGENT_URL=http://subgraph-agent:4005/graphql
       - SUBGRAPH_KNOWLEDGE_URL=http://subgraph-knowledge:4006/graphql
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/edusphere/protocol/openid-connect/certs
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318

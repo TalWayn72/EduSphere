@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 31 March 2026
+**Last Updated:** 31 March 2026 (QA gate — all E2E tests verified live)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -101,10 +101,38 @@
 This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferences`, etc.
 
 **Verification:**
-- Live API: `mutation { updateUserPreferences(input: { locale: "he" }) { id preferences { locale } } }` returns `{"data":{"updateUserPreferences":{"id":"...","preferences":{"locale":"he"}}}}` ✅
+- Live API: `mutation { updateUserPreferences(input: { locale: "he" }) { id preferences { locale } } }` returns `{"data":{"updateUserPreferences":{"id":"00000000-0000-0000-0000-000000000005","preferences":{"locale":"he"}}}}` ✅
 - Unit tests: `query-complexity.spec.ts` — 17/17 pass, including `does not apply list multiplier for camelCase compound names ending in s` ✅
 - Gateway tests: 319/319 pass ✅
-- E2E regression: `language-save-regression.spec.ts` (mock guard) — 2/2 pass ✅
+- E2E regression: `language-save-regression.spec.ts` — 2/2 pass ✅
+- E2E happy path: `user-preferences-save.spec.ts` — 5/5 pass ✅
+- E2E error paths: `language-error-paths.spec.ts` — 5/5 pass ✅
+- E2E visual: `visual-language-error.spec.ts` — 4/4 pass (snapshots updated) ✅
+- TypeScript: `apps/web typecheck` — 0 errors ✅
+
+---
+
+## ✅ BUG-065-GAPS — Language Preference Test Coverage Gaps
+
+- **Status:** ✅ Fixed — 31 Mar 2026
+- **Severity:** 🟡 Medium (test infrastructure gap, not user-facing)
+- **Files Changed:** `apps/web/e2e/user-preferences-save.spec.ts`, `apps/web/e2e/language-error-paths.spec.ts`, `apps/web/e2e/visual-language-error.spec.ts`, `apps/web/e2e/language-save-regression.spec.ts`
+
+**Root Cause (combined with BUG-111):**
+1. **JWT issuer mismatch** — gateway `KEYCLOAK_ISSUER_URL` pointed to `keycloak:8080` (internal Docker hostname) while tokens were issued by `localhost:8080` (external). Added `KEYCLOAK_ISSUER_URL` separation in `apps/gateway/src/config/gateway-config.ts` so internal validation uses the correct Docker-internal hostname while tokens declare the external hostname.
+2. **Query complexity heuristic** — `isListField()` in `apps/gateway/src/middleware/query-complexity.ts` incorrectly applied 10× multiplier to camelCase mutation names ending in `s`. Fixed by checking for uppercase letters in the field name.
+
+**Fix Summary:**
+- `gateway-config.ts` — separated `KEYCLOAK_ISSUER_URL` from `KEYCLOAK_URL` for issuer validation
+- `query-complexity.ts` — `isListField()` helper that only applies multiplier to simple lowercase plural nouns
+- 4 new E2E spec files covering happy paths, error paths, visual regression, and regression guards
+- `apps/web/src/components/assessment/RadarChart.tsx` — TypeScript `formatter` type cast fixed (exit 2 → 0)
+
+**Verification:**
+- All 16 new E2E tests pass against live services: 5 + 5 + 4 + 2 = 16 ✅
+- Live mutation confirmed: `{"data":{"updateUserPreferences":{"id":"...","preferences":{"locale":"he"}}}}` ✅
+- TypeScript strict compilation: 0 errors ✅
+- Date: 2026-03-31
 
 ---
 

@@ -10,7 +10,10 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'edusphere';
 const JWKS_URL = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`;
-const KEYCLOAK_ISSUER = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
+// KEYCLOAK_ISSUER_URL allows the issuer in tokens (e.g. http://localhost:8080)
+// to differ from KEYCLOAK_URL used for internal JWKS fetching (e.g. http://keycloak:8080).
+const KEYCLOAK_ISSUER_URL = process.env.KEYCLOAK_ISSUER_URL || KEYCLOAK_URL;
+const KEYCLOAK_ISSUER = `${KEYCLOAK_ISSUER_URL}/realms/${KEYCLOAK_REALM}`;
 const KEYCLOAK_AUDIENCE = process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web';
 const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
 const DEV_TOKEN = 'dev-token-mock-jwt';
