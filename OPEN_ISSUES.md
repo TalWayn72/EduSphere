@@ -27,6 +27,7 @@
 
 | ID | Issue | Fixed In |
 |----|-------|----------|
+| BUG-065-GAPS | 6 test coverage gaps for language preference save flow — infrastructure failures undetected because all layers mocked | 31 Mar 2026 |
 | BUG-110 | Subgraphs killed every 15 min by cleanup script — "השרת אינו זמין" on /courses (10th+ occurrence) | 31 Mar 2026 |
 
 ### ✅ Fixed (30 Mar 2026 Session)
