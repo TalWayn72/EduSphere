@@ -1,8 +1,11 @@
 # EduSphere — Stale Node.js Process Cleanup
-# Runs every 15 min via scheduled task. Kills node.exe older than 15 min (except dev/MCP/Docker).
+# Runs every 15 min via scheduled task. Kills node.exe older than 15 min (except dev/MCP/Docker/subgraphs).
+# BUG-110 FIX (31 Mar 2026): Added "subgraph", "gateway", "edusphere" to protected list.
+# Root cause: subgraphs (node dist/main on ports 4001-4006) were not matching any protected
+# keyword and were killed every 15 min, causing "השרת אינו זמין" on /courses.
 $logFile = "C:\Users\P0039217\.claude\projects\EduSphere\docs\logs\node-cleanup.log"
 $threshold = (Get-Date).AddMinutes(-15)
-$protected = @("vite", "mcp", "docker", "chromadb")
+$protected = @("vite", "mcp", "docker", "chromadb", "subgraph", "gateway", "edusphere")
 
 $allNodes = Get-Process -Name "node" -ErrorAction SilentlyContinue
 $beforeCount = ($allNodes | Measure-Object).Count

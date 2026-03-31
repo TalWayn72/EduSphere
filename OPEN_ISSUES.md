@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 30 March 2026
+**Last Updated:** 31 March 2026
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -22,6 +22,12 @@
 |----|-------|---------|
 | FEAT-API-MUTATIONS | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
 | FEAT-AGENT-SANDBOX | Agent execution sandboxing (process isolation, resource limits) | 30 Mar 2026 |
+
+### ✅ Fixed (31 Mar 2026 Session)
+
+| ID | Issue | Fixed In |
+|----|-------|----------|
+| BUG-110 | Subgraphs killed every 15 min by cleanup script — "השרת אינו זמין" on /courses (10th+ occurrence) | 31 Mar 2026 |
 
 ### ✅ Fixed (30 Mar 2026 Session)
 
@@ -243,6 +249,33 @@
 **Summary:** Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertions across 215 spec files with 4,613 baseline PNGs. QA gate: 46 failures fixed across 5 categories (snapshot mismatches, loading timing, navigation/redirect, content/DOM, DEV_MODE auth).
 
 **Key docs:** `docs/testing/VISUAL_TESTING_COVERAGE.md`
+
+---
+
+## ✅ BUG-110 — Subgraphs Killed Every 15 Min by Cleanup Script (31 Mar 2026)
+
+- **Status:** ✅ Fixed
+- **Date:** 31 Mar 2026
+- **Severity:** 🔴 Critical (10th+ occurrence — recurring production blocker)
+- **Symptom:** User sees "השרת אינו זמין" (server unavailable) on `localhost:5173/courses` after subgraphs die
+
+**Problem:** All 6 NestJS subgraphs (ports 4001–4006, running as `node --enable-source-maps .../dist/main`) were being killed every 15 minutes by the `scripts/cleanup-stale-nodes.ps1` scheduled task.
+
+**Root cause:** The cleanup script's `$protected` array contained only `@("vite", "mcp", "docker", "chromadb")`. Subgraph process command lines (`node --enable-source-maps .../apps/subgraph-core/dist/main`) did not match any of those patterns, so they were unconditionally killed after 15 minutes of uptime — the exact interval the scheduled task runs on.
+
+**Evidence from logs (`docs/logs/node-cleanup.log`):**
+```
+2026-03-30 00:44:29 | Before: 159 | Killed: 1 node, 0 chrome-headless | After: 156 | Memory: 78.2%
+2026-03-30 05:43:38 | Before: 0  | Killed: 0 ...  (all subgraphs gone — machine restart or prior kill)
+```
+
+**Solution:** Added `"subgraph"`, `"gateway"`, `"edusphere"` to the protected keyword list in `scripts/cleanup-stale-nodes.ps1`. Subgraph cmdlines contain `EduSphere\apps\subgraph-*` so they now match `"subgraph"` and `"edusphere"` and are protected.
+
+**File changed:** `scripts/cleanup-stale-nodes.ps1` — line 5: `$protected` extended from 4 to 7 entries.
+
+**Existing visual test coverage:** Confirmed — `apps/web/e2e/network-error-banner.spec.ts` (BUG-039 regression, 10 tests including `toHaveScreenshot`) and `apps/web/e2e/offline-mode-visual.spec.ts` (11 visual tests with `toHaveScreenshot`) cover the offline/server-down banner. No new test needed; existing coverage is comprehensive.
+
+**Anti-recurrence:** The `$protected` list now explicitly guards all EduSphere long-running server processes. Future server-type processes (e.g., transcription-worker) should add their keyword to `$protected`. Consider adding a startup script that also adds `--title edusphere-subgraph` to node args for belt-and-suspenders protection.
 
 ---
 
