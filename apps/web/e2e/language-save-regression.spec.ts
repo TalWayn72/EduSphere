@@ -26,7 +26,7 @@ import {
   IS_DEV_MODE,
 } from './env';
 import { routeGraphQL } from './graphql-mock.helpers';
-import { loginInDevMode } from './auth.helpers';
+import { login, loginInDevMode } from './auth.helpers';
 
 // ─── Keycloak helper (used only when IS_DEV_MODE=false) ──────────────────────
 
@@ -111,11 +111,8 @@ test.describe('language-save-regression — ci-compatible mock guard', () => {
   test('BUG-065 guard: error toast string absent after mocked-success save', async ({
     page,
   }) => {
-    if (IS_DEV_MODE) {
-      await loginInDevMode(page);
-    } else {
-      await loginViaKeycloak(page);
-    }
+    // login() auto-detects DEV_MODE vs Keycloak from the DOM
+    await login(page);
 
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
 
@@ -132,11 +129,8 @@ test.describe('language-save-regression — ci-compatible mock guard', () => {
   test('BUG-065 guard: generic failed-to-save text also absent', async ({
     page,
   }) => {
-    if (IS_DEV_MODE) {
-      await loginInDevMode(page);
-    } else {
-      await loginViaKeycloak(page);
-    }
+    // login() auto-detects DEV_MODE vs Keycloak from the DOM
+    await login(page);
 
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
 

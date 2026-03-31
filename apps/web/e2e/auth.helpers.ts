@@ -19,7 +19,6 @@
 import type { Page } from '@playwright/test';
 import {
   BASE_URL,
-  IS_DEV_MODE,
   KEYCLOAK_REALM_URL,
   TestUser,
   TEST_USERS,
@@ -38,6 +37,9 @@ import {
  * in the same test will find the app in an authenticated state.
  *
  * Fast — no Keycloak round-trip needed.
+ *
+ * NOTE: Callers must call page.addInitScript() BEFORE calling this function,
+ * and must have already navigated to /login.
  */
 export async function loginInDevMode(page: Page): Promise<void> {
   // Inject English locale into localStorage BEFORE any app scripts run.
@@ -80,17 +82,22 @@ export async function loginInDevMode(page: Page): Promise<void> {
  * Perform a full Keycloak OIDC Authorization Code + PKCE login.
  *
  * Prerequisites: VITE_DEV_MODE=false and a running Keycloak instance.
- * The app must be navigated to /login BEFORE calling this.
  *
  * The function handles the full redirect chain:
  *   /login → click "Sign In" → Keycloak form → fill credentials → submit →
  *   Keycloak redirect → app callback → router renders authenticated route
+ *
+ * NOTE: This function navigates to /login internally. If the page has already
+ * been navigated (e.g. by login()), pass skipGoto=true to avoid a second goto.
  */
 export async function loginViaKeycloak(
   page: Page,
-  user: Pick<TestUser, 'email' | 'password'> = TEST_USERS.superAdmin
+  user: Pick<TestUser, 'email' | 'password'> = TEST_USERS.superAdmin,
+  skipGoto = false
 ): Promise<void> {
-  await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+  if (!skipGoto) {
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+  }
 
   // Wait for Keycloak.init() to complete (silent SSO check via iframe may add delay)
   await page
@@ -144,21 +151,55 @@ export async function loginViaKeycloak(
 // ─── Smart login ─────────────────────────────────────────────────────────────
 
 /**
- * Smart login — uses the fast DEV_MODE shortcut when available,
- * falls back to full Keycloak OIDC flow when VITE_DEV_MODE=false.
+ * Smart login — detects the actual running app mode (DEV_MODE vs Keycloak)
+ * by inspecting the DOM and uses the appropriate login flow.
  *
- * This is the recommended function for most test `beforeEach` blocks.
+ * This is more reliable than reading process.env.VITE_DEV_MODE because:
+ *   - The test process env may differ from the running Vite server's env.
+ *   - reuseExistingServer:true means Playwright may reuse a server started
+ *     with VITE_DEV_MODE=false, even when the test process has no VITE_DEV_MODE.
  *
- * @param user - Optional user credentials (only used in LIVE_BACKEND mode)
+ * Flow:
+ *   1. Inject localStorage (locale + sidebar) via addInitScript.
+ *   2. Navigate once to /login.
+ *   3. Check for [data-testid="dev-login-btn"] in the DOM (timeout 5s).
+ *      - Present  → DEV_MODE: click the button and wait for redirect.
+ *      - Absent   → Keycloak: click "Sign In with Keycloak", fill the form,
+ *                   wait for OIDC callback, then authenticated route.
+ *
+ * @param user - Optional credentials (only used in Keycloak/LIVE_BACKEND mode)
  */
 export async function login(
   page: Page,
   user?: Pick<TestUser, 'email' | 'password'>
 ): Promise<void> {
-  if (IS_DEV_MODE) {
-    await loginInDevMode(page);
+  // Inject locale/sidebar into EVERY page (including Vite HMR reloads).
+  // Must be registered BEFORE the first page.goto() call.
+  await page.addInitScript(() => {
+    localStorage.setItem('edusphere_locale', 'en');
+    localStorage.setItem('edusphere-sidebar-collapsed', 'true');
+  });
+
+  // Single navigation to /login — shared by both paths.
+  await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+
+  // Detect the actual app mode from the DOM.
+  // The process.env.VITE_DEV_MODE flag IS_DEV_MODE may be stale if the test
+  // runner reused a server with a different VITE_DEV_MODE setting.
+  const devBtn = page.locator('[data-testid="dev-login-btn"]');
+  const isActuallyDevMode = await devBtn.isVisible().catch(() => false) ||
+    await devBtn.waitFor({ timeout: 3_000 }).then(() => true).catch(() => false);
+
+  if (isActuallyDevMode) {
+    // ── DEV_MODE path ──────────────────────────────────────────────────────
+    await devBtn.click();
+    await page
+      .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+      .catch(() => {});
+    await page.waitForLoadState('domcontentloaded');
   } else {
-    await loginViaKeycloak(page, user);
+    // ── Keycloak/OIDC path — app already on /login ──────────────────────────
+    await loginViaKeycloak(page, user ?? TEST_USERS.superAdmin, true);
   }
 }
 
