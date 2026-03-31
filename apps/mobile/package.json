@@ -43,7 +43,7 @@
     "expo-sqlite": "~55.0.11",
     "expo-status-bar": "~2.2.0",
     "expo-task-manager": "~12.0.2",
-    "expo-video": "~2.0.0",
+    "expo-video": "~55.0.11",
     "react-native-reanimated": "^4.0.0",
     "graphql": "^16.9.0",
     "graphql-ws": "^5.16.0",

@@ -204,8 +204,8 @@ importers:
         specifier: ~12.0.2
         version: 12.0.6(expo@55.0.6)(react-native@0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1))
       expo-video:
-        specifier: ~2.0.0
-        version: 2.0.6(expo@55.0.6)(react-native@0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)
+        specifier: ~55.0.11
+        version: 55.0.11(expo@55.0.6)(react-native@0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)
       graphql:
         specifier: ^16.9.0
         version: 16.12.0
@@ -13511,8 +13511,8 @@ packages:
       expo: '*'
       react-native: '*'
 
-  expo-video@2.0.6:
-    resolution: {integrity: sha512-oDorKwjreHT596oY6ZfktbDa3VF+Sq7gVsTbnQ4QVqGYL13mIO0s+h4y9xMyG/cDWyFpiRc4UT8KkPdxL0wViQ==}
+  expo-video@55.0.11:
+    resolution: {integrity: sha512-XCXcPfzVYx6CgXlbRPH2sgacsNT82T6+euyyFlZsG+iuF5tUOWnMgToTuCmktAkwKDe70pNonoQI9HtZjSfNXw==}
     peerDependencies:
       expo: '*'
       react: '*'
@@ -34162,7 +34162,7 @@ snapshots:
       react-native: 0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1)
       unimodules-app-loader: 6.0.8
 
-  expo-video@2.0.6(expo@55.0.6)(react-native@0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1))(react@18.3.1):
+  expo-video@55.0.11(expo@55.0.6)(react-native@0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1))(react@18.3.1):
     dependencies:
       expo: 55.0.6(@babel/core@7.29.0)(@expo/dom-webview@55.0.3)(react-dom@19.2.4(react@18.3.1))(react-native@0.83.0(@babel/core@7.29.0)(@types/react@18.3.28)(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       react: 18.3.1
