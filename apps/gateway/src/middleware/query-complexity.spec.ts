@@ -40,6 +40,55 @@ describe('query-complexity', () => {
       expect(estimateComplexity({ name: { value: 's' } }, 0, 's')).toBe(1);
     });
 
+    it('does not apply list multiplier for camelCase compound names ending in s', () => {
+      // "updateUserPreferences" and "emailNotifications" end with 's' but are
+      // camelCase compound names, not list-returning fields.
+      // Regression test: "Query complexity 2222 exceeds 1000" for
+      // updateUserPreferences { id preferences { locale theme emailNotifications pushNotifications } }
+      const mutationNode: SelectableNode = {
+        name: { value: 'updateUserPreferences' },
+        selectionSet: {
+          selections: [
+            { name: { value: 'id' } },
+            {
+              name: { value: 'preferences' },
+              selectionSet: {
+                selections: [
+                  { name: { value: 'locale' } },
+                  { name: { value: 'theme' } },
+                  { name: { value: 'emailNotifications' } },
+                  { name: { value: 'pushNotifications' } },
+                ],
+              },
+            },
+          ],
+        },
+      };
+      // With the fix: camelCase names (updateUserPreferences, emailNotifications,
+      // pushNotifications) no longer get the 10x list multiplier.
+      // "preferences" is all-lowercase so it still gets the list heuristic,
+      // but the total cost stays well under the 1000 limit.
+      // Without fix: 2222. With fix: < 100.
+      const cost = estimateComplexity(mutationNode, 1, 'updateUserPreferences');
+      expect(cost).toBeLessThan(100);
+    });
+
+    it('still applies list multiplier for simple plural nouns (all-lowercase)', () => {
+      // "users", "courses" etc. are simple plural nouns and should still be 10x
+      const usersNode: SelectableNode = {
+        name: { value: 'users' },
+        selectionSet: {
+          selections: [
+            { name: { value: 'id' } },
+            { name: { value: 'email' } },
+          ],
+        },
+      };
+      // users (list): 1 + (id:1 + email:1) * 10 = 21
+      const cost = estimateComplexity(usersNode, 1, 'users');
+      expect(cost).toBe(21);
+    });
+
     it('calculates correct complexity for simple two-level tree', () => {
       const node: SelectableNode = {
         name: { value: 'query' },

@@ -22,11 +22,33 @@ function measureDepth(node: SelectableNode, depth = 0): number {
 }
 
 /**
+ * Returns true if a field name looks like a list-returning field.
+ * Uses two heuristics:
+ * 1. The name must end with 's' and have length > 1.
+ * 2. The name must be a simple lowercase word (no camelCase uppercase letters).
+ *    This excludes compound names like "emailNotifications", "updateUserPreferences",
+ *    "userPreferences" — they end with 's' but are not list fields.
+ *    Plain plural nouns like "users", "courses", "annotations" qualify.
+ */
+function isListField(name: string): boolean {
+  if (!name.endsWith('s') || name.length <= 1) return false;
+  // Reject camelCase names: if any character after position 0 is uppercase,
+  // this is a compound name, not a simple plural noun.
+  for (let i = 1; i < name.length; i++) {
+    if (name[i] === name[i].toUpperCase() && name[i] !== name[i].toLowerCase()) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Estimate query complexity.
- * Each field costs 1 unit. Fields whose name ends with 's' (heuristic for
- * list-returning fields) multiply their subtree cost by 10 to reflect worst-case
- * cardinality. The `fieldName` parameter carries the name of the *current* node
- * being costed so the parent can apply the list multiplier correctly.
+ * Each field costs 1 unit. Fields whose name is a simple plural noun ending
+ * with 's' (e.g. "users", "courses") multiply their subtree cost by 10 to
+ * reflect worst-case cardinality. CamelCase compound names (e.g.
+ * "emailNotifications", "updateUserPreferences") are excluded from this
+ * heuristic even when they end with 's'.
  */
 export function estimateComplexity(
   node: SelectableNode,
@@ -34,7 +56,7 @@ export function estimateComplexity(
   fieldName = ''
 ): number {
   if (depth > 20) return 1;
-  const isList = fieldName.endsWith('s') && fieldName.length > 1;
+  const isList = isListField(fieldName);
   if (!node.selectionSet) return isList ? 10 : 1;
 
   const childCost = node.selectionSet.selections.reduce((total, child) => {

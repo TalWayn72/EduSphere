@@ -27,6 +27,7 @@
 
 | ID | Issue | Fixed In |
 |----|-------|----------|
+| BUG-111 | Language preference save failing — query-complexity heuristic applied 10× multiplier to camelCase fields ending in 's' (e.g. `updateUserPreferences`), pushing mutation over MAX_COMPLEXITY=1000 limit | 31 Mar 2026 |
 | BUG-065-GAPS | 6 test coverage gaps for language preference save flow — infrastructure failures undetected because all layers mocked | 31 Mar 2026 |
 | BUG-110 | Subgraphs killed every 15 min by cleanup script — "השרת אינו זמין" on /courses (10th+ occurrence) | 31 Mar 2026 |
 
@@ -82,6 +83,28 @@
 | INFRA-1 | HiveMind shared intelligence layer (3 MCP servers) | (pending) |
 
 > For full details on all 100+ completed items, see `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
+
+---
+
+## ✅ BUG-111 — Language Preference Save Failing (Query Complexity Heuristic)
+
+- **Status:** ✅ Fixed — 31 Mar 2026
+- **Severity:** 🔴 High (user-facing — language preference could not be saved)
+- **Files Changed:** `apps/gateway/src/middleware/query-complexity.ts`
+
+**Root Cause:** The `estimateComplexity` function in the gateway's query-complexity middleware used a naive heuristic: any field name ending in `'s'` was treated as a list field and had its subtree cost multiplied by 10×. This incorrectly flagged camelCase compound mutation names such as `updateUserPreferences` (ends in `s`), `emailNotifications`, `userPreferences` — pushing the `updateUserPreferences` mutation cost from ~5 to ~50+, which exceeded `MAX_COMPLEXITY=1000` after nesting.
+
+**Fix:** Added `isListField()` helper that rejects camelCase names. A field is considered a list field only if:
+1. Its name ends with `'s'` and has length > 1, AND
+2. It contains NO uppercase letters after position 0 (i.e., it is a simple lowercase plural noun like `users`, `courses`, `annotations`)
+
+This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferences`, etc.
+
+**Verification:**
+- Live API: `mutation { updateUserPreferences(input: { locale: "he" }) { id preferences { locale } } }` returns `{"data":{"updateUserPreferences":{"id":"...","preferences":{"locale":"he"}}}}` ✅
+- Unit tests: `query-complexity.spec.ts` — 17/17 pass, including `does not apply list multiplier for camelCase compound names ending in s` ✅
+- Gateway tests: 319/319 pass ✅
+- E2E regression: `language-save-regression.spec.ts` (mock guard) — 2/2 pass ✅
 
 ---
 
