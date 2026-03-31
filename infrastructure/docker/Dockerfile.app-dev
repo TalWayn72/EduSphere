@@ -1,0 +1,54 @@
+# ═══════════════════════════════════════════════════════════════
+# EduSphere — Dev App Image (subgraphs + gateway)
+# Builds packages + subgraph apps inside container.
+# Uses --continue so broken packages (redis-pubsub) don't block
+# the build of packages actually needed by the subgraphs.
+# restart: unless-stopped handles auto-recovery.
+#
+# After source changes:
+#   docker-compose -f docker-compose.dev.yml build
+#   docker-compose -f docker-compose.dev.yml up -d
+# nc (netcat) is in node:20-alpine busybox.
+# ═══════════════════════════════════════════════════════════════
+# syntax=docker/dockerfile:1
+ARG NODE_VERSION=20.19.0
+ARG PNPM_VERSION=10.6.5
+
+# ─── Stage 1: base ───────────────────────────────────────────────
+FROM node:${NODE_VERSION}-alpine3.21 AS base
+ARG PNPM_VERSION
+RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit && \
+    npm cache clean --force
+WORKDIR /app
+
+# ─── Stage 2: deps ───────────────────────────────────────────────
+FROM base AS deps
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json \
+     tsconfig.json tsconfig.base.json ./
+COPY packages/ packages/
+COPY apps/ apps/
+# --shamefully-hoist mirrors npm/yarn behavior: all deps hoisted to
+# root node_modules so undeclared-but-used packages are found.
+# This resolves the numerous "phantom deps" in the workspace packages.
+RUN pnpm install --frozen-lockfile --shamefully-hoist
+
+# ─── Stage 3: builder ────────────────────────────────────────────
+# Step 1: Build packages with --continue (tolerates redis-pubsub
+#         and auth failures — they have undeclared peer deps that
+#         are provided by the subgraph apps at runtime).
+# Step 2: Build the subgraph apps (they depend only on correctly
+#         built packages).
+FROM deps AS builder
+RUN pnpm turbo build --filter='./packages/*' --continue
+RUN pnpm turbo build \
+    --filter='@edusphere/subgraph-core' \
+    --filter='@edusphere/subgraph-content' \
+    --filter='@edusphere/subgraph-annotation' \
+    --filter='@edusphere/subgraph-collaboration' \
+    --filter='@edusphere/subgraph-agent' \
+    --filter='@edusphere/subgraph-knowledge'
+
+# ─── Stage 4: development ────────────────────────────────────────
+FROM builder AS development
+EXPOSE 4000 4001 4002 4003 4004 4005 4006
+CMD ["node", "dist/main.js"]

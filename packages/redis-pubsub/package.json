@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@edusphere/tsconfig": "workspace:*",
+    "@nestjs/common": "^11.1.14",
     "@types/node": "^22.10.5",
     "@vitest/coverage-v8": "^4.0.18",
     "typescript": "^6.0.3",

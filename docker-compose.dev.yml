@@ -192,37 +192,41 @@ services:
 
   # ═══════════════════════════════════════════════════════════════
   # Core Subgraph (Port 4001)
+  # Built from Dockerfile.app-dev — full workspace with compiled dist.
+  # restart: unless-stopped — auto-recovers from crashes and OOM kills.
+  # To rebuild after source changes:
+  #   docker-compose -f docker-compose.dev.yml build && \
+  #   docker-compose -f docker-compose.dev.yml up -d
   # ═══════════════════════════════════════════════════════════════
   subgraph-core:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-subgraph-core
     working_dir: /app/apps/subgraph-core
-    command: pnpm dev
+    command: node dist/main.js
     environment:
       - NODE_ENV=development
       - PORT=4001
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_CLIENT_ID=edusphere-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-core
-      - NODE_OPTIONS=--max-old-space-size=384
+      - NATS_URL=nats://nats:4222
+      - NODE_OPTIONS=--max-old-space-size=512
     ports:
       - "4001:4001"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/subgraph-core/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4001 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
-    mem_limit: 512m
+      retries: 5
+      start_period: 30s
+    mem_limit: 768m
     mem_reservation: 256m
     depends_on:
       postgres:
@@ -230,8 +234,6 @@ services:
       nats:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -242,33 +244,32 @@ services:
   subgraph-content:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-subgraph-content
     working_dir: /app/apps/subgraph-content
-    command: pnpm dev
+    command: node dist/main.js
     environment:
       - NODE_ENV=development
       - PORT=4002
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_CLIENT_ID=edusphere-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-content
-      - NODE_OPTIONS=--max-old-space-size=384
+      - NATS_URL=nats://nats:4222
+      - NODE_OPTIONS=--max-old-space-size=512
     ports:
       - "4002:4002"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/subgraph-content/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4002 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
-    mem_limit: 512m
+      retries: 5
+      start_period: 30s
+    mem_limit: 768m
     mem_reservation: 256m
     depends_on:
       postgres:
@@ -276,8 +277,6 @@ services:
       nats:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -288,39 +287,37 @@ services:
   subgraph-annotation:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-subgraph-annotation
     working_dir: /app/apps/subgraph-annotation
-    command: pnpm dev
+    command: node dist/main.js
     environment:
       - NODE_ENV=development
       - PORT=4003
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_CLIENT_ID=edusphere-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-annotation
-      - NODE_OPTIONS=--max-old-space-size=384
+      - NATS_URL=nats://nats:4222
+      - NODE_OPTIONS=--max-old-space-size=512
     ports:
       - "4003:4003"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/subgraph-annotation/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4003 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
-    mem_limit: 512m
+      retries: 5
+      start_period: 30s
+    mem_limit: 768m
     mem_reservation: 256m
     depends_on:
       postgres:
         condition: service_healthy
       nats:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -331,39 +328,37 @@ services:
   subgraph-collaboration:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-subgraph-collaboration
     working_dir: /app/apps/subgraph-collaboration
-    command: pnpm dev
+    command: node dist/main.js
     environment:
       - NODE_ENV=development
       - PORT=4004
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_CLIENT_ID=edusphere-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-collaboration
-      - NODE_OPTIONS=--max-old-space-size=384
+      - NATS_URL=nats://nats:4222
+      - NODE_OPTIONS=--max-old-space-size=512
     ports:
       - "4004:4004"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/subgraph-collaboration/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4004 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
-    mem_limit: 512m
+      retries: 5
+      start_period: 30s
+    mem_limit: 768m
     mem_reservation: 256m
     depends_on:
       postgres:
         condition: service_healthy
       nats:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -374,82 +369,78 @@ services:
   subgraph-agent:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-subgraph-agent
     working_dir: /app/apps/subgraph-agent
-    command: pnpm dev
+    command: node dist/main.js
     environment:
       - NODE_ENV=development
       - PORT=4005
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_CLIENT_ID=edusphere-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-agent
+      - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=768
     ports:
       - "4005:4005"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/subgraph-agent/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4005 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 5
+      start_period: 30s
     mem_limit: 1g
     mem_reservation: 512m
     depends_on:
       postgres:
         condition: service_healthy
       nats:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
 
   # ═══════════════════════════════════════════════════════════════
-  # Knowledge Subgraph (Port 4006) - pgvector
+  # Knowledge Subgraph (Port 4006) - pgvector + Apache AGE
   # ═══════════════════════════════════════════════════════════════
   subgraph-knowledge:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-subgraph-knowledge
     working_dir: /app/apps/subgraph-knowledge
-    command: pnpm dev
+    command: node dist/main.js
     environment:
       - NODE_ENV=development
       - PORT=4006
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_CLIENT_ID=edusphere-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-knowledge
+      - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=768
     ports:
       - "4006:4006"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/subgraph-knowledge/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4006 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 5
+      start_period: 30s
     mem_limit: 1g
     mem_reservation: 512m
     depends_on:
       postgres:
         condition: service_healthy
       nats:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -460,11 +451,11 @@ services:
   gateway:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/docker/Dockerfile.app-dev
       target: development
     container_name: edusphere-gateway
     working_dir: /app/apps/gateway
-    command: pnpm dev
+    command: npx tsx src/index.ts
     environment:
       - NODE_ENV=development
       - PORT=4000
@@ -474,23 +465,22 @@ services:
       - SUBGRAPH_COLLABORATION_URL=http://subgraph-collaboration:4004/graphql
       - SUBGRAPH_AGENT_URL=http://subgraph-agent:4005/graphql
       - SUBGRAPH_KNOWLEDGE_URL=http://subgraph-knowledge:4006/graphql
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=edusphere
+      - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/edusphere/protocol/openid-connect/certs
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=gateway
-      - NODE_OPTIONS=--max-old-space-size=384
+      - NODE_OPTIONS=--max-old-space-size=512
     ports:
       - "4000:4000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/gateway/node_modules
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 4000 || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
-    mem_limit: 512m
+      retries: 5
+      start_period: 30s
+    mem_limit: 768m
     mem_reservation: 256m
     depends_on:
       subgraph-core:
@@ -504,8 +494,6 @@ services:
       subgraph-agent:
         condition: service_healthy
       subgraph-knowledge:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - edusphere
