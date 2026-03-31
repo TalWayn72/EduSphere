@@ -14,7 +14,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.0.0",
     "@langchain/community": "^1.1.16",
-    "@langchain/openai": "^1.2.8",
+    "@langchain/openai": "^1.4.1",
     "ai": "^4.0.38",
     "ioredis": "^5.4.2",
     "langchain": "^1.2.24",
