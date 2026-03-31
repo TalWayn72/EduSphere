@@ -50,7 +50,7 @@
     "nats": "^2.29.3",
     "nestjs-pino": "^4.3.0",
     "ollama-ai-provider": "^1.2.0",
-    "pdfkit": "^0.17.2",
+    "pdfkit": "^0.18.0",
     "pg": "^8.14.0",
     "pino": "^10.3.1",
     "pino-http": "^10.5.0",
