@@ -19,9 +19,6 @@ interface SearchUserResult {
   userId: string;
   displayName: string;
   bio: string | null;
-  followersCount: number;
-  followingCount: number;
-  isFollowedByMe: boolean;
 }
 
 interface SearchUsersData {
@@ -105,14 +102,11 @@ export function UserSearchPage() {
                           {user.bio}
                         </p>
                       )}
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {user.followersCount} {t('followers')}
-                      </p>
                     </div>
                     <FollowButton
                       userId={user.userId}
-                      initialIsFollowing={user.isFollowedByMe}
-                      followersCount={user.followersCount}
+                      initialIsFollowing={false}
+                      followersCount={0}
                     />
                   </CardContent>
                 </Card>

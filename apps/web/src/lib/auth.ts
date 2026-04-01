@@ -1,10 +1,7 @@
 import Keycloak from 'keycloak-js';
 
-// SessionStorage key used to persist explicit dev-mode login across page reloads.
-// initKeycloak() sets devAuthenticated=false on every cold start. Only after the
-// user explicitly calls login() is the flag written, keeping the user authenticated
-// across page reloads within the same browser session (cleared on tab/window close).
-// This prevents incognito / fresh sessions from bypassing the login screen entirely.
+// SessionStorage key for explicit dev-mode login persistence across page reloads.
+// Only set after user calls login(); cleared on tab/window close.
 export const DEV_LOGGED_IN_KEY = 'edusphere_dev_logged_in';
 
 /** @deprecated Use DEV_LOGGED_IN_KEY. Kept for backward-compat cleanup in logout(). */
@@ -22,12 +19,7 @@ const keycloakConfig = {
 
 export const keycloak = DEV_MODE ? null : new Keycloak(keycloakConfig);
 
-// Guard: Keycloak.init() must only be called once per instance.
-// React StrictMode runs effects twice in development. Using a shared
-// promise ensures both invocations wait for the SAME init() call to
-// complete — the second caller returns the already-in-flight promise
-// instead of returning false immediately (which would cause the router
-// to render before authentication is established).
+// Guard: init() called once. StrictMode double-invocations share this promise.
 let initPromise: Promise<boolean> | null = null;
 
 export interface AuthUser {
@@ -67,24 +59,14 @@ let _tokenRefreshInterval: ReturnType<typeof setInterval> | null = null;
 const KEYCLOAK_INIT_TIMEOUT_MS = 10_000;
 
 export function initKeycloak(): Promise<boolean> {
-  // Development mode - skip Keycloak
   if (DEV_MODE) {
     // eslint-disable-next-line no-console -- DEV-only auth mode indicator
     if (import.meta.env.DEV) console.debug('[Auth] DEV MODE: Running without Keycloak authentication');
-    // Require an explicit login() call — do NOT auto-authenticate on cold
-    // start. sessionStorage is empty in incognito / fresh sessions, so using
-    // a "logged-in" flag (opt-in) instead of a "logged-out" flag (opt-out)
-    // ensures a login screen is always shown until the user actively signs in.
-    const wasLoggedIn =
-      window.sessionStorage.getItem(DEV_LOGGED_IN_KEY) === 'true';
-    devAuthenticated = wasLoggedIn;
+    devAuthenticated = window.sessionStorage.getItem(DEV_LOGGED_IN_KEY) === 'true';
     return Promise.resolve(devAuthenticated);
   }
 
-  // Return the in-flight promise if init is already running.
-  // React StrictMode calls effects twice in development; the second caller
-  // must wait for the same init() rather than short-circuiting with `false`
-  // (which would cause the router to render before authentication completes).
+  // Return the in-flight promise (StrictMode double-call guard).
   if (initPromise) {
     return initPromise;
   }
@@ -92,23 +74,10 @@ export function initKeycloak(): Promise<boolean> {
   const kcInitPromise = keycloak!
     .init({
       onLoad: 'check-sso',
-      // BUG-01 fix: silentCheckSsoRedirectUri was removed because it causes
-      // keycloak-js to open a hidden iframe back to the Keycloak server to
-      // perform the silent SSO check. Keycloak's default CSP sets
-      // `frame-ancestors 'self'`, which blocks that iframe from loading on a
-      // fresh browser session. The iframe never fires its postMessage so
-      // Keycloak.init() never resolves, leaving the app stuck on the
-      // "Initializing authentication..." spinner indefinitely.
-      //
-      // Without silentCheckSsoRedirectUri, keycloak-js performs the SSO
-      // check via a redirect instead of an iframe. The redirect resolves
-      // immediately when no session exists (returning authenticated=false)
-      // and restores an existing session normally when one is present.
-      //
-      // checkLoginIframe: false additionally disables the periodic
-      // session-validity polling iframe that keycloak-js would otherwise
-      // start after a successful login — eliminating the same class of CSP
-      // issue for the ongoing session lifecycle.
+      // BUG-01: silentCheckSsoRedirectUri removed — CSP blocks the hidden
+      // iframe on fresh sessions, causing init() to hang indefinitely.
+      // checkLoginIframe: false disables the periodic session-validity
+      // polling iframe (same CSP class of issue).
       checkLoginIframe: false,
       pkceMethod: 'S256',
     })
@@ -128,16 +97,36 @@ export function initKeycloak(): Promise<boolean> {
   // "Initializing authentication..." spinner forever.  If the Keycloak token
   // exchange hangs (e.g. server unreachable after login redirect), we fall
   // back to unauthenticated state after KEYCLOAK_INIT_TIMEOUT_MS.
+  //
+  // Late-auth recovery: if the timeout fires first but Keycloak eventually
+  // authenticates, we dispatch a 'keycloak-late-auth' event so App.tsx can
+  // seamlessly transition the UI to the authenticated state.
+  let didTimeout = false;
   const timeoutPromise = new Promise<boolean>((resolve) => {
     setTimeout(() => {
-      console.error(
-        `[Auth] Keycloak init timed out after ${KEYCLOAK_INIT_TIMEOUT_MS}ms — continuing unauthenticated.`
+      didTimeout = true;
+      console.warn(
+        `[Auth] Keycloak init timed out after ${KEYCLOAK_INIT_TIMEOUT_MS}ms — continuing unauthenticated. Will recover if auth completes later.`
       );
       resolve(false);
     }, KEYCLOAK_INIT_TIMEOUT_MS);
   });
 
   initPromise = Promise.race([kcInitPromise, timeoutPromise]);
+
+  // Late-auth recovery: if the timeout won but Keycloak eventually succeeds,
+  // set up token refresh and notify the app so it can re-render as authenticated.
+  kcInitPromise.then((authenticated) => {
+    if (didTimeout && authenticated) {
+      // eslint-disable-next-line no-console -- late-auth recovery logging
+      console.info('[Auth] Keycloak authenticated after timeout — recovering session.');
+      setupTokenRefresh();
+      window.dispatchEvent(new Event('keycloak-late-auth'));
+    }
+  }).catch(() => {
+    // kcInitPromise rejection is already handled above (line 121-125).
+    // Nothing to do here — avoid unhandled rejection.
+  });
 
   return initPromise;
 }

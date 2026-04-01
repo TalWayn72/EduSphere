@@ -7,6 +7,7 @@ extend type User @key(fields: "id") {
 type SocialFeedItem {
   id: ID!
   actorId: ID!
+  actorDisplayName: String!
   verb: String!
   objectType: String!
   objectId: ID!
@@ -19,6 +20,7 @@ type SocialRecommendation {
   contentTitle: String!
   followersCount: Int!
   isMutualFollower: Boolean!
+  lastActivity: String!
 }
 
 extend type Query {

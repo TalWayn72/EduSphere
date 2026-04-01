@@ -38,9 +38,20 @@ export class SocialFeedService {
 
     const ctx = this.followService.tenantCtx(tenantId, userId);
     return withTenantContext(this.followService.db, ctx, async (tx) => {
-      return tx
-        .select()
+      const rows = await tx
+        .select({
+          id: schema.socialFeedItems.id,
+          tenantId: schema.socialFeedItems.tenantId,
+          actorId: schema.socialFeedItems.actorId,
+          actorDisplayName: sql<string>`COALESCE(${schema.users.display_name}, 'Unknown User')`.as('actor_display_name'),
+          verb: schema.socialFeedItems.verb,
+          objectType: schema.socialFeedItems.objectType,
+          objectId: schema.socialFeedItems.objectId,
+          objectTitle: schema.socialFeedItems.objectTitle,
+          createdAt: schema.socialFeedItems.createdAt,
+        })
         .from(schema.socialFeedItems)
+        .leftJoin(schema.users, eq(schema.socialFeedItems.actorId, schema.users.id))
         .where(
           and(
             eq(schema.socialFeedItems.tenantId, tenantId),
@@ -49,6 +60,7 @@ export class SocialFeedService {
         )
         .orderBy(desc(schema.socialFeedItems.createdAt))
         .limit(limit);
+      return rows;
     });
   }
 

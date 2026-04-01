@@ -63,10 +63,31 @@ function cleanKeycloakUrlParams(): void {
 
 function App() {
   const [keycloakReady, setKeycloakReady] = useState(false);
+  // Counter incremented when Keycloak authenticates after the init timeout.
+  // Triggers a re-render so the app picks up the now-authenticated state.
+  const [, setLateAuthTick] = useState(0);
 
   // Register the PWA service worker once on mount (production only)
   useEffect(() => {
     registerServiceWorker();
+  }, []);
+
+  // Late-auth recovery: if Keycloak init timed out but authentication
+  // eventually succeeded, the auth module dispatches 'keycloak-late-auth'.
+  // We listen for it here and trigger a re-render so that isAuthenticated()
+  // returns true and the router navigates to the authenticated route tree.
+  useEffect(() => {
+    function handleLateAuth() {
+      setLateAuthTick((t) => t + 1);
+      // If this was originally a Keycloak redirect, navigate to dashboard
+      // now that auth has recovered.
+      if (_wasKeycloakRedirect && isAuthenticated()) {
+        cleanKeycloakUrlParams();
+        router.navigate('/dashboard', { replace: true });
+      }
+    }
+    window.addEventListener('keycloak-late-auth', handleLateAuth);
+    return () => window.removeEventListener('keycloak-late-auth', handleLateAuth);
   }, []);
 
   useEffect(() => {

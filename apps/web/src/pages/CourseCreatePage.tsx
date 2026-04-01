@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AiCourseCreatorModal } from '@/components/AiCourseCreatorModal';
 import { CourseWizardStep1 } from './CourseWizardStep1';
 import { PageShell } from '@/components/PageShell';
@@ -93,35 +94,38 @@ export function CourseCreatePage() {
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}
           </Form>
-          <Suspense fallback={LazyFallback}>
-            {step === 1 && (
-              <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />
-            )}
-            {step === 2 && (
-              <CourseWizardMediaStep
-                courseId={DRAFT_COURSE_ID}
-                mediaList={wizardData.mediaList}
-                onChange={updateWizard}
-              />
-            )}
-            {step === 3 && (
-              <CourseWizardStep3
-                data={currentData}
-                onPublish={handlePublish}
-                isSubmitting={isSubmitting}
-              />
-            )}
-          </Suspense>
+          <ErrorBoundary key={step} pageName={`CourseWizard-step${step}`}>
+            <Suspense fallback={LazyFallback}>
+              {step === 1 && (
+                <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />
+              )}
+              {step === 2 && (
+                <CourseWizardMediaStep
+                  courseId={DRAFT_COURSE_ID}
+                  mediaList={wizardData.mediaList}
+                  onChange={updateWizard}
+                />
+              )}
+              {step === 3 && (
+                <CourseWizardStep3
+                  data={currentData}
+                  onPublish={handlePublish}
+                  isSubmitting={isSubmitting}
+                />
+              )}
+            </Suspense>
+          </ErrorBoundary>
         </Card>
 
         {/* Navigation */}
         {step < STEPS.length - 1 && (
           <div className="flex justify-between">
-            <Button variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
+            <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('wizard.back')}
             </Button>
             <Button
+              type="button"
               onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
               disabled={step === 0 && !canAdvanceStep1}
             >
@@ -132,11 +136,12 @@ export function CourseCreatePage() {
         )}
         {step === STEPS.length - 1 && (
           <div className="flex justify-between items-center gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => setStep(lastContentStep)}>
+            <Button type="button" variant="outline" onClick={() => setStep(lastContentStep)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('wizard.backToMedia')}
             </Button>
             <Button
+              type="button"
               variant="outline"
               onClick={handleExportScorm}
               disabled={isExporting}

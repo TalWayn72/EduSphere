@@ -21,6 +21,7 @@ export interface SocialFeedItemDto {
   id: string;
   tenantId: string;
   actorId: string;
+  actorDisplayName: string;
   verb: string;
   objectType: string;
   objectId: string;

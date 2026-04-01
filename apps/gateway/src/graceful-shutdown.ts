@@ -12,10 +12,12 @@
  */
 
 import type { Server } from 'http';
+import type { WebSocketServer } from 'ws';
 import type { Logger } from 'pino';
 
 export interface ShutdownDeps {
   server: Server;
+  wsServer?: WebSocketServer;
   stopRateLimitCleanup: () => void;
   shutdownNatsPubSub: () => Promise<void>;
   logger: Logger;
@@ -81,7 +83,7 @@ export async function performShutdown(
   signal: string,
   deps: ShutdownDeps
 ): Promise<void> {
-  const { server, stopRateLimitCleanup, shutdownNatsPubSub, logger } = deps;
+  const { server, wsServer, stopRateLimitCleanup, shutdownNatsPubSub, logger } = deps;
 
   logger.info({ signal }, '[shutdown] received signal — starting graceful shutdown');
 
@@ -98,14 +100,24 @@ export async function performShutdown(
     });
   });
 
-  // 2. Wait for active WebSocket connections to drain
+  // 2. Close WebSocket server (stops accepting new WS connections)
+  if (wsServer) {
+    await new Promise<void>((resolve) => {
+      wsServer.close(() => {
+        logger.info('[shutdown] WebSocket server closed');
+        resolve();
+      });
+    });
+  }
+
+  // 3. Wait for active connections to drain
   await waitForConnectionDrain(server, DRAIN_TIMEOUT_MS, logger);
 
-  // 3. Stop rate-limit cleanup timer
+  // 4. Stop rate-limit cleanup timer
   stopRateLimitCleanup();
   logger.info('[shutdown] rate-limit cleanup stopped');
 
-  // 4. Drain NATS pub/sub connection
+  // 5. Drain NATS pub/sub connection
   await shutdownNatsPubSub();
   logger.info('[shutdown] NATS pub/sub drained');
 

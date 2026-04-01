@@ -141,6 +141,10 @@ export const urqlClient = createClient({
         PageInfo: () => null,
         UserPreferences: () => null,
         PresignedUploadUrl: () => null,
+        TenantBranding: () => null,
+        TenantLanguageSettings: () => null,
+        PublicTenantBranding: () => null,
+        BrandedLoginData: () => null,
         CourseProgress: (data) =>
           (data as { courseId?: string }).courseId ?? null,
       },

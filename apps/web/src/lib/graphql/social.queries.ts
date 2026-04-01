@@ -45,9 +45,6 @@ export const SEARCH_USERS_QUERY = gql`
       userId
       displayName
       bio
-      followersCount
-      followingCount
-      isFollowedByMe
     }
   }
 `;

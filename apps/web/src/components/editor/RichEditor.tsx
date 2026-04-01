@@ -15,7 +15,12 @@ import { EditorToolbar } from './EditorToolbar';
 import './editor.css';
 import 'katex/dist/katex.min.css';
 
-const lowlight = createLowlight();
+let lowlight: ReturnType<typeof createLowlight> | undefined;
+try {
+  lowlight = createLowlight();
+} catch {
+  // Graceful degradation - code blocks won't have syntax highlighting
+}
 
 export interface RichEditorProps {
   content: string;
@@ -53,7 +58,7 @@ export function RichEditor({
       TableHeader,
       TaskList,
       TaskItem.configure({ nested: true }),
-      CodeBlockLowlight.configure({ lowlight }),
+      ...(lowlight ? [CodeBlockLowlight.configure({ lowlight })] : []),
       Mathematics,
     ],
     content: parsedContent,

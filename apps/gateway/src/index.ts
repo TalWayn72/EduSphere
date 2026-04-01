@@ -2,10 +2,12 @@
 import { initTelemetry } from '@edusphere/telemetry';
 initTelemetry('gateway');
 
-import { createGatewayRuntime } from '@graphql-hive/gateway';
+import { createGatewayRuntime, getGraphQLWSOptions } from '@graphql-hive/gateway';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { resolve, dirname } from 'path';
+import { WebSocketServer } from 'ws';
+import { useServer as useWSServer } from 'graphql-ws/use/ws';
 import {
   checkRateLimit,
   stopRateLimitCleanup,
@@ -83,8 +85,28 @@ const server = createServer(async (req, res) => {
   gateway.handle(req as unknown as Request, res as unknown as Response);
 });
 
+// ── WebSocket server for GraphQL subscriptions (graphql-ws protocol) ────────
+
+const wsServer = new WebSocketServer({ noServer: true, path: '/graphql' });
+const wsOptions = getGraphQLWSOptions(gateway, () => ({}));
+useWSServer(wsOptions, wsServer);
+
+server.on('upgrade', (req, socket, head) => {
+  const { pathname } = new URL(req.url ?? '/', `http://localhost:${port}`);
+  if (pathname === '/graphql') {
+    wsServer.handleUpgrade(req, socket, head, (ws) => {
+      wsServer.emit('connection', ws, req);
+    });
+  } else {
+    socket.destroy();
+  }
+});
+
+logger.info('WebSocket upgrade handler registered for /graphql');
+
 server.listen(port, () => {
   logger.info(`Gateway running on http://localhost:${port}/graphql`);
+  logger.info(`WebSocket subscriptions available at ws://localhost:${port}/graphql`);
   logger.info('GraphQL Playground available');
   logger.info(
     {
@@ -102,6 +124,7 @@ server.listen(port, () => {
 
 registerShutdownHandlers({
   server,
+  wsServer,
   stopRateLimitCleanup,
   shutdownNatsPubSub,
   logger,
