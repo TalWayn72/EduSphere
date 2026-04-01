@@ -187,9 +187,15 @@ async function seed() {
 
     console.log('✅ Created 2 modules');
 
-    // Initialize Apache AGE graph ontology
+    // Initialize Apache AGE graph ontology (best-effort — AGE may not be available in CI)
     console.log('🔄 Initializing Apache AGE graph ontology...');
-    await initializeGraphOntology(db);
+    try {
+      await initializeGraphOntology(db);
+      console.log('✅ Apache AGE graph ontology initialized');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.log(`⚠️  Apache AGE not available — skipping graph ontology: ${msg}`);
+    }
 
     // Seed example course: נהר שלום — הרש"ש
     console.log('📚 Seeding example Kabbalah course: נהר שלום...');
